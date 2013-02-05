@@ -68,135 +68,130 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <iostream>
 #include <fstream>
 #include "../Include/ApplicationProcess.h"
 
 /****************************************************************************************************
-* FUNCTION DEFINITIONS
-****************************************************************************************************/
+ * FUNCTION DEFINITIONS
+ ****************************************************************************************************/
 
 /****************************************************************************************************
-* Constructor
-****************************************************************************************************/
+ * Constructor
+ ****************************************************************************************************/
 CApplicationProcess::CApplicationProcess(void)
 {
 	//Add constructor code here
+	XDDfilename = NULL;
+	ProjectPath = NULL;
 }
 
 /****************************************************************************************************
-* Destructor
-****************************************************************************************************/
+ * Destructor
+ ****************************************************************************************************/
 CApplicationProcess::~CApplicationProcess(void)
 {
 	//Add destructor code here
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::ParseXDDfile
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CApplicationProcess::ParseXDDfile(char* pbFilename)
+ * Function Name: CApplicationProcess::checkFileStatus
+ * Description  : This Function checks the status of the file.
+ * Return value : INT32
+ ****************************************************************************************************/
+INT32 CApplicationProcess::checkFileStatus(char* pbFilename)
 {
-	//Nothing to do
-}
-/****************************************************************************************************
-* Function Name: CApplicationProcess::checkFileStatus
-* Description:
-* Return value: int
-****************************************************************************************************/
-INT32 CApplicationProcess::checkFileStatus(char* pbFilename) 
-{
-	ifstream file (pbFilename, ios::in|ios::binary|ios::ate);
-	
-	if (file.is_open())
+	ifstream file(pbFilename, ios::in | ios::binary | ios::ate);
+
+	if (TRUE == (file.is_open()))
 	{
 		return TRUE;
 	}
 	else
 	{
 		return FALSE;
-	} 
+	}
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::addComplexDataType
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::addComplexDataType
+ * Description  : This Function adds complex data type colletion
+ * Return value : void
+ ****************************************************************************************************/
 void CApplicationProcess::addComplexDataType(CComplexDataType objComplexData)
 {
 	INT32 iItemPosition = CDTCollection.Add();
-	
-	objComplexData.Index 		 =	iItemPosition;
-	CDTCollection[iItemPosition] = 	objComplexData;		
+
+	objComplexData.Index = iItemPosition;
+	CDTCollection[iItemPosition] = objComplexData;
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::DeleteComplexDataTypeCollection()
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::DeleteComplexDataTypeCollection()
+ * Description  : This Function deletes complex data type collection 
+ * Return value : void
+ ****************************************************************************************************/
 void CApplicationProcess::DeleteComplexDataTypeCollection()
 {
-	CDTCollection.Clear();	
+	CDTCollection.Clear();
 }
 /****************************************************************************************************
-* Function Name: CApplicationProcess::addParameter
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CApplicationProcess::addParameter(Parameter  stParam)
+ * Function Name: CApplicationProcess::addParameter
+ * Description  : This function adds parameter to collection list
+ * Return value : void
+ ****************************************************************************************************/
+void CApplicationProcess::addParameter(Parameter stParam)
 {
 	INT32 iItemPosition = ParameterCollection.Add();
-	
+
 	stParam.ParaIndex = iItemPosition;
-	ParameterCollection[iItemPosition] = stParam;			
+	ParameterCollection[iItemPosition] = stParam;
 }
 /****************************************************************************************************
-* Function Name: CApplicationProcess::Deleteparametercollection
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::Deleteparametercollection
+ * Description  : This function clears the parameter collection list
+ * Return value : void
+ ****************************************************************************************************/
 void CApplicationProcess::DeleteParameterCollection()
 {
 	ParameterCollection.Clear();
 }
 /****************************************************************************************************
-* Function Name: CApplicationProcess::get_ParameterIndexby_UniqueIDRef
-* Description:
-* Return value: int
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::get_ParameterIndexby_UniqueIDRef
+ * Description  : This function returns parameter index with reference to IDs
+ * Return value : INT32
+ ****************************************************************************************************/
 INT32 CApplicationProcess::get_ParameterIndexby_UniqueIDRef(char *pbUniqueIdRef)
 {
-	for(INT32 iLoopCount = 0; iLoopCount<ParameterCollection.Count(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < ParameterCollection.Count();
+			iLoopCount++)
 	{
 		Parameter stParams;
 		stParams = ParameterCollection[iLoopCount];
-		if(strcmp(pbUniqueIdRef, stParams.name_id_dt_attr.getUniqueID()) == 0)
+		if (0 == strcmp(pbUniqueIdRef, stParams.name_id_dt_attr.getUniqueID()))
 		{
 			return iLoopCount;
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::get_Parameterby_UniqueIDRef
-* Description:
-* Return value: Parameter*
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::get_Parameterby_UniqueIDRef
+ * Description  : This function returns parameter with reference to IDs
+ * Return value: Parameter*
+ ****************************************************************************************************/
 Parameter* CApplicationProcess::get_Parameterby_UniqueIDRef(char *pbUniqueIdRef)
 {
-	for(INT32 iLoopCount = 0; iLoopCount < ParameterCollection.Count(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < ParameterCollection.Count();
+			iLoopCount++)
 	{
 		Parameter stParams;
-		
+
 		stParams = ParameterCollection[iLoopCount];
-		if(strcmp(pbUniqueIdRef, stParams.name_id_dt_attr.getUniqueID()) == 0)
+		if (0 == strcmp(pbUniqueIdRef, stParams.name_id_dt_attr.getUniqueID()))
 		{
 			return &ParameterCollection[iLoopCount];
 		}
@@ -205,38 +200,38 @@ Parameter* CApplicationProcess::get_Parameterby_UniqueIDRef(char *pbUniqueIdRef)
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::get_CDT_UniqueIDRef
-* Description:
-* Return value: int
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::get_CDT_UniqueIDRef
+ * Description  : This function returns unique reference ids from the collection list
+ * Return value : INT32
+ ****************************************************************************************************/
 INT32 CApplicationProcess::get_CDT_UniqueIDRef(char *pbUniqueIdRef)
 {
-	for(INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
 	{
 		CComplexDataType objCDT;
-		
+
 		objCDT = CDTCollection[iLoopCount];
-		if(strcmp(pbUniqueIdRef, objCDT.name_id_attr->getUniqueID()) == 0)
+		if (0 == strcmp(pbUniqueIdRef, objCDT.name_id_attr->getUniqueID()))
 		{
 			return iLoopCount;
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::getCDTbyUniqueID
-* Description:
-* Return value: CComplexDataType*
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::getCDTbyUniqueID
+ * Description  : This function returns CDT values based on unique reference ids from the collection list
+ * Return value : CComplexDataType*
+ ****************************************************************************************************/
 CComplexDataType* CApplicationProcess::getCDTbyUniqueID(char *pbUniqueId)
 {
-	for(INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
 	{
 		CComplexDataType objCDT;
-		
+
 		objCDT = CDTCollection[iLoopCount];
-		if(strcmp(pbUniqueId, objCDT.name_id_attr->getUniqueID()) == 0)
+		if (0 == strcmp(pbUniqueId, objCDT.name_id_attr->getUniqueID()))
 		{
 			return &CDTCollection[iLoopCount];
 		}
@@ -245,20 +240,23 @@ CComplexDataType* CApplicationProcess::getCDTbyUniqueID(char *pbUniqueId)
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::getCDTbydt_UniqueRefID
-* Description:
-* Return value: CComplexDataType*
-****************************************************************************************************/
-CComplexDataType* CApplicationProcess::getCDTbydt_UniqueRefID(char *pbUniqueRefId)
+ * Function Name: CApplicationProcess::getCDTbydt_UniqueRefID
+ * Description  : This function returns data type of CDT based on unique reference ids from the collection list
+ * Return value : CComplexDataType*
+ ****************************************************************************************************/
+CComplexDataType* CApplicationProcess::getCDTbydt_UniqueRefID(
+		char *pbUniqueRefId)
 {
-	for(INT32 iLoopCount = 0; iLoopCount<CDTCollection.Count(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
 	{
 		CComplexDataType objCDT;
-		
+
 		objCDT = CDTCollection[iLoopCount];
-		if( objCDT.name_id_attr->getDtUniqueRefId() != NULL)
+		if (NULL != objCDT.name_id_attr->getDtUniqueRefId())
 		{
-			if(strcmp(pbUniqueRefId, objCDT.name_id_attr->getDtUniqueRefId()) == 0)
+			if (0
+					== strcmp(pbUniqueRefId,
+							objCDT.name_id_attr->getDtUniqueRefId()))
 			{
 				return &CDTCollection[iLoopCount];
 			}
@@ -268,58 +266,59 @@ CComplexDataType* CApplicationProcess::getCDTbydt_UniqueRefID(char *pbUniqueRefI
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::getCDTbydtIndex
-* Description:
-* Return value: CComplexDataType*
-****************************************************************************************************/
-CComplexDataType* CApplicationProcess::getCDTbydtIndex(int iIndex)
+ * Function Name: CApplicationProcess::getCDTbydtIndex
+ * Description  : This function returns CDT index values
+ * Return value : CComplexDataType*
+ ****************************************************************************************************/
+CComplexDataType* CApplicationProcess::getCDTbydtIndex(INT32 iIndex)
 {
 	return &CDTCollection[iIndex];
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::updatePreviousCDT_UId
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CApplicationProcess::updatePreviousCDT_UId(char *pbUniqueID, int iIndex)
+ * Function Name: CApplicationProcess::updatePreviousCDT_UId
+ * Description  : This function updates CDT collection list 
+ * Return value : void
+ ****************************************************************************************************/
+void CApplicationProcess::updatePreviousCDT_UId(char* pbUniqueID, INT32 iIndex)
 {
 	CComplexDataType* pobjCDT;
-	
-	pobjCDT 					= CDTCollection.GetAddress(iIndex);
-	pobjCDT->previousCDT_UId 	= (char*)malloc(strlen(pbUniqueID) + 1);
+
+	pobjCDT = CDTCollection.GetAddress(iIndex);
+	pobjCDT->previousCDT_UId = new char[strlen(pbUniqueID) + 1];
 	strcpy(pobjCDT->previousCDT_UId, pbUniqueID);
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::get_UniqueIDRef_by_ParameterIndex
-* Description:
-* Return value: Parameter
-****************************************************************************************************/
-Parameter CApplicationProcess::get_UniqueIDRef_by_ParameterIndex(INT32 iParameterIndex)
+ * Function Name: CApplicationProcess::get_UniqueIDRef_by_ParameterIndex
+ * Description  : This function returns parameter index
+ * Return value : Parameter
+ ****************************************************************************************************/
+Parameter CApplicationProcess::get_UniqueIDRef_by_ParameterIndex(
+		INT32 iParameterIndex)
 {
 	Parameter stParams;
-	
+
 	stParams = ParameterCollection[iParameterIndex];
-	
+
 	return stParams;
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::getCDTCount
-* Description:
-* Return value: int
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::getCDTCount
+ * Description  : This function returns CDT collection count
+ * Return value : INT32
+ ****************************************************************************************************/
 INT32 CApplicationProcess::getCDTCount()
 {
 	return CDTCollection.Count();
 }
 
 /****************************************************************************************************
-* Function Name: CApplicationProcess::getCDTbyCount
-* Description:
-* Return value: CComplexDataType*
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::getCDTbyCount
+ * Description  : This function returns CDT index collection value 
+ * Return value: CComplexDataType*
+ ****************************************************************************************************/
 CComplexDataType* CApplicationProcess::getCDTbyCount(INT32 iIndex)
 {
 	return &CDTCollection[iIndex];

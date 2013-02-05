@@ -71,16 +71,16 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include "TCollection.h"
 #include "Declarations.h"
 
 #pragma once
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CBaseIndex
 {
 	public:
@@ -88,27 +88,27 @@ class DllExport CBaseIndex
 		~CBaseIndex(void);
 
 	protected:
-		const char*		m_Name;
-		const char*		m_Index;		
-		const char*		m_LowLimit;
-		const char*		m_HighLimit;
-		EObjectType		m_objectType;
-		DataType		m_dataType;		
-		const char*		m_accessType;
-		const char*		m_DefaultValue;
-		char*			m_ActualValue;
-		EPDOMapping 	m_pdoMapping;
-		int				m_NodeID;
-		char*			m_UniqueIDRef;
-		int				m_ParameterIndex;
-		char*			m_dataTypeValue;					/* Only used for ObjectDictionary*/
-		EFlag			m_IsIncludedInCDC;
+		const char* m_Name;
+		const char* m_Index;
+		const char* m_LowLimit;
+		const char* m_HighLimit;
+		EObjectType m_objectType;
+		DataType m_dataType;
+		const char* m_accessType;
+		const char* m_DefaultValue;
+		char* m_ActualValue;
+		EPDOMapping m_pdoMapping;
+		INT32 m_NodeID;
+		char* m_UniqueIDRef;
+		INT32 m_ParameterIndex;
+		char* m_dataTypeValue;/* Only used for ObjectDictionary*/
+		EFlag m_IsIncludedInCDC;
 
-	public :
-		const char* getName(); 		
+	public:
+		const char* getName();
 		void setName(char* Name);
 
-		const char* getIndexValue();			
+		const char* getIndexValue();
 		void setIndexValue(char* Index);
 
 		const char* getDefaultValue();
@@ -116,7 +116,7 @@ class DllExport CBaseIndex
 
 		const char* getActualValue();
 		void setActualValue(char* Value);
-		
+
 		const char* getAccessType();
 		void setAccessType(char* Access);
 
@@ -126,9 +126,9 @@ class DllExport CBaseIndex
 		const char* getHighLimit();
 		void setHighLimit(char* HighLimit);
 
-		DataType getDataType();		
+		DataType getDataType();
 		void setDataType(char* dataTypeValue);
-		void setDataType(char* dataTypeName, int NodeID);
+		void setDataType(char* dataTypeName, INT32 NodeID);
 
 		const char* getPDOMapping();
 		void setPDOMapping(char* pdoMappingValue);
@@ -137,22 +137,21 @@ class DllExport CBaseIndex
 		EObjectType getEObjectType();
 		void setObjectType(char* objectType);
 
-		int getNodeID();
-		void setNodeID(int NodeID);
+		INT32 getNodeID();
+		void setNodeID(INT32 NodeID);
 
 		bool IsIndexVaueValid(char* value);
 		void SaveChanges(char* Name, char* Value);
-			
+
 		char* getUniqueIDRef();
 		void setUniqueIDRef(char* UniqueID);
-		
+
 		char* getDataTypeValue();
 		void setDataTypeValue(char* value);
 
-	 	EFlag getFlagIfIncludedCdc();
+		EFlag getFlagIfIncludedCdc();
 		void setFlagIfIncludedCdc(EFlag flag);
-		
-		void setDataTypeST(DataType  dt);
+
+		void setDataTypeST(DataType dt);
 };
 #endif //BaseIndex_h
-

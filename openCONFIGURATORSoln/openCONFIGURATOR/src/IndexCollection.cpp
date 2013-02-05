@@ -68,165 +68,175 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <stdio.h>
 #include "../Include/IndexCollection.h"
 #include "../Include/Internal.h"
 
 /****************************************************************************************************
-* FUNCTION DEFINITIONS
-****************************************************************************************************/
+ * FUNCTION DEFINITIONS
+ ****************************************************************************************************/
 
 /****************************************************************************************************
-* Constructor
-****************************************************************************************************/
+ * Constructor
+ ****************************************************************************************************/
 CIndexCollection::CIndexCollection(void)
 {
-	//IndexList.size =0;
 	m_IndexCount = 0;
 }
 
 /****************************************************************************************************
-* Destructor
-****************************************************************************************************/
+ * Destructor
+ ****************************************************************************************************/
 CIndexCollection::~CIndexCollection(void)
 {
 	//Add destructor code here
 }
 
 /****************************************************************************************************
-* Function Name: CIndexCollection::addIndex
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CIndexCollection::addIndex
+ * Description  : This function collects the objindex
+ * Return value : void
+ ****************************************************************************************************/
 void CIndexCollection::addIndex(CIndex objIndex)
-{		
+{
 	INT32 iItemPosition = collectionObj.Add();
 	char* substr = NULL;
-	substr = subString((char*)objIndex.getIndexValue(), 0, 2);
-	if(strcmp(substr,"14")==0 ||strcmp(substr,"16") ==0)
+	substr = subString((char*) objIndex.getIndexValue(), 0, 2);
+	if ((0 == strcmp(substr, "14")) || (0 == strcmp(substr, "16")))
 	{
-		objIndex.setPDOType(PDO_RPDO);			
+		objIndex.setPDOType(PDO_RPDO);
 	}
-	else if(strcmp(substr,"18")==0 ||strcmp(substr,"1A") ==0 ||strcmp(substr,"1a") ==0)
+	else if ((0 == strcmp(substr, "18")) || (0 == strcmp(substr, "1A"))
+			|| (0 == strcmp(substr, "1a")))
 	{
-		objIndex.setPDOType(PDO_TPDO);		
+		objIndex.setPDOType(PDO_TPDO);
+	}
+	else
+	{
+		//Nothing to be added.
 	}
 	collectionObj[iItemPosition] = objIndex;
+	//cout << "iItemPosition" << iItemPosition << endl;
 	m_IndexCount = collectionObj.Count();
 }
-	
+
 /****************************************************************************************************
-* Function Name: CIndexCollection::deleteIndex
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CIndexCollection::deleteIndex(int iIndexID)
+ * Function Name: CIndexCollection::deleteIndex
+ * Description  : This Function deletes the index value 
+ * Return value : void
+ ****************************************************************************************************/
+void CIndexCollection::deleteIndex(INT32 iIndexID)
 {
-   collectionObj.Remove(iIndexID);
-   m_IndexCount = collectionObj.Count();
+	collectionObj.Remove(iIndexID);
+	m_IndexCount = collectionObj.Count();
 }
-	
+
 /****************************************************************************************************
-* Function Name: CIndexCollection::DeleteIndexCollection
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CIndexCollection::DeleteIndexCollection() 
+ * Function Name: CIndexCollection::DeleteIndexCollection
+ * Description  : This Function clears the indexcollection 
+ * Return value : void
+ ****************************************************************************************************/
+void CIndexCollection::DeleteIndexCollection()
 {
 	collectionObj.Clear();
 	m_IndexCount = collectionObj.Count();
 }
 
 /****************************************************************************************************
-* Function Name: CIndexCollection::DeletePDOs
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CIndexCollection::DeletePDOs() 
+ * Function Name: CIndexCollection::DeletePDOs
+ * Description  : This Function deletes PDOs 
+ * Return value : void
+ ****************************************************************************************************/
+void CIndexCollection::DeletePDOs()
 {
-	int iLoopCount;
-	char* substr= new char[3];
+	INT32 iLoopCount;
+	char* substr = new char[SUBINDEX_LEN];
 	CIndex objIndex;
-	for(iLoopCount =0; iLoopCount < m_IndexCount; iLoopCount++)
+	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
 	{
 		objIndex = collectionObj[iLoopCount];
-		substr = subString((char*)objIndex.getIndexValue(), 0, 2);
-		if(strcmp(substr, "1A")==0 || strcmp(substr, "1a")==0 ||
-		strcmp(substr, "14")==0 || strcmp(substr, "16")==0   ||
-		strcmp(substr, "18")==0 )
-		{	
-			collectionObj.Remove(iLoopCount);
-			m_IndexCount = collectionObj.Count();
-			iLoopCount = 0;
-		}		
-	}
-	delete [] substr;
-}
-
-/****************************************************************************************************
-* Function Name: CIndexCollection::DeletePIObjects
-* Description:
-* Return value: void
-****************************************************************************************************/
-void CIndexCollection::DeletePIObjects()
-{
-	int iLoopCount;
-	char* substr= new char[2];
-	CIndex objIndex;
-	for(iLoopCount =0; iLoopCount < m_IndexCount; iLoopCount++)
-	{
-		objIndex = collectionObj[iLoopCount];
-		substr = subString((char*)objIndex.getIndexValue(), 0, 1);
-		if(strcmp(substr,"A")==0  ||  strcmp(substr,"a")==0 )
+		substr = subString((char*) objIndex.getIndexValue(), 0, 2);
+		if ((0 == strcmp(substr, "1A")) || (0 == strcmp(substr, "1a"))
+				|| (0 == strcmp(substr, "14")) || (0 == strcmp(substr, "16"))
+				|| (0 == strcmp(substr, "18")))
 		{
 			collectionObj.Remove(iLoopCount);
 			m_IndexCount = collectionObj.Count();
 			iLoopCount = 0;
-		}		
+		}
 	}
-	delete [] substr;
+	delete[] substr;
 }
-	
+
 /****************************************************************************************************
-* Function Name: CIndexCollection::getIndex
-* Description:
-* Return value: CIndex*
-****************************************************************************************************/
-CIndex* CIndexCollection::getIndex(int iCount)
+ * Function Name: CIndexCollection::DeletePIObjects
+ * Description  : This Function deletes PIObjects
+ * Return value : void
+ ****************************************************************************************************/
+void CIndexCollection::DeletePIObjects()
+{
+	INT32 iLoopCount = 0;
+	char* substr = new char[2];
+
+	CIndex objIndex;
+	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
+	{
+		objIndex = collectionObj[iLoopCount];
+		substr = subString((char*) objIndex.getIndexValue(), 0, 1);
+		if ((0 == strcmp(substr, "A")) || (0 == strcmp(substr, "a")))
+		{
+			collectionObj.Remove(iLoopCount);
+			m_IndexCount = collectionObj.Count();
+			iLoopCount = 0;
+		}
+	}
+	delete[] substr;
+}
+
+/****************************************************************************************************
+ * Function Name: CIndexCollection::getIndex
+ * Description  : This function collects index count 
+ * Return value : CIndex*
+ ****************************************************************************************************/
+CIndex* CIndexCollection::getIndex(INT32 iCount)
 {
 	return &collectionObj[iCount];
 }
-	
+
 /****************************************************************************************************
-* Function Name: CIndexCollection::getIndexbyIndexValue
-* Description:
-* Return value: CIndex*
-****************************************************************************************************/
+ * Function Name: CIndexCollection::getIndexbyIndexValue
+ * Description  : This function collects index values
+ * Return value: CIndex*
+ ****************************************************************************************************/
 CIndex* CIndexCollection::getIndexbyIndexValue(char* pbIndex)
 {
 	INT32 iLoopCount;
 	CIndex objIndex;
-	for(iLoopCount =0; iLoopCount < m_IndexCount; iLoopCount++)
+	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
 	{
 		objIndex = collectionObj[iLoopCount];
-		if(strcmp(StringToUpper((char*)objIndex.getIndexValue()),StringToUpper(pbIndex)) == 0)
+		//NULL check values 
+		if (0
+				== strcmp(StringToUpper((char*) objIndex.getIndexValue()),
+						StringToUpper(pbIndex)))
 		{
 			return &collectionObj[iLoopCount];
 		}
-	}		
+	}
 	return NULL;
 }
-	
+
 /****************************************************************************************************
-* Function Name: CIndexCollection::getNumberofIndexes
-* Description:
-* Return value: int
-****************************************************************************************************/
-int CIndexCollection::getNumberofIndexes()
+ * Function Name: CIndexCollection::getNumberofIndexes
+ * Description:   This function returns total nummber of index
+ * Return value: INT32
+ ****************************************************************************************************/
+
+//Why no UINT32 check for what it i'll return
+INT32 CIndexCollection::getNumberofIndexes()
 {
 	return m_IndexCount;
 }
-
 

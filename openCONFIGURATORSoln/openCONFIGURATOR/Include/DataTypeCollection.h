@@ -72,29 +72,29 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include "Declarations.h"
 #include "TCollection.h"
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CDataTypeCollection
 {
 	public:
 		CDataTypeCollection(void);
 		~CDataTypeCollection(void);
 	private:
-		int m_DataTypeCount;
-		
+		INT32 m_DataTypeCount;
+
 	private:
 		TCollection<DataType> collectionObj;
 	public:
 		void addDataType(DataType objDataType);
 		void DeleteDataTypeCollection();
-		int getNumberOfDataTypes();
-		DataType* getDataTypeElement(int DataTypeId);
+		INT32 getNumberOfDataTypes();
+		DataType* getDataTypeElement(INT32 DataTypeId);
 		DataType* getDataType(char* DataTypevalue);
 		DataType* getDataTypeByName(char* DataTypeName);
 };

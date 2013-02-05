@@ -68,8 +68,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <iostream>
 #include "../Include/ProjectSettings.h"
 #include "../Include/Internal.h"
@@ -77,122 +77,136 @@
 using namespace std;
 
 /****************************************************************************************************
-* Global Variables
-****************************************************************************************************/
-bool CPjtSettings::instanceFlag=false;
+ * Global Variables
+ ****************************************************************************************************/
+bool CPjtSettings::instanceFlag = false;
 CPjtSettings* CPjtSettings::objPjtSettings = NULL;
 
 /****************************************************************************************************
-* FUNCTION DEFINITIONS
-****************************************************************************************************/
+ * FUNCTION DEFINITIONS
+ ****************************************************************************************************/
 
 /****************************************************************************************************
-* Constructor
-****************************************************************************************************/
+ * Constructor
+ ****************************************************************************************************/
 CPjtSettings::CPjtSettings(void)
-{		
-	#if defined DEBUG
-			cout << "\nPjtSettings Objects Initialized!\n" << endl;	
-	#endif
-		m_saveMode 			= DISCARD_AS;
-		m_generateMode 		= NO_AG;
-		m_IP_openPOWERLINK 	= NULL;	
-	#if defined DEBUG
-		//cout << "\n Returning m_saveMode:-" << m_saveMode <<endl;	
-	#endif
+{
+#if defined DEBUG
+	cout << "\nPjtSettings Objects Initialized!\n" << endl;
+#endif
+	m_saveMode = DISCARD_AS;
+	m_generateMode = NO_AG;
+	m_IP_openPOWERLINK = NULL;
+	m_bExpertViewSelected = false;
+	m_viewMode = SIMPLE; //TODO: Review initialisation
+#if defined DEBUG
+	cout << "m_saveMode:" << m_saveMode << endl;
+	cout << "m_generateMode:" << m_generateMode << endl;
+	//cout << "m_IP_openPOWERLINK:" << m_IP_openPOWERLINK <<endl;
+	cout << "m_bExpertViewSelected:" << m_bExpertViewSelected << endl;
+	cout << "m_viewMode:" << m_viewMode << endl;
+#endif
 }
 
 /****************************************************************************************************
-* Destructor
-****************************************************************************************************/
+ * Destructor
+ ****************************************************************************************************/
 CPjtSettings::~CPjtSettings(void)
-{		
+{
 	instanceFlag = false;
-	#if defined DEBUG
-		cout << "\n\n\n\nPjtSettings Object Deleted!\n" << endl;	
-	#endif
+#if defined DEBUG
+	cout << "\n\n\n\nPjtSettings Object Deleted!\n" << endl;
+#endif
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::getPjtSettingsPtr
-* Description:
-* Return value: CPjtSettings*
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getPjtSettingsPtr
+ * Description  : This function creats new Pjtsettings 
+ * Return value : CPjtSettings*
+ ****************************************************************************************************/
 CPjtSettings* CPjtSettings::getPjtSettingsPtr()
 {
-	if(!instanceFlag)
+	if (!instanceFlag)
 	{
-		objPjtSettings 	= 	new CPjtSettings();
-		instanceFlag	=	true;
-		#if defined DEBUG
-			cout << "\n\n\n\nNew PjtSettings Object Created!\n" << endl;	
-		#endif
+		objPjtSettings = new CPjtSettings();
+		instanceFlag = true;
+#if defined DEBUG
+		cout << "\n\n\n\nNew PjtSettings Object Created!\n" << endl;
+#endif
 	}
-	return objPjtSettings;	
+	return objPjtSettings;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::getSaveAttr
-* Description:
-* Return value: EAutoSave
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getSaveAttr
+ * Description  : This function saves new Pjtsettings 
+ * Return value : EAutoSave
+ ****************************************************************************************************/
 EAutoSave CPjtSettings::getSaveAttr()
 {
 	return m_saveMode;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::setSaveAttr
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CPjtSettings::setSaveAttr
+ * Description:   This function sets mode for pjt settings
+ * Return value: void
+ ****************************************************************************************************/
 void CPjtSettings::setSaveAttr(EAutoSave enumAutoSaveMode)
 {
 	m_saveMode = enumAutoSaveMode;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::getGenerateAttr
-* Description:
-* Return value: EAutoGenerate
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getGenerateAttr
+ * Description:   This function generates mode for pjt settings  
+ * Return value: EAutoGenerate
+ ****************************************************************************************************/
 EAutoGenerate CPjtSettings::getGenerateAttr()
 {
-	#if defined DEBUG
-		//cout << "\n Returning m_generateMode:-" << m_generateMode <<endl;	
-	#endif	
-	return m_generateMode;		
+#if defined DEBUG
+	//cout << "\n Returning m_generateMode:-" << m_generateMode <<endl;	
+#endif	
+	return m_generateMode;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::setGenerateAttr
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CPjtSettings::setGenerateAttr
+ * Description  : This function sets mode for pjt settings 
+ * Return value : void
+ ****************************************************************************************************/
 void CPjtSettings::setGenerateAttr(EAutoGenerate enumAutoGenerateMode)
 {
 	m_generateMode = enumAutoGenerateMode;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::setPOWERLINK_IP
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CPjtSettings::setPOWERLINK_IP
+ * Description  : This function assigns IP address for Powerlink
+ * Return value : void
+ ****************************************************************************************************/
 void CPjtSettings::setPOWERLINK_IP(char* pbIPAddr)
-{	
-	m_IP_openPOWERLINK = new char[strlen(pbIPAddr) + ALLOC_BUFFER];
-	strcpy((char*)m_IP_openPOWERLINK, pbIPAddr);
+{
+//TODO: review
+	if (NULL != m_IP_openPOWERLINK)
+	{
+		delete[] m_IP_openPOWERLINK;
+	}
+
+	m_IP_openPOWERLINK = new char[strlen(pbIPAddr) + STR_ALLOC_BUFFER];
+	strcpy((char*) m_IP_openPOWERLINK, pbIPAddr);
+
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::getPOWERLINK_IP
-* Description:
-* Return value: char*
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getPOWERLINK_IP
+ * Description  : This Function returns Powerlink IP
+ * Return value : char*
+ ****************************************************************************************************/
+//TODO: Unused Function
 const char* CPjtSettings::getPOWERLINK_IP()
 {
-	if(m_IP_openPOWERLINK != NULL)
+	if (NULL != m_IP_openPOWERLINK)
 	{
 		return m_IP_openPOWERLINK;
 	}
@@ -202,39 +216,39 @@ const char* CPjtSettings::getPOWERLINK_IP()
 	}
 }
 /****************************************************************************************************
-* Function Name: CPjtSettings::getViewMode
-* Description:
-* Return value: EViewMode
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getViewMode
+ * Description  : This function sets view mode under pjt settings
+ * Return value : EViewMode
+ ****************************************************************************************************/
 EViewMode CPjtSettings::getViewMode()
 {
 	return m_viewMode;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::setViewMode
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CPjtSettings::setViewMode
+ * Description  : This function assigns view mode
+ * Return value : void
+ ****************************************************************************************************/
 void CPjtSettings::setViewMode(EViewMode enumViewMode)
 {
 	m_viewMode = enumViewMode;
 }
 /****************************************************************************************************
-* Function Name: CPjtSettings::getExpertViewSelectedFlag
-* Description:
-* Return value: bool
-****************************************************************************************************/
+ * Function Name: CPjtSettings::getExpertViewSelectedFlag
+ * Description  : This function sets flag for type of view selected under pjt settings
+ * Return value : bool
+ ****************************************************************************************************/
 bool CPjtSettings::getExpertViewSelectedFlag()
 {
 	return m_bExpertViewSelected;
 }
 
 /****************************************************************************************************
-* Function Name: CPjtSettings::setExpertViewSelectedFlag
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CPjtSettings::setExpertViewSelectedFlag
+ * Description:   This function assigns type of view selected under pjt settings
+ * Return value: void
+ ****************************************************************************************************/
 void CPjtSettings::setExpertViewSelectedFlag(bool bExpertViewSelected)
 {
 	m_bExpertViewSelected = bExpertViewSelected;

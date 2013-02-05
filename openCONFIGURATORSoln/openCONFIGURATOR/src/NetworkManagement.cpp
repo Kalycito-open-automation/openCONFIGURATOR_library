@@ -70,127 +70,139 @@
 #include "../Include/NetworkManagement.h"
 #include "../Include/Internal.h"
 
+/****************************************************************************************************
+ * FUNCTION DEFINITIONS
+ ****************************************************************************************************/
+
+/****************************************************************************************************
+ * Constructor
+ ****************************************************************************************************/
 CNetworkManagement::CNetworkManagement(void)
-{	
+{
 	m_MaxPDOCount = 0;
+	m_NodeID = 0;
 }
 
+/****************************************************************************************************
+ * Destructor
+ ****************************************************************************************************/
 CNetworkManagement::~CNetworkManagement(void)
 {
+	//Add destructor code here
 }
 /****************************************************************************************************
-* Function Name: CApplicationProcess::addParameter
-* Description:
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CApplicationProcess::addParameter
+ * Description  : This function collects feature for each object
+ * Return value : void
+ ****************************************************************************************************/
 void CNetworkManagement::addFeature(Feature stfeature)
 {
-	
 	INT32 iItemPosition = FeatureCollection.Add();
-	FeatureCollection[iItemPosition] = stfeature;		
+	FeatureCollection[iItemPosition] = stfeature;
 }
 /****************************************************************************************************
-* Function Name: CNetworkManagement::getNodeID
-* Description: Returns the NodeID of the Node of the NetworkManagement Object
-* Return value: int
-****************************************************************************************************/
+ * Function Name: CNetworkManagement::getNodeID
+ * Description: Returns the NodeID of the Node of the NetworkManagement Object
+ * Return value: INT32
+ ****************************************************************************************************/
 INT32 CNetworkManagement::getNodeID()
 {
 	return m_NodeID;
 }
 
 /****************************************************************************************************
-* Function Name: CNetworkManagement::setNodeID
-* Description: sets the NodeID of the NetworkManagement Object
-* Return value: void
-****************************************************************************************************/
-void CNetworkManagement::setNodeID(int NodeID)
+ * Function Name: CNetworkManagement::setNodeID
+ * Description: sets the NodeID of the NetworkManagement Object
+ * Return value: void
+ ****************************************************************************************************/
+void CNetworkManagement::setNodeID(INT32 NodeID)
 {
 	m_NodeID = NodeID;
 }
 /****************************************************************************************************
-* Function Name: CNetworkManagement::getFeatureValue
-* Description: gets the network Management feature value
-* Return value: char*
-****************************************************************************************************/
-char* CNetworkManagement::getFeatureValue(EFeatureType featureType, char *featureName)
+ * Function Name: CNetworkManagement::getFeatureValue
+ * Description: gets the network Management feature value
+ * Return value: char*
+ ****************************************************************************************************/
+char* CNetworkManagement::getFeatureValue(EFeatureType featureType,
+		char* featureName)
 {
-	int iLoopCount;
-	char *pbRetString = NULL;
-	
+	INT32 iLoopCount = 0;
+	char* pbRetString = NULL;
+	Feature stFeature;
 
-	for(iLoopCount =0; iLoopCount < FeatureCollection.Count() ; iLoopCount++)
+	for (iLoopCount = 0; iLoopCount < FeatureCollection.Count(); iLoopCount++)
 	{
-		Feature stFeature;		
-		stFeature = FeatureCollection[iLoopCount];	
-		if( stFeature.m_featureType == featureType && (!strcmp(featureName, stFeature.m_Name)))
-		{		
-			pbRetString = new char[strlen(stFeature.m_Value) + STR_ALLOC_BUFFER];
+		stFeature = FeatureCollection[iLoopCount];
+		if (stFeature.m_featureType == featureType
+				&& (!strcmp(featureName, stFeature.m_Name)))
+		{
+			pbRetString =
+					new char[strlen(stFeature.m_Value) + STR_ALLOC_BUFFER];
 			strcpy(pbRetString, stFeature.m_Value);
 			return pbRetString;
 		}
 	}
-	pbRetString = new char[1 + ALLOC_BUFFER];
-	strcpy((char*)pbRetString,"");
+	pbRetString = new char[1 + STR_ALLOC_BUFFER];
+	strcpy((char*) pbRetString, "");
 	return pbRetString;
 }
 /****************************************************************************************************
-* Function Name: CNetworkManagement::getNumberOfFeatures
-* Description: returns the Number of Features
-* Return value: UINT32
-****************************************************************************************************/
+ * Function Name: CNetworkManagement::getNumberOfFeatures
+ * Description: returns the Number of Features
+ * Return value: UINT32
+ ****************************************************************************************************/
 UINT32 CNetworkManagement::getNumberOfFeatures()
-{	
+{
 	return FeatureCollection.Count();
 }
 /****************************************************************************************************
-* Function Name: CNetworkManagement::getNumberOfFeatures
-* Description: returns the Number of Features
-* Return value: UINT32
-****************************************************************************************************/
+ * Function Name: CNetworkManagement::getFeature
+ * Description:  returns feature collection list 
+ * Return value: Feature*
+ ****************************************************************************************************/
 Feature* CNetworkManagement::getFeature(UINT32 uiCount)
-{	
+{
 	return &FeatureCollection[uiCount];
 }
 
 /**************************************************************************************************
-* Function Name: CNetworkManagement::DeleteNetworkManagementCollections
-* Description: 
-* Return value: void
-****************************************************************************************************/
+ * Function Name: CNetworkManagement::DeleteFeatureCollections
+ * Description: DeleteNetworkManagementCollections
+ * Return value: void
+ ****************************************************************************************************/
 void CNetworkManagement::DeleteFeatureCollections()
 {
-    
-    if(FeatureCollection.Count() != 0)
-    {
-        FeatureCollection.Clear();
-    }
+	if (0 != FeatureCollection.Count())
+	{
+		FeatureCollection.Clear();
+	}
 }
 /****************************************************************************************************
-* Function Name: CIndexCollection::getMaxPDOCount
-* Description:
-* Return value: INT32
-****************************************************************************************************/
-INT32 CNetworkManagement::getMaxPDOCount() 
+ * Function Name: CIndexCollection::getMaxPDOCount
+ * Description:
+ * Return value: INT32
+ ****************************************************************************************************/
+INT32 CNetworkManagement::getMaxPDOCount()
 {
 	return m_MaxPDOCount;
 }
 /****************************************************************************************************
-* Function Name: CIndexCollection::calculateMaxPDOCount
-* Description: calculates the PDO count from the PDOTPDOChannels parameter in MN xdd and m_MaxPDOCount is updated with that specified value
-* Return value: void
-****************************************************************************************************/
-void CNetworkManagement::calculateMaxPDOCount() 
-{	
+ * Function Name: CIndexCollection::calculateMaxPDOCount
+ * Description: calculates the PDO count from the PDOTPDOChannels parameter in MN xdd and m_MaxPDOCount is updated with that specified value
+ * Return value: void
+ ****************************************************************************************************/
+void CNetworkManagement::calculateMaxPDOCount()
+{
 	char* pbMaxPDOCount = new char[5];
 	char* featureName = new char[20];
 	m_MaxPDOCount = 0;
-	if(( NULL == pbMaxPDOCount ) || ( NULL == featureName ))
+	if ((NULL == pbMaxPDOCount) || (NULL == featureName))
 	{
-		#if defined DEBUG
-		cout<<"Memory allocation error"<<__FUNCTION__<<endl;
-		#endif
-		
+#if defined DEBUG
+		cout << "Memory allocation error" << __FUNCTION__ << endl;
+#endif
+
 		ocfmException ex;
 		ex.ocfm_Excpetion(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 		throw ex;
@@ -199,16 +211,16 @@ void CNetworkManagement::calculateMaxPDOCount()
 	{
 		strcpy(featureName, "PDOTPDOChannels");
 		strcpy(pbMaxPDOCount, getFeatureValue(MN_FEATURES, featureName));
-		m_MaxPDOCount = atoi((char*)pbMaxPDOCount);
+		m_MaxPDOCount = atoi((char*) pbMaxPDOCount);
 		//check is made for the validating the value in MN xdd. 
 		//Min value = 0; Maxvalue = 256 (EPSG specification)
-		if(m_MaxPDOCount > 256)
+		if (m_MaxPDOCount > 256)
 		{
 			ocfmException ex;
 			ex.ocfm_Excpetion(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
 			throw ex;
 		}
 	}
-	delete [] pbMaxPDOCount;
-	delete [] featureName;
+	delete[] pbMaxPDOCount;
+	delete[] featureName;
 }

@@ -7,7 +7,7 @@
 // NAME:  Node.h
 //
 // BASE  CLASSES: none
-//  
+//
 // PURPOSE:  purpose description
 //
 // AUTHOR:  Kalycito Powerlink Team
@@ -72,8 +72,8 @@
 #pragma once
 
 /************************************************************************************************
-* Includes
-************************************************************************************************/
+ * Includes
+ ************************************************************************************************/
 #include "DataTypeCollection.h"
 #include "IndexCollection.h"
 #include "Declarations.h"
@@ -82,8 +82,8 @@
 #include "NetworkManagement.h"
 
 /************************************************************************************************
-* Classes
-************************************************************************************************/
+ * Classes
+ ************************************************************************************************/
 class DllExport CNode
 {
 	public:
@@ -94,42 +94,43 @@ class DllExport CNode
 		CIndexCollection *m_IndexCollection;
 		CApplicationProcess* m_ApplicationProcess;
 		CNetworkManagement *m_NetworkManagement;
-				
-		int				m_NodeId;
-		ENodeType		m_NodeType;
-		int				m_NodeIndex;
-		bool			m_HasPdoObjects;
-		char*			m_NodeName;
-		EStationType	m_StationType;
-		char*			m_ForcedCycle;
-		bool			m_ForcedCycleFlag;
-		char*			m_PollResponseTimeout;
-        int             m_PResActPayload;
-        int             m_PReqActPayload;
+
+		INT32 m_NodeId;
+		ENodeType m_NodeType;
+		INT32 m_NodeIndex;
+		bool m_HasPdoObjects;
+		char* m_NodeName;
+		EStationType m_StationType;
+		char* m_ForcedCycle;
+		bool m_ForcedCycleFlag;
+		char* m_PollResponseTimeout;
+		INT32 m_PResActPayload;
+		INT32 m_PReqActPayload;
 		/*	typedef TCollection<ProcessImage> PICollection;*/
 	public:
 		/*typedef _PICollection PICollection;*/
 		TCollection<ProcessImage> ProcessImageCollection;
-		TCollection<MNPdoVariable> MNPDOINVarCollection, MNPDOOUTVarCollection ;
+		TCollection<MNPdoVariable> MNPDOINVarCollection;
+		TCollection<MNPdoVariable> MNPDOOUTVarCollection;
 		TCollection<NETProcessImage> NETProcessImageCollection;
 	public:
 		CDataTypeCollection* getDataTypeCollection();
 		CIndexCollection* getIndexCollection();
 		CApplicationProcess* getApplicationProcess();
 		CNetworkManagement *getNetworkManagement();
-		
-		int getNodeId();
-		void setNodeId(int NodeId);
 
-		int getNodeIndex();
-		void setNodeIndex(int NodeIndex);
+		INT32 getNodeId();
+		void setNodeId(INT32 NodeId);
+
+		INT32 getNodeIndex();
+		void setNodeIndex(INT32 NodeIndex);
 
 		char* getNodeName();
 		void setNodeName(char* NodeName);
 
 		ENodeType getNodeType();
 		void setNodeType(ENodeType NodeType);
-		
+
 		bool HasPdoObjects();
 		void setFlagForPdoObjects(bool flag);
 
@@ -137,31 +138,31 @@ class DllExport CNode
 		void CreateDataTypeCollection();
 		void CreateApplicationProcess();
 		void CreateNetworkManagament();
-		
+
 		void addProcessImage(ProcessImage processImage);
-		void addNETProcessImage(NETProcessImage objNETProcessImage );
+		void addNETProcessImage(NETProcessImage objNETProcessImage);
 		void addMNPDOvar(MNPdoVariable variable, EPDOType pdoType);
 
 		CIndexCollection* getPDOIndexCollection(EPDOType PDOType);
 		CIndexCollection* getIndexCollectionWithoutPDO();
 		CIndexCollection*getPDOIndexCollection();
-		
-		ProcessImage* getPIbyParaIndex(int paraIndex);
+
+		ProcessImage* getPIbyParaIndex(INT32 paraIndex);
 		void DeleteCollectionsForPI();
 		EStationType getStationType();
 		void setStationType(EStationType StationType);
 
 		char* getForcedCycle();
 		bool getForceCycleFlag();
-        ocfmRetCode setForcedCycle(char* ForcedCycle);
-        void resetForcedCycleValue();
+		ocfmRetCode setForcedCycle(char* ForcedCycle);
+		void resetForcedCycleValue();
 		void setForceCycleFlag(bool bForceCycleFlag);
 		void setPollResponseTimeout(char* pbPollResponseTimeout);
 		bool isNull();
 		void DeleteCollectionsForNETPI();
-        void setPResActPayloadValue(int);
-        int getPResActPayloadValue();
-        void setPReqActPayloadValue(int);
-        int getPReqActPayloadValue();
+		void setPResActPayloadValue(INT32);
+		INT32 getPResActPayloadValue();
+		void setPReqActPayloadValue(INT32);
+		INT32 getPReqActPayloadValue();
 };
 #endif // Node_h

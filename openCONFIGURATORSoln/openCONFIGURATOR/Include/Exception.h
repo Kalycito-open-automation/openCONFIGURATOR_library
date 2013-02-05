@@ -72,22 +72,22 @@
 #pragma once
 
 /************************************************************************************************
-Includes
-************************************************************************************************/
+ Includes
+ ************************************************************************************************/
 #include "Declarations.h"
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
-class ocfmException : public std::exception
+ * Classes
+ ****************************************************************************************************/
+class ocfmException: public std::exception
 {
-		public:
-			ocfmException(void);
-			~ocfmException(void) throw();	
-		public:
-			ocfmRetCode _ocfmRetCode;
-		public:
-			void ocfm_Excpetion(EConfiuguratorErrors errcode);
+	public:
+		ocfmException(void);
+		~ocfmException(void) throw ();
+	public:
+		ocfmRetCode _ocfmRetCode;
+	public:
+		void ocfm_Excpetion(EConfiuguratorErrors errcode);
 };
 
 #endif // exception_h

@@ -72,54 +72,54 @@ using namespace std;
 
 %inline %{
 
-ocfmRetCode ImportXML(char* fileName, int NodeID, ENodeType NodeType);
-ocfmRetCode ReImportXML(char* fileName, int NodeID, ENodeType NodeType);
+ocfmRetCode ImportXML(char* fileName, INT32 NodeID, ENodeType NodeType);
+ocfmRetCode ReImportXML(char* fileName, INT32 NodeID, ENodeType NodeType);
 
 ocfmRetCode GenerateXAP(char* fileName);
 ocfmRetCode GenerateCDC(char* fileName);
 
-ocfmRetCode CreateNode(int NodeID, ENodeType NodeType, char* NodeName);
-ocfmRetCode parseFile(char* filename, int NodeID, ENodeType  NodeType);
-ocfmRetCode DeleteNode(int NodeID, ENodeType NodeType);
-ocfmRetCode DeleteNodeObjDict(int NodeID, ENodeType NodeType);
+ocfmRetCode CreateNode(INT32 NodeID, ENodeType NodeType, char* NodeName);
+ocfmRetCode parseFile(char* filename, INT32 NodeID, ENodeType  NodeType);
+ocfmRetCode DeleteNode(INT32 NodeID, ENodeType NodeType);
+ocfmRetCode DeleteNodeObjDict(INT32 NodeID, ENodeType NodeType);
 
-ocfmRetCode DeleteIndex(int NodeID, ENodeType NodeType, char* IndexID);
-ocfmRetCode DeleteSubIndex(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
-ocfmRetCode AddIndex(int NodeID, ENodeType NodeType, char* IndexID);
-ocfmRetCode AddSubIndex(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
-ocfmRetCode SetIndexAttributes(int NodeID, ENodeType NodeType, char* IndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
-//ocfmRetCode SetSubIndexAttributes(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName);
-ocfmRetCode SetSubIndexAttributes(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
+ocfmRetCode DeleteIndex(INT32 NodeID, ENodeType NodeType, char* IndexID);
+ocfmRetCode DeleteSubIndex(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
+ocfmRetCode AddIndex(INT32 NodeID, ENodeType NodeType, char* IndexID);
+ocfmRetCode AddSubIndex(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
+ocfmRetCode SetIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
+//ocfmRetCode SetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName);
+ocfmRetCode SetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
 
-ocfmRetCode IfNodeExists(int NodeID, ENodeType NodeType, int* NodePos, bool& ExistfFlag);
-ocfmRetCode IfIndexExists(int NodeID, ENodeType NodeType, char* IndexID, int* IndexPos);
-ocfmRetCode IfSubIndexExists(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, int* SubIndexPos, int* IndexPos);
+ocfmRetCode IfNodeExists(INT32 NodeID, ENodeType NodeType, INT32* NodePos, bool& ExistfFlag);
+ocfmRetCode IfIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32* IndexPos);
+ocfmRetCode IfSubIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, INT32* SubIndexPos, INT32* IndexPos);
 
-ocfmRetCode GetIndexAttributes(int NodeID, ENodeType NodeType, char* IndexID, EAttributeType AttributeType, char* Out_AttributeValue);
-ocfmRetCode GetSubIndexAttributes(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, EAttributeType AttributeType,char* Out_AttributeValue);
-ocfmRetCode GetNodeCount(int MNID, int* Out_NodeCount);
-ocfmRetCode GetIndexCount(int NodeID, ENodeType NodeType, int* Out_IndexCount);
-ocfmRetCode GetSubIndexCount(int NodeID, ENodeType NodeType, char* IndexID, int* Out_SubIndexCount);
+ocfmRetCode GetIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, EAttributeType AttributeType, char* Out_AttributeValue);
+ocfmRetCode GetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, EAttributeType AttributeType,char* Out_AttributeValue);
+ocfmRetCode GetNodeCount(INT32 MNID, INT32* Out_NodeCount);
+ocfmRetCode GetIndexCount(INT32 NodeID, ENodeType NodeType, INT32* Out_IndexCount);
+ocfmRetCode GetSubIndexCount(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32* Out_SubIndexCount);
 
-ocfmRetCode GetNodeAttributesbyNodePos(int NodePos, int* Out_NodeID, char* Out_NodeName, EStationType* Out_eStationType, char* Out_ForcedCycle, bool* bForcedCycleFlag);
-ocfmRetCode GetIndexIDbyIndexPos(int NodeID, ENodeType NodeType, int IndexPos, char* Out_IndexID);
-ocfmRetCode GetSubIndexIDbySubIndexPos(int NodeID, ENodeType NodeType, char* IndexID, int SubIndexPos, char* Out_SubIndexID);
+ocfmRetCode GetNodeAttributesbyNodePos(INT32 NodePos, INT32* Out_NodeID, char* Out_NodeName, EStationType* Out_eStationType, char* Out_ForcedCycle, bool* bForcedCycleFlag);
+ocfmRetCode GetIndexIDbyIndexPos(INT32 NodeID, ENodeType NodeType, INT32 IndexPos, char* Out_IndexID);
+ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32 SubIndexPos, char* Out_SubIndexID);
 
-ocfmRetCode GetIndexIDbyPositions(int NodePos, int IndexPos, char* Out_IndexID);
-ocfmRetCode GetSubIndexIDbyPositions(int NodePos, int IndexPos, int SubIndexPos, char* Out_SubIndexID);
-ocfmRetCode GetIndexAttributesbyPositions(int NodePos, int IndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
-ocfmRetCode GetSubIndexAttributesbyPositions(int NodePos, int IndexPos, int SubIndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
+ocfmRetCode GetIndexIDbyPositions(INT32 NodePos, INT32 IndexPos, char* Out_IndexID);
+ocfmRetCode GetSubIndexIDbyPositions(INT32 NodePos, INT32 IndexPos, INT32 SubIndexPos, char* Out_SubIndexID);
+ocfmRetCode GetIndexAttributesbyPositions(INT32 NodePos, INT32 IndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
+ocfmRetCode GetSubIndexAttributesbyPositions(INT32 NodePos, INT32 IndexPos, INT32 SubIndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
 
 void LoadObjectDictionary(char* fileName);
 ocfmRetCode GenerateMNOBD();
 
-ocfmRetCode SetAllIndexAttributes(int NodeID, ENodeType NodeType, 
+ocfmRetCode SetAllIndexAttributes(INT32 NodeID, ENodeType NodeType, 
 char* IndexID, char* ActualValue,
 char* IndexName, char* Access, char* dataTypeValue,
 char* pdoMappingVal, char* defaultValue, char* highLimit,
 char* lowLimit, char* objType, EFlag flagIfIncludedInCdc);
 
-ocfmRetCode SetAllSubIndexAttributes(int NodeID, ENodeType NodeType, 
+ocfmRetCode SetAllSubIndexAttributes(INT32 NodeID, ENodeType NodeType, 
 char* IndexID, char* SubIndexID, char* ActualValue,
 char* IndexName, char* Access, char* dataTypeValue,
 char* pdoMappingVal, char* defaultValue, char* highLimit,

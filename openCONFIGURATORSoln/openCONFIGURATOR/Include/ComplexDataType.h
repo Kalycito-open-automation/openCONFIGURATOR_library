@@ -72,33 +72,33 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 #include "Declarations.h"
 #include "TCollection.h"
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CComplexDataType
 {
- public:
-	CComplexDataType(void);
-	~CComplexDataType(void);
-	TCollection<varDeclaration> varCollection;
-	int			VarIndex;
-	int			Index;		
-	char*	previousCDT_UId;
-		
+	public:
+		CComplexDataType(void);
+		~CComplexDataType(void);
+		TCollection<varDeclaration> varCollection;
+		INT32 VarIndex;
+		INT32 Index;
+		char* previousCDT_UId;
+
 	private:
-		int			m_varCount;
-			
+		INT32 m_varCount;
+
 	public:
 		appProcessCommon *name_id_attr;
-			
+
 	public:
-		 void addVarDeclaration(varDeclaration VarDecl);
+		void addVarDeclaration(varDeclaration VarDecl);
 };
 #endif // complexdatatype_h

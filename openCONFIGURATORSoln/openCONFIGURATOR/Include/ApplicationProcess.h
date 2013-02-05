@@ -73,8 +73,8 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <string>
 #include "ComplexDataType.h"
 #include "TCollection.h"
@@ -82,8 +82,8 @@
 using namespace std;
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CApplicationProcess
 {
 	public:
@@ -98,21 +98,20 @@ class DllExport CApplicationProcess
 	public:
 		void DeleteComplexDataTypeCollection(void);
 		void DeleteParameterCollection(void);
-		void ParseXDDfile(char* filename);
-		int checkFileStatus(char* filename);		
+		//void ParseXDDfile(char* filename);
+		INT32 checkFileStatus(char* filename);
 		void addComplexDataType(CComplexDataType complexDT);
-		void addParameter(Parameter  parameter);
-		int get_ParameterIndexby_UniqueIDRef(char* UniqueIdRef);
-		Parameter* get_Parameterby_UniqueIDRef(char* UniqueIdRef);	
+		void addParameter(Parameter parameter);
+		INT32 get_ParameterIndexby_UniqueIDRef(char* UniqueIdRef);
+		Parameter* get_Parameterby_UniqueIDRef(char* UniqueIdRef);
 		CComplexDataType* getCDTbyUniqueID(char* UniqueId);
 		CComplexDataType* getCDTbydt_UniqueRefID(char* UniqueRefId);
-		CComplexDataType* getCDTbydtIndex(int Index);
-		int get_CDT_UniqueIDRef(char *UniqueIdRef);
-		void updatePreviousCDT_UId(char *UniqueID, int Index);
-		Parameter get_UniqueIDRef_by_ParameterIndex(int ParameterIndex);
-		int getCDTCount();
-		CComplexDataType* getCDTbyCount(int count);
+		CComplexDataType* getCDTbydtIndex(INT32 Index);
+		INT32 get_CDT_UniqueIDRef(char *UniqueIdRef);
+		void updatePreviousCDT_UId(char *UniqueID, INT32 Index);
+		Parameter get_UniqueIDRef_by_ParameterIndex(INT32 ParameterIndex);
+		INT32 getCDTCount();
+		CComplexDataType* getCDTbyCount(INT32 count);
 };
 
 #endif // ApplicationProcess_h
-

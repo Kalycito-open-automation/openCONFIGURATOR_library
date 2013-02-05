@@ -72,31 +72,31 @@
 #pragma once
 
 /************************************************************************************************
-* Defines
-************************************************************************************************/
+ * Defines
+ ************************************************************************************************/
 #include "Index.h"
 
 using namespace std;
 
 /************************************************************************************************
-* Classes
-************************************************************************************************/
+ * Classes
+ ************************************************************************************************/
 class DllExport CIndexCollection
 {
 	public:
 		CIndexCollection(void);
 		~CIndexCollection(void);
 	private:
-		int m_IndexCount;
+		INT32 m_IndexCount;
 		TCollection<CIndex> collectionObj;
 	public:
 		void addIndex(CIndex objIndex);
-		void deleteIndex(int IndexID);
+		void deleteIndex(INT32 IndexID);
 		void DeleteIndexCollection();
-		void DeletePDOs() ;
+		void DeletePDOs();
 		void DeletePIObjects();
-		int getNumberofIndexes();
-		CIndex* getIndex(int Count);
-		CIndex* getIndexbyIndexValue(char* Index);		
+		INT32 getNumberofIndexes();
+		CIndex* getIndex(INT32 Count);
+		CIndex* getIndexbyIndexValue(char* Index);
 };
 #endif // IndexCollection_h

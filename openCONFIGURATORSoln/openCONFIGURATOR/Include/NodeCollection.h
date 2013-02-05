@@ -72,14 +72,14 @@
 #pragma once
 
 /************************************************************************************************
-* Includes
-************************************************************************************************/
+ * Includes
+ ************************************************************************************************/
 #include "Declarations.h"
 #include "Node.h"
 
 /************************************************************************************************
-* Classes
-************************************************************************************************/
+ * Classes
+ ************************************************************************************************/
 class DllExport CNodeCollection
 {
 	public:
@@ -88,21 +88,21 @@ class DllExport CNodeCollection
 
 	private:
 		TCollection<CNode> collectionObj;
-		int m_NodeCount;
+		INT32 m_NodeCount;
 		static bool instanceFlag;
 		static CNodeCollection *objNodeCollection;
-	public :
-		int getNumberOfNodes();
-		void addNode(CNode  objNode);
-		void deleteNode(int NodeID);
+	public:
+		INT32 getNumberOfNodes();
+		void addNode(CNode objNode);
+		void deleteNode(INT32 NodeID);
 		static CNodeCollection* getNodeColObjectPointer();
-		CNode getNode(ENodeType nodeType,int NodeId);
-		CNode getNode(int NodeId);
-		CNode getNodebyCollectionIndex(int ColIndex);		
+		CNode getNode(ENodeType nodeType, INT32 NodeId);
+		CNode getNode(INT32 NodeId);
+		CNode getNodebyCollectionIndex(INT32 ColIndex);
 		CNode getMNNode();
-		CNode* getNodePtr(ENodeType nodeType,int NodeId);
-		CNode* getNodebyColIndex(int ColIndex);		
-		int getCNNodesCount();
-		static CNodeCollection getNodeColObject();		
+		CNode* getNodePtr(ENodeType nodeType, INT32 NodeId);
+		CNode* getNodebyColIndex(INT32 ColIndex);
+		INT32 getCNNodesCount();
+		static CNodeCollection getNodeColObject();
 };
 #endif // NodeCollection_h

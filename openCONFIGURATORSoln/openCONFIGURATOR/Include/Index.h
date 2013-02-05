@@ -72,36 +72,36 @@
 #pragma once
 
 /************************************************************************************************
-* Includes
-************************************************************************************************/
+ * Includes
+ ************************************************************************************************/
 #include "TCollection.h"
 #include "Declarations.h"
 #include "BaseIndex.h"
 #include "SubIndex.h"
 
 /************************************************************************************************
-* Classes
-************************************************************************************************/
-class DllExport CIndex  : public CBaseIndex 
+ * Classes
+ ************************************************************************************************/
+class DllExport CIndex: public CBaseIndex
 {
 	public:
 		CIndex(void);
-		~CIndex(void);		
-	private:		
-		int m_SubIndexCount;
+		~CIndex(void);
+	private:
+		INT32 m_SubIndexCount;
 		EPDOType m_PDOType;
 	private:
 		TCollection<CSubIndex> collectionObj;
-	public :
+	public:
 		void addSubIndex(CSubIndex objSubIndex);
-		void deleteSubIndex(int SubIndexID);
-        void deleteSubIndexCollection();
-		int getNumberofSubIndexes();
-		CSubIndex* getSubIndex(int SubIndexId);
+		void deleteSubIndex(INT32 SubIndexID);
+		void deleteSubIndexCollection();
+		INT32 getNumberofSubIndexes();
+		CSubIndex* getSubIndex(INT32 SubIndexId);
 		EPDOType getPDOType();
 		void setPDOType(EPDOType PDOType);
-		CSubIndex* getSubIndexbyIndexValue(char* Index);			
-		void SwapSubObjects(int pos1, int pos2);
+		CSubIndex* getSubIndexbyIndexValue(char* Index);
+		void SwapSubObjects(INT32 pos1, INT32 pos2);
 		void UpdateArraySubObjects();
 };
 #endif // Index_h

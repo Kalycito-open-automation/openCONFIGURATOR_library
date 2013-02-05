@@ -72,8 +72,8 @@
 #pragma once
 
 /************************************************************************************************
-* Includes
-************************************************************************************************/
+ * Includes
+ ************************************************************************************************/
 #include <libxml/xmlreader.h>
 #include "Index.h"
 #include "DataTypeCollection.h"
@@ -84,50 +84,49 @@
 #include "Internal.h"
 
 /************************************************************************************************
-* Classes
-************************************************************************************************/
+ * Classes
+ ************************************************************************************************/
 class CObjectDictionary
 {
 	public:
 		CObjectDictionary(void);
 		~CObjectDictionary(void);
-		private:
+	private:
 		static bool instanceFlag;
-		int m_s_attrIdx_SIdx;
-				
+		INT32 m_s_attrIdx_SIdx;
+
 		enum ObjectType
 		{
-			INDEX =  0,
-			SUBINDEX
+			INDEX = 0, SUBINDEX
 		};
-		
+
 		typedef struct s_attrIdx_SIdx
 		{
-			char* Idx;
-			char* start_Index;
-			char* end_Index;
-			ObjectType	objectType;			
-		}s_attrIdx_SIdx;
-		
+				char* Idx;
+				char* start_Index;
+				char* end_Index;
+				ObjectType objectType;
+		} s_attrIdx_SIdx;
+
 		TCollection<s_attrIdx_SIdx> collectionObj;
-		
+
 	public:
 		static CNode* objDictNode;
 		static CObjectDictionary* objectDictionary;
-		
+
 	public:
-		void	CheckIfSameIndex(char* Index);
+		void CheckIfSameIndex(char* Index);
 		CIndex* getIndexDictAttribues(char* Index);
 		void ProcessObjectDictionary(xmlTextReaderPtr reader);
 		static CObjectDictionary* getObjDictPtr();
 		void addSameAttributesObjects(s_attrIdx_SIdx object);
-		void createSameattrObject(char* value, ObjectType objType, char*Idx );
+		void createSameattrObject(char* value, ObjectType objType, char*Idx);
 		CIndex* getObjectDictIndex(char* Idx);
 		CSubIndex* getObjectDictSubIndex(char* Idx, char* SIdx);
-		int ifObjectDictIndexExists(char* Index);
-		int ifObjectDictSubIndexExists(char* Idx, char* SIdx);
+		INT32 ifObjectDictIndexExists(char* Index);
+		INT32 ifObjectDictSubIndexExists(char* Idx, char* SIdx);
 		bool checkInTheRange(char* Idx, char* StartIdx, char* EndIdx);
 		void printall();
-		char* getIndexName(char* pbObjectIndex, char* pbObjectName);		
+		char* getIndexName(char* pbObjectIndex, char* pbObjectName);
 };
 #endif // ObjectDictionary_h

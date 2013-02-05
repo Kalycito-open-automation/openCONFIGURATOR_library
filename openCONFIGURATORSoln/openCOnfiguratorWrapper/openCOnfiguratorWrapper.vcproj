@@ -39,13 +39,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				AdditionalIncludeDirectories="c:\Tcl\include"
+				Optimization="0"
+				EnableIntrinsicFunctions="false"
+				AdditionalIncludeDirectories="C:\Tcl\include"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				WarningLevel="3"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -60,7 +62,8 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="openconfigurator.lib tcl85.lib"
 				AdditionalLibraryDirectories="c:\Tcl\lib;&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
+				AssemblyDebug="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -110,11 +113,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\TCL\include"
+				Optimization="0"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="false"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="C:\Tcl\include"
+				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				EnableFunctionLevelLinking="false"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -132,8 +138,9 @@
 				AdditionalDependencies="openconfigurator.lib tcl85.lib"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;c:\tcl\lib"
 				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				LinkTimeCodeGeneration="0"
 				TargetMachine="1"
 			/>
 			<Tool

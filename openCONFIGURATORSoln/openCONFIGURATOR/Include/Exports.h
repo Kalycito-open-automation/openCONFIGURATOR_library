@@ -70,15 +70,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /************************************************************************************************
-* Defines
-************************************************************************************************/
+ * Defines
+ ************************************************************************************************/
 #define DllExport
-//# define DEBUG
+# define DEBUG
 
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
-	 #undef DllExport
-	 #define DllExport  __declspec(dllexport)	 
+#undef DllExport
+#define DllExport  __declspec(dllexport)	 
 #endif 
 #endif // Exports_h
-

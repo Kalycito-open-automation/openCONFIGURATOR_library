@@ -67,19 +67,19 @@
 // $Log:      $
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <string.h>
 #include <stdlib.h>
 #include "../Include/ComplexDataType.h"
 
 /****************************************************************************************************
-* FUNCTION DEFINITIONS
-****************************************************************************************************/
+ * FUNCTION DEFINITIONS
+ ****************************************************************************************************/
 
 /****************************************************************************************************
-* Constructor
-****************************************************************************************************/
+ * Constructor
+ ****************************************************************************************************/
 CComplexDataType::CComplexDataType(void)
 {
 	name_id_attr = new appProcessCommon;
@@ -88,25 +88,27 @@ CComplexDataType::CComplexDataType(void)
 	name_id_attr->m_Name = NULL;
 	name_id_attr->UniqueId = NULL;
 	VarIndex = -1;
-	previousCDT_UId = NULL;			
+	previousCDT_UId = NULL;
+	m_varCount = 0;
+	Index = -1;
 }
 
 /****************************************************************************************************
-* Destructor
-****************************************************************************************************/
+ * Destructor
+ ****************************************************************************************************/
 CComplexDataType::~CComplexDataType(void)
 {
 	//Add destructor code here
 }
 
 /****************************************************************************************************
-* Function Name : CComplexDataType::addVarDeclaration
-* Description   :
-* Return value: void
-****************************************************************************************************/
+ * Function Name : CComplexDataType::addVarDeclaration
+ * Description   : This Function adds variable declarations for complex datatype
+ * Return value  : void
+ ****************************************************************************************************/
 void CComplexDataType::addVarDeclaration(varDeclaration objVarDecl)
 {
-	INT32 iItemPosition 				= varCollection.Add();
-	varCollection[iItemPosition] 		= objVarDecl;
-	m_varCount 							= varCollection.Count();
+	INT32 iItemPosition = varCollection.Add();
+	varCollection[iItemPosition] = objVarDecl;
+	m_varCount = varCollection.Count();
 }

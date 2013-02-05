@@ -70,8 +70,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /************************************************************************************************
-* Includes
-************************************************************************************************/
+ * Includes
+ ************************************************************************************************/
+#include <stddef.h>
 #include <string>
 #include <libxml/xmlwriter.h>
 #include <libxml/xmlreader.h>
@@ -86,8 +87,8 @@
 #include "Exception.h"
 
 /*******************************************************************e *****************************
-* Defines
-************************************************************************************************/
+ * Defines
+ ************************************************************************************************/
 #define TOOL_VERSION "1.2.2"
 #define LAST_TOOL_VERSION "1.2.1"
 #define PREV_TOOL_VERSION_1 "1.1.0"
@@ -130,108 +131,114 @@
 #define EPL_NODEASSIGN_MN_PRES          0x00001000L // Bit 12
 #define EPL_NODEASSIGN_CHAINED_CN       0x00004000L // Bit 14
 #define EPL_NODEASSIGN_VALID            0x80000000L // Bit 31
+/************************************************************************************************
+ * Enumerations
+ ************************************************************************************************/
+typedef enum
+{
+	ADD = 0, DELETE
+} EOperation;
 
 /************************************************************************************************
-* Enumerations
-************************************************************************************************/
-typedef enum{
-	ADD = 0,
-	DELETE
-}EOperation;
-
-/************************************************************************************************
-* structure
-************************************************************************************************/
+ * structure
+ ************************************************************************************************/
 #define BUILDTIME_BUF_LEN 80
 
-typedef struct{
-	  time_t rawtime;
-	  struct tm * timeinfo;
-	  char buffer [BUILDTIME_BUF_LEN];
+typedef struct
+{
+		time_t rawtime;
+		struct tm * timeinfo;
+		char buffer[BUILDTIME_BUF_LEN];
 } sBuildTime;
 
 /************************************************************************************************
-* Externs
-************************************************************************************************/
+ * Externs
+ ************************************************************************************************/
 extern int iConfigDate;
 extern int iConfigTime;
 extern UINT32 uiCycleNumber;
 /************************************************************************************************
-* Global variables
-************************************************************************************************/
-static const int g_simple_arr_size = 19;
-static bool ObjectDictLoaded = false;
-static const UINT32 uiPreScalar =0;
+ * Global variables
+ ************************************************************************************************/
+static const INT32 g_simple_arr_size = 19;
+//TODO: to be removed unused variable
+static const UINT32 uiPreScalar = 0;
 
 /****************************************************************************************************
-* Function Declarations
-****************************************************************************************************/
+ * Function Declarations
+ ****************************************************************************************************/
 char* ConvertToUpper(char* str);
-char* _IntToAscii( long value, char* result, int base );
+char* _IntToAscii(long value, char* result, INT32 base);
 bool CheckIfNotPDO(char* Index);
 void CreateTree();
 bool CheckIfNotPDO(char* Index);
 void ProcessUniqueIDRefs();
-char* subString(char* str, int startpos, int len);
+char* subString(char* str, INT32 startpos, INT32 len);
 char* reverse(char* str);
 ocfmRetCode ProcessPDONodes();
 ocfmRetCode ProcessPDONodes(bool IsBuild);
 ocfmRetCode GenerateMNOBD(bool IsBuild);
 bool CheckIfManufactureSpecificObject(char* Index);
 bool IsAscii(char c);
-int lenOfCNBuffer(char* Buffer);
-char* padLeft(char* str, char padChar, int padLength);
+INT32 lenOfCNBuffer(char* Buffer);
+char* padLeft(char* str, char padChar, INT32 padLength);
 unsigned long hex2int(char *a);
 CIndex* getMNIndexValues(char* Index);
 bool CheckAllowedCNIndexes(char* IndexValue);
 bool CheckBlockedMNIndexes(char* IndexValue);
-int ConvertCdcToBinary(char* fileName,char* tempFile);
+//TODO: To be removed. Convert cdc to binary
+INT32 ConvertCdcToBinary(char* fileName, char* tempFile);
 char* getParameterAccess(char* access);
-bool CheckEndElement(int NodeType, char* element, char* comparewith);
-bool CheckStartElement(int NodeType, char* element, char* comparewith);
+bool CheckEndElement(INT32 NodeType, char* element, char* comparewith);
+bool CheckStartElement(INT32 NodeType, char* element, char* comparewith);
 bool CheckifSimpleDT(char* Name, char* size);
-char* getPIName(int NodeID);
-void setIndexAttributes(xmlTextReaderPtr reader, CIndex* objIndex, bool& hasPDO);
+char* getPIName(INT32 NodeID);
+void setIndexAttributes(xmlTextReaderPtr reader, CIndex* objIndex,
+		bool& hasPDO);
 void setSubIndexAttributes(xmlTextReaderPtr reader, CSubIndex* objSubIndex);
-void setDataTypeAttributes(xmlTextReaderPtr reader ,DataType* objDataType);
-char* ConvertToHexformat(char* hexValue, int padlength, bool DoPadding);
-int getCNDataLen(char* Buffer);
-bool CheckIfDataTypeExists(char* dtVal, int NodeID);
+void setDataTypeAttributes(xmlTextReaderPtr reader, DataType* objDataType);
+char* ConvertToHexformat(char* hexValue, INT32 padlength, bool DoPadding);
+INT32 getCNDataLen(char* Buffer);
+bool CheckIfDataTypeExists(char* dtVal, INT32 NodeID);
 bool CheckIfMappingPDO(char* Index);
 bool CheckIfHex(char* value);
-void WriteXAPElements(ProcessImage piCol[], xmlTextWriterPtr& writer,int VarCount, EPIDirectionType piType);
-void StartXAPxml(xmlTextWriterPtr& writer,  xmlDocPtr& doc);
-void EndWrtitingXAP( xmlTextWriterPtr& writer, char* fileName, xmlDocPtr& doc);
-bool CheckIfSubIndexExists(int NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
+void WriteXAPElements(ProcessImage piCol[], xmlTextWriterPtr& writer,
+		INT32 VarCount, EPIDirectionType piType);
+void StartXAPxml(xmlTextWriterPtr& writer, xmlDocPtr& doc);
+void EndWrtitingXAP(xmlTextWriterPtr& writer, char* fileName, xmlDocPtr& doc);
+bool CheckIfSubIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID,
+		char* SubIndexID);
 ocfmRetCode processProjectXML(xmlTextReaderPtr reader, char* PjtPath);
 bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 bool setProjectSettings_Auto(xmlTextReaderPtr reader);
 bool setProjectSettings_Communication(xmlTextReaderPtr reader);
-int getConfigDate();
-int getConfigTime();
+INT32 getConfigDate();
+INT32 getConfigTime();
 bool getandCreateNode(xmlTextReaderPtr reader, char* PjtPath);
 bool saveProjectXML(char* ProjectPath, char* ProjectName);
-void SetSIdxValue(char* Idx, char* SIdx,
-char* value, CIndexCollection * objIdxCol,
-int NodeId, ENodeType NodeType, bool setDefaultValue);
-ocfmRetCode AddOtherRequiredCNIndexes(int NodeId);
-void CreateMNPDOVar(int Offset, int dataSize,IEC_Datatype dtenum, EPDOType pdoType, CNode *objNode);
-int getCNsTotalIndexSubIndex(int NodeID);
-int reversedata(UINT8 *actemp1, UINT8 *actemp2, UINT32 size);
+void SetSIdxValue(char* Idx, char* SIdx, char* value,
+		CIndexCollection * objIdxCol, INT32 NodeId, ENodeType NodeType,
+		bool setDefaultValue);
+ocfmRetCode AddOtherRequiredCNIndexes(INT32 NodeId);
+void CreateMNPDOVar(INT32 Offset, INT32 dataSize, IEC_Datatype dtenum,
+		EPDOType pdoType, CNode *objNode);
+INT32 getNodeTotalIndexSubIndex(INT32 NodeID);
+INT32 reversedata(UINT8 *actemp1, UINT8 *actemp2, UINT32 size);
 char* StringToUpper(char* str);
-void setFlagForRequiredCNIndexes(int NodeId);
-void UpdateCNCycleTime(CIndexCollection  *objIdxCol,char* cycleTime);
-void	UpdateNumberOfEnteriesSIdx(CIndex *objIndex, ENodeType NodeType);
-int getDataSize(char* dataTypeVal);
+void setFlagForRequiredCNIndexes(INT32 NodeId);
+void UpdateCNCycleTime(CIndexCollection *objIdxCol, char* cycleTime);
+void UpdateNumberOfEnteriesSIdx(CIndex *objIndex, ENodeType NodeType);
+INT32 getDataSize(char* dataTypeVal);
 bool checkIfStringDatatypes(char* datatypeValue);
-bool CheckIfDataTypeByNameExists(char* dtName, int NodeID);
-ocfmRetCode AddOtherMNIndexes(int NodeID);
+bool CheckIfDataTypeByNameExists(char* dtName, INT32 NodeID);
+ocfmRetCode AddOtherMNIndexes(INT32 NodeID);
 void AuotgenerateOtherIndexs(CNode* objNode);
-void UpdatedCNDateORTime(CIndex* pobjMNIndex, int iNodeId, EDateTime eDT);
-void copyPDODefToAct(int iNodeID, ENodeType enumNodeType);
-void copyMNPropDefToAct(int iNodeID, ENodeType enumNodeType);
-void copySubIndexDefToAct(int iNodeID, ENodeType enumNodeType, bool bForce, char *indexId, char *subIndexId );
-void copyIndexDefToAct(int iNodeID, ENodeType enumNodeType, char *indexId );
+void UpdatedCNDateORTime(CIndex* pobjMNIndex, INT32 iNodeId, EDateTime eDT);
+void copyPDODefToAct(INT32 iNodeID, ENodeType enumNodeType);
+void copyMNPropDefToAct(INT32 iNodeID, ENodeType enumNodeType);
+void copySubIndexDefToAct(INT32 iNodeID, ENodeType enumNodeType, bool bForce,
+		char *indexId, char *subIndexId);
+void copyIndexDefToAct(INT32 iNodeID, ENodeType enumNodeType, char *indexId);
 void setFlagForRequiredMNIndexes(INT32 iNodeId);
 bool CheckAllowedDTForMapping(char* dtName);
 void setFeatures(xmlTextReaderPtr reader, Feature* stFeature);
@@ -240,53 +247,61 @@ char* setNodeAssigmentBits(CNode* objNode);
 char* getLastAvailableCycleNumber();
 ocfmRetCode RecalculateMultiplex();
 void checkAndCorrectName(char* checkName);
-void CheckAndReAssignMultiplex(int iCNNodeId, char* CycleValue );
+void CheckAndReAssignMultiplex(INT32 iCNNodeId, char* CycleValue);
 ocfmRetCode CheckMutliplexAssigned();
 UINT32 getFreeCycleNumber(UINT32 uiCycleNumber);
 bool IsMultiplexCycleNumberContinuous(UINT32 uiCycleNumber);
-void calculateCNPollResponse(int iNodeID, ENodeType enumNodeType);
+void calculateCNPollResponse(INT32 iNodeID, ENodeType enumNodeType);
 ocfmRetCode CheckUpperAndLowerLimits(char* pcLowLimit, char* pcHighLimit);
-ocfmRetCode AddSubobject(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID);
+ocfmRetCode AddSubobject(INT32 iNodeID, ENodeType enumNodeType,
+		char* pbIndexID);
 CSubIndex* getMNSubIndexValues(char* pbIndex, char* pbSubIndex);
-void UpdateCNAsyncMTUsize(CIndexCollection  *pobjIdxCol,char* pbAsyncMTUsize);
-void UpdateCNMultiPrescal(CIndexCollection  *pobjIdxCol,char* pbMultiPrescal);
+void UpdateCNAsyncMTUsize(CIndexCollection *pobjIdxCol, char* pbAsyncMTUsize);
+void UpdateCNMultiPrescal(CIndexCollection *pobjIdxCol, char* pbMultiPrescal);
 bool checkIfValueZero(char* pcValue);
 INT32 GetDecimalValue(char* pcValue);
-void UpdateCNNodeAssignment(CNode*  pobjNode);
+void UpdateCNNodeAssignment(CNode* pobjNode);
 void ResetMultiplexedCNForceCycle();
 bool CheckIfMultiplexedCNExist();
 void CopyCustomErrorString(ocfmRetCode* stRet, char* pcCustomErrString);
-void UpdateCNMultipleCycleAssign(CNode*  pobjNode);
-void UpdateMNNodeAssignmentIndex(CNode *pobjNode, INT32 CNsCount, char* pcIndex, bool allowMNSubindex);
+void UpdateCNMultipleCycleAssign(CNode* pobjNode);
+void UpdateMNNodeAssignmentIndex(CNode *pobjNode, INT32 CNsCount, char* pcIndex,
+		bool allowMNSubindex);
 void RecalculateCNPresTimeout(char* pbSubIndexId);
 bool ValidateCNPresTimeout(char* pbSubIndexId, char* pcCheckValue);
 void CopyOldNodeIdAssignmentObject(CNode* pobjNode, INT32 iOldNodeId);
-void CopyOldNodeIdAssignmentObjectSubindex(CNode* pobjNode, INT32 iOldNodeId, char* pcIndex);
+void CopyOldNodeIdAssignmentObjectSubindex(CNode* pobjNode, INT32 iOldNodeId,
+		char* pcIndex);
 bool CheckAccessTypeForInclude(char* pcAccesstype);
 CSubIndex* DuplicateSubIndexObject(CSubIndex* pobjSubindex);
-void EnableDisableMappingPDO(CIndexCollection* pobjIdxCol, CIndex* objIndex, char* Buffer, bool EnableFlag);
-void FormatCdc(CIndexCollection *objIndexCollection, char* Buffer1, FILE* fileptr, ENodeType eNodeType );
+void EnableDisableMappingPDO(CIndexCollection* pobjIdxCol, CIndex* objIndex,
+		char* Buffer, bool EnableFlag);
+void FormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
+		FILE* fileptr, ENodeType eNodeType);
 bool IsDefaultActualNotEqual(CBaseIndex* pBaseIndexObject);
 bool ReactivateMappingPDO(CIndexCollection* pobjIndexCol, CIndex* pobjIndex);
-void BRSpecificFormatCdc(CIndexCollection *objIndexCollection, char* Buffer1, FILE* fileptr, ENodeType eNodeType, int iNodeId );
-void BRSpecificGetIndexData(CIndex* objIndex, char* Buffer, int iNodeId );
+void BRSpecificFormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
+		FILE* fileptr, ENodeType eNodeType, INT32 iNodeId);
+void BRSpecificGetIndexData(CIndex* objIndex, char* Buffer, INT32 iNodeId);
 INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 iNodeID);
-void UpdateCNSoCTolerance(CIndexCollection  *pobjIdxCol,char* pbSocTolerance);
+void UpdateCNSoCTolerance(CIndexCollection *pobjIdxCol, char* pbSocTolerance);
 INT32* ArrangeNodeIDbyStation();
 void SortNodeID(INT32 *piNodeIDColl, INT32 iColSize);
 bool IsPresMN();
 void setPresMNNodeAssigmentBits();
 bool CheckToolVersion(char* pcCurrentToolVersion);
-void UpdatePreqActLoad(CNode*  pobjNode, EAutoGenerate ePjtSetting);
-void UpdatePresActLoad(CNode*  pobjNode );
-void UpdateCNPresMNActLoad(CNode*  pobjNode);
-void UpdateCNVisibleNode(CNode*  pobjNode) throw(ocfmException);
-bool ISCNNodeAssignmentValid(CNode*  pobjNode);
-bool CopyMNSubindexToCN(CNode*  pobjNode, char *pcIndex, char *pcSubIndex);
+void UpdatePreqActLoad(CNode* pobjNode, EAutoGenerate ePjtSetting);
+void UpdatePresActLoad(CNode* pobjNode);
+void UpdateCNPresMNActLoad(CNode* pobjNode);
+void UpdateCNVisibleNode(CNode* pobjNode);
+bool ISCNNodeAssignmentValid(CNode* pobjNode);
+bool CopyMNSubindexToCN(CNode* pobjNode, char *pcIndex, char *pcSubIndex);
 void CalculatePayload();
-void SetCNLossObjects(int iNodeID, ENodeType enumNodeType);
+void SetCNLossObjects(INT32 iNodeID, ENodeType enumNodeType);
 void ResetAllSubIndexFlag(CIndex *pobjIndex);
-ocfmRetCode SetSubIndexAttributesByAttribute(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID, char* pbSubIndexID, EAttributeType enumAttributeType, char* pbInAttributeValue);
+ocfmRetCode SetSubIndexAttributesByAttribute(INT32 iNodeID,
+		ENodeType enumNodeType, char* pbIndexID, char* pbSubIndexID,
+		EAttributeType enumAttributeType, char* pbInAttributeValue);
 void SetBuildTime();
 const char* GetBuildTime();
 

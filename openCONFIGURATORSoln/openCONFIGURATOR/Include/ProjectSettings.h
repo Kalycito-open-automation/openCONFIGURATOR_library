@@ -72,19 +72,19 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include "Declarations.h"
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CPjtSettings
 {
 	public:
 		CPjtSettings(void);
-		~CPjtSettings(void);		
-	private:		
+		~CPjtSettings(void);
+	private:
 		static bool instanceFlag;
 		static CPjtSettings *objPjtSettings;
 		EAutoGenerate m_generateMode;
@@ -92,7 +92,7 @@ class DllExport CPjtSettings
 		char* m_IP_openPOWERLINK;
 		EViewMode m_viewMode;
 		bool m_bExpertViewSelected;
-	public :
+	public:
 		static CPjtSettings* getPjtSettingsPtr();
 		EAutoSave getSaveAttr();
 		void setSaveAttr(EAutoSave);

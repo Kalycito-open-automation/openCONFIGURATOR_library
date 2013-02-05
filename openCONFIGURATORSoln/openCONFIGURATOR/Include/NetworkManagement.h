@@ -72,8 +72,8 @@
 #pragma once
 
 /****************************************************************************************************
-* Includes
-****************************************************************************************************/
+ * Includes
+ ****************************************************************************************************/
 #include <string>
 #include "ComplexDataType.h"
 #include "TCollection.h"
@@ -81,29 +81,29 @@
 using namespace std;
 
 /****************************************************************************************************
-* Classes
-****************************************************************************************************/
+ * Classes
+ ****************************************************************************************************/
 class DllExport CNetworkManagement
 {
 	public:
 		CNetworkManagement(void);
 		~CNetworkManagement(void);
 
-	public:		
-		TCollection<Feature> FeatureCollection;	
+	public:
+		TCollection<Feature> FeatureCollection;
 	private:
 		INT32 m_NodeID;
 		INT32 m_MaxPDOCount;
 	public:
 		INT32 getMaxPDOCount();
-		void  calculateMaxPDOCount();
-		void addFeature(Feature  stfeature);
-		int getNodeID();
-		void setNodeID(int NodeID);
+		void calculateMaxPDOCount();
+		void addFeature(Feature stfeature);
+		INT32 getNodeID();
+		void setNodeID(INT32 NodeID);
 		char* getFeatureValue(EFeatureType featureType, char* featureName);
 		Feature* getFeature(UINT32 iCount);
 		UINT32 getNumberOfFeatures();
-        void DeleteFeatureCollections();
+		void DeleteFeatureCollections();
 };
 
 #endif // NetworkManagement_h
