@@ -1,75 +1,59 @@
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  $Source: $
-//
-// NAME:  ProcessImage.cpp
-//
-// BASE  CLASSES: none
-//  
-// PURPOSE:  purpose description
-//
-// AUTHOR:  Kalycito Powerlink Team
-//
-//  COPYRIGHT NOTICE:
-//
-//	****************************************************************************
+/**
+ ************************************************************************************************
+ \file			ProcessImage.cpp
 
-// (c) Kalycito Infotech Private Limited
-//
-//  Project:      openCONFIGURATOR 
-//
-//  Description:  
-//
-//
-//  License:
-//
-//    Redistribution and use in source and binary forms, with or without
-//    modification, are permitted provided that the following conditions
-//    are met:
-//
-//    1. Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//
-//    2. Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//
-//    3. Neither the name of Kalycito Infotech Private Limited nor the names of 
-//       its contributors may be used to endorse or promote products derived
-//       from this software without prior written permission. For written
-//       permission, please contact info@kalycito.com.
-//
-//    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//    COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//    BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//    ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//    POSSIBILITY OF SUCH DAMAGE.
-//
-//    Severability Clause:
-//
-//        If a provision of this License is or becomes illegal, invalid or
-//        unenforceable in any jurisdiction, that shall not affect:
-//        1. the validity or enforceability in that jurisdiction of any other
-//           provision of this License; or
-//        2. the validity or enforceability in other jurisdictions of that or
-//           any other provision of this License.
-//
-//****************************************************************************/
-//
-//  REVISION HISTORY:
-// $Log:      $
-///////////////////////////////////////////////////////////////////////////////////////////////
+ \brief			Handles Inout,offset values for process image
+ ************************************************************************************************
+ */
 
-/****************************************************************************************************
- * Includes
- ****************************************************************************************************/
+/*
+ (c) Kalycito Infotech Private Limited
+
+ License:
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ its contributors may be used to endorse or promote products derived
+ from this software without prior written permission. For written
+ permission, please contact info@kalycito.com.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+ Severability Clause:
+
+ If a provision of this License is or becomes illegal, invalid or
+ unenforceable in any jurisdiction, that shall not affect:
+ 1. the validity or enforceability in that jurisdiction of any other
+ provision of this License; or
+ 2. the validity or enforceability in other jurisdictions of that or
+ any other provision of this License.
+
+ ****************************************************************************/
+
+/****************************************************************************************************/
+/* Includes */
+
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -80,15 +64,15 @@
 #include "../Include/Exception.h"
 #include "../Include/ProcessImage.h"
 
-/****************************************************************************************************
- * Defines
- ****************************************************************************************************/
+/****************************************************************************************************/
+/* Defines */
+
 #define HEADER_FILE_BUFFER 5000000
 #define TOTAL_MODULES 10000
 
-/****************************************************************************************************
- * Global Variables
- ****************************************************************************************************/
+/****************************************************************************************************/
+/* Global Variables */
+
 INT32 iInVars = 0;
 INT32 iOutVars = 0;
 
@@ -110,15 +94,23 @@ static tADDRESSTABLE AddressTable[NO_OF_PI_ENTERIES] =
 };
 ModuleCol astModuleInfo[TOTAL_MODULES];
 
-/****************************************************************************************************
- * FUNCTION DEFINITIONS
- ***************************************************************************************************/
+//==========================================================================//
+// 				F U N C T I O N  D E F I N I T I O N S  					//
+//==========================================================================//
 
-/****************************************************************************************************
- * Function Name: SetPIOffsets
- * Description  : This function sets offset value for process image
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			SetPIOffsets
+ 
+ This function sets offset value for process image
+ 
+ \param			pobjProcessImage     Class Pointer Variable of ProcessImage
+ \param			iStartByteOffset     Integer Variable to hold the value of startbyteoffset  
+ \param			iPosition            Integer Variable to hold the value of image position 
+ \param			iStartBitOffset      Integer Variable to hold the value of startbitoffset 
+ \return		void
+ */
+/*****************************************************************************/
 //TODO: Unused function
 void SetPIOffsets(ProcessImage* pobjProcessImage, INT32& iStartByteOffset,
 		INT32 iPosition, INT32& iStartBitOffset)
@@ -153,11 +145,18 @@ void SetPIOffsets(ProcessImage* pobjProcessImage, INT32& iStartByteOffset,
 	}
 }
 
-/****************************************************************************************************
- * Function Name: GroupInOutPIVariables
- * Description  : This function assigns inout values for process image variables
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			GroupInOutPIVariables
+ 
+ This function assigns inout values for process image variables
+ 
+ \param			aobjPIInCol       Class Variable of ProcessImage to hold the value of object
+ \param			aobjPIOutCol      Class Variable of ProcessImage to hold the value of object 
+ \return		void
+ */
+/*****************************************************************************/
+
 void GroupInOutPIVariables(ProcessImage aobjPIInCol[],
 		ProcessImage aobjPIOutCol[])
 {
@@ -199,11 +198,18 @@ void GroupInOutPIVariables(ProcessImage aobjPIInCol[],
 	}
 }
 
-/****************************************************************************************************
- * Function Name: GroupNETPIVariables
- * Description:
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			GroupNETPIVariables
+ 
+ 
+ 
+ \param			DirectionType   Class Variable of EPIDirectionType to hold the direction type
+ \param			aobjPICol       Class Variable of NETProcessImage to hold the object 
+ \return		void
+ */
+/*****************************************************************************/
+
 INT32 GroupNETPIVariables(EPIDirectionType DirectionType,
 		NETProcessImage aobjPICol[])
 {
@@ -232,11 +238,16 @@ INT32 GroupNETPIVariables(EPIDirectionType DirectionType,
 	return NetPIVarsCount;
 }
 
-/****************************************************************************************************
- * Function Name: SetUniquePIVarName
- * Description  : This function assigns unique variables for process image
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			SetUniquePIVarName
+ 
+ This function assigns unique variables for process image
+ 
+ \return		void
+ */
+/*****************************************************************************/
+
 void SetUniquePIVarName()
 {
 	CNodeCollection* pobjNodeCol = NULL;
@@ -350,14 +361,20 @@ void SetUniquePIVarName()
 			}
 		}
 	}
-	return;
+	//return;
 }
 
-/****************************************************************************************************
- * Function Name: getIECDT
- * Description:
- * Return value: PIDataInfo*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getIECDT
+ 
+ 
+ \param			pbDataStr       Character Pointer Variable to hold the value of data 
+ \param			iDataSize		Integer Variable to hold the value of data size		
+ \return		PIDataInfo*
+ */
+/*****************************************************************************/
+
 PIDataInfo* getIECDT(char* pbDataStr, INT32 iDataSize)
 {
 	PIDataInfo *pstDataInfo = new PIDataInfo;
@@ -464,11 +481,21 @@ PIDataInfo* getIECDT(char* pbDataStr, INT32 iDataSize)
 	return pstDataInfo;
 }
 
-/****************************************************************************************************
- * Function Name: CheckIfModuleExists
- * Description  : This function checks whether the module is present or not
- * Return value : bool
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			CheckIfModuleExists
+ 
+ This function checks whether the module is present or not
+ 
+ \param			pbModuleName        Character Pointer Variable to hold the value of Module Name      
+ \param			ModuleNo            Integer Variable to hold the value of Module number  
+ \param			iNoOfModules        Integer Variable to hold the value of NUmber of modules 
+ \param			astModCol           Structure Class Variable of ModuleCol
+ \return		BOOL
+ \retval			TRUE			if successful
+ \retval			FALSE			if there is already a message pending	
+ */
+/*****************************************************************************/
 //TODO: Unused function
 bool CheckIfModuleExists(char* pbModuleName, INT32 & ModuleNo,
 		INT32 iNoOfModules, ModuleCol astModCol[])
@@ -484,11 +511,21 @@ bool CheckIfModuleExists(char* pbModuleName, INT32 & ModuleNo,
 	return false;
 }
 
-/****************************************************************************************************
- * Function Name: GenerateXAPHeaderFile
- * Description:   This function generates the header file
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			GenerateXAPHeaderFile
+ 
+ This function generates the header file
+ 
+ \param			pbFileName
+ \param			objPIInCol
+ \param			objPIOutCol
+ \param			iInVar
+ \param			iOutVar
+ \return		void	
+ */
+/*****************************************************************************/
+
 void GenerateXAPHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
 		ProcessImage objPIOutCol[], INT32 iInVar, INT32 iOutVar)
 {
@@ -601,11 +638,20 @@ void GenerateXAPHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
 	delete[] pbXapHeaderIncludeGuard;
 }
 
-/****************************************************************************************************
- * Function Name: WriteXAPHeaderContents
- * Description  : This function writes content into header file
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			WriteXAPHeaderContents
+ 
+ This function writes content into header file
+ 
+ \param			objProcessImage       Class Variable of ProcessImage to hold the process image value
+ \param			iNumberOfVars         Integer variable to hold the value of total number of variables 
+ \param			enumDirType           Enum Variable of  EPIDirectionType
+ \param			fpXapHeader           File Pointer Varible to hold the header file
+ \return		void	
+ */
+/*****************************************************************************/
+
 void WriteXAPHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
 		EPIDirectionType enumDirType, FILE* fpXapHeader)
 {
@@ -769,11 +815,21 @@ void WriteXAPHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
 	delete[] pbBuffer;
 }
 
-/****************************************************************************************************
- * Function Name: GenerateNETHeaderFile
- * Description:   This function generates header file interface
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			GenerateNETHeaderFile
+ 
+ This function generates header file interface
+ 
+ \param			pbFileName          Character POinter Variable to hold the value of file name
+ \param			objPIInCol          Class variable of ProcessImage
+ \param			objPIOutCol         Class variable of ProcessImage
+ \param			iInVar              Integer Variable to hold input value   
+ \param			iOutVar             Integer Variable to hold output value 
+ \return		void	
+ */
+/*****************************************************************************/
+
 void GenerateNETHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
 		ProcessImage objPIOutCol[], INT32 iInVar, INT32 iOutVar)
 {
@@ -860,11 +916,20 @@ void GenerateNETHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
 	fclose(fpNetFile);
 }
 
-/****************************************************************************************************
- * Function Name: WriteNETHeaderContents
- * Description: This function writes header contents
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			WriteNETHeaderContents
+ 
+ This function writes header contents
+ 
+ \param			objProcessImage       Class Variable of ProcessImage
+ \param			iNumberOfVars         Integer Variabl to hold the value of number of variables 
+ \param			enumDirType           Enum Variable of EPIDirectionType 
+ \param			fpNetHeader           File Pointer Variable to hold the header
+ \return		void	
+ */
+/*****************************************************************************/
+
 void WriteNETHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
 		EPIDirectionType enumDirType, FILE* fpNetHeader)
 {
@@ -983,11 +1048,23 @@ void WriteNETHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
 
 }
 
-/****************************************************************************************************
- * Function Name: GroupNETHeaderContents
- * Description:     
- * Return value: INT32
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			GroupNETHeaderContents
+ 
+ This Function groups the header contents
+ 
+ This function writes header contents
+ 
+ \param			objProcessImage       Class Variable of ProcessImage
+ \param			iNumberOfVars         Integer Variabl to hold the value of number of variables 
+ \param			enumDirType           Enum Variable of EPIDirectionType 
+ \param			fpNetHeader           File Pointer Variable to hold the header
+ 
+ \return		INT32	
+ */
+/*****************************************************************************/
+
 INT32 GroupNETHeaderContents(ProcessImage objProcessImage[],
 		INT32 iNumberOfVars, EPIDirectionType enumDirType, FILE* fpNetHeader)
 {
@@ -1213,11 +1290,19 @@ INT32 GroupNETHeaderContents(ProcessImage objProcessImage[],
 	return iTotalsize;
 }
 
-/****************************************************************************************************
- * Function Name: SetSIdxDataType
- * Description:   This fumction sets index for all data types
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			SetSIdxDataType
+ 
+ This fumction sets index for all data types
+ 
+ \param			pobjDataType     Class Pointer variable of DataType
+ \param			pbIdx            Character Pointer Variable to hold the value of Index
+ \param			pbSIdx           Character Pointer Variable to hold the value of Sub Index
+ \return		void	
+ */
+/*****************************************************************************/
+
 void SetSIdxDataType(DataType *pobjDataType, char* pbIdx, char* pbSIdx)
 {
 	if ((NULL == pobjDataType) || (NULL == pbIdx) || (NULL == pbSIdx))
@@ -1245,11 +1330,19 @@ void SetSIdxDataType(DataType *pobjDataType, char* pbIdx, char* pbSIdx)
 	pobjSIdx->setDataTypeST(*pobjDataType);
 }
 
-/****************************************************************************************************
- * Function Name: AddPDOIndexsToMN
- * Description:  This function adds PDO indexes to MN
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			AddPDOIndexsToMN
+ 
+ This function adds PDO indexes to MN
+ 
+ \param			pbIndex           Character Pointer Variable to hold the value of Index
+ \param			pbSubIndex        Character Pointer Variable to hold the value of Sub Index
+ \param			enumPdoType       Enum Variable of  EPDOType
+ \return		void	
+ */
+/*****************************************************************************/
+
 void AddPDOIndexsToMN(char* pbIndex, char* pbSubIndex, EPDOType enumPdoType)
 {
 	ocfmRetCode stRetCode;
@@ -1366,11 +1459,20 @@ void AddPDOIndexsToMN(char* pbIndex, char* pbSubIndex, EPDOType enumPdoType)
 	}
 }
 
-/****************************************************************************************************
- * Function Name: getPIAddress
- * Description:  This function sets process image address
- * Return value: char*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getPIAddress
+ 
+ This function sets process image address
+ 
+ \param			dt                 Class Variable of PDODataType to hold the datatype
+ \param			dirType            Class Variable of EPIDirectionType to hold the value of direction type
+ \param			iOffset            Integer Variable to hold offset value
+ \param			iDataSize          Integer Varibale to hold the value of datasize   
+ \return		stPIObject	
+ */
+/*****************************************************************************/
+
 PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
 		INT32 iDataSize)
 {
@@ -1414,11 +1516,17 @@ PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
 	return stPIObject;
 }
 
-/****************************************************************************************************
- * Function Name: getPIDataTypeName
- * Description  : This function sets value for process image datatype
- * Return value : char*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getPIDataTypeName
+ 
+ This function sets value for process image datatype
+ 
+ \param			pbAddress       Character Pointer Variable to hold the Process image address
+ \return		char*	
+ */
+/*****************************************************************************/
+
 char* getPIDataTypeName(char* pbAddress)
 {
 	char *pbRetString = NULL;
@@ -1484,11 +1592,17 @@ char* getPIDataTypeName(char* pbAddress)
 	return pbRetString;
 }
 
-/****************************************************************************************************
- * Function Name: getPIName
- * Description  : This function retuns process image name
- * Return value : char*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getPIName
+ 
+ This function returns process image name
+ 
+ \param			pbAddress  Character Pointer Variable to hold the Process image address
+ \return		char*	
+ */
+/*****************************************************************************/
+
 char* getPIName(char* pbAddress)
 {
 	char *pbRetString = NULL;
@@ -1554,21 +1668,37 @@ char* getPIName(char* pbAddress)
 	return pbRetString;
 }
 
-/****************************************************************************************************
- * Function Name: CheckIfProcessImageIdx
- * Description: This function checks for process image index
- * Return value: bool
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			CheckIfProcessImageIdx
+ 
+ This function checks for process image index
+ 
+ \param			pbIndex       Character Pointer Variable to hold the value of index
+ \return		BOOL
+ \retval			TRUE			if successful
+ \retval			FALSE			if there is already a message pending	
+ */
+/*****************************************************************************/
+
 bool CheckIfProcessImageIdx(char* pbIndex)
 {
 	return ((0 <= strcmp(pbIndex, "A000")) && (0 >= strcmp(pbIndex, "AFFF")));
 }
 
-/**************************************************************************************************
- * Function Name: SearchModuleNameNETProcessImageCollection
- * Description:   This function collects process image based on the module name
- * Return value: INT32
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			SearchModuleNameNETProcessImageCollection
+ 
+ This function collects process image based on the module name
+ 
+ \param			CNNodeID         Integer Variable to hold the node id      
+ \param			iItemLoopCount   Integer Variable to hold the value of loop count   
+ \param			schModuleName    Character Pointer Variable to hold the name of the search module
+ \return		INT32	
+ */
+/*****************************************************************************/
+
 INT32 SearchModuleNameNETProcessImageCollection(INT32 CNNodeID,
 		INT32 iItemLoopCount, char* schModuleName)
 {
@@ -1599,11 +1729,19 @@ INT32 SearchModuleNameNETProcessImageCollection(INT32 CNNodeID,
 	return -1;
 }
 
-/**************************************************************************************************
- * Function Name: CopyPItoNETPICollection
- * Description:   This function copies process image to interface process image collection
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			CopyPItoNETPICollection
+ 
+ This function copies process image to interface process image collection
+ 
+ \param			objProcessImage               Class Variable of ProcessImage
+ \param			objNETProcessImage            Class Variable of NETProcessImage 
+ \param			ModuleName                    Character Pointer Variable to hold the module name
+ \return		void	
+ */
+/*****************************************************************************/
+
 void CopyPItoNETPICollection(ProcessImage objProcessImage,
 		NETProcessImage objNETProcessImage, char* ModuleName)
 {
@@ -1637,11 +1775,18 @@ void CopyPItoNETPICollection(ProcessImage objProcessImage,
 
 	objNode->addNETProcessImage(objNETProcessImage);
 }
-/**************************************************************************************************
- * Function Name: GetDatatypeNETPI
- * Description:   This function returns data type for process image
- * Return value: char*
- ****************************************************************************************************/
+
+/*****************************************************************************/
+/**
+ \brief			GetDatatypeNETPI
+ 
+ This function returns data type for process image
+ 
+ \param			dt_enum       Enum Variable of IEC_Datatype to hold the datatype of process image
+ \return		char*	
+ */
+/*****************************************************************************/
+
 char* GetDatatypeNETPI(IEC_Datatype dt_enum)
 {
 	char* pcDTNetString;
@@ -1707,11 +1852,18 @@ char* GetDatatypeNETPI(IEC_Datatype dt_enum)
 	}
 	return pcDTNetString;
 }
-/**************************************************************************************************
- * Function Name: GetDatasizeNETPI
- * Description: This function returns data size for process image
- * Return value: INT32
- ****************************************************************************************************/
+
+/*****************************************************************************/
+/**
+ \brief			GetDatasizeNETPI
+ 
+ This function returns data size for process image
+ 
+ \param			dt_enum Enum Variable of IEC_Datatype to hold the datatype of process image
+ \return		INT32	
+ */
+/*****************************************************************************/
+
 INT32 GetDatasizeNETPI(IEC_Datatype dt_enum)
 {
 	INT32 iDSNetString = 0;

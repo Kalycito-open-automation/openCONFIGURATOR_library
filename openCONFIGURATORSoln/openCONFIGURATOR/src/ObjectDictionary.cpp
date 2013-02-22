@@ -1,75 +1,59 @@
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// $Source: $
-//
-// NAME: ObjectDictionary.cpp
-//
-// BASE CLASSES: none
-//
-// PURPOSE: purpose description
-//
-// AUTHOR: Kalycito Powerlink Team
-//
-// COPYRIGHT NOTICE:
-//
-// ****************************************************************************
+/**
+ ************************************************************************************************
+ \file			ObjectDictionary.cpp
 
-// (c) Kalycito Infotech Private Limited
-//
-// Project: openCONFIGURATOR
-//
-// Description:
-//
-//
-// License:
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//
-// 1. Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright
-// notice, this list of conditions and the following disclaimer in the
-// documentation and/or other materials provided with the distribution.
-//
-// 3. Neither the name of Kalycito Infotech Private Limited nor the names of
-// its contributors may be used to endorse or promote products derived
-// from this software without prior written permission. For written
-// permission, please contact info@kalycito.com.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-//
-// Severability Clause:
-//
-// If a provision of this License is or becomes illegal, invalid or
-// unenforceable in any jurisdiction, that shall not affect:
-// 1. the validity or enforceability in that jurisdiction of any other
-// provision of this License; or
-// 2. the validity or enforceability in other jurisdictions of that or
-// any other provision of this License.
-//
-//****************************************************************************/
-//
-// REVISION HISTORY:
-// $Log: $
-///////////////////////////////////////////////////////////////////////////////////////////////
+ \brief			Creats object dictionary for each node and Process the Node value,Name and its attributes
+ ************************************************************************************************
+ */
 
-/****************************************************************************************************
- * Includes
- ****************************************************************************************************/
+/*
+ (c) Kalycito Infotech Private Limited
+
+ License:
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ its contributors may be used to endorse or promote products derived
+ from this software without prior written permission. For written
+ permission, please contact info@kalycito.com.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+ Severability Clause:
+
+ If a provision of this License is or becomes illegal, invalid or
+ unenforceable in any jurisdiction, that shall not affect:
+ 1. the validity or enforceability in that jurisdiction of any other
+ provision of this License; or
+ 2. the validity or enforceability in other jurisdictions of that or
+ any other provision of this License.
+
+ ****************************************************************************/
+
+/****************************************************************************************************/
+/* Includes */
+
 #include <iostream>
 #include "../Include/ObjectDictionary.h"
 #include "../Include/Internal.h"
@@ -77,21 +61,26 @@
 
 using namespace std;
 
-/****************************************************************************************************
- * Global Variables
- ****************************************************************************************************/
+/****************************************************************************************************/
+/* Global Variables */
+
 INT32 iLastObjDictIndexParsed = 0;
 bool CObjectDictionary::instanceFlag = false;
 CObjectDictionary* CObjectDictionary::objectDictionary = NULL;
 CNode* CObjectDictionary::objDictNode = NULL;
 
-/****************************************************************************************************
- * FUNCTION DEFINITIONS
- ****************************************************************************************************/
+//==========================================================================//
+// 				F U N C T I O N  D E F I N I T I O N S  					//
+//==========================================================================//
 
-/****************************************************************************************************
- * Constructor
- ****************************************************************************************************/
+/*************************************************************************/
+/* Constructor */
+
+/**
+ 
+ @param void
+ */
+
 CObjectDictionary::CObjectDictionary(void)
 {
 	objDictNode = new CNode();
@@ -103,19 +92,29 @@ CObjectDictionary::CObjectDictionary(void)
 	m_s_attrIdx_SIdx = collectionObj.Count();
 }
 
-/****************************************************************************************************
- * Destructor
- ****************************************************************************************************/
+/*************************************************************************/
+/* Destructor */
+
+/**
+ 
+ @param void
+ */
+
 CObjectDictionary::~CObjectDictionary(void)
 {
 	//Add destructor code here
 }
 
-/****************************************************************************************************
- * Function Name: CObjectDictionary::getObjDictPtr
- * Description  : This function returns object dictionary based on the value of instance flag 
- * Return value : CObjectDictionary*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getObjDictPtr
+ 
+ This is a member function of CObjectDictionary returns object dictionary based on the value of instance flag 
+
+ \return		CObjectDictionary*
+ */
+/*****************************************************************************/
+
 CObjectDictionary* CObjectDictionary::getObjDictPtr()
 {
 	if (!instanceFlag)
@@ -126,11 +125,17 @@ CObjectDictionary* CObjectDictionary::getObjDictPtr()
 	return objectDictionary;
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::ProcessObjectDictionary
- * Description  : Process the Node value,Name and its attributes
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			ProcessObjectDictionary
+ 
+ This is a member function of CObjectDictionary Process the Node value,Name and its attributes
+ 
+ \param			reader  xml Variable of type xmlTextReaderPtr 
+ \return		void
+ */
+/*****************************************************************************/
+
 void CObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 {
 	const xmlChar *name;
@@ -264,11 +269,17 @@ void CObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::addSameAttributesObjects
- * Description: add the SubIndex in the Index Object
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			addSameAttributesObjects
+ 
+ This is a member function of CObjectDictionary add the SubIndex in the Index Object
+ 
+ \param			stAttrIdx Structure Variable of s_attrIdx_SIdx to hold the attribute index
+ \return		void
+ */
+/*****************************************************************************/
+
 void CObjectDictionary::addSameAttributesObjects(s_attrIdx_SIdx stAttrIdx)
 {
 	INT32 iItemPosition = collectionObj.Add();
@@ -277,11 +288,19 @@ void CObjectDictionary::addSameAttributesObjects(s_attrIdx_SIdx stAttrIdx)
 	m_s_attrIdx_SIdx = collectionObj.Count();
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::createSameattrObject
- * Description  : This function creats object dictionary 
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			createSameattrObject
+ 
+ This is a member function of CObjectDictionary creats object dictionary
+ 
+ \param			pbValue          Character Pointer Variable to hold the value of the object
+ \param			enumObjType      Enum Variable of  ObjectType to hold the value of Object type
+ \param			pbIdx            Character Pointer Variable to hold the value of Index
+ \return		void
+ */
+/*****************************************************************************/
+
 void CObjectDictionary::createSameattrObject(char* pbValue,
 		ObjectType enumObjType, char* pbIdx)
 {
@@ -321,11 +340,18 @@ void CObjectDictionary::createSameattrObject(char* pbValue,
 	delete[] pbSubIdx;
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::getObjectDictIndex
- * Description  : This function returns index value of the object dictionary
- * Return value : CIndex*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getObjectDictIndex
+ 
+ This is a member function of CObjectDictionary returns index value of the object dictionary
+ 
+ \param			pbIdx            Character Pointer Variable to hold the value of Index
+ 
+ \return		CIndex*
+ */
+/*****************************************************************************/
+
 CIndex* CObjectDictionary::getObjectDictIndex(char* pbIdx)
 {
 	CIndex* pobjIndex = NULL;
@@ -362,11 +388,18 @@ CIndex* CObjectDictionary::getObjectDictIndex(char* pbIdx)
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::getObjectDictSubIndex
- * Description:   This function returns the object dictonary for sub index
- * Return value: CSubIndex*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getObjectDictSubIndex
+ 
+ This is a member function of CObjectDictionary returns the object dictonary for sub index
+ 
+ \param			pbIdx       Character pointer variable to hold the value of Index
+ \param			pbSIdx      Character pointer variable to hold the value of Sub-Index
+ \return		CIndex*
+ */
+/*****************************************************************************/
+
 CSubIndex* CObjectDictionary::getObjectDictSubIndex(char* pbIdx, char* pbSIdx)
 {
 	CSubIndex* pobjSIdx = NULL;
@@ -423,11 +456,21 @@ CSubIndex* CObjectDictionary::getObjectDictSubIndex(char* pbIdx, char* pbSIdx)
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::checkInTheRange
- * Description  : This function returns the range of the object dictionary ids   
- * Return value : bool
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			checkInTheRange
+ 
+ This is a member function of CObjectDictionary returns the range of the object dictionary ids
+ 
+ \param			pbIdx              Character Pointer Variable to hold the value of Index
+ \param			pbStartIdx         Character Pointer Variable to hold the value of Start Index 
+ \param			pbEndIdx           Character Pointer Variable to hold the value of End Index
+ \return		BOOL
+ \retval			TRUE			if successful
+ \retval			FALSE			if there is already a message pending	
+ */
+/*****************************************************************************/
+
 bool CObjectDictionary::checkInTheRange(char* pbIdx, char* pbStartIdx,
 		char* pbEndIdx)
 {
@@ -442,11 +485,15 @@ bool CObjectDictionary::checkInTheRange(char* pbIdx, char* pbStartIdx,
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::printall
- * Description  : This function collects the object ids,start index and end index
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			printall
+ 
+ This is a member function of CObjectDictionary collects the object ids,start index and end index
+ 
+ \return		void
+ */
+/*****************************************************************************/
 //TODO: Unused function
 void CObjectDictionary::printall()
 {
@@ -457,11 +504,16 @@ void CObjectDictionary::printall()
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::ifObjectDictIndexExists
- * Description  : This function returns the obj dictionary value from the collection list based on the index value
- * Return value : INT32
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			ifObjectDictIndexExists
+ 
+ This is a member function of CObjectDictionaryreturns the obj dictionary value from the collection list based on the index value
+ 
+ \param			pbIdx		Character Pointer Variable to hold the value of index		
+ \return		INT32
+ */
+/*****************************************************************************/
 //TODO: Unused function
 INT32 CObjectDictionary::ifObjectDictIndexExists(char* pbIdx)
 {
@@ -481,11 +533,17 @@ INT32 CObjectDictionary::ifObjectDictIndexExists(char* pbIdx)
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::ifObjectDictSubIndexExists
- * Description  : This function returns the obj dictionary value from the collection list based on the subindex value
- * Return value : INT32
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			ifObjectDictSubIndexExists
+ 
+ This is a member function of CObjectDictionary returns the obj dictionary value from the collection list based on the subindex value
+ 
+ \param			pbIdx      Character Pointer Variable to hold the value of index		
+ \param			pbSIdx	   Character Pointer Variable to hold the value of Subindex		
+ \return		INT32
+ */
+/*****************************************************************************/
 //TODO: Unused function
 INT32 CObjectDictionary::ifObjectDictSubIndexExists(char* pbIdx, char* pbSIdx)
 {
@@ -513,11 +571,18 @@ INT32 CObjectDictionary::ifObjectDictSubIndexExists(char* pbIdx, char* pbSIdx)
 	}
 }
 
-/**************************************************************************************************
- * Function Name: CObjectDictionary::getIndexName
- * Description  : This function returns the index name
- * Return value : char*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getIndexName
+ 
+ This is a member function of CObjectDictionary  returns the index name
+ 
+ \param			pbObjectIndex  Character Pointer Variable to hold the value of Object index
+ \param			pbObjectName   Character Pointer Variable to hold the value of Object name				
+ \return		char*
+ */
+/*****************************************************************************/
+
 char* CObjectDictionary::getIndexName(char* pbObjectIndex, char* pbObjectName)
 {
 	char* pbName = NULL;

@@ -1,94 +1,83 @@
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  $Source: $
-//
-// NAME:  ProjectSettings.cpp
-//
-// BASE  CLASSES: none
-//  
-// PURPOSE:  purpose description
-//
-// AUTHOR:  Kalycito Powerlink Team
-//
-//  COPYRIGHT NOTICE:
-//
-//	****************************************************************************
+/**
+ ************************************************************************************************
+ \file			ProjectSettings.cpp
 
-// (c) Kalycito Infotech Private Limited
-//
-//  Project:      openCONFIGURATOR 
-//
-//  Description:  
-//
-//
-//  License:
-//
-//    Redistribution and use in source and binary forms, with or without
-//    modification, are permitted provided that the following conditions
-//    are met:
-//
-//    1. Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//
-//    2. Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//
-//    3. Neither the name of Kalycito Infotech Private Limited nor the names of 
-//       its contributors may be used to endorse or promote products derived
-//       from this software without prior written permission. For written
-//       permission, please contact info@kalycito.com.
-//
-//    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//    COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//    BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//    ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//    POSSIBILITY OF SUCH DAMAGE.
-//
-//    Severability Clause:
-//
-//        If a provision of this License is or becomes illegal, invalid or
-//        unenforceable in any jurisdiction, that shall not affect:
-//        1. the validity or enforceability in that jurisdiction of any other
-//           provision of this License; or
-//        2. the validity or enforceability in other jurisdictions of that or
-//           any other provision of this License.
-//
-//****************************************************************************/
-//
-//  REVISION HISTORY:
-// $Log:      $
-///////////////////////////////////////////////////////////////////////////////////////////////
+ \brief			Handles project settings such as view mode,new settings,generate,ip address.
+ ************************************************************************************************
+ */
 
-/****************************************************************************************************
- * Includes
- ****************************************************************************************************/
+/*
+ (c) Kalycito Infotech Private Limited
+
+ License:
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ its contributors may be used to endorse or promote products derived
+ from this software without prior written permission. For written
+ permission, please contact info@kalycito.com.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+ Severability Clause:
+
+ If a provision of this License is or becomes illegal, invalid or
+ unenforceable in any jurisdiction, that shall not affect:
+ 1. the validity or enforceability in that jurisdiction of any other
+ provision of this License; or
+ 2. the validity or enforceability in other jurisdictions of that or
+ any other provision of this License.
+
+ ****************************************************************************/
+
+/****************************************************************************************************/
+/* Includes */
+
 #include <iostream>
 #include "../Include/ProjectSettings.h"
 #include "../Include/Internal.h"
 
 using namespace std;
 
-/****************************************************************************************************
- * Global Variables
- ****************************************************************************************************/
+/****************************************************************************************************/
+/* Global Variables */
+
 bool CPjtSettings::instanceFlag = false;
 CPjtSettings* CPjtSettings::objPjtSettings = NULL;
 
-/****************************************************************************************************
- * FUNCTION DEFINITIONS
- ****************************************************************************************************/
+//==========================================================================//
+// 				F U N C T I O N  D E F I N I T I O N S  					//
+//==========================================================================//
 
-/****************************************************************************************************
- * Constructor
- ****************************************************************************************************/
+/*************************************************************************/
+/* Constructor */
+
+/**
+ 
+ @param void
+ */
+
 CPjtSettings::CPjtSettings(void)
 {
 #if defined DEBUG
@@ -99,18 +88,16 @@ CPjtSettings::CPjtSettings(void)
 	m_IP_openPOWERLINK = NULL;
 	m_bExpertViewSelected = false;
 	m_viewMode = SIMPLE; //TODO: Review initialisation
-#if defined DEBUG
-	cout << "m_saveMode:" << m_saveMode << endl;
-	cout << "m_generateMode:" << m_generateMode << endl;
-	//cout << "m_IP_openPOWERLINK:" << m_IP_openPOWERLINK <<endl;
-	cout << "m_bExpertViewSelected:" << m_bExpertViewSelected << endl;
-	cout << "m_viewMode:" << m_viewMode << endl;
-#endif
 }
 
-/****************************************************************************************************
- * Destructor
- ****************************************************************************************************/
+/*************************************************************************/
+/* Destructor */
+
+/**
+ 
+ @param void
+ */
+
 CPjtSettings::~CPjtSettings(void)
 {
 	instanceFlag = false;
@@ -119,11 +106,16 @@ CPjtSettings::~CPjtSettings(void)
 #endif
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::getPjtSettingsPtr
- * Description  : This function creats new Pjtsettings 
- * Return value : CPjtSettings*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getPjtSettingsPtr
+ 
+ This is a member function of CPjtSettings creats new Pjtsettings 
+
+ \return		CPjtSettings*
+ */
+/*****************************************************************************/
+
 CPjtSettings* CPjtSettings::getPjtSettingsPtr()
 {
 	if (!instanceFlag)
@@ -137,31 +129,47 @@ CPjtSettings* CPjtSettings::getPjtSettingsPtr()
 	return objPjtSettings;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::getSaveAttr
- * Description  : This function saves new Pjtsettings 
- * Return value : EAutoSave
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getSaveAttr
+ 
+ This is a member function of CPjtSettings saves new Pjtsettings  
+
+ \return		EAutoSave
+ */
+/*****************************************************************************/
+
 EAutoSave CPjtSettings::getSaveAttr()
 {
 	return m_saveMode;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::setSaveAttr
- * Description:   This function sets mode for pjt settings
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			setSaveAttr
+ 
+ This is a member function of CPjtSettings sets mode for pjt settings 
+ 
+ \param			enumAutoSaveMode   Enum Variable of EAutoSave to save the attributes
+ \return		void
+ */
+/*****************************************************************************/
+
 void CPjtSettings::setSaveAttr(EAutoSave enumAutoSaveMode)
 {
 	m_saveMode = enumAutoSaveMode;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::getGenerateAttr
- * Description:   This function generates mode for pjt settings  
- * Return value: EAutoGenerate
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getGenerateAttr
+ 
+ This is a member function of CPjtSettings generates mode for pjt settings    
+
+ \return		EAutoGenerate
+ */
+/*****************************************************************************/
+
 EAutoGenerate CPjtSettings::getGenerateAttr()
 {
 #if defined DEBUG
@@ -170,21 +178,33 @@ EAutoGenerate CPjtSettings::getGenerateAttr()
 	return m_generateMode;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::setGenerateAttr
- * Description  : This function sets mode for pjt settings 
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			setGenerateAttr
+ 
+ This is a member function of CPjtSettings sets mode for pjt settings  
+ 
+ \param			enumAutoGenerateMode Enum Variable of EAutoGenerate to generate attribute
+ \return		void
+ */
+/*****************************************************************************/
+
 void CPjtSettings::setGenerateAttr(EAutoGenerate enumAutoGenerateMode)
 {
 	m_generateMode = enumAutoGenerateMode;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::setPOWERLINK_IP
- * Description  : This function assigns IP address for Powerlink
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			setPOWERLINK_IP
+ 
+ This is a member function of CPjtSettings assigns IP address for Powerlink  
+ 
+ \param			pbIPAddr   Character Pointer variable to hold IPaddress
+ \return		void
+ */
+/*****************************************************************************/
+
 void CPjtSettings::setPOWERLINK_IP(char* pbIPAddr)
 {
 //TODO: review
@@ -198,11 +218,16 @@ void CPjtSettings::setPOWERLINK_IP(char* pbIPAddr)
 
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::getPOWERLINK_IP
- * Description  : This Function returns Powerlink IP
- * Return value : char*
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			getPOWERLINK_IP
+ 
+ This is a member function of CPjtSettings returns Powerlink IP  
+ 
+ \return		char*
+ */
+/*****************************************************************************/
+
 //TODO: Unused Function
 const char* CPjtSettings::getPOWERLINK_IP()
 {
@@ -215,40 +240,66 @@ const char* CPjtSettings::getPOWERLINK_IP()
 		return NULL;
 	}
 }
-/****************************************************************************************************
- * Function Name: CPjtSettings::getViewMode
- * Description  : This function sets view mode under pjt settings
- * Return value : EViewMode
- ****************************************************************************************************/
+
+/*****************************************************************************/
+/**
+ \brief			getViewMode
+ 
+ This is a member function of CPjtSettings sets view mode under pjt settings  
+ 
+ \return		EViewMode
+ */
+/*****************************************************************************/
+
 EViewMode CPjtSettings::getViewMode()
 {
 	return m_viewMode;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::setViewMode
- * Description  : This function assigns view mode
- * Return value : void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			setViewMode
+ 
+ This is a member function of CPjtSettings assigns view mode  
+ 
+ \param			enumViewMode	Enum Variable of EViewMode to hold the value of mode type			
+ \return		void
+ */
+/*****************************************************************************/
+
 void CPjtSettings::setViewMode(EViewMode enumViewMode)
 {
 	m_viewMode = enumViewMode;
 }
-/****************************************************************************************************
- * Function Name: CPjtSettings::getExpertViewSelectedFlag
- * Description  : This function sets flag for type of view selected under pjt settings
- * Return value : bool
- ****************************************************************************************************/
+
+/*****************************************************************************/
+/**
+ \brief			getExpertViewSelectedFlag
+ 
+ This is a member function of CPjtSettings sets flag for type of view selected under pjt settings  
+ 
+ \return		BOOL
+ \retval			TRUE			if successful
+ \retval			FALSE			if there is already a message pending	
+ */
+/*****************************************************************************/
+
 bool CPjtSettings::getExpertViewSelectedFlag()
 {
 	return m_bExpertViewSelected;
 }
 
-/****************************************************************************************************
- * Function Name: CPjtSettings::setExpertViewSelectedFlag
- * Description:   This function assigns type of view selected under pjt settings
- * Return value: void
- ****************************************************************************************************/
+/*****************************************************************************/
+/**
+ \brief			setExpertViewSelectedFlag
+ 
+ This is a member function of CPjtSettings assigns type of view selected under pjt settings 
+ 
+ \param			bExpertViewSelected	 Boolean Variable to hold the value of Expertview selected			
+ \return		void
+ */
+/*****************************************************************************/
+
 void CPjtSettings::setExpertViewSelectedFlag(bool bExpertViewSelected)
 {
 	m_bExpertViewSelected = bExpertViewSelected;

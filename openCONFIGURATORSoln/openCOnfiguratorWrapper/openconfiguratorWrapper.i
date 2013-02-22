@@ -97,7 +97,7 @@ ocfmRetCode IfSubIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID, ch
 
 ocfmRetCode GetIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, EAttributeType AttributeType, char* Out_AttributeValue);
 ocfmRetCode GetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, EAttributeType AttributeType,char* Out_AttributeValue);
-ocfmRetCode GetNodeCount(INT32 MNID, INT32* Out_NodeCount);
+ocfmRetCode GetNodeCount(INT32 MnNodeID, INT32* Out_NodeCount);
 ocfmRetCode GetIndexCount(INT32 NodeID, ENodeType NodeType, INT32* Out_IndexCount);
 ocfmRetCode GetSubIndexCount(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32* Out_SubIndexCount);
 
