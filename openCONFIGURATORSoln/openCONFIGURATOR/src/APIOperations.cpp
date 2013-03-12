@@ -670,15 +670,104 @@ ocfmRetCode DeleteNode(INT32 iNodeID, ENodeType enumNodeType)
 			//1F92->subIdx(CN Nodeid) doesnot exists
 		}
 		delete[] pbSIdx;
+
+		//Delete the auto generated pdo indexes also.
+		CNode *pobjMNnode = NULL;
+		CIndexCollection *pobjMnIdxCol = NULL;
+		pobjMNnode = pobjNodeCollection->getNodePtr(MN, MN_NODEID);
+		pobjMnIdxCol = pobjMNnode->getIndexCollection();
+		INT32 iTotalMNidx = pobjMnIdxCol->getNumberofIndexes();
+		cout<< "iTotalMNidx" <<iTotalMNidx<<endl;
+		for(INT32 iLoopCount = 0; iLoopCount < iTotalMNidx; iLoopCount++)
+		{
+			CIndex *pobjMnCommIndex = NULL;
+			char* pbSubstr1 = new char[SUBINDEX_LEN];
+			char* pbSubstr2 = new char[SUBINDEX_LEN];
+			bool b14entry = false;
+			bool b18entry = false;
+
+			pobjMnCommIndex = pobjMnIdxCol->getIndex(iLoopCount);
+			pbSubstr1 = subString((char*) pobjMnCommIndex->getIndexValue(), 0, 2);
+			pbSubstr2 = subString((char*) pobjMnCommIndex->getIndexValue(), 2, 2);
+			cout<<"Entry Processing: "<<pbSubstr1<<pbSubstr2<<endl;
+			if ((0 == strcmp(pbSubstr1, "14")))
+			{
+				b14entry = true;
+			}
+			else if((0 == strcmp(pbSubstr1, "18")))
+			{
+				b18entry = true;
+			}
+
+
+			if ((b14entry == true) || (b18entry == true))
+			{
+				CSubIndex *pobjSubIndex = NULL;
+				char* pbActValue = new char[SUBINDEX_LEN];
+				pobjSubIndex = pobjMnCommIndex->getSubIndexbyIndexValue((char*) "01");
+				if(NULL != pobjSubIndex)
+				{
+					INT32 iTempNodeid;
+					pbActValue = (char*)pobjSubIndex->getActualValue(); //NULL
+					iTempNodeid = GetDecimalValue(pbActValue);
+
+					if(iNodeID == iTempNodeid)
+					{
+						CIndex *pbojMnTxIndex = NULL;
+						char *pbMnTxIndexId =  new char[INDEX_LEN];
+						if(b14entry)
+						{
+							pbMnTxIndexId = strcpy(pbMnTxIndexId, "16");
+							pbMnTxIndexId = strcat(pbMnTxIndexId, pbSubstr2);
+
+							pbojMnTxIndex = pobjMnIdxCol->getIndexbyIndexValue(pbMnTxIndexId);
+						}
+						else if(b18entry)
+						{
+							pbMnTxIndexId = strcpy(pbMnTxIndexId, "1A");
+							pbMnTxIndexId = strcat(pbMnTxIndexId, pbSubstr2);
+
+							pbojMnTxIndex = pobjMnIdxCol->getIndexbyIndexValue(pbMnTxIndexId);
+						}
+						else
+						{
+							//no others will enter
+						}
+
+						if (NULL != pbojMnTxIndex)
+						{
+							ocfmRetCode stErrorInfo;
+							pbojMnTxIndex->deleteSubIndexCollection();
+							stErrorInfo = AddSubIndex(MN_NODEID, MN, pbMnTxIndexId, (char*) "00");
+							if (stErrorInfo.code != OCFM_ERR_SUCCESS)
+							{
+								cout<<"00th subindex cannot be added"<<endl;
+							}
+							pobjSubIndex->setActualValue((char*)"00");
+						}
+						cout<<"subidx Coll deleted"<<endl;
+						delete[] pbMnTxIndexId;
+					}
+				}
+				else
+				{
+					//00th subindex in the communication index is not present
+				}
+				//delete[] pbActValue;
+			}
+			delete[] pbSubstr1;
+			delete[] pbSubstr2;
+		}
 	}
 
 	pobjNodeCollection->deleteNode(iNodePos);
+
 
 #if defined DEBUG
 	cout << "Deleted " << enumNodeType << ". NodeID:" << iNodeID << endl;
 #endif
 
-	stErrorInfo.code = OCFM_ERR_SUCCESS;
+	//stErrorInfo.code = OCFM_ERR_SUCCESS;
 	return stErrorInfo;
 }
 
@@ -5699,8 +5788,8 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 				objProcessImage.Name =
 						(char*) malloc(
 								strlen(
-										objVarDecl.nam_id_dt_attr->getName()) + strlen(pbModuleName) + 6 + ALLOC_BUFFER);strcpy
-				(objProcessImage.Name, getPIName(pobjNode->getNodeId()));
+										objVarDecl.nam_id_dt_attr->getName()) + strlen(pbModuleName) + 6 + ALLOC_BUFFER);
+				strcpy(objProcessImage.Name, getPIName(pobjNode->getNodeId()));
 				strcat(objProcessImage.Name, pbModuleName);
 				strcat(objProcessImage.Name, ".");
 				strcat(objProcessImage.Name,
@@ -9715,7 +9804,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			/*Process PDO Nodes*/
 			stRetInfo = ProcessPDONodes(IsBuild);
 #if defined DEBUG
-			cout << "Nodes Processed" << endl;
+			cout << "PDO's in CN Nodes Processed" << endl;
 #endif
 			if (stRetInfo.code != OCFM_ERR_SUCCESS)
 			{
@@ -9730,10 +9819,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			//pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
 			//objMNNode = pobjNodeCollection->getNode(MN, MN_NODEID);
 			//pobjIndexCollection = objMNNode.getIndexCollection();
-			//Check for existance of the Index
-#if defined DEBUG
-			cout << "N1006" << endl;
-#endif
 
 			CNetworkManagement *pobjNwManagement = NULL;
 			pobjNwManagement = pobjMNNode->getNetworkManagement();
@@ -9745,19 +9830,19 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			/* Delete the MN's old object dictionary*/
 			pobjIndexCollection = pobjMNNode->getIndexCollection();
 			pobjIndexCollection->DeletePDOs();
+#if defined DEBUG
+			cout << "MN Node PDO's deleted" << endl;
+#endif
 			// Delete Process Image Objects
 			pobjIndexCollection->DeletePIObjects();
 #if defined DEBUG
-			cout << "MN Node Object dictionary deleted" << endl;
+			cout << "Deleted PI objects (Axxx indexes) in MN" << endl;
 #endif
 			// Autogenertate other indexs 
 			AuotgenerateOtherIndexs(pobjMNNode);
 			/* Add other Indexes than PDO*/
 #if defined DEBUG
-			cout << "Index added" << endl;
-#endif
-#if defined DEBUG
-			cout << "Deleted" << endl;
+			cout << "Auotgenerated Other Indexs in MN" << endl;
 #endif
 		}
 
@@ -9766,6 +9851,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 		if (true == bIsPresMN)
 		{
+#if defined DEBUG
+			cout << "PresMN: iTxChannelCount set to 1" << endl;
+#endif
 			iTxChannelCount = 1;
 		}
 		pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
@@ -9920,8 +10008,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					pbIdx = padLeft(pbIdx, '0', 2);
 					pbMNIndex = strcat(pbMNIndex, pbIdx);
 
-					stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
-					/* set bFlag to true for 1800*/
+					stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);					/* set bFlag to true for 1800*/
 					pobjIndex = objMNIndexCol->getIndexbyIndexValue(pbMNIndex);
 					if (pobjIndex != NULL)
 						pobjIndex->setFlagIfIncludedCdc(TRUE);
@@ -9959,6 +10046,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					strcat(pbMNIndex, pbIdx);
 					/* Set the MN's PDO Index*/
 					stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
+
 
 					if (stRetInfo.code != OCFM_ERR_SUCCESS)
 					{

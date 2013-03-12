@@ -1479,7 +1479,9 @@ PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
 	INT32 idx;
 	INT32 subIndex;
 	PIObject stPIObject;
-
+#if defined DEBUG
+	cout << __FUNCTION__ << ":: Datatype:" << dt << " DirectionType:" << dirType << " iOffset:" << iOffset << " iDataSize:" << iDataSize << endl;
+#endif
 	stPIObject.Index = new char[INDEX_LEN];
 	stPIObject.SubIndex = new char[SUBINDEX_LEN];
 
@@ -1488,8 +1490,8 @@ PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
 		if ((AddressTable[idx].dt == dt)
 				&& (AddressTable[idx].Direction == dirType))
 		{
-			INT32 iTempDataSize = iDataSize / 8;
-			subIndex = (iOffset) / iTempDataSize + 1;
+			INT32 iDataSizeBytes = iDataSize / 8;
+			subIndex = (iOffset / iDataSizeBytes) + 1;
 			if (subIndex > 254)
 			{
 				INT32 div = subIndex / 254;
