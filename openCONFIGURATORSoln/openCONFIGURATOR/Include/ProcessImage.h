@@ -72,7 +72,7 @@ typedef enum EPIDirectionType
 
 typedef enum ePDODataType
 {
-	UNSIGNED8 = 0, INTEGER8, UNSIGNED16, INTEGER16, UNSIGNED32, INTEGER32
+	UNSIGNED8 = 0, INTEGER8, UNSIGNED16, INTEGER16, UNSIGNED32, INTEGER32, 	REAL32,	INTEGER64,	UNSIGNED64
 } PDODataType;
 
 typedef struct PIDataInfo
@@ -159,7 +159,7 @@ extern int iOutVars;
 /************************************************************************************************/
 /* Constants */
 
-static const int NO_OF_PI_ENTERIES = 12;
+static const int NO_OF_PI_ENTERIES = 18;
 
 /****************************************************************************************************/
 /* Function Declarations */

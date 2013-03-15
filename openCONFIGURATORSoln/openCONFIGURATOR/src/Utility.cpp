@@ -752,14 +752,15 @@ INT32 reversedata(UINT8 *pbArg1, UINT8 *pbArg2, UINT32 uiSize)
 
 /*****************************************************************************/
 /**
- \brief			CheckAllowedDTForMapping
+ \brief		CheckAllowedDTForMapping
  
  This function checks for the datatype allowed for mapping
  
- \param			dtName       Character Pointer variable to hold datatype name
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending						
+ \param		dtName	Character Pointer variable to hold datatype name
+
+ \return	BOOL
+ \retval		TRUE			if Allowed Datatype for Mapping
+ \retval		FALSE			if not allowed
  */
 /*****************************************************************************/
 
@@ -768,9 +769,11 @@ bool CheckAllowedDTForMapping(char* dtName)
 	if (0 == strcmp(StringToUpper(dtName), "INTEGER8")
 			|| 0 == strcmp(StringToUpper(dtName), "INTEGER16")
 			|| 0 == strcmp(StringToUpper(dtName), "INTEGER32")
+			|| 0 == strcmp(StringToUpper(dtName), "INTEGER64")
 			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED8")
 			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED16")
-			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED32"))
+			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED32")
+			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED64"))
 	{
 		return true;
 
@@ -889,7 +892,8 @@ void checkAndCorrectName(char* checkName)
  
  This function checks for zero value
  
- \param			pcValue				Character Pointer Variable to hold the value 
+ \param			pcValue				Character Pointer Variable to hold the value
+
  \return		BOOL
  \retval			TRUE			if successful
  \retval			FALSE			if there is already a message pending
@@ -960,7 +964,8 @@ INT32 GetDecimalValue(char* pcValue)
  
  This function checks for access type
  
- \param			pcAccesstype		Character Pointer Variable to hold the Access type 		
+ \param			pcAccesstype		Character Pointer Variable to hold the Access type 
+
  \return		BOOL
  \retval			TRUE			if successful
  \retval			FALSE			if there is already a message pending

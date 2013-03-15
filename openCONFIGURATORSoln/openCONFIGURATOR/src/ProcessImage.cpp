@@ -84,12 +84,18 @@ static tADDRESSTABLE AddressTable[NO_OF_PI_ENTERIES] =
 { "A100", UNSIGNED16, OUTPUT },
 { "A1C0", INTEGER32, OUTPUT },
 { "A200", UNSIGNED32, OUTPUT },
+{ "A240", REAL32, OUTPUT},
+{ "A400", INTEGER64, OUTPUT},
+{ "A440", UNSIGNED64, OUTPUT},
 { "A480", INTEGER8, INPUT },
 { "A4C0", UNSIGNED8, INPUT },
 { "A540", INTEGER16, INPUT },
 { "A580", UNSIGNED16, INPUT },
 { "A640", INTEGER32, INPUT },
 { "A680", UNSIGNED32, INPUT },
+{ "A6C0", REAL32, INPUT},
+{ "A880", INTEGER64, INPUT},
+{ "A8C0", UNSIGNED64, INPUT},
 
 };
 ModuleCol astModuleInfo[TOTAL_MODULES];
@@ -1399,6 +1405,8 @@ void AddPDOIndexsToMN(char* pbIndex, char* pbSubIndex, EPDOType enumPdoType)
 	stRetCode = AddSubIndex(MN_NODEID, MN, pbIndex, pbSubIndex);
 	if (OCFM_ERR_SUCCESS != stRetCode.code)
 	{
+		//TODO: Error occurred once while mapping tpdo from cn to mn xdc
+		cout<<__LINE__<<" add subindex error in line"<<endl;
 		ocfmException objException;
 		objException.ocfm_Excpetion(stRetCode.code);
 		throw objException;
@@ -1582,6 +1590,16 @@ char* getPIDataTypeName(char* pbAddress)
 			pbRetString = (char*) "Integer32";
 			break;
 		}
+		case INTEGER64:
+		{
+			pbRetString = (char*) "Integer64";
+			break;
+		}
+		case UNSIGNED64:
+		{
+			pbRetString = (char*) "Unsigned64";
+			break;
+		}
 		default:
 		{
 			//Handled error case and returned dummy value to avoid warning
@@ -1658,6 +1676,17 @@ char* getPIName(char* pbAddress)
 			pbRetString = (char*) "I32";
 			break;
 		}
+		case UNSIGNED64:
+		{
+			pbRetString = (char*) "U64";
+			break;
+		}
+		case INTEGER64:
+		{
+			pbRetString = (char*) "I64";
+			break;
+		}
+
 		default:
 		{
 			//Handled error case and returned dummy value to avoid warning

@@ -416,13 +416,23 @@ void setDataTypeAttributes(xmlTextReaderPtr pxtrReader, DataType *objDataType)
 		{
 			objDataType->IEC_dt = DINT;
 		}
+		else if ((0 == strcmp(objDataType->Name, "Unsigned64"))
+				|| (0 == strcmp(objDataType->Name, "UNSIGNED64")))
+		{
+			objDataType->IEC_dt = ULINT;
+		}
+		else if ((0 == strcmp(objDataType->Name, "Integer64"))
+				|| (0 == strcmp(objDataType->Name, "INTEGER64")))
+		{
+			objDataType->IEC_dt = LINT;
+		}
 		else if ((0 == strcmp(objDataType->Name, "Real32"))
 				|| (0 == strcmp(objDataType->Name, "REAL32")))
 		{
 			objDataType->IEC_dt = REAL;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Unsigned64"))
-				|| (0 == strcmp(objDataType->Name, "UNSIGNED64")))
+		else if ((0 == strcmp(objDataType->Name, "Real64"))
+				|| (0 == strcmp(objDataType->Name, "REAL64")))
 		{
 			objDataType->IEC_dt = LREAL;
 		}

@@ -264,11 +264,23 @@ void ocfmException::ocfm_Excpetion(EConfiuguratorErrors enumErrcode)
 		break;
 	case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
 		strcpy(_ocfmRetCode.errorString,
-				"Memory Allocation error, Try restarting the application");
+				"Memory allocation failed. Try restarting the application");
 		break;
 	case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
 		strcpy(_ocfmRetCode.errorString,
 				"Number of TPDO channels exceeded, Reduce the value PDOTPDOChannels in MN xdd");
+		break;
+	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
+		strcpy(_ocfmRetCode.errorString,
+				"NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND");
+		break;
+	case OCFM_ERR_INVALID_PARAMETER:
+		strcpy(_ocfmRetCode.errorString,
+			"Invalid parameter: Internal Error. Try restarting the Application");
+		break;
+	case OCFM_ERR_INVALID_SIZE_MAPPED:
+		strcpy(_ocfmRetCode.errorString,
+				"Invalid Size mapped for the PDO. Check the length for the according datatype");
 		break;
 	default:
 		strcpy(_ocfmRetCode.errorString, "Unhandled Error");

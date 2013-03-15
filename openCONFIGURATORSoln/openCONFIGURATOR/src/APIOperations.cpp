@@ -2359,9 +2359,11 @@ void EnableDisableMappingPDO(CIndexCollection* pobjIdxCol, CIndex* pobjIndex,
 		}
 		else
 		{
-			//OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND
 			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_UNKNOWN);
+			objException.ocfm_Excpetion(OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND);
+#if defined DEBUG
+			cout << "NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND: Index: " << pobjIndex->getIndexValue() << endl;
+#endif
 			throw objException;
 		}
 	}
@@ -5705,11 +5707,11 @@ void BRSpecificFormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
  \param		pbModuleName		Character pointer to hold the Module name
  \param		pbModuleIndex		Character pointer to hold the Module Index value
 
- \return	void
+ \return	INT32
  */
 /******************************************************************************************/
 
-void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
+INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 		CNode* pobjNode, Parameter* pobjParameter, EPDOType enumPdoType,
 		char* pbModuleName, char* pbModuleIndex)
 {
@@ -5733,7 +5735,9 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 	bool bIsNewBitStringVar = false;
 	INT32 iDataSize = 0;
 	INT32 iTotalBytesMapped = 0;
-
+	#if defined DEBUG
+	cout<<"iStartBitOffset: "<<iStartBitOffset<<"iOffset"<<iOffset<<"iDataSize"<<iDataSize<<"iTotalBytesMapped"<<iTotalBytesMapped<<endl;
+	#endif
 	for (INT32 iLoopCount = 0; iLoopCount < pobjCDT->varCollection.Count();
 			iLoopCount++)
 	{
@@ -5749,8 +5753,14 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 			pobjAppProc->updatePreviousCDT_UId(objVarDecl.StructUniqueId,
 					pobjCDT->Index);
 			iLastVarIndex = iLoopCount;
+			#if defined DEBUG
+			cout<<"ProcessCDT Internal call 1 starts"<<endl;
+			#endif
 			ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
 					enumPdoType, pbModuleName, pbModuleIndex);
+			#if defined DEBUG
+			cout<<"ProcessCDT Internal call 1 End"<<endl;
+			#endif
 		}
 		if (!bCDTCompleted)
 		{
@@ -5924,6 +5934,8 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 				//TODO: "else" Added.Operation need to be specified
 			}
 			pobjNode->addProcessImage(objProcessImage);
+
+
 		}
 
 	}
@@ -5947,15 +5959,26 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 							objVarDecl.StructUniqueId, pobjCDT->Index);
 
 					iLastVarIndex = iLoopCount;
+					#if defined DEBUG
+					cout<<"ProcessCDT Internal call 2 starts"<<endl;
+					#endif
 					ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
 							enumPdoType, pbModuleName, pbModuleIndex);
+					#if defined DEBUG
+					cout<<"ProcessCDT Internal call 2 End"<<endl;
+					#endif
+					
 
 				}
 			}
 		}
 	}
 	bCDTCompleted = true;
-	//TODO:some return values to be specified
+	#if defined DEBUG
+	cout<<"iStartBitOffset: "<<iStartBitOffset<<"iOffset"<<iOffset<<endl;
+	#endif
+	//Returned current offset in bytes
+	return iOffset;
 }
 
 /*****************************************************************************************/
@@ -5970,11 +5993,11 @@ void ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
  \param		pbModuleName	Character pointer to hold the Module name
  \param		pbModuleIndex	Character pointer to hold the Module Index value
 
- \return	void
+ \return	INT32	Returns the current offset in bytes
  */
 /******************************************************************************************/
 
-void DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
+INT32 DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 		EPDOType enumPdoType, char* pbModuleName, char* pbModuleIndex)
 {
 	if ((NULL == uniquedIdref) || (NULL == pobjNode) || (NULL == pbModuleName)
@@ -5989,7 +6012,7 @@ void DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 	Parameter* pobjParameter = NULL;
 	CApplicationProcess* pobjAppProc = NULL;
 	CComplexDataType* pobjCDT = NULL;
-
+	INT32 iCurOffset = 0;
 	try
 	{
 		if (pobjNode->getApplicationProcess() != NULL)
@@ -6020,7 +6043,7 @@ void DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 								OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 						throw objocfmException;
 					}
-					ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
+					iCurOffset = ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
 							enumPdoType, pbModuleName, pbModuleIndex);
 					iLastVarIndex = -1;
 					bCDTCompleted = false;
@@ -6039,6 +6062,7 @@ void DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 	{
 		throw ex;
 	}
+	return iCurOffset;
 }
 
 /*****************************************************************************************/
@@ -6327,6 +6351,8 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 							delete[] pcIdx;
 						}
 						//CN's cannot have 18xx & 1Axx other than 1800 & 1A00 mapped for MN
+
+						INT32 iPrevOffsetUniqueId = -1;
 						while (iSiCount <= iSiTotal)
 						{
 							CSubIndex *pobjSubIdx = NULL;
@@ -6351,10 +6377,6 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 								pbModuleIndex = subString((char*) pbActualVal,
 										iLength - 4, 4);
 								pbModuleIndex[5] = '\0';
-#if defined DEBUG	
-								cout << "pbModuleIndex:" << pbModuleIndex
-								<< endl;
-#endif
 
 								/* Get the SubIndex*/
 								char* pbSubIndex = NULL; // = new char[SUBINDEX_SIZE + ALLOC_BUFFER];
@@ -6364,8 +6386,13 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 								pbSubIndex[3] = '\0';
 
 #if defined DEBUG	
-								cout << "pbSubIndex:" << pbSubIndex << endl;
+								cout << "pbModuleIndex:" << pbModuleIndex << "pbSubIndex:" << pbSubIndex << endl;
 #endif
+
+								//Mapped length in bits
+								INT32 iMappedLength = 0;
+								iMappedLength = hex2int(subString((char*) pbActualVal, 2, 4));
+								cout<<" IntMapLength:"<<iMappedLength<<endl;
 
 								CIndex *pobjModuleIndex = NULL;
 								CSubIndex *pobjModuleSIndex = NULL;
@@ -6502,10 +6529,23 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 
 								if (uniqueidRefID != NULL)
 								{
-									DecodeUniqiueIDRef(uniqueidRefID, pobjNode,
+									INT32 iOffset = 0;
+									iOffset = DecodeUniqiueIDRef(uniqueidRefID, pobjNode,
 											pdoType,
 											(char*) pobjModuleIndex->getName(),
 											(char*) pobjModuleIndex->getIndexValue());
+									if(iMappedLength != ((iOffset - iPrevOffsetUniqueId)*8))
+									{
+										ocfmException objex;
+										objex.ocfm_Excpetion(OCFM_ERR_INVALID_SIZE_MAPPED);
+
+										char acCustomError[200] = { 0 };
+										sprintf(acCustomError, "Invalid Length for the mapping object. Index: %s SubIndex: %s in node: %d", (char*)objIndex.getIndexValue(), (char*)pobjSubIdx->getIndexValue(), pobjNode->getNodeId());
+										CopyCustomErrorString(&(objex._ocfmRetCode), acCustomError);
+
+										throw objex;
+									}
+									iPrevOffsetUniqueId = iOffset;
 								}
 								else
 								{
@@ -6643,6 +6683,19 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 										}
 									}
 
+#if defined DEBUG
+									cout<<"DataSize: "<<dt.DataSize*8<<" MappedLength: "<<iMappedLength<<endl;
+#endif
+									if((dt.DataSize * 8) != iMappedLength)
+									{
+										ocfmException objex;
+										objex.ocfm_Excpetion(OCFM_ERR_INVALID_SIZE_MAPPED);
+										char acCustomError[200] = { 0 };
+										sprintf(acCustomError, "Invalid Length for the mapping object. Index: %s SubIndex: %s in node: %d", (char*)objIndex.getIndexValue(), (char*)pobjSubIdx->getIndexValue(), pobjNode->getNodeId());
+										CopyCustomErrorString(&(objex._ocfmRetCode), acCustomError);
+
+										throw objex;
+									}
 									objProcessImage.DataInfo.DataSize =
 											dt.DataSize * 8;
 
@@ -9316,7 +9369,9 @@ void GetMNPDOSubIndex(MNPdoVariable stMNPdoVar, INT32& iPrevSubIndex,
 	strcat(pbActValue, stMNPdoVar.Index);
 
 	pobjSubIndex->setActualValue(pbActValue);
-
+	#if defined DEBUG
+	cout<<"Actual Value"<<pbActValue<<endl;
+	#endif
 	AddPDOIndexsToMN(stMNPdoVar.Index, stMNPdoVar.SubIndex, stMNPdoVar.pdoType);
 	delete[] pbOffset;
 	delete[] pbActValue;
@@ -10299,7 +10354,6 @@ INT32 ComputeOUTOffset(INT32 iDataSize, EPDOType enumPdoType)
 		stSize64OUTOffset.prevOffset = stSize64OUTOffset.currOffset;
 		iOffset = stSize64OUTOffset.currOffset;
 		stSize64OUTOffset.currOffset = stSize64OUTOffset.currOffset + 8;
-
 		break;
 	default:
 		cout << "Undefined DataSize Encountered:" << __FUNCTION__ << endl;
@@ -10449,7 +10503,7 @@ INT32 ComputeINOffset(INT32 iDataSize, EPDOType enumPdoType)
 	case 64:
 		stSize64INOffset.prevOffset = stSize64INOffset.currOffset;
 		iOffset = stSize64INOffset.currOffset;
-
+		stSize64INOffset.currOffset = stSize64INOffset.currOffset + 8;
 		break;
 	default:
 		cout << "Undefined DataSize Encountered:" << __FUNCTION__ << endl;
@@ -11655,7 +11709,7 @@ void CreateMNPDOVar(INT32 iOffset, INT32 iDataSize, IEC_Datatype enumDataType,
 			dt = UNSIGNED32;
 			break;
 		case 64:
-			//dt = UNSIGNED64 to be added
+			dt = UNSIGNED64;
 			break;
 		default:
 			break;
@@ -11747,7 +11801,26 @@ void CreateMNPDOVar(INT32 iOffset, INT32 iDataSize, IEC_Datatype enumDataType,
 		break;
 	case LINT:
 	case LREAL:
+		if(enumPdoType == PDO_TPDO)
+		{
+			objpi =  getPIAddress(INTEGER64, INPUT, iOffset, iDataSize);
+		}
+		else if(enumPdoType == PDO_RPDO)
+		{
+			objpi =  getPIAddress(INTEGER64, OUTPUT, iOffset, iDataSize);
+		}
 		break;
+	case ULINT:
+		if(enumPdoType == PDO_TPDO)
+		{
+			objpi =  getPIAddress(UNSIGNED64, INPUT, iOffset, iDataSize);
+		}
+		else if(enumPdoType == PDO_RPDO)
+		{
+			objpi =  getPIAddress(UNSIGNED64, OUTPUT, iOffset, iDataSize);
+		}
+		break;
+
 		// Handled all values 
 	case BOOL:
 		cout << "Data type BOOL not handled" << endl;
@@ -11763,9 +11836,6 @@ void CreateMNPDOVar(INT32 iOffset, INT32 iDataSize, IEC_Datatype enumDataType,
 		break;
 	case LWORD:
 		cout << "Data type LWORD not handled" << endl;
-		break;
-	case ULINT:
-		cout << "Data type ULINT not handled" << endl;
 		break;
 	case STRING:
 		cout << "Data type STRING not handled" << endl;
@@ -12406,7 +12476,6 @@ ocfmRetCode UpdateNodeParams(INT32 iCurrNodeId, INT32 iNewNodeID,
 	ocfmRetCode stErrorInfo;
 	stErrorInfo.errorString = NULL;
 	stErrorInfo.code = OCFM_ERR_UNKNOWN;
-
 	INT32 iNodePos;
 	try
 	{
