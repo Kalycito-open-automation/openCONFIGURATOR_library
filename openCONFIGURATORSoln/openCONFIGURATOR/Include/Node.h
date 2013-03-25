@@ -130,7 +130,7 @@ class DllExport CNode
 
 		CIndexCollection* getPDOIndexCollection(EPDOType PDOType);
 		CIndexCollection* getIndexCollectionWithoutPDO();
-		CIndexCollection*getPDOIndexCollection();
+		CIndexCollection*getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount);
 
 		ProcessImage* getPIbyParaIndex(INT32 paraIndex);
 		void DeleteCollectionsForPI();

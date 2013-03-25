@@ -268,7 +268,7 @@ void ocfmException::ocfm_Excpetion(EConfiuguratorErrors enumErrcode)
 		break;
 	case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
 		strcpy(_ocfmRetCode.errorString,
-				"Number of TPDO channels exceeded, Reduce the value PDOTPDOChannels in MN xdd");
+				"Number of TPDO channels exceeded");
 		break;
 	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
 		strcpy(_ocfmRetCode.errorString,

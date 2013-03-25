@@ -1247,13 +1247,13 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 	stErrorInfo.code = OCFM_ERR_UNKNOWN;
 	stErrorInfo.errorString = NULL;
 	INT32 iIndexPos = 0;
+	ocfmException objException;
 
 	try
 	{
 		if (NULL == pbIndexID)
 		{
 			stErrorInfo.code = OCFM_ERR_UNKNOWN;
-			ocfmException objException;
 			objException.ocfm_Excpetion(OCFM_ERR_UNKNOWN);
 			throw objException;
 		}
@@ -1262,7 +1262,6 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 				&iIndexPos);
 		if (OCFM_ERR_SUCCESS == stErrorInfo.code)
 		{
-			ocfmException objException;
 			objException.ocfm_Excpetion(OCFM_ERR_INDEX_ALREADY_EXISTS);
 			throw objException;
 		}
@@ -1279,7 +1278,6 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 			pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
 			if (NULL == pobjNodeCollection)
 			{
-				ocfmException objException;
 				objException.ocfm_Excpetion(OCFM_ERR_NO_NODES_FOUND);
 				throw objException;
 			}
@@ -1287,7 +1285,6 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 			pobjIndexCollection = objNode.getIndexCollection();
 			if (NULL == pobjIndexCollection)
 			{
-				ocfmException objException;
 				objException.ocfm_Excpetion(OCFM_ERR_NO_INDEX_FOUND);
 				throw objException;
 			}
@@ -1297,9 +1294,28 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 			if (NULL == pobjOBD)
 			{
 				stErrorInfo.code = OCFM_ERR_UNKNOWN;
-				ocfmException objException;
 				objException.ocfm_Excpetion(OCFM_ERR_UNKNOWN);
 				throw objException;
+			}
+
+			//Validate for TPDO channels for a CN
+			if((CN == objNode.getNodeType()) && ( (0 == strncmp(pbIndexID, "1A", 2)) || (0 == strncmp(pbIndexID, "1a", 2))))
+			{
+				INT32 tpdoCount = 0;
+				INT32 rpdoCount = 0;
+				objNode.getPDOIndexCollection(&rpdoCount, &tpdoCount);
+				#if defined DEBUG
+					cout<<"tpdoCount:"<<tpdoCount<<" rpdoCount:"<<rpdoCount<<endl;
+				#endif
+				//Allowed to add TPDO only if the node has 0 TPDO's(1Axx)
+				if(tpdoCount > 0)
+				{
+					objException.ocfm_Excpetion(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+					char acCustomError[200] = { 0 };
+					sprintf(acCustomError, "CN cannot have more than one TPDO Channel");
+					CopyCustomErrorString(&(objException._ocfmRetCode), acCustomError);
+					throw objException;
+				}
 			}
 
 			pobjDictIndex = pobjOBD->getObjectDictIndex(pbIndexID);
@@ -1345,7 +1361,6 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 			}
 			else
 			{
-				ocfmException objException;
 				objException.ocfm_Excpetion(OCFM_ERR_INVALID_INDEXID);
 				throw objException;
 			}
@@ -1355,7 +1370,6 @@ ocfmRetCode AddIndex(INT32 iNodeID, ENodeType enumNodeType, char* pbIndexID)
 		else
 		{
 			// This Part of code is never expected to happen
-			ocfmException objException;
 			objException.ocfm_Excpetion(OCFM_ERR_INVALID_INDEXID);
 			throw objException;
 		}
@@ -3299,7 +3313,9 @@ void UpdateCNVisibleNode(CNode* pobjNode)
 	}
 
 	CIndexCollection* objPDOCollection = NULL;
-	objPDOCollection = pobjNode->getPDOIndexCollection();
+	INT32 tpdoCount = 0;
+	INT32 rpdoCount = 0;
+	objPDOCollection = pobjNode->getPDOIndexCollection(&tpdoCount, &rpdoCount);
 
 	if (NULL == objPDOCollection)
 	{
@@ -6161,15 +6177,26 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 				}
 				EStationType eNodeStation = pobjNode->getStationType();
 
-				/* Empty ProcessImage collection*/
+				/* Empty ProcessImage collection (Axxx objects)*/
 				pobjNode->DeleteCollectionsForPI();
 
-				objPDOCollection = pobjNode->getPDOIndexCollection();
+				INT32 countTPDO = 0;
+				INT32 countRPDO = 0;
+				objPDOCollection = pobjNode->getPDOIndexCollection(&countRPDO, &countTPDO);
 
 				if (objPDOCollection == NULL)
 				{
 					cout << "objPDOCollection NULL" << endl;
 					continue;
+				}
+				//Validate the number of TPDO's for a CN
+				if(countTPDO > 1)
+				{
+					objocfmException.ocfm_Excpetion(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+					char acCustomError[200] = { 0 };
+					sprintf(acCustomError, "CN Node-Id: %d cannot have more than one TPDO Channel", pobjNode->getNodeId());
+					CopyCustomErrorString(&(objocfmException._ocfmRetCode), acCustomError);
+					throw objocfmException;
 				}
 
 				pobjIndexCollection = pobjNode->getIndexCollection();
@@ -6887,7 +6914,9 @@ void CalculatePayload()
 
 			EStationType eNodeStation = pobjNode->getStationType();
 			CIndexCollection* objPDOCollection = NULL;
-			objPDOCollection = pobjNode->getPDOIndexCollection();
+			INT32 tpdoCount = 0;
+			INT32 rpdoCount = 0;
+			objPDOCollection = pobjNode->getPDOIndexCollection(&rpdoCount, &tpdoCount);
 
 			if (objPDOCollection != NULL)
 			{
@@ -12861,8 +12890,9 @@ void setPresMNNodeAssigmentBits()
 
 	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
 	objMNNode = pobjNodeCol->getMNNode();
-
-	objPDOCollection = objMNNode.getPDOIndexCollection();
+	INT32 tpdoCount = 0;
+	INT32 rpdoCount = 0;
+	objPDOCollection = objMNNode.getPDOIndexCollection(&rpdoCount, &tpdoCount);
 	if (objPDOCollection != NULL)
 	{
 		pobjIndexCollection = objMNNode.getIndexCollection();

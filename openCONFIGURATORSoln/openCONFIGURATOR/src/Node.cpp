@@ -497,31 +497,40 @@ CIndexCollection* CNode::getPDOIndexCollection(EPDOType enumEpdoType)
 /**
  \brief			getPDOIndexCollection
  
- This is a member function of CNode adds the indexs under PDO index collection
+ This is a member function of CNode creates a new temproary Index collection which has all PDO indexes for that node and updates the number of rpdo and tpdo indexes(16xx & 1Axx)
  
  \return		CIndexCollection*
  */
 /*****************************************************************************/
 
-CIndexCollection* CNode::getPDOIndexCollection()
+CIndexCollection* CNode::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
 {
 	CIndexCollection* pobjPdoIndexCollection = new CIndexCollection();
 	CIndex* pobjIndex = NULL;
-	cout << "getPDOIndexCollection Execution:"
-			<< m_IndexCollection->getNumberofIndexes() << endl;
+
 	for (INT32 iLoopCount = 0;
 			iLoopCount < m_IndexCollection->getNumberofIndexes(); iLoopCount++)
 	{
 		pobjIndex = m_IndexCollection->getIndex(iLoopCount);
-		if ((pobjIndex->getPDOType() == PDO_TPDO)
-				|| (pobjIndex->getPDOType() == PDO_RPDO))
+		if ((pobjIndex->getPDOType() == PDO_TPDO))
 		{
-			cout << "PDO INdex: " << pobjIndex->getIndexValue() << endl;
+			if ((0 == strncmp(pobjIndex->getIndexValue(), "1A", 2)) || 0 == strncmp(pobjIndex->getIndexValue(), "1a", 2))
+			{
+				*tpdoCount = *tpdoCount + 1;
+			}
+			pobjPdoIndexCollection->addIndex(*pobjIndex);
+		}
+		else if((pobjIndex->getPDOType() == PDO_RPDO))
+		{
+			if (0 == strncmp(pobjIndex->getIndexValue(), "16", 2))
+			{
+				*rpdoCount = *rpdoCount + 1;
+			}
 			pobjPdoIndexCollection->addIndex(*pobjIndex);
 		}
 		else
 		{
-			cout << "I: " << pobjIndex->getIndexValue() << endl;
+			//other than TPDO or RPDO
 		}
 	}
 	return pobjPdoIndexCollection;
