@@ -1546,18 +1546,20 @@ char* getPIDataTypeName(char* pbAddress)
 		if (0 == strcmp(AddressTable[iLoopCount].Address, pbAddress))
 		{
 			dt = AddressTable[iLoopCount].dt;
+			break;
 		}
 		else if (0 < strcmp(AddressTable[iLoopCount].Address, pbAddress))
 		{
 			dt = (0 < iLoopCount) ?
 					AddressTable[iLoopCount - 1].dt :
 					static_cast<PDODataType>(-1);
+			break;
 		}
 		else
 		{
 			//TODO: else added. operation to be specified
 		}
-
+	}
 		switch (dt)
 		{
 		case UNSIGNED8:
@@ -1608,7 +1610,9 @@ char* getPIDataTypeName(char* pbAddress)
 		}
 		}
 
-	}
+#if defined DEBUG
+		cout<<__FUNCTION__<<" pbAddress:"<<pbAddress<<" pbRetString:"<<pbRetString<<endl;
+#endif
 	return pbRetString;
 }
 
@@ -1632,18 +1636,20 @@ char* getPIName(char* pbAddress)
 		if (0 == strcmp(AddressTable[iLoopCount].Address, pbAddress))
 		{
 			dt = AddressTable[iLoopCount].dt;
+			break;
 		}
 		else if (0 < strcmp(AddressTable[iLoopCount].Address, pbAddress))
 		{
 			dt = (0 < iLoopCount) ?
 					AddressTable[iLoopCount - 1].dt :
 					static_cast<PDODataType>(-1);
+			break;
 		}
 		else
 		{
 			//TOOD: else added, operation to be specified
 		}
-
+	}
 		switch (dt)
 		{
 		case UNSIGNED8:
@@ -1694,8 +1700,9 @@ char* getPIName(char* pbAddress)
 			break;
 		}
 		}
-	}
-
+#if defined DEBUG
+		cout<<__FUNCTION__<<" pbAddress:"<<pbAddress<<" pbRetString:"<<pbRetString<<endl;
+#endif
 	return pbRetString;
 }
 
