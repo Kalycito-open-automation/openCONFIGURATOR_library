@@ -5723,7 +5723,7 @@ void BRSpecificFormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
  \param		pbModuleName		Character pointer to hold the Module name
  \param		pbModuleIndex		Character pointer to hold the Module Index value
 
- \return	INT32
+ \return	INT32				Total bytes mapped for that module
  */
 /******************************************************************************************/
 
@@ -5752,7 +5752,7 @@ INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 	INT32 iDataSize = 0;
 	INT32 iTotalBytesMapped = 0;
 	#if defined DEBUG
-	cout<<"iStartBitOffset: "<<iStartBitOffset<<"iOffset"<<iOffset<<"iDataSize"<<iDataSize<<"iTotalBytesMapped"<<iTotalBytesMapped<<endl;
+	cout<<"iStartBitOffset: "<<iStartBitOffset<<" iOffset:"<<iOffset<<" iDataSize:"<<iDataSize<<" iTotalBytesMapped:"<<iTotalBytesMapped<<endl;
 	#endif
 	for (INT32 iLoopCount = 0; iLoopCount < pobjCDT->varCollection.Count();
 			iLoopCount++)
@@ -5920,6 +5920,9 @@ INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 			{
 				/* Total bytes Mapped */
 				iTotalBytesMapped = iTotalBytesMapped + (iDataSize / 8);
+				#if defined DEBUG
+				cout<<"iTotalBytesMapped:"<<iTotalBytesMapped<<endl;
+				#endif
 				if (iTotalBytesMapped > MAX_PI_SIZE)
 				{
 					ocfmException objex;
@@ -5950,7 +5953,6 @@ INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 				//TODO: "else" Added.Operation need to be specified
 			}
 			pobjNode->addProcessImage(objProcessImage);
-
 
 		}
 
@@ -5991,10 +5993,10 @@ INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
 	}
 	bCDTCompleted = true;
 	#if defined DEBUG
-	cout<<"iStartBitOffset: "<<iStartBitOffset<<"iOffset"<<iOffset<<endl;
+	cout<<"iTotalBytesMapped: "<<iTotalBytesMapped<<" iOffset"<<iOffset<<endl;
 	#endif
-	//Returned current offset in bytes
-	return iOffset;
+	//Returned current mapped size in bytes
+	return iTotalBytesMapped;
 }
 
 /*****************************************************************************************/
@@ -6009,7 +6011,7 @@ INT32 ProcessCDT(CComplexDataType* pobjCDT, CApplicationProcess* pobjAppProc,
  \param		pbModuleName	Character pointer to hold the Module name
  \param		pbModuleIndex	Character pointer to hold the Module Index value
 
- \return	INT32	Returns the current offset in bytes
+ \return	INT32	Returns total bytes mapped for that module
  */
 /******************************************************************************************/
 
@@ -6028,7 +6030,7 @@ INT32 DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 	Parameter* pobjParameter = NULL;
 	CApplicationProcess* pobjAppProc = NULL;
 	CComplexDataType* pobjCDT = NULL;
-	INT32 iCurOffset = 0;
+	INT32 iTotalBytesMapped = 0;
 	try
 	{
 		if (pobjNode->getApplicationProcess() != NULL)
@@ -6059,7 +6061,7 @@ INT32 DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 								OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 						throw objocfmException;
 					}
-					iCurOffset = ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
+					iTotalBytesMapped = ProcessCDT(pobjCDT, pobjAppProc, pobjNode, pobjParameter,
 							enumPdoType, pbModuleName, pbModuleIndex);
 					iLastVarIndex = -1;
 					bCDTCompleted = false;
@@ -6078,7 +6080,7 @@ INT32 DecodeUniqiueIDRef(char* uniquedIdref, CNode* pobjNode,
 	{
 		throw ex;
 	}
-	return iCurOffset;
+	return iTotalBytesMapped;
 }
 
 /*****************************************************************************************/
@@ -6379,7 +6381,6 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 						}
 						//CN's cannot have 18xx & 1Axx other than 1800 & 1A00 mapped for MN
 
-						INT32 iPrevOffsetUniqueId = -1;
 						while (iSiCount <= iSiTotal)
 						{
 							CSubIndex *pobjSubIdx = NULL;
@@ -6556,12 +6557,15 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 
 								if (uniqueidRefID != NULL)
 								{
-									INT32 iOffset = 0;
-									iOffset = DecodeUniqiueIDRef(uniqueidRefID, pobjNode,
+									INT32 totalBytesMapped = 0;
+									totalBytesMapped = DecodeUniqiueIDRef(uniqueidRefID, pobjNode,
 											pdoType,
 											(char*) pobjModuleIndex->getName(),
 											(char*) pobjModuleIndex->getIndexValue());
-									if(iMappedLength != ((iOffset - iPrevOffsetUniqueId)*8))
+									#if defined DEBUG
+										cout<<"iMappedLength:"<<iMappedLength<<" totalBytesMapped:"<<totalBytesMapped<<endl;
+									#endif
+									if(iMappedLength != (totalBytesMapped*8))
 									{
 										ocfmException objex;
 										objex.ocfm_Excpetion(OCFM_ERR_INVALID_SIZE_MAPPED);
@@ -6572,7 +6576,6 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 
 										throw objex;
 									}
-									iPrevOffsetUniqueId = iOffset;
 								}
 								else
 								{
@@ -9913,6 +9916,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 			/* Delete the MN's old object dictionary*/
 			pobjIndexCollection = pobjMNNode->getIndexCollection();
+//DO not delete and try to add PDO indexes.
 			pobjIndexCollection->DeletePDOs();
 #if defined DEBUG
 			cout << "MN Node PDO's deleted" << endl;
@@ -9986,7 +9990,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						pbIdx = padLeft(pbIdx, '0', 2);
 						pbMNIndex = strcat(pbMNIndex, pbIdx);
-						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
+							stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
 
 						//to write cn node id in 18XX/01
 						pbMappNodeID = _IntToAscii(objNode.getNodeId(),
@@ -10092,7 +10096,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					pbIdx = padLeft(pbIdx, '0', 2);
 					pbMNIndex = strcat(pbMNIndex, pbIdx);
 
-					stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);					/* set bFlag to true for 1800*/
+						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);					/* set bFlag to true for 1800*/
 					pobjIndex = objMNIndexCol->getIndexbyIndexValue(pbMNIndex);
 					if (pobjIndex != NULL)
 						pobjIndex->setFlagIfIncludedCdc(TRUE);
@@ -10129,14 +10133,12 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					strcpy(pbMNIndex, "16");
 					strcat(pbMNIndex, pbIdx);
 					/* Set the MN's PDO Index*/
-					stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
-
-
-					if (stRetInfo.code != OCFM_ERR_SUCCESS)
-					{
-						objocfmException.ocfm_Excpetion(stRetInfo.code);
+						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
+						if (stRetInfo.code != OCFM_ERR_SUCCESS)
+						{
+							objocfmException.ocfm_Excpetion(stRetInfo.code);
 						delete[] pArrangedNodeIDbyStation;
-						throw objocfmException;
+							throw objocfmException;
 					}
 
 					pobjIndex = objMNIndexCol->getIndexbyIndexValue(pbMNIndex);
