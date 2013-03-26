@@ -85,7 +85,6 @@ CBaseIndex::CBaseIndex(void)
 	m_accessType = NULL;
 	m_LowLimit = NULL;
 	m_UniqueIDRef = NULL;
-	m_dataTypeValue = NULL;
 	m_dataType.DataTypeValue = NULL;
 	m_NodeID = 0;
 	m_dataType.DataSize = 0;
@@ -131,6 +130,7 @@ const char* CBaseIndex::getName()
  \brief			setName
  
  This is a member function of CBaseIndex to set the Name of the Index Object
+
  \param			pbName	Pointer variable to hold the name of the index object
  \return	void
  */
@@ -138,6 +138,11 @@ const char* CBaseIndex::getName()
 
 void CBaseIndex::setName(char* pbName)
 {
+	if(NULL != m_Name)
+	{
+		delete[] m_Name;
+	}
+
 	if (NULL != pbName)
 	{
 		m_Name = new char[strlen(pbName) + STR_ALLOC_BUFFER];
@@ -178,6 +183,10 @@ const char* CBaseIndex::getIndexValue()
 
 void CBaseIndex::setIndexValue(char* pbIndex)
 {
+	if(NULL != m_Index)
+	{
+		delete[] m_Index;
+	}
 	m_Index = new char[strlen(pbIndex) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_Index, pbIndex);
 }
@@ -217,6 +226,10 @@ const char* CBaseIndex::getLowLimit()
 
 void CBaseIndex::setLowLimit(char* pbLowLimit)
 {
+	if(NULL != m_LowLimit)
+	{
+		delete[] m_LowLimit;
+	}
 	m_LowLimit = new char[strlen(pbLowLimit) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_LowLimit, pbLowLimit);
 }
@@ -256,6 +269,10 @@ const char* CBaseIndex::getHighLimit()
 
 void CBaseIndex::setHighLimit(char* pbHighLimit)
 {
+	if(NULL != m_HighLimit)
+	{
+		delete[] m_HighLimit;
+	}
 	m_HighLimit = new char[strlen(pbHighLimit) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_HighLimit, pbHighLimit);
 }
@@ -288,6 +305,10 @@ const char* CBaseIndex::getDefaultValue()
 
 void CBaseIndex::setDefaultValue(char* pbValue)
 {
+	if(NULL != m_DefaultValue)
+	{
+		delete[] m_DefaultValue;
+	}
 	m_DefaultValue = new char[strlen(pbValue) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_DefaultValue, pbValue);
 }
@@ -324,6 +345,10 @@ const char* CBaseIndex::getActualValue()
 
 void CBaseIndex::setActualValue(char* pbValue)
 {
+	if(NULL != m_ActualValue)
+	{
+		delete[] m_ActualValue;
+	}
 	m_ActualValue = new char[strlen(pbValue) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_ActualValue, pbValue);
 }
@@ -356,6 +381,10 @@ const char* CBaseIndex::getAccessType()
 
 void CBaseIndex::setAccessType(char* pbAccessType)
 {
+	if(NULL != m_accessType)
+	{
+		delete[] m_accessType;
+	}
 	m_accessType = new char[strlen(pbAccessType) + STR_ALLOC_BUFFER];
 	strcpy((char*) m_accessType, pbAccessType);
 }

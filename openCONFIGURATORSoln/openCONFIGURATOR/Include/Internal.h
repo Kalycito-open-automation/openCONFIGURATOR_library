@@ -283,6 +283,7 @@ bool CopyMNSubindexToCN(CNode* pobjNode, char *pcIndex, char *pcSubIndex);
 void CalculatePayload();
 void SetCNLossObjects(INT32 iNodeID, ENodeType enumNodeType);
 void ResetAllSubIndexFlag(CIndex *pobjIndex);
+void ResetAllPdos(INT32 nodeId, ENodeType nodeType);
 ocfmRetCode SetSubIndexAttributesByAttribute(INT32 iNodeID,
 		ENodeType enumNodeType, char* pbIndexID, char* pbSubIndexID,
 		EAttributeType enumAttributeType, char* pbInAttributeValue);

@@ -3608,6 +3608,98 @@ void ResetAllSubIndexFlag(CIndex* pobjIndex)
 	pobjIndex->setFlagIfIncludedCdc(FALSE);
 }
 
+/*****************************************************************************/
+/**
+ \brief		ResetAllPdos
+ 
+ This function resets the values in all the PDO(14xx, 16xx, 18xx, 1Axx) indexes and subindexes to 0
+ 
+ \param		nodeId		Integer Variable to hold node id
+ \param		nodeType	Enum of type ENodeType to hold node type
+
+ \return	void
+ */
+/*****************************************************************************/
+void ResetAllPdos(INT32 nodeId, ENodeType nodeType)
+{
+	CNodeCollection *objNodeCol = NULL;
+	CNode *objNode = NULL;
+	CIndexCollection *objIdxCol = NULL;
+
+	objNodeCol = CNodeCollection::getNodeColObjectPointer();
+	objNode = objNodeCol->getNodePtr(nodeType, nodeId);
+	objIdxCol = objNode->getIndexCollection();
+
+	INT32 idxLoopCnt = 0;
+	for (idxLoopCnt = 0; idxLoopCnt < objIdxCol->getNumberofIndexes(); idxLoopCnt++)
+	{
+		CIndex *pobjIndex = NULL;
+		pobjIndex = objIdxCol->getIndex(idxLoopCnt);
+		if((NULL == pobjIndex) || (NULL == pobjIndex->getIndexValue()))
+		{
+			continue;
+		}
+
+		if(!CheckIfNotPDO((char*)pobjIndex->getIndexValue()))
+		{
+			INT32 totalNoOfSidx = 0;
+			INT32 sidxLoopCnt = 0;
+			totalNoOfSidx = pobjIndex->getNumberofSubIndexes();
+
+			char* idxSubString = new char[SUBINDEX_LEN];
+			idxSubString = subString((char*)pobjIndex->getIndexValue(), 0, 2);
+			if ((0 == strcmp(idxSubString, "1A"))
+				|| (0 == strcmp(idxSubString, "1a"))
+				|| (0 == strcmp(idxSubString, "16"))
+				)
+			{
+				for(sidxLoopCnt = 0; sidxLoopCnt < totalNoOfSidx; sidxLoopCnt++)
+				{
+					CSubIndex *objSubIdx = NULL;
+					objSubIdx = pobjIndex->getSubIndex(sidxLoopCnt);
+					if((NULL == objSubIdx) || (NULL == objSubIdx->getIndexValue()))
+					{
+						continue;
+					}
+					if((0 == strcmp(objSubIdx->getIndexValue(), (char*)"00")))
+					{
+						objSubIdx->setActualValue((char*)"0x0");
+					}
+					else
+					{
+						objSubIdx->setActualValue((char*)"0x0000000000000000");
+					}
+
+				}
+				//get 00 sidx set val 0
+				//get all idx set actval 0x000..(16)
+			}
+			if((0 == strcmp(idxSubString, "14"))
+				|| (0 == strcmp(idxSubString, "18"))
+				)
+			{
+				for(sidxLoopCnt = 0; sidxLoopCnt < totalNoOfSidx; sidxLoopCnt++)
+				{
+					CSubIndex *objSubIdx = NULL;
+					objSubIdx = pobjIndex->getSubIndex(sidxLoopCnt);
+					if((NULL == objSubIdx) || (NULL == objSubIdx->getIndexValue()))
+					{
+						continue;
+					}
+					if((0 == strcmp(objSubIdx->getIndexValue(), (char*)"00")))
+					{
+						//Not to set the value for nr.of entries sidx
+					}
+					else
+					{
+						objSubIdx->setActualValue((char*)"0x0");
+					}
+				}
+			}
+			delete[] idxSubString;
+		}
+	}
+}
 /*****************************************************************************************/
 /**
  \brief		GetIndexData
@@ -3783,7 +3875,7 @@ void GetIndexData(CIndex* objIndex, char* Buffer)
 			objSubIndex = objIndex->getSubIndex(i);
 #if defined DEBUG
 			cout << "Indexx:" << objIndex->getIndexValue() << " SIdx:"
-			<< objSubIndex->getIndexValue() << endl;
+				<< objSubIndex->getIndexValue() <<" iValue:" << i << endl;
 #endif
 			bAccessType = CheckAccessTypeForInclude(
 					(char*) objSubIndex->getAccessType());
@@ -3810,11 +3902,13 @@ void GetIndexData(CIndex* objIndex, char* Buffer)
 							== GetDecimalValue(
 									(char*) objSubIndex->getActualValue()))
 					{
+						cout<<"Actual Value 0 continue"<<endl;
 						if ((NULL == objSubIndex->getDefaultValue())
 								|| (0
 										== GetDecimalValue(
 												(char*) objSubIndex->getDefaultValue())))
 						{
+							cout<<"Default continue"<<endl;
 							continue;
 						}
 						continue; //non-Zero actual values should NOT be added
@@ -9911,15 +10005,16 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			pobjNwManagement = pobjMNNode->getNetworkManagement();
 			iMaxNumberOfChannels = pobjNwManagement->getMaxPDOCount();
 #if defined DEBUG
-			cout << "Max Number Of Channels" << iMaxNumberOfChannels << endl;
+			cout << "Max Number Of TPDO Channels" << iMaxNumberOfChannels << endl;
 #endif
 
 			/* Delete the MN's old object dictionary*/
 			pobjIndexCollection = pobjMNNode->getIndexCollection();
-//DO not delete and try to add PDO indexes.
-			pobjIndexCollection->DeletePDOs();
+//DO not delete and try to reset PDO indexes.
+			//			pobjIndexCollection->DeletePDOs();
+			ResetAllPdos(pobjMNNode->getNodeId(), pobjMNNode->getNodeType());
 #if defined DEBUG
-			cout << "MN Node PDO's deleted" << endl;
+			//cout << "MN Node PDO's deleted" << endl;
 #endif
 			// Delete Process Image Objects
 			pobjIndexCollection->DeletePIObjects();
@@ -9981,6 +10076,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					}
 					/* Create PDO_TxCommParam_XXh_REC 1800 INdex*/
 					CIndex* pobjIndex;
+					iIndexPos = 0;
 					char* pbMappNodeID = new char[SUBINDEX_LEN];
 					strcpy(pbMNIndex, "18");
 					if (CHAINED != eCurrCNStation)
@@ -9990,7 +10086,12 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						pbIdx = padLeft(pbIdx, '0', 2);
 						pbMNIndex = strcat(pbMNIndex, pbIdx);
+						stRetInfo = IfIndexExists(MN_NODEID, MN, pbMNIndex, &iIndexPos);
+						if (stRetInfo.code != OCFM_ERR_SUCCESS)
+						{
+							cout<<"AddIndex: "<<pbMNIndex<<__LINE__<<endl;
 							stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
+						}
 
 						//to write cn node id in 18XX/01
 						pbMappNodeID = _IntToAscii(objNode.getNodeId(),
@@ -9999,13 +10100,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					else
 					{
 						//1800 is used of PRes chained station
-						iIndexPos = 0;
 						strcpy(pbMNIndex, (char *) "1800");
 						strcpy(pbIdx, (char *) "00");
 						stRetInfo = IfIndexExists(MN_NODEID, MN, pbMNIndex,
 								&iIndexPos);
 						if (stRetInfo.code != OCFM_ERR_SUCCESS)
 						{
+							cout<<"AddIndex: "<<pbMNIndex<<__LINE__<<endl;
 							stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
 						}
 
@@ -10048,6 +10149,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 							&iIndexPos);
 					if (stRetInfo.code != OCFM_ERR_SUCCESS)
 					{
+						cout<<"AddIndex: "<<pbMNIndex<<__LINE__<<endl;
 						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
 					}
 
@@ -10059,13 +10161,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						delete[] pArrangedNodeIDbyStation;
 						throw objocfmException;
 					}
-
-					for (INT32 iLoopCount = 0;
-							iLoopCount < objNode.MNPDOOUTVarCollection.Count();
-							iLoopCount++)
+					INT32 PdoOutCount = 0;
+					for (PdoOutCount = 0;
+							PdoOutCount < objNode.MNPDOOUTVarCollection.Count();
+							PdoOutCount++)
 					{
 						MNPdoVariable stMNPdoVar;
-						stMNPdoVar = objNode.MNPDOOUTVarCollection[iLoopCount];
+						stMNPdoVar = objNode.MNPDOOUTVarCollection[PdoOutCount];
 						pobjIndex = objMNIndexCol->getIndexbyIndexValue(
 								pbMNIndex);
 
@@ -10076,6 +10178,16 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 									pobjIndex, pbMNIndex, iOutPrevSize);
 							iOutPrevSize = iOutPrevSize + stMNPdoVar.DataSize;
 						}
+					}
+					CSubIndex *pbMnPdoSidx = NULL;
+					pbMnPdoSidx = pobjIndex->getSubIndexbyIndexValue((char*)"00");
+					if(NULL != pbMnPdoSidx)
+					{
+						char *temp = new char[INDEX_LEN];
+						temp = _IntToAscii(PdoOutCount, temp, 10);
+						//itoa(PdoOutCount, temp, 16);
+						pbMnPdoSidx->setActualValue(temp);
+						delete [] temp;
 					}
 
 					if (CHAINED == eCurrCNStation)
@@ -10095,8 +10207,12 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 					pbIdx = padLeft(pbIdx, '0', 2);
 					pbMNIndex = strcat(pbMNIndex, pbIdx);
-
+					stRetInfo = IfIndexExists(MN_NODEID, MN, pbMNIndex, &iIndexPos);
+					if (stRetInfo.code != OCFM_ERR_SUCCESS)
+					{
+						cout<<"AddIndex: "<<pbMNIndex<<__LINE__<<endl;
 						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);					/* set bFlag to true for 1800*/
+					}
 					pobjIndex = objMNIndexCol->getIndexbyIndexValue(pbMNIndex);
 					if (pobjIndex != NULL)
 						pobjIndex->setFlagIfIncludedCdc(TRUE);
@@ -10133,27 +10249,43 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					strcpy(pbMNIndex, "16");
 					strcat(pbMNIndex, pbIdx);
 					/* Set the MN's PDO Index*/
+					stRetInfo = IfIndexExists(MN_NODEID, MN, pbMNIndex, &iIndexPos);
+					if (stRetInfo.code != OCFM_ERR_SUCCESS)
+					{
+						cout<<"AddIndex: "<<pbMNIndex<<__LINE__<<endl;
 						stRetInfo = AddIndex(MN_NODEID, MN, pbMNIndex);
 						if (stRetInfo.code != OCFM_ERR_SUCCESS)
 						{
 							objocfmException.ocfm_Excpetion(stRetInfo.code);
-						delete[] pArrangedNodeIDbyStation;
+							//delete[] pArrangedNodeIDbyStation; no new so no delete
 							throw objocfmException;
+						}
 					}
 
 					pobjIndex = objMNIndexCol->getIndexbyIndexValue(pbMNIndex);
-					for (INT32 iLoopCount = 0;
-							iLoopCount < objNode.MNPDOINVarCollection.Count();
-							iLoopCount++)
+					INT32 PdoInCount = 0;
+					for (PdoInCount = 0;
+							PdoInCount < objNode.MNPDOINVarCollection.Count();
+							PdoInCount++)
 					{
 						MNPdoVariable stMNPdoVar;
-						stMNPdoVar = objNode.MNPDOINVarCollection[iLoopCount];
+						stMNPdoVar = objNode.MNPDOINVarCollection[PdoInCount];
 						pobjIndex = objMNIndexCol->getIndexbyIndexValue(
 								pbMNIndex);
 						pobjIndex->setFlagIfIncludedCdc(TRUE);
 						GetMNPDOSubIndex(stMNPdoVar, iInPrevSubIndex, pobjIndex,
 								pbMNIndex, iInPrevSize);
 						iInPrevSize = iInPrevSize + stMNPdoVar.DataSize;
+					}
+					CSubIndex *pbMnPdoSidx = NULL;
+					pbMnPdoSidx = pobjIndex->getSubIndexbyIndexValue((char*)"00");
+					if(NULL != pbMnPdoSidx)
+					{
+						char *temp = new char[INDEX_LEN];
+						temp = _IntToAscii(PdoInCount, temp, 10);
+						//itoa(PdoInCount, temp, 16);
+						pbMnPdoSidx->setActualValue(temp);
+						delete [] temp;
 					}
 				}
 				delete[] pbVersionNumber;
@@ -10164,7 +10296,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		delete[] pArrangedNodeIDbyStation;
 		setFlagForRequiredMNIndexes(MN_NODEID);
 	}
-
 	catch (ocfmException& objocfmException)
 	{
 		return objocfmException._ocfmRetCode;
@@ -12329,6 +12460,7 @@ void copyPDODefToAct(INT32 iNodeID, ENodeType enumNodeType)
 				{
 					if (pobjSIndex->getDefaultValue() != NULL)
 					{
+						cout<<"pobjSIndex:"<<pobjSIndex->getIndexValue()<<endl;
 						pobjSIndex->setActualValue(
 								(char*) pobjSIndex->getDefaultValue());
 					}
