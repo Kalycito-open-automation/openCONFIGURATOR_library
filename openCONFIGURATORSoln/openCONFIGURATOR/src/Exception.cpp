@@ -272,7 +272,7 @@ void ocfmException::ocfm_Excpetion(EConfiuguratorErrors enumErrcode)
 		break;
 	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
 		strcpy(_ocfmRetCode.errorString,
-				"NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND");
+				"NoOfEntries SubIndex not present");
 		break;
 	case OCFM_ERR_INVALID_PARAMETER:
 		strcpy(_ocfmRetCode.errorString,
@@ -281,6 +281,10 @@ void ocfmException::ocfm_Excpetion(EConfiuguratorErrors enumErrcode)
 	case OCFM_ERR_INVALID_SIZE_MAPPED:
 		strcpy(_ocfmRetCode.errorString,
 				"Invalid Size mapped for the PDO. Check the length for the according datatype");
+		break;
+	case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
+		strcpy(_ocfmRetCode.errorString,
+				"Invalid mapping type for the PDO. Check the pdo mapping for the mapped PI object");
 		break;
 	default:
 		strcpy(_ocfmRetCode.errorString, "Unhandled Error");

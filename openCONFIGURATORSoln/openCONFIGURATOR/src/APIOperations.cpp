@@ -6648,6 +6648,55 @@ ocfmRetCode ProcessPDONodes(bool IsBuild)
 								}
 
 								EPDOType pdoType = objIndex.getPDOType();
+								char* pdoMappingType = new char[strlen(pobjModuleSIndex->getPDOMapping()) + STR_ALLOC_BUFFER];
+								pdoMappingType = strcpy(pdoMappingType, pobjModuleSIndex->getPDOMapping());
+
+								#if defined DEBUG
+								cout<<"Mapping:"<<pdoMappingType<<" pdoType:"<<pdoType<<endl;
+								#endif
+
+								if ((0 == strcmp(ConvertToUpper((char*)pdoMappingType), "TPDO")) && (pdoType == PDO_TPDO))
+								{
+								}
+								else if ((0 == strcmp(ConvertToUpper((char*)pdoMappingType), "RPDO")) && (pdoType == PDO_RPDO))
+								{
+								}
+								else
+								{
+									char* pdoDummyMappingType = new char[ 20 + STR_ALLOC_BUFFER];
+									if (0 == strcmp(ConvertToUpper((char*)pdoMappingType), "TPDO"))
+									{
+										pdoDummyMappingType = strcpy(pdoDummyMappingType, "RPDO");
+									}
+									else if (0 == strcmp(ConvertToUpper((char*)pdoMappingType), "RPDO"))
+									{
+										pdoDummyMappingType = strcpy(pdoDummyMappingType, "TPDO");
+									}
+									else
+									{
+										if (pdoType == PDO_TPDO)
+										{
+											pdoDummyMappingType = strcpy(pdoDummyMappingType, "TPDO");
+										}
+										else
+										{
+											pdoDummyMappingType = strcpy(pdoDummyMappingType, "RPDO");
+										}
+										//nothing to do
+									}
+									ocfmException objex;
+									objex.ocfm_Excpetion(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+
+									char acCustomError[200] = { 0 };
+									//Sample: In Node: 123  invalid object mapped in 1A00 / 01. The object 6000 / 00 has pdo mapping set to OPTIONAL. use an object which has pdo mapping TPDO.
+									sprintf(acCustomError, "Node: %d has invalid object mapped in %s / %s. \n The object %s / %s has pdo mapping set to %s. Use an object which has pdo mapping %s.", pobjNode->getNodeId(), objIndex.getIndexValue(), pobjSubIdx->getIndexValue(), pbModuleIndex, pbSubIndex, pdoMappingType, pdoDummyMappingType);
+
+									CopyCustomErrorString(&(objex._ocfmRetCode), acCustomError);
+									delete[] pdoDummyMappingType;
+									delete[] pdoMappingType;
+									throw objex;
+								}
+								delete[] pdoMappingType;
 
 								if (uniqueidRefID != NULL)
 								{

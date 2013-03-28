@@ -1975,7 +1975,7 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 									BAD_CAST objSubIndexPtr->getHighLimit());
 						}
 					}
-
+//TODO: Index checked for null. Fixit strcmp 0 sidx
 					if ((pobjIndexPtr->getPDOMapping() != NULL))
 					{
 						if (objSubIndexPtr->getPDOMapping() != NULL)

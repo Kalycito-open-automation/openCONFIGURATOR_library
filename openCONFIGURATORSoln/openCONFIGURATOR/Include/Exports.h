@@ -58,7 +58,7 @@
 /* Defines */
 
 #define DllExport
-#define DEBUG
+//#define DEBUG
 
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
