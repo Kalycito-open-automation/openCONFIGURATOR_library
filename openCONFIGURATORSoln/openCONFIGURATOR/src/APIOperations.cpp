@@ -2083,7 +2083,10 @@ ocfmRetCode SetSubIndexAttributesByAttribute(INT32 iNodeID,
 				pobjSubIndex->setActualValue((char*) "");
 			break;
 		case PDOMAPPING:
-			// No Operation
+			if (NULL != pbInAttributeValue)
+				pobjSubIndex->setPDOMapping(pbInAttributeValue);
+			else
+				pobjSubIndex->setPDOMapping((char*) "");
 			break;
 		case LOWLIMIT:
 			// No Operation

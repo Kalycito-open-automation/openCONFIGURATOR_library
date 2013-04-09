@@ -212,7 +212,7 @@ char* StringToUpper(char* str);
 void setFlagForRequiredCNIndexes(INT32 NodeId);
 void UpdateCNCycleTime(CIndexCollection *objIdxCol, char* cycleTime);
 void UpdateNumberOfEnteriesSIdx(CIndex *objIndex, ENodeType NodeType);
-INT32 getDataSize(char* dataTypeVal);
+//INT32 getDataSize(char* dataTypeVal);
 bool checkIfStringDatatypes(char* datatypeValue);
 bool CheckIfDataTypeByNameExists(char* dtName, INT32 iNodeID);
 ocfmRetCode AddOtherMNIndexes(INT32 NodeID);

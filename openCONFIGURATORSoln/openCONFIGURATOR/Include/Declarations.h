@@ -424,6 +424,7 @@ DllExport ocfmRetCode GetNodeDataTypes(INT32 iNodeId, ENodeType eNodeType,
 		char* Out_DataTypes);
 DllExport ocfmRetCode NewProjectNode(INT32 iNodeID, ENodeType enumNodeType,
 		char* pbNodeName, char * pbImportXmlFile);
+DllExport INT32 getDataSize(char* dataTypeVal);
 #ifndef __GNUC__
 #pragma warning( disable: 4251 )
 #endif

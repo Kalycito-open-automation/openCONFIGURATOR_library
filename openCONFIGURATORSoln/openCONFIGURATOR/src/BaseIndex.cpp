@@ -549,7 +549,7 @@ void CBaseIndex::setPDOMapping(char* pbPdoMapping)
 	else
 	{
 #ifdef DEBUG
-		cout << "Error! setPDOMapping failed\n" << endl;
+		cout << "Error! setPDOMapping failed: "<<pbPdoMapping<<" index: "<< m_Index<<"\n" << endl;
 #endif
 	}
 	delete[] pbStrBuff;
