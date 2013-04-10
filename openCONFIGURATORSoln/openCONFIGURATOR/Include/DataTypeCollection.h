@@ -61,26 +61,75 @@
 
 /**
  ******************************************************************************************************
- \class			CDataTypeCollection
+ \class			DataTypeCollection
  \brief			This class is to handle complex datatype collection in xdd/xdc file
  
  *******************************************************************************************************/
-class DllExport CDataTypeCollection
+class DataTypeCollection
 {
 	public:
-		CDataTypeCollection(void);
-		~CDataTypeCollection(void);
-	private:
-		INT32 m_DataTypeCount;
+		DataTypeCollection(void);
+		~DataTypeCollection(void);
+
+		/*****************************************************************************/
+		/**
+		 \brief			This function shall be used to add an object of DataType to a collection list and update the count
+		  
+		 \param			objDataType		Class variable of DataType to include in data type collection	
+		 
+		 \return		void
+		 */
+		/*****************************************************************************/
+		void AddDataType(DataType objDataType);
+		/*****************************************************************************/
+		/**
+		 \brief			This function shall be used to delete the objects of DataType collection list and update the count
+		 
+		 \return		void
+		 */
+		/*****************************************************************************/
+		void DeleteDataTypeCollection();
+		/*****************************************************************************/
+		/**
+		 \brief			This function shall be used to return number of DataType objects in the DataType collection list
+		  
+		 \return		INT32
+		 */
+		/*****************************************************************************/		
+		INT32 GetNumberOfDataTypes();
+		/*****************************************************************************/
+		/**
+		 \brief			This function shall be used to return the DataType object at the given position in the collection list
+		  
+		 \param			dataTypePosition	Integer to hold the datatype id
+		 
+		 \return		DataType
+		 */
+		/*****************************************************************************/
+		DataType* GetDataTypeElement(INT32 dataTypePosition);
+		/*****************************************************************************/
+		/**
+		 \brief			This function shall be used to return the DataType object(whose dataTypeValue matches the given parameter) from the collection list
+		 
+		 \param			dataTypeValue		Character pointer to the datatype value
+
+		 \return		DataType*
+		 */
+		/*****************************************************************************/
+		DataType* GetDataType(char* dataTypeValue);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the DataType object whose dataTypeValue matches the given parameter
+		 
+		 \param		dataTypeValue		Character pointer to the datatype value
+		 
+		 \return	DataType*
+		 */
+		/*****************************************************************************/
+		DataType* GetDataTypeByName(char* dataTypeValue);
 
 	private:
-		TCollection<DataType> collectionObj;
-	public:
-		void addDataType(DataType objDataType);
-		void DeleteDataTypeCollection();
-		INT32 getNumberOfDataTypes();
-		DataType* getDataTypeElement(INT32 DataTypeId);
-		DataType* getDataType(char* DataTypevalue);
-		DataType* getDataTypeByName(char* DataTypeName);
+		INT32 dataTypeCollectionCount;
+		TCollection<DataType> dataTypeCollectionObj;
 };
 #endif // DataTypeCollection_h

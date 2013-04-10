@@ -57,13 +57,13 @@
 #include <stdio.h>
 #include "../Include/NodeCollection.h"
 #include "../Include/Node.h"
-//$S Only for testing
+
 
 /****************************************************************************************************/
 /* Global Variables */
 
-bool CNodeCollection::instanceFlag = false;
-CNodeCollection* CNodeCollection::objNodeCollection = NULL;
+bool NodeCollection::instanceFlag = false;
+NodeCollection* NodeCollection::objNodeColl = NULL;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -74,12 +74,12 @@ CNodeCollection* CNodeCollection::objNodeCollection = NULL;
 
 /**
  
- @param void
+
  */
 
-CNodeCollection::CNodeCollection(void)
+NodeCollection::NodeCollection(void)
 {
-	m_NodeCount = collectionObj.Count();
+	nodeCount = nodeCollObj.Count();
 }
 
 /*************************************************************************/
@@ -87,128 +87,69 @@ CNodeCollection::CNodeCollection(void)
 
 /**
  
- @param void
+
  */
 
-CNodeCollection::~CNodeCollection(void)
+NodeCollection::~NodeCollection(void)
 {
 	instanceFlag = false;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNumberOfNodes
- 
- This is a member function of CNodeCollection returns node count
 
- \return	INT32
- */
-/*****************************************************************************/
 
-INT32 CNodeCollection::getNumberOfNodes()
+INT32 NodeCollection::GetNumberOfNodes()
 {
-	return m_NodeCount;
+	return nodeCount;
 }
 
-/*****************************************************************************/
-/**
- \brief			addNode
- 
- This is a member function of CNodeCollection collects objects under node count
- 
- \param			objNode        Class Variable of CNode to hold the value of object node
- \return	void
- */
-/*****************************************************************************/
-
-void CNodeCollection::addNode(CNode objNode)
+void NodeCollection::AddNode(Node nodeObj)
 {
-	INT32 iItemPosition = collectionObj.Add();
+	INT32 iItemPosition = nodeCollObj.Add();
 
-	collectionObj[iItemPosition] = objNode;
-	m_NodeCount = collectionObj.Count();
+	nodeCollObj[iItemPosition] = nodeObj;
+	nodeCount = nodeCollObj.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			deleteNode
- 
- This is a member function of CNodeCollection deletes the node ids
- 
- \param			iNodeID    Integer Variable holds the value of Node ID
- \return	void
- */
-/*****************************************************************************/
-
-void CNodeCollection::deleteNode(INT32 iNodeID)
+void NodeCollection::DeleteNode(INT32 nodePos)
 {
-	collectionObj.Remove(iNodeID);
-	m_NodeCount = collectionObj.Count();
+	nodeCollObj.Remove(nodePos);
+	nodeCount = nodeCollObj.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			getNodeColObjectPointer
- 
- This is a member function of CNodeCollection collects the location of node
- 
- \return	CNodeCollection*
- */
-/*****************************************************************************/
 
-CNodeCollection* CNodeCollection::getNodeColObjectPointer()
+
+NodeCollection* NodeCollection::GetNodeColObjectPointer()
 {
 	if (!instanceFlag)
 	{
-		objNodeCollection = new CNodeCollection();
+		objNodeColl = new NodeCollection();
 		instanceFlag = true;
 	}
-	return objNodeCollection;
+	return objNodeColl;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNodeColObject
- 
- This is a member function of CNodeCollection collects value of node objects
- 
- \return	CNodeCollection
- */
-/*****************************************************************************/
 
-CNodeCollection CNodeCollection::getNodeColObject()
+
+NodeCollection NodeCollection::GetNodeColObject()
 {
 	if (!instanceFlag)
 	{
-		objNodeCollection = new CNodeCollection();
+		objNodeColl = new NodeCollection();
 		instanceFlag = true;
 	}
-	return *objNodeCollection;
+	return *objNodeColl;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNode
- 
- This is a member function of CNodeCollection the type of node objects
-
- \param			enumNodeType  Enum Variable of ENodeType to hold the value of Enum Node type
- \param			iNodeID		  Integer Variable to hold the value of Node id		
- \return	CNode
- */
-/*****************************************************************************/
-
-CNode CNodeCollection::getNode(ENodeType enumNodeType, INT32 iNodeID)
+Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
 {
-	INT32 iLoopCount = 0;
-	CNode objNode;
+	INT32 nodeLC = 0;
+	Node objNode;
 
-	for (iLoopCount = 0; iLoopCount < m_NodeCount; iLoopCount++)
+	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
 	{
-		objNode = objNodeCollection->collectionObj[iLoopCount];
+		objNode = objNodeColl->nodeCollObj[nodeLC];
 
-		if (objNode.getNodeType() == enumNodeType
-				&& objNode.getNodeId() == iNodeID)
+		if ((objNode.GetNodeType() == nodeType ) && (objNode.GetNodeId() == nodeId))
 		{
 			return objNode;
 		}
@@ -216,58 +157,35 @@ CNode CNodeCollection::getNode(ENodeType enumNodeType, INT32 iNodeID)
 	return objNode;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNodePtr
-
- This is a member function of CNodeCollection collects the location of node objects type 
-
- \param			enumNodeType  Enum Variable of ENodeType to hold the value of Enum Node type
- \param			iNodeID		  Integer Variable to hold the value of Node id					
-
- \return	CNode* / NULL
- */
-/*****************************************************************************/
-
-CNode* CNodeCollection::getNodePtr(ENodeType enumNodeType, INT32 iNodeID)
+Node* NodeCollection::GetNodePtr(NodeType nodeType, INT32 nodeId)
 {
-	INT32 iLoopCount = 0;
-	CNode* pobjNode = NULL;
+	INT32 nodeLC = 0;
+	Node* objNode = NULL;
 
-	for (iLoopCount = 0; iLoopCount < m_NodeCount; iLoopCount++)
+	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
 	{
-		pobjNode = &(objNodeCollection->collectionObj[iLoopCount]);
+		objNode = &(objNodeColl->nodeCollObj[nodeLC]);
 
-		if (pobjNode->getNodeType() == enumNodeType
-				&& pobjNode->getNodeId() == iNodeID)
+		if ((objNode->GetNodeType() == nodeType) && (objNode->GetNodeId() == nodeId))
 		{
-			return pobjNode;
+			return objNode;
 		}
 	}
 	return NULL;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNode
- 
- This is a member function of CNodeCollection collects the type of node objects 
 
- \param			iNodeID			Integer Variable to hold the value of Node id		
- \return	CNode
- */
-/*****************************************************************************/
 //TODO: unused function
-CNode CNodeCollection::getNode(INT32 iNodeID)
+Node NodeCollection::GetNode(INT32 nodeId)
 {
-	INT32 iLoopCount = 0;
-	CNode objNode;
+	INT32 nodeLC = 0;
+	Node objNode;
 
-	for (iLoopCount = 0; iLoopCount < m_NodeCount; iLoopCount++)
+	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
 	{
-		objNode = objNodeCollection->collectionObj[iLoopCount];
+		objNode = objNodeColl->nodeCollObj[nodeLC];
 
-		if (objNode.getNodeId() == iNodeID)
+		if (objNode.GetNodeId() == nodeId)
 		{
 			return objNode;
 		}
@@ -275,26 +193,17 @@ CNode CNodeCollection::getNode(INT32 iNodeID)
 	return objNode;
 }
 
-/*****************************************************************************/
-/**
- \brief			getMNNode
- 
- This is a member function of CNodeCollection collects the type of node objects for MN
 
- \return	CNode
- */
-/*****************************************************************************/
-
-CNode CNodeCollection::getMNNode()
+Node NodeCollection::GetMNNode()
 {
-	INT32 iLoopCount;
-	CNode objNode;
+	INT32 nodeLC;
+	Node objNode;
 
-	for (iLoopCount = 0; iLoopCount < m_NodeCount; iLoopCount++)
+	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
 	{
-		objNode = objNodeCollection->collectionObj[iLoopCount];
+		objNode = objNodeColl->nodeCollObj[nodeLC];
 
-		if (objNode.getNodeType() == MN)
+		if (objNode.GetNodeType() == MN)
 		{
 			return objNode;
 		}
@@ -303,58 +212,28 @@ CNode CNodeCollection::getMNNode()
 	return objNode;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNodebyCollectionIndex
- 
- This is a member function of CNodeCollection returns node from the node collection index
-
- \param			iColIndex    Integer Variable to hold value of column index
- \return	CNode
- */
-/*****************************************************************************/
-
-CNode CNodeCollection::getNodebyCollectionIndex(INT32 iColIndex)
+Node NodeCollection::GetNodebyCollectionIndex(INT32 position)
 {
-	return collectionObj[iColIndex];
+	return nodeCollObj[position];
 }
 
-/*****************************************************************************/
-/**
- \brief			getNodebyColIndex
- 
- This is a member function of CNodeCollection collects the node with reference to the index location 
-
- \param			iColIndex   Integer Variable to hold value of column index
- \return	CNode*
- */
-/*****************************************************************************/
-
-CNode* CNodeCollection::getNodebyColIndex(INT32 iColIndex)
+Node* NodeCollection::GetNodebyColIndex(INT32 position)
 {
-	return &collectionObj[iColIndex];
+	return &nodeCollObj[position];
 }
 
-/*****************************************************************************/
-/**
- \brief			getCNNodesCount
- 
- This is a member function of CNodeCollection collects the CN node count 
 
- \return	INT32
- */
-/*****************************************************************************/
 
-INT32 CNodeCollection::getCNNodesCount()
+INT32 NodeCollection::GetCNNodesCount()
 {
-	INT32 iCNNodecount = 0;
+	INT32 cnNodeCount = 0;
 
-	for (INT32 iLoopCount = 0; iLoopCount < collectionObj.Count(); iLoopCount++)
+	for (INT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.Count(); nodeCountLC++)
 	{
-		if (collectionObj[iLoopCount].getNodeType() == CN)
+		if (nodeCollObj[nodeCountLC].GetNodeType() == CN)
 		{
-			iCNNodecount++;
+			cnNodeCount++;
 		}
 	}
-	return iCNNodecount;
+	return cnNodeCount;
 }

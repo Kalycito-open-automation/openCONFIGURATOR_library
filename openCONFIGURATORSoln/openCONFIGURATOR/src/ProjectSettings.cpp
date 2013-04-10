@@ -63,8 +63,8 @@ using namespace std;
 /****************************************************************************************************/
 /* Global Variables */
 
-bool CPjtSettings::instanceFlag = false;
-CPjtSettings* CPjtSettings::objPjtSettings = NULL;
+bool PjtSettings::instanceFlag = false;
+PjtSettings* PjtSettings::pjtSettingsObj = NULL;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -75,19 +75,19 @@ CPjtSettings* CPjtSettings::objPjtSettings = NULL;
 
 /**
  
- @param void
+
  */
 
-CPjtSettings::CPjtSettings(void)
+PjtSettings::PjtSettings(void)
 {
 #if defined DEBUG
 	cout << "\nPjtSettings Objects Initialized!\n" << endl;
 #endif
-	m_saveMode = DISCARD_AS;
-	m_generateMode = NO_AG;
-	m_IP_openPOWERLINK = NULL;
-	m_bExpertViewSelected = false;
-	m_viewMode = SIMPLE; //TODO: Review initialisation
+	saveMode = DISCARD_AS;
+	generateMode = NO_AG;
+	ipAddress = NULL;
+	expertView = false;
+	viewMode = SIMPLE; //TODO: Review initialisation
 }
 
 /*************************************************************************/
@@ -95,10 +95,10 @@ CPjtSettings::CPjtSettings(void)
 
 /**
  
- @param void
+
  */
 
-CPjtSettings::~CPjtSettings(void)
+PjtSettings::~PjtSettings(void)
 {
 	instanceFlag = false;
 #if defined DEBUG
@@ -106,134 +106,64 @@ CPjtSettings::~CPjtSettings(void)
 #endif
 }
 
-/*****************************************************************************/
-/**
- \brief			getPjtSettingsPtr
- 
- This is a member function of CPjtSettings creats new Pjtsettings 
 
- \return		CPjtSettings*
- */
-/*****************************************************************************/
-
-CPjtSettings* CPjtSettings::getPjtSettingsPtr()
+PjtSettings* PjtSettings::GetPjtSettingsPtr()
 {
 	if (!instanceFlag)
 	{
-		objPjtSettings = new CPjtSettings();
+		pjtSettingsObj = new PjtSettings();
 		instanceFlag = true;
 #if defined DEBUG
-		cout << "\n\n\n\nNew PjtSettings Object Created!\n" << endl;
+		cout << "\n\n\nNew PjtSettings Object Created!\n" << endl;
 #endif
 	}
-	return objPjtSettings;
+	return pjtSettingsObj;
 }
 
-/*****************************************************************************/
-/**
- \brief			getSaveAttr
- 
- This is a member function of CPjtSettings saves new Pjtsettings  
 
- \return		EAutoSave
- */
-/*****************************************************************************/
-
-EAutoSave CPjtSettings::getSaveAttr()
+AutoSave PjtSettings::GetSaveAttr()
 {
-	return m_saveMode;
+	return saveMode;
 }
 
-/*****************************************************************************/
-/**
- \brief			setSaveAttr
- 
- This is a member function of CPjtSettings sets mode for pjt settings 
- 
- \param			enumAutoSaveMode   Enum Variable of EAutoSave to save the attributes
- \return		void
- */
-/*****************************************************************************/
-
-void CPjtSettings::setSaveAttr(EAutoSave enumAutoSaveMode)
+void PjtSettings::SetSaveAttr(AutoSave autoSaveMode)
 {
-	m_saveMode = enumAutoSaveMode;
+	saveMode = autoSaveMode;
 }
 
-/*****************************************************************************/
-/**
- \brief			getGenerateAttr
- 
- This is a member function of CPjtSettings generates mode for pjt settings    
 
- \return		EAutoGenerate
- */
-/*****************************************************************************/
-
-EAutoGenerate CPjtSettings::getGenerateAttr()
+AutoGenerate PjtSettings::GetGenerateAttr()
 {
 #if defined DEBUG
-	//cout << "\n Returning m_generateMode:-" << m_generateMode <<endl;	
+	//cout << "\n Returning AutoGenerate mode:-" << generateMode <<endl;
 #endif	
-	return m_generateMode;
+	return generateMode;
 }
 
-/*****************************************************************************/
-/**
- \brief			setGenerateAttr
- 
- This is a member function of CPjtSettings sets mode for pjt settings  
- 
- \param			enumAutoGenerateMode Enum Variable of EAutoGenerate to generate attribute
- \return		void
- */
-/*****************************************************************************/
-
-void CPjtSettings::setGenerateAttr(EAutoGenerate enumAutoGenerateMode)
+void PjtSettings::SetGenerateAttr(AutoGenerate autoGenerateMode)
 {
-	m_generateMode = enumAutoGenerateMode;
+	generateMode = autoGenerateMode;
 }
 
-/*****************************************************************************/
-/**
- \brief			setPOWERLINK_IP
- 
- This is a member function of CPjtSettings assigns IP address for Powerlink  
- 
- \param			pbIPAddr   Character Pointer variable to hold IPaddress
- \return		void
- */
-/*****************************************************************************/
-
-void CPjtSettings::setPOWERLINK_IP(char* pbIPAddr)
+void PjtSettings::SetIP(char* ipAddr)
 {
 //TODO: review
-	if (NULL != m_IP_openPOWERLINK)
+	if (NULL != ipAddress)
 	{
-		delete[] m_IP_openPOWERLINK;
+		delete[] ipAddress;
 	}
 
-	m_IP_openPOWERLINK = new char[strlen(pbIPAddr) + STR_ALLOC_BUFFER];
-	strcpy((char*) m_IP_openPOWERLINK, pbIPAddr);
+	ipAddress = new char[strlen(ipAddr) + STR_ALLOC_BUFFER];
+	strcpy((char*) ipAddress, ipAddr);
 
 }
 
-/*****************************************************************************/
-/**
- \brief			getPOWERLINK_IP
- 
- This is a member function of CPjtSettings returns Powerlink IP  
- 
- \return		char*
- */
-/*****************************************************************************/
-
 //TODO: Unused Function
-const char* CPjtSettings::getPOWERLINK_IP()
+const char* PjtSettings::GetIP()
 {
-	if (NULL != m_IP_openPOWERLINK)
+	if (NULL != ipAddress)
 	{
-		return m_IP_openPOWERLINK;
+		return ipAddress;
 	}
 	else
 	{
@@ -241,67 +171,25 @@ const char* CPjtSettings::getPOWERLINK_IP()
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			getViewMode
- 
- This is a member function of CPjtSettings sets view mode under pjt settings  
- 
- \return		EViewMode
- */
-/*****************************************************************************/
 
-EViewMode CPjtSettings::getViewMode()
+ViewMode PjtSettings::GetViewMode()
 {
-	return m_viewMode;
+	return viewMode;
 }
 
-/*****************************************************************************/
-/**
- \brief			setViewMode
- 
- This is a member function of CPjtSettings assigns view mode  
- 
- \param			enumViewMode	Enum Variable of EViewMode to hold the value of mode type			
- \return		void
- */
-/*****************************************************************************/
-
-void CPjtSettings::setViewMode(EViewMode enumViewMode)
+void PjtSettings::SetViewMode(ViewMode viewModeTemp)
 {
-	m_viewMode = enumViewMode;
+	viewMode = viewModeTemp;
 }
 
-/*****************************************************************************/
-/**
- \brief			getExpertViewSelectedFlag
- 
- This is a member function of CPjtSettings sets flag for type of view selected under pjt settings  
- 
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
 
-bool CPjtSettings::getExpertViewSelectedFlag()
+bool PjtSettings::GetExpertViewSelectedFlag()
 {
-	return m_bExpertViewSelected;
+	return expertView;
 }
 
-/*****************************************************************************/
-/**
- \brief			setExpertViewSelectedFlag
- 
- This is a member function of CPjtSettings assigns type of view selected under pjt settings 
- 
- \param			bExpertViewSelected	 Boolean Variable to hold the value of Expertview selected			
- \return		void
- */
-/*****************************************************************************/
-
-void CPjtSettings::setExpertViewSelectedFlag(bool bExpertViewSelected)
+void PjtSettings::SetExpertViewSelectedFlag(bool expertViewTemp)
 {
-	m_bExpertViewSelected = bExpertViewSelected;
+	expertView = expertViewTemp;
 }
 

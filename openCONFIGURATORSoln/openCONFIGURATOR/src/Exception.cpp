@@ -69,7 +69,7 @@
 
 /**
  
- @param void
+
  */
 
 ocfmException::ocfmException(void)
@@ -82,7 +82,7 @@ ocfmException::ocfmException(void)
 
 /**
  
- @param void
+
  */
 
 ocfmException::~ocfmException(void) throw ()
@@ -90,23 +90,13 @@ ocfmException::~ocfmException(void) throw ()
 	//Add destructor code here	
 }
 
-/*****************************************************************************/
-/**
- \brief			ocfm_Excpetion
- 
- This is a member Function of ocfmException displays Error statements
- 
- \param			enumErrcode	 Enum Variable of EConfiuguratorErrors to hold the error code		
- \return		void
- */
-/*****************************************************************************/
 
-void ocfmException::ocfm_Excpetion(EConfiuguratorErrors enumErrcode)
+void ocfmException::OCFMException(ConfiguratorErrors errCode)
 {
-	_ocfmRetCode.code = enumErrcode;
+	_ocfmRetCode.code = errCode;
 	_ocfmRetCode.errorString = new char[ERR_STRING_LEN];
 
-	switch (enumErrcode)
+	switch (errCode)
 	{
 	case OCFM_ERR_FILE_NOT_PRESENT:
 		strcpy(_ocfmRetCode.errorString, "File not present");

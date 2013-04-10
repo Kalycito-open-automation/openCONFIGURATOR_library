@@ -54,7 +54,7 @@
 #ifndef Internal_h
 #define Internal_h
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Includes */
 
 #include <stddef.h>
@@ -71,7 +71,7 @@
 #include "NetworkManagement.h"
 #include "Exception.h"
 
-/*************************************************************************************************/
+/*****************************************************************************/
 /* Defines */
 
 #define TOOL_VERSION "1.2.2"
@@ -116,15 +116,16 @@
 #define EPL_NODEASSIGN_MN_PRES          0x00001000L // Bit 12
 #define EPL_NODEASSIGN_CHAINED_CN       0x00004000L // Bit 14
 #define EPL_NODEASSIGN_VALID            0x80000000L // Bit 31
-/************************************************************************************************/
+/*****************************************************************************/
 /* Enumerations */
 
+/*
 typedef enum
 {
 	ADD = 0, DELETE
 } EOperation;
-
-/************************************************************************************************/
+*/
+/*****************************************************************************/
 /* structure */
 
 #define BUILDTIME_BUF_LEN 80
@@ -134,162 +135,1366 @@ typedef struct
 		time_t rawtime;
 		struct tm * timeinfo;
 		char buffer[BUILDTIME_BUF_LEN];
-} sBuildTime;
+} BuildTime;
 
-/************************************************************************************************/
+/*****************************************************************************/
 /* Externs */
 
-extern int iConfigDate;
-extern int iConfigTime;
-extern UINT32 uiCycleNumber;
+extern int configDateGlobal;
+extern int configTimeGlobal;
+extern UINT32 cycleNumberGlobal;
 
-/************************************************************************************************/
+/*****************************************************************************/
 /* Global variables */
 
-static const int g_simple_arr_size = 19;
-static const UINT32 uiPreScalar = 0;
+static const int gSimpleArrSize = 19;
+static const UINT32 preScalarGlobal = 0;
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Function Declarations */
 
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the input parameter string in upper case format
+
+ \param		str		Character pointer to the string
+
+ \return	char*
+ */
+/*****************************************************************************/
 char* ConvertToUpper(char* str);
-char* _IntToAscii(long value, char* result, INT32 base);
-bool CheckIfNotPDO(char* Index);
-bool CheckIfNotPDO(char* Index);
+/*****************************************************************************/
+/**
+ \brief		This function shall convert the given value to a ASCII string
+
+ \param		srcValue       Long Integer to hold the value to be converted to ASCII string
+ \param		destStr        Character pointer to the ASCII string version
+ \param		baseValue      Integer to hold the basevalue
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given Index ID is of PDO type
+
+ \param		indexId		Character pointer to the value of index ID
+
+ \return	BOOL
+ \retval	TRUE		if given Index ID is not of PDO type
+ \retval	FALSE		if given Index ID is of PDO type
+ */
+/*****************************************************************************/
+bool CheckIfNotPDO(char* indexId);
 void ProcessUniqueIDRefs();
-char* subString(char* str, INT32 startpos, INT32 len);
-char* reverse(char* str);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return a substring of the input parameter string from the given startPos for given len
+
+ \param		str    			Character pointer to the string
+ \param		startPos    	Integer to hold the value of starting position of the sub string in the string
+ \param		len     		Integer to hold the value of sub string length required
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* SubString(char* str, INT32 startPos, INT32 len);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the reversed version the input parameter string
+
+ \param		str  	Character pointer to the string
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* Reverse(char* str);
+/*****************************************************************************************/
+/**
+ \brief		ProcessPDONodes
+
+ This API shall process the PDO nodes of the Controlled node
+
+ \return	ocfmRetCode			ConfiguratorErrors
+ */
+/******************************************************************************************/
 ocfmRetCode ProcessPDONodes();
-ocfmRetCode ProcessPDONodes(bool IsBuild);
+/*****************************************************************************************/
+/**
+ \brief		This function shall process the PDO Nodes of the CNs and generate a PDO collection that is used to create the MN PDO's & the process image variables
+
+ \param		isBuild		Boolean flag to hold the value true if it is Build process
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/******************************************************************************************/
+ocfmRetCode ProcessPDONodes(bool isBuild);
+/*****************************************************************************/
+/**
+ \brief		This function shall auto generate the MN's object dictionary
+
+ \param		IsBuild			Boolean value to set if this is a build process or not
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
 ocfmRetCode GenerateMNOBD(bool IsBuild);
-bool CheckIfManufactureSpecificObject(char* Index);
-bool IsAscii(char c);
-INT32 lenOfCNBuffer(char* Buffer);
-char* padLeft(char* str, char padChar, INT32 padLength);
-unsigned long hex2int(char *a);
-CIndex* getMNIndexValues(char* Index);
-bool CheckAllowedCNIndexes(char* IndexValue);
-bool CheckBlockedMNIndexes(char* IndexValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given Index ID corresponds to the range for Manufaturer Specific Object
+
+ \param		indexId     Character Pointer Variable to hold the value of index
+
+ \return	BOOL
+ \retval	TRUE		if the given Index ID corresponds to the range for Manufaturer Specific Object
+ \retval	FALSE		if the given Index ID does not correspond to the range for Manufaturer Specific Object
+ */
+/*****************************************************************************/
+bool CheckIfManufactureSpecificObject(char* indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given character value is any ASCII character other than 0 to 9
+
+ \param		argVar		Character to hold the input parameter
+
+ \return	BOOL
+ \retval	TRUE		if given character value is any ASCII character other than 0 to 9
+ \retval	FALSE		if given character value is any ASCII character from 0 to 9
+ */
+/*****************************************************************************/
+bool IsAscii(char argVar);
+/*****************************************************************************************/
+/**
+ \brief		This function shall return the total size of data in the buffer
+
+ \param		cdcBuffer		Character pointer to hold the buffer data
+
+ \return	INT32
+ */
+/******************************************************************************************/
+INT32 LenOfCNBuffer(char* cdcBuffer);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to pad the left side portion of the string with the given padChar and for the given padLength
+
+ \param		str      		Character pointer to the string
+ \param		padChar         Character to hold the padding character
+ \param		padLength       Integer to hold the value of Pad Length
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* PadLeft(char* str, char padChar, INT32 padLength);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the integer version of the given hexadecimal string paramater
+
+ \param		hexStr   	Character pointer to the hex value string to be converted to integer
+
+ \return	ULONG
+ */
+/*****************************************************************************/
+ULONG HexToInt(char *hexStr);
+/*****************************************************************************************/
+/**
+ \brief			This function shall return the Index class pointer for the index id of the MN
+
+ \param			indexId		Character pointer to hold the Index id value
+
+ \return		Index*
+ */
+/******************************************************************************************/
+Index* GetMNIndexValues(char* indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given Index ID is allowed for use as a CN index
+
+ \param		indexId      	Character pointer to the value of Index ID
+
+ \return	BOOL
+ \retval	TRUE			if the given Index ID is allowed for use as a CN index
+ \retval	FALSE			if the given Index ID is not allowed for use as a CN index
+ */
+/*****************************************************************************/
+bool CheckAllowedCNIndexes(char* indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given Index ID is allowed for use in MN
+
+ \param		indexId		Character pointer to hold the value of Index ID
+
+ \return	BOOL
+ \retval	TRUE		if the given Index ID is not allowed for use in MN
+ \retval	FALSE		if the given Index ID is allowed for use in MN
+ */
+/*****************************************************************************/
+bool CheckBlockedMNIndexes(char* indexId);
 //TODO: To be removed. Convert cdc to binary
 INT32 ConvertCdcToBinary(char* fileName, char* tempFile);
-char* getParameterAccess(char* access);
-bool CheckEndElement(INT32 NodeType, char* element, char* comparewith);
-bool CheckStartElement(INT32 NodeType, char* element, char* comparewith);
-bool CheckifSimpleDT(char* Name, char* size);
-char* getPIName(INT32 NodeID);
-void setIndexAttributes(xmlTextReaderPtr reader, CIndex* objIndex,
-		bool& hasPDO);
-void setSubIndexAttributes(xmlTextReaderPtr reader, CSubIndex* objSubIndex);
-void setDataTypeAttributes(xmlTextReaderPtr reader, DataType* objDataType);
-char* ConvertToHexformat(char* hexValue, INT32 padlength, bool DoPadding);
-INT32 getCNDataLen(char* Buffer);
-bool CheckIfDataTypeExists(char* dtVal, INT32 NodeID);
-bool CheckIfMappingPDO(char* Index);
-bool CheckIfHex(char* value);
-void WriteXAPElements(ProcessImage piCol[], xmlTextWriterPtr& writer,
-		INT32 VarCount, EPIDirectionType piType);
-void StartXAPxml(xmlTextWriterPtr& writer, xmlDocPtr& doc);
-void EndWrtitingXAP(xmlTextWriterPtr& writer, char* fileName, xmlDocPtr& doc);
-bool CheckIfSubIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID,
-		char* SubIndexID);
-ocfmRetCode processProjectXML(xmlTextReaderPtr reader, char* PjtPath);
-bool IfVersionNumberMatches(xmlTextReaderPtr reader);
-bool setProjectSettings_Auto(xmlTextReaderPtr reader);
-bool setProjectSettings_Communication(xmlTextReaderPtr reader);
-INT32 getConfigDate();
-INT32 getConfigTime();
-bool getandCreateNode(xmlTextReaderPtr reader, char* PjtPath);
-bool saveProjectXML(char* ProjectPath, char* ProjectName);
-void SetSIdxValue(char* Idx, char* SIdx, char* value,
-		CIndexCollection * objIdxCol, INT32 NodeId, ENodeType NodeType,
-		bool setDefaultValue);
-ocfmRetCode AddOtherRequiredCNIndexes(INT32 NodeId);
-void CreateMNPDOVar(INT32 Offset, INT32 dataSize, IEC_Datatype dtenum,
-		EPDOType pdoType, CNode *objNode);
-INT32 getNodeTotalIndexSubIndex(INT32 NodeID);
-INT32 reversedata(UINT8 *actemp1, UINT8 *actemp2, UINT32 size);
-char* StringToUpper(char* str);
-void setFlagForRequiredCNIndexes(INT32 NodeId);
-void UpdateCNCycleTime(CIndexCollection *objIdxCol, char* cycleTime);
-void UpdateNumberOfEnteriesSIdx(CIndex *objIndex, ENodeType NodeType);
-//INT32 getDataSize(char* dataTypeVal);
-bool checkIfStringDatatypes(char* datatypeValue);
-bool CheckIfDataTypeByNameExists(char* dtName, INT32 iNodeID);
-ocfmRetCode AddOtherMNIndexes(INT32 NodeID);
-void AuotgenerateOtherIndexs(CNode* objNode);
-void UpdatedCNDateORTime(CIndex* pobjMNIndex, INT32 iNodeId, EDateTime eDT);
-void copyPDODefToAct(INT32 iNodeID, ENodeType enumNodeType);
-void copyMNPropDefToAct(INT32 iNodeID, ENodeType enumNodeType);
-void copySubIndexDefToAct(INT32 iNodeID, ENodeType enumNodeType, bool bForce,
-		char *indexId, char *subIndexId);
-void copyIndexDefToAct(INT32 iNodeID, ENodeType enumNodeType, char *indexId);
-void setFlagForRequiredMNIndexes(INT32 iNodeId);
-bool CheckAllowedDTForMapping(char* dtName);
-void setFeatures(xmlTextReaderPtr reader, Feature* stFeature);
-CIndex getPDOIndexByOffset(CIndex* objIndex);
-char* setNodeAssigmentBits(CNode* objNode);
-char* getLastAvailableCycleNumber();
-ocfmRetCode RecalculateMultiplex();
-void checkAndCorrectName(char* checkName);
-void CheckAndReAssignMultiplex(INT32 iCNNodeId, char* CycleValue);
-ocfmRetCode CheckMutliplexAssigned();
-UINT32 getFreeCycleNumber(UINT32 uiCycleNumber);
-bool IsMultiplexCycleNumberContinuous(UINT32 uiCycleNumber);
-void calculateCNPollResponse(INT32 iNodeID, ENodeType enumNodeType);
-ocfmRetCode CheckUpperAndLowerLimits(char* pcLowLimit, char* pcHighLimit);
-ocfmRetCode AddSubobject(INT32 iNodeID, ENodeType enumNodeType,
-		char* pbIndexID);
-CSubIndex* getMNSubIndexValues(char* pbIndex, char* pbSubIndex);
-void UpdateCNAsyncMTUsize(CIndexCollection *pobjIdxCol, char* pbAsyncMTUsize);
-void UpdateCNMultiPrescal(CIndexCollection *pobjIdxCol, char* pbMultiPrescal);
-bool checkIfValueZero(char* pcValue);
-INT32 GetDecimalValue(char* pcValue);
-void UpdateCNNodeAssignment(CNode* pobjNode);
-void ResetMultiplexedCNForceCycle();
-bool CheckIfMultiplexedCNExist();
-void CopyCustomErrorString(ocfmRetCode* stRet, char* pcCustomErrString);
-void UpdateCNMultipleCycleAssign(CNode* pobjNode);
-void UpdateMNNodeAssignmentIndex(CNode *pobjNode, INT32 CNsCount, char* pcIndex,
-		bool allowMNSubindex);
-void RecalculateCNPresTimeout(char* pbSubIndexId);
-bool ValidateCNPresTimeout(char* pbSubIndexId, char* pcCheckValue);
-void CopyOldNodeIdAssignmentObject(CNode* pobjNode, INT32 iOldNodeId);
-void CopyOldNodeIdAssignmentObjectSubindex(CNode* pobjNode, INT32 iOldNodeId,
-		char* pcIndex);
-bool CheckAccessTypeForInclude(char* pcAccesstype);
-CSubIndex* DuplicateSubIndexObject(CSubIndex* pobjSubindex);
-void EnableDisableMappingPDO(CIndexCollection* pobjIdxCol, CIndex* objIndex,
-		char* Buffer, bool EnableFlag);
-void FormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
-		FILE* fileptr, ENodeType eNodeType);
-bool IsDefaultActualNotEqual(CBaseIndex* pBaseIndexObject);
-bool ReactivateMappingPDO(CIndexCollection* pobjIndexCol, CIndex* pobjIndex);
-void BRSpecificFormatCdc(CIndexCollection *objIndexCollection, char* Buffer1,
-		FILE* fileptr, ENodeType eNodeType, INT32 iNodeId);
-void BRSpecificGetIndexData(CIndex* objIndex, char* Buffer, INT32 iNodeId);
-INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 iNodeID);
-void UpdateCNSoCTolerance(CIndexCollection *pobjIdxCol, char* pbSocTolerance);
-INT32* ArrangeNodeIDbyStation();
-void SortNodeID(INT32 *piNodeIDColl, INT32 iColSize);
-bool IsPresMN();
-void setPresMNNodeAssigmentBits();
-bool CheckToolVersion(char* pcCurrentToolVersion);
-void UpdatePreqActLoad(CNode* pobjNode, EAutoGenerate ePjtSetting);
-void UpdatePresActLoad(CNode* pobjNode);
-void UpdateCNPresMNActLoad(CNode* pobjNode);
-void UpdateCNVisibleNode(CNode* pobjNode);
-bool ISCNNodeAssignmentValid(CNode* pobjNode);
-bool CopyMNSubindexToCN(CNode* pobjNode, char *pcIndex, char *pcSubIndex);
-void CalculatePayload();
-void SetCNLossObjects(INT32 iNodeID, ENodeType enumNodeType);
-void ResetAllSubIndexFlag(CIndex *pobjIndex);
-void ResetAllPdos(INT32 nodeId, ENodeType nodeType);
-ocfmRetCode SetSubIndexAttributesByAttribute(INT32 iNodeID,
-		ENodeType enumNodeType, char* pbIndexID, char* pbSubIndexID,
-		EAttributeType enumAttributeType, char* pbInAttributeValue);
-void SetBuildTime();
-const char* GetBuildTime();
+/*****************************************************************************/
+/**
+ \brief		This function shall get the parameter access code by providing the access type
 
-char* ConvertStringToHex(char* actString);
+ \param		accessStr	Character pointer to the access type
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* GetParameterAccess(char* accessStr);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given elementId is XML_READER_TYPE_END_ELEMENT and if srcElement and compareElement strings are the same
+
+ \param		elementId         	Integer to hold the value of node type
+ \param		srcElement         	Character pointer to element value
+ \param		compareElement     	Character pointer to compare element value
+
+ \return	BOOL
+ \retval	TRUE				if end element condition is satisfied
+ \retval	FALSE				if end element condition is not satisfied
+ */
+/*****************************************************************************/
+bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given elementId is XML_READER_TYPE_ELEMENT and if srcElement and compareElement strings are the same
+
+ \param		elementId         	Integer to hold the value of node type
+ \param		srcElement         	Character pointer to element value
+ \param		compareElement     	Character pointer to compare element value
+
+ \return	BOOL
+ \retval	TRUE				if start element condition is satisfied
+ \retval	FALSE				if start element condition is not satisfied
+ */
+/*****************************************************************************/
+bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given datatype is a simple datatype
+
+ \param		datatypeName     Character pointer to datatype name
+ \param		dataSize         Character ointer to datatype size
+
+ \return	BOOL
+ \retval	TRUE			if the given datatype is a simple datatype
+ \retval	FALSE			if the given datatype is not a simple datatype
+ */
+/*****************************************************************************/
+bool CheckifSimpleDT(char *datatypeName, char *dataSize);
+/*****************************************************************************/
+/**
+ \brief		This function shall return the string with CN node id
+
+ \param		nodeID		Integer to hold the Node Id of a node
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* GetPIName(INT32 nodeID);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding attribute of the Index in the calling function. If the retrieved value is of Index type, the relevant PDO type is assigned to the Index
+
+ \param		reader			xml pointer of type xmlTextReaderPtr
+ \param		indexObj       	Class pointer of Index
+ \param		hasPDO         	Boolean to check PDO
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding attribute of the SubIndex in the calling function
+
+ \param		reader		xml pointer of xmlTextReaderPtr
+ \param		sidxObj		Class pointer of SubIndex
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding IEC datatype of the datatype object in the calling function
+
+ \param		reader		xml pointer of xmlTextReaderPtr
+ \param		dtObj     	Class pointer of DataType
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the hexadecimal string version of the given hexadecimal value
+
+ \param		hexValue       	Character pointer to the hex value to be converted to string format
+ \param		padLength       Integer to hold value of padding length
+ \param		doPadding       Boolean to decide if padding is to be done
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding);
+/*****************************************************************************************/
+/**
+ \brief		This function shall return the total size of data in the buffer
+
+ \param		cdcBuffer		Character pointer to the buffer data
+
+ \return	INT32
+ */
+/******************************************************************************************/
+INT32 GetCNDataLen(char* cdcBuffer);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given Index ID is of mapping PDO type
+
+ \param		indexId		Character pointer to the value of index ID
+
+ \return	BOOL
+ \retval	TRUE		if the given Index ID is of mapping PDO type
+ \retval	FALSE		if the given Index ID is not of mapping PDO type
+ */
+/*****************************************************************************/
+bool CheckIfMappingPDO(char* indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given string is hexadecimal
+
+ \param		srcStr    	Character pointer to the value of hex
+
+ \return	BOOL
+ \retval	TRUE		if the given string is hexadecimal
+ \retval	FALSE		if the given string is not hexadecimal
+ */
+/*****************************************************************************/
+bool CheckIfHex(char* srcStr);
+/*****************************************************************************************/
+/**
+ \brief		This function shall write the XAP configurations to the given xml file pointer
+
+ \param		piCollObj		struct array of type ProcessImage to hold the collection
+ \param		xmlWriter		xml pointer of type xmlTextWriterPtr
+ \param		varCount		Integer to hold process image variable count
+ \param		piType			Enumeration flag of type PIDirectionType(input/output)
+
+ \return	void
+ */
+/******************************************************************************************/
+void WriteXAPElements(ProcessImage piCollObj[], xmlTextWriterPtr& xmlWriter, INT32 varCount, PIDirectionType piType);
+/*****************************************************************************************/
+/**
+ \brief		This function shall write the xml tag & autogenerated context to xap.h
+
+ \param		xmlWriter		xml pointer of type xmlTextWriterPtr
+ \param		xmlDocObj		xml pointer of type xmlDocPtr
+
+ \return	void
+ */
+/******************************************************************************************/
+void StartXAPxml(xmlTextWriterPtr& xmlWriter, xmlDocPtr& xmlDocObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall complete the xap configuration & save the file
+
+ \param		xmlWriter		xml pointer of type xmlTextWriterPtr
+ \param		xmlFileName		Char pointer to the file name
+ \param		xmlDocObj		xml pointer of type xmlDocPtr
+
+ \return	void
+ */
+/******************************************************************************************/
+void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName, xmlDocPtr& xmlDocObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall process the Node value, Name and its attributes
+
+ \param		xmlReader		xml pointer of type xmlTextReaderPtr
+ \param		projectPath		Character pointer to the Project path
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath);
+/*****************************************************************************/
+/**
+ \brief		This function shall get the 'Auto' info from the Project xml and store it in the object
+
+ \param		xmlReader	xml pointer of type xmlTextReaderPtr
+
+ \return	BOOL
+
+ \retval	TRUE		if successful
+ \retval	FALSE		if there is already a message pending
+ */
+/*****************************************************************************/
+bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader);
+/*****************************************************************************/
+/**
+ \brief		This function shall get the communication info from the Project xml and store it in the object
+
+ \param		xmlReader	xml pointer of type xmlTextReaderPtr
+
+ \return	BOOL
+
+ \retval	TRUE			if successful
+ \retval	FALSE			if there is already a message pending
+ */
+/*****************************************************************************/
+bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the number of days since Jan 1 1984
+
+ \return	INT32
+ */
+/*****************************************************************************/
+INT32 GetConfigDate();
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the time in milliseconds since Jan 1 1984
+
+ \return	INT32
+ */
+/*****************************************************************************/
+INT32 GetConfigTime();
+/*****************************************************************************/
+/**
+ \brief		This function shall gets the Node properties from the Project xml and create the Nodes
+
+ \param		xmlReader		xml pointer of type xmlTextReaderPtr
+ \param		projectPath		Character pointer to the Project path
+
+ \return	BOOL
+
+ \retval	TRUE			if successful
+ \retval	FALSE			if there is already a message pending
+ */
+/*****************************************************************************/
+bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath);
+/*****************************************************************************/
+/**
+ \brief		This function shall save the project details into the project location
+
+ \param		projectPath		Character pointer to the Project Path
+ \param		projectName		Character pointer to the Project Name
+
+ \return	BOOL
+
+ \retval	TRUE			if successful
+ \retval	FALSE			if there is already a message pending
+ */
+/*****************************************************************************/
+bool SaveProjectXML(char* projectPath, char* projectName);
+/*****************************************************************************/
+/**
+ \brief		This function shall set the actual value to the sub index in the index specified
+
+ \param		indexId				Character pointer to the index id
+ \param		sidxId				Character pointer to the Sub index id
+ \param		value				Character pointer to the actual value
+ \param		indexCollObj		Class pointer of the class IndexCollection
+ \param		nodeId				Integer to hold the node id
+ \param		nodeType			Enum of type NodeType to hold node type
+ \param		setDefaultValue		Boolean flag to set Default Value
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetSIdxValue(char* indexId, char* sidxId, char* value, IndexCollection *indexCollObj, INT32 nodeId, NodeType nodeType, bool setDefaultValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to add other required CN indices
+
+ \param		nodeId			Integer to hold the value of Node ID
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall create the MN PDO's in a collection used for process image manipulation
+
+ \param		offsetVal		Integer to hold the offset value
+ \param		dataSize		Integer to hold the size of the data
+ \param		iecDataType		Enum of type IEC_Datatype to hold datatype
+ \param		pdoType			Enum of type PDOType to hold PDO type
+ \param		nodeObj			Class pointer of the class Node
+
+ \return	void
+ */
+/*****************************************************************************/
+void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType, PDOType pdoType, Node *nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall return the total no. of Indices and Sub Indices that can be written to the CDC for the node ID
+
+ \param		nodeId		Integer to hold the node id of the node
+
+ \return	INT32
+ */
+/******************************************************************************************/
+INT32 GetNodeTotalIndexSubIndex(INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to reverse the order of entries in the source memory of length 'srcLen' and store in the destionation memory
+
+ \param		destData		Unsigned integer pointer to destination data memory
+ \param		srcData     	Unsigned integer pointer to source data memory
+ \param		srcLen		 	Unsigned integer to hold number of entries in source to reversed
+
+ \return	INT32
+ */
+/*****************************************************************************/
+INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the input parameter string in upper case format
+
+ \param		srcStr		Character pointer to the string
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* StringToUpper(char* srcStr);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to set the flag to enable inclusion in CDC generation for the required CN indices
+
+ \param		nodeId     Integer to hold the value of Node ID
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetFlagForRequiredCNIndexes(INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the cycle time index value(0x1006) of the CN
+
+ \param		indexCollObj		Class pointer of IndexCollection for a CN node
+ \param		cycleTimeValue		Character pointer to the new cycle time value
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue);
+/*****************************************************************************/
+/**
+ \brief		Updates Sub Index "00"/NumberofEntries with the total number of Sub Indexes excluding Sub Index with id "00"
+
+ \param		indexObj		Class pointer of the class Index
+ \param		nodeType		Enum of type NodeType to hold node type
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given data type is of string type
+
+ \param		dataTypeValue     	Character Pointer Variable to hold datatype value
+
+ \return	BOOL
+ \retval	TRUE				if the given data type is of string type
+ \retval	FALSE				if the given data type is not of string type
+ */
+/*****************************************************************************/
+bool CheckIfStringDatatypes(char* dataTypeValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall create other required MN indices
+
+ \param		nodeID			Integer variable to hold the node id
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode AddOtherMNIndexes(INT32 nodeID);
+/*****************************************************************************/
+/**
+ \brief		This function auto generates the values in the other required MN indices
+
+ \param		nodeObj	Class pointer of the class Node
+
+ \return	void
+ */
+/*****************************************************************************/
+void AuotgenerateOtherIndexs(Node* nodeObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the CN's Date or Time in the corresponding Sub Index of the MN
+
+ \param		indexObj		Class pointer of the class Index
+ \param		nodeId			Integer to hold the Node Id of a node
+ \param		dateOrTime		Enum of type DateTime to hold either DATE or TIME to updated
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdatedCNDateORTime(Index* indexObj, INT32 nodeId, DateTime dateOrTime);
+/*****************************************************************************/
+/**
+ \brief		This function shall copy PDO's(16xx, 1Axx) default value to actual value
+
+ \param		nodeId			Integer to hold the Node Id of a node
+ \param		nodeType		Enum to hold the Node type of the node
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyPDODefToAct(INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall copy the (0x1006, 0x1F8A/0x02, 0x1F98/0x07, 0x1F98/0x08) indices' default value to actual value
+
+ \param		nodeId			Integer to hold the node id
+ \param		nodeType		Enum of type NodeType to hold the Node type
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyMNPropDefToAct(INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall copy the Sub Index's default value to the actual value. If for copy is set empty values will be copied while the default value is not configured
+
+ \param		nodeId			Integer to hold the Node ID
+ \param		nodeType		Enum of type NodeType to hold the Node type
+ \param		forceCopy			Boolean value to set force copy or not
+ \param		indexId			Character pointer to the IndexId
+ \param		subIndexId		Character pointer to the SubIndex Id
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopySubIndexDefToAct(INT32 nodeId, NodeType nodeType, bool forceCopy, char *indexId, char *subIndexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall copy the index's default value to the actual value
+
+ \param		nodeId			Integer to hold the node id
+ \param		nodeType		Enum of type NodeType to hold the Node type
+ \param		indexId			Character pointer to the Index Id
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyIndexDefToAct(INT32 nodeId, NodeType nodeType, char *indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to set the flag to enable inclusion in CDC generation for the required MN Index
+
+ \param		nodeId   	Integer to hold the value of Node ID
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetFlagForRequiredMNIndexes(INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the given dataTypeName is allowed for mapping
+
+ \param		dataTypeName		Character pointer to the datatype name
+
+ \return	BOOL
+ \retval	TRUE				if the given dataTypeName is allowed for mapping
+ \retval	FALSE				if the given dataTypeName is not allowed for mapping
+ */
+/*****************************************************************************/
+bool CheckAllowedDTForMapping(char* dataTypeName);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding feature object attributes in the calling function
+
+ This Function shall set the features
+
+ \param		reader		xml Pointer Variable of xmlTextReaderPtr
+ \param		featureObj	struct Pointer Variable of type Feature
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall return the Index after sorting the collection by offset value
+
+ \param		indexObj	Class pointer of the class Index
+
+ \return	Index
+ */
+/*****************************************************************************/
+Index GetPDOIndexByOffset(Index* indexObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall return the 1F81 object data depending upon the condition (if Multiplex set bit 8, if chained set bit 14)
+
+ \param		nodeObj	Class pointer of the class Node
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* GetNodeAssigmentBits(Node* nodeObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the last available Forced Cycle Value from OX1F98/0X07 Index/SubIndex of the MN
+
+ \return	char*
+ */
+/*****************************************************************************/
+char* GetLastAvailableCycleNumber();
+/*****************************************************************************/
+/**
+ \brief		This function shall recalculate the multiplex cycle for CNs
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode RecalculateMultiplex();
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to replace the characters other than alphabets, numbers and '_' in the given string with the character '_'
+
+ \param		srcStr		Character pointer to the name
+
+ \return	void
+ */
+/*****************************************************************************/
+void CheckAndCorrectName(char* srcStr);
+/*****************************************************************************/
+/**
+ \brief		This function shall check and re-assign the multiplexed cycle value
+
+ \param		nodeId			Integer to hold the node id of the CN
+ \param		cycleValue		Character pointer to the multiplexed cycle value
+
+ \return	void
+ */
+/*****************************************************************************/
+void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue);
+/*****************************************************************************/
+/**
+ \brief		This function checks 'multiplexed' SubIndex (0x1F98/0x07) is assigned or not
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode CheckMutliplexAssigned();
+/*****************************************************************************/
+/**
+ \brief		This function shall return the cycle number which is available
+
+ \param		parmCycleNumber		Unsigned Integer to hold the maximum limit for the cycle number
+
+ \return	UINT32
+ */
+/*****************************************************************************/
+UINT32 GetFreeCycleNumber(UINT32 parmCycleNumber);
+/*****************************************************************************/
+/**
+ \brief		This function shall validate if the multiplexed cycle number is continuous or not
+
+ \param		parmCycleNumber		Unsigned Integer to hold the maximum limit for the cycle number
+
+ \return	BOOL
+
+ \retval	TRUE		if continuous multiplexed cycle number is present
+ \retval	FALSE		if multiplexed cycle number is not continuous
+ */
+/*****************************************************************************/
+bool IsMultiplexCycleNumberContinuous(UINT32 parmCycleNumber);
+/*****************************************************************************/
+/**
+ \brief		This function shall calculate the CN Poll Response time of the CN
+
+ \param		nodeId			Integer to hold the node id
+ \param		nodeType		Enum to hold the Node type
+
+ \return	void
+ */
+/*****************************************************************************/
+void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to validate if upper limit value is greater than lower limit value
+
+ \param		lowLimitVal		Character pointer to the lower limit value
+ \param		highLimitVal	Character pointer to the higher limit value
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal);
+
+/*****************************************************************************/
+/**
+ \brief		To check and add the NumberOfEntries subIndex for manufacturer specific objects
+
+ \param		nodeId			Integer variable to hold the Node Id of a node
+ \param		nodeType		Enum to hold the Node type of the node
+ \param		indexId		Character pointer to hold the IndexID
+
+ \return	ocfmRetCode
+ */
+/*****************************************************************************/
+ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId);
+
+/*****************************************************************************************/
+/**
+ \brief		This function shall return the Sub Index class pointer for the specific Index & Sub Index of the MN
+
+ \param		indexId			Character pointer to the Index id value
+ \param		subIndexId		Character pointer to the SubIndex id value
+
+ \return	SubIndex* / NULL
+ */
+/******************************************************************************************/
+SubIndex* GetMNSubIndexValues(char* indexId, char* subIndexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the Asynchronous MTU size(0x1F98/0x08) of the CN
+
+ \param		indexCollObj		Class pointer of IndexCollection for a CN node
+ \param		asyncMTUsize		Character pointer to the new AsyncMTUsize value
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateCNAsyncMTUsize(IndexCollection* indexCollObj, char* asyncMTUsize);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the Multiplexing prescaler (0x1F98/0x07) of the CN
+
+ \param		indexCollObj		Class pointer of IndexCollection for a CN node
+ \param		multiPrescalVal		Character pointer to the new Multiplexing prescaler value
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateCNMultiPrescal(IndexCollection* indexCollObj, char* multiPrescalVal);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the input string is hex/ascii and appropriately checks if its value is 0
+
+ \param		srcStr		Character pointer to the string to be checked
+
+ \return	BOOL
+ \retval	TRUE		if value is 0
+ \retval	FALSE		if value is not 0
+ */
+/*****************************************************************************/
+bool CheckIfValueZero(char* srcStr);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the decimal version of the input string is hex/ascii string
+
+ \param		srcStr		Character pointer to the input string to be checked
+
+ \return	INT32
+ */
+/*****************************************************************************/
+INT32 GetDecimalValue(char* srcStr);
+/*****************************************************************************************/
+/**
+ \brief		This function shall update the 'Actual Value' attribute of sub index of the NMT_NodeAssignment object (0x1F81) of the CN with reference to corresponding entry in MN OBD
+
+ \param		nodeObj		Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdateCNNodeAssignment(Node* nodeObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall reset the Multiplexed CN's forced cycle value
+
+ \return	void
+ */
+/*****************************************************************************/
+void ResetMultiplexedCNForceCycle();
+/*****************************************************************************/
+/**
+ \brief		This function shall check for the existence of a CN with muliplexed station type
+
+ \return	BOOL
+
+ \retval	TRUE			if Multiplexed CN Exist
+ \retval	FALSE			if Multiplexed CN does not Exist
+ */
+/*****************************************************************************/
+bool CheckIfMultiplexedCNExist();
+/*****************************************************************************/
+/**
+ \brief		This function shall copy the custom error description to be thrown to the exception handler
+
+ \param		errCodeObj		Struct pointer of type ocfmRetCode to the Errorcode & error string
+ \param		customErrStr	Character pointer to the custom error description
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyCustomErrorString(ocfmRetCode* errCodeObj, char* customErrStr);
+/*****************************************************************************************/
+/**
+ \brief		This function shall update the 'Actual Value' attribute of sub index of the NMT_MultipleCyleAssign object (0x1F9B) of the CN with reference to corresponding entry in MN OBD
+
+ \param		nodeObj	Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdateCNMultipleCycleAssign(Node* nodeObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the MN Indices & SubIndices with the values corresponding to the CN node id
+
+ \param		nodeObj				Class pointer of the class Node
+ \param		cnCount				Integer to hold the total no.of CN's count
+ \param		indexId				Character pointer to the IndexID
+ \param		allowMNSubindex		Boolean value to allow or disallow the subindex in MN
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId, bool allowMNSubindex);
+/*****************************************************************************/
+/**
+ \brief			This function shall recalculate the the CN Pres Timeout value
+
+ \param			sidxId
+ \return		void
+ */
+/*****************************************************************************/
+void RecalculateCNPresTimeout(char* sidxId);
+/*****************************************************************************/
+/**
+ \brief		This function shall validate CN's Pres Timeout value with the Pres default timeout value
+
+ \param		subIndexId			Character pointer to the IndexID
+ \param		presTimeOutVal		Character pointer to the new PresTimeout value
+
+ \return	BOOL
+ \retval	TRUE			if successful
+ \retval	FALSE			if there is already a message pending
+ */
+/*****************************************************************************/
+bool ValidateCNPresTimeout(char* subIndexId, char* presTimeOutVal);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to update the Sub Index entry of the Indices 0x1F81, 0x1F92, 0x1F9B of the CN in the MN OBD
+
+
+ \param		nodeObj			Class pointer of the class Node
+ \param		oldNodeId		Integer to hold the old Node ID of a CN node
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyOldNodeIdAssignmentObject(Node* nodeObj, INT32 oldNodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to update the Sub Index entry of given Index of the CN in the MN OBD
+
+ \param		nodeObj		Class pointer of the class Node
+ \param		oldNodeId	Integer to hold the old Node Id of a CN node
+ \param		indexId		Character pointer to the IndexID
+
+ \return	void
+ */
+/*****************************************************************************/
+void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId, char* indexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check accessType to determine inclusion in CDC generation
+
+ This function checks for access type
+
+ \param		accessType		Character pointer to the Access type
+
+ \return	BOOL
+ \retval	TRUE			if accessType allows inclusion in CDC generation
+ \retval	FALSE			if accessType does not allow inclusion in CDC generation
+ */
+/*****************************************************************************/
+bool CheckAccessTypeForInclude(char* accessType);
+SubIndex* DuplicateSubIndexObject(SubIndex* objSubindex);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to enable or disable the Mapping of PDOs before the PDO contents are written to the CDC.
+
+ \param		indexCollObj	Class pointer of IndexCollection for a single node
+ \param		indexObj		Class pointer of Index for the PDO index
+ \param		cdcBuffer		Character pointer to the values to be written to the CDC
+ \param		enablePDO		Boolean value to enable or disable the PDO
+
+ \return	void
+ */
+/*****************************************************************************/
+void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj, char* cdcBuffer, bool enablePDO);
+/*****************************************************************************************/
+/**
+ \brief		This function shall write the buffer with the Index data in the Index collection that can be written in the CDC
+
+ \param		objIndexCollection		Class pointer of IndexCollection for node
+ \param		Buffer1					Character pointer to the buffer data
+ \param		fileptr
+ \param		eNodeType				Enumeration flag for Node type (CN/MN)
+
+ \return	void
+ */
+/******************************************************************************************/
+void FormatCdc(IndexCollection *objIndexCollection, char* Buffer1, FILE* fileptr, NodeType eNodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall check if the default value is same as the actual value
+
+ \param		baseIndexObj	Class pointer of the class BaseIndex
+
+ \return	BOOL
+
+ \retval	TRUE				if default value equal to actual value
+ \retval	FALSE				if default value not equal to actual value
+ */
+/*****************************************************************************/
+bool IsDefaultActualNotEqual(BaseIndex* baseIndexObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall analyse the settings of a mapping object and return the eligibility to enable/disable the mapping PDO
+
+ \param		indexCollObj	Class pointer of the class IndexCollection
+ \param		indexObj		Class pointer of the class Index
+
+ \return	BOOL
+
+ \retval	TRUE			if the mapping pdo can be reactivated
+ \retval	FALSE			if the mapping pdo cannot be reactivated
+ */
+/*****************************************************************************/
+bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall write the buffer with the Index data in the Index collection that can be written in the CDC
+
+ \param		objIndexCollection		Class pointer of IndexCollection for node
+ \param		Buffer1					Character pointer to the buffer data
+ \param		fileptr
+ \param		eNodeType				Enumeration flag for Node type (CN/MN)
+ \param		iNodeId					Integer to hold the Node id to be written to the 1F81 index
+
+ \return	void
+ */
+/******************************************************************************************/
+void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1, FILE* fileptr, NodeType eNodeType, INT32 iNodeId);
+/*****************************************************************************************/
+/**
+ \brief		This function shall write the buffer(char pointer) with the Index data(id value, datatype value, actual value) to be used for CDC generation in a BnR specific format
+
+ \param		indexObj		Class pointer of Index for node
+ \param		cdcBuffer		Character pointer to the buffer data
+ \param		nodeId			Integer to hold the Node id to be written to the 0x1F81 Index
+
+ \return	void
+ */
+/******************************************************************************************/
+void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId);
+/*****************************************************************************************/
+/**
+ \brief		This function shall return the total no. of Indices and Sub Indices that can be written to the CDC((recommended by BnR) for the node ID
+
+ \param		nodeId	Integer to hold the Node id
+
+ \return	INT32
+ */
+/******************************************************************************************/
+INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall update the Loss of SoC Tolerance index value(0x1C14) of the CN
+
+ \param		indexCollObj			Class pointer of IndexCollection for a CN node
+ \param		socToleranceValue		Character pointer to the new Loss of SoC Tolerance value
+
+ \return	void
+ */
+/*****************************************************************************/
+void UpdateCNSoCTolerance(IndexCollection* indexCollObj, char* socToleranceValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall sort the Node ID by the station type
+
+ \return	INT32*
+ */
+/*****************************************************************************/
+INT32* ArrangeNodeIDbyStation();
+/*****************************************************************************/
+/**
+ \brief		This function shall sort the Node ID in a given Node ID collection
+
+ \param		nodeIDColl			Integer pointer to the collection of all Nodes
+ \param		collectionSize		Integer to hold the collection size
+
+ \return	void
+ */
+/*****************************************************************************/
+void SortNodeID(INT32 *nodeIDColl, INT32 collectionSize);
+/*****************************************************************************/
+/**
+ \brief		This function shall check if the MN node is a Pres chained station
+
+ \return	BOOL
+
+ \retval		TRUE			if pres MN
+ \retval		FALSE			if not a pres MN
+ */
+/*****************************************************************************/
+bool IsPresMN();
+/*****************************************************************************/
+/**
+ \brief		This function shall set the Pres MN Node Assigment Bits for 0x1F81 Index depending upon the condition (if Multiplex set bit 8, if chained set bit 14)
+
+ \return	void*
+ */
+/*****************************************************************************/
+void SetPresMNNodeAssigmentBits();
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check for correctness of given tool version
+
+ \param		currentToolVersion		Character pointer to the current tool version
+
+ \return	BOOL
+ \retval	TRUE					if current tool version matches any of the valid versions
+ \retval	FALSE					if current tool version does not match any of the valid versions
+ */
+/*****************************************************************************/
+bool CheckToolVersion(char* currentToolVersion);
+/*****************************************************************************************/
+/**
+ \brief		This function shall set the calculated Preq actual payload value in PReqActPayloadLimit(0x1F98/0x04) for the CN and NMT_MNPReqPayloadList(0x1F8B) for the MN
+
+ \param		nodeObj		Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdatePreqActLoad(Node* nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall set the calculated Pres actual payload value in PResActPayloadLimit(0x1F98/0x05) for the CN and NMT_PResPayloadLimitList(0x1F8D) for the MN
+
+ \param		nodeObj		Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdatePresActLoad(Node* nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall set the calculated payload value of all other CNs in the network in NMT_PResPayloadLimitList(0x1F8D) object for this CN
+
+ \param		nodeObj		Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdateCNPresMNActLoad(Node* nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall copy the 0x1F81 and 0x1F8D objects from MN to the CNs and also checks if number of cross traffic stations exceeds limit
+
+ \param		nodeObj		Class pointer of Node for a CN node
+
+ \return	void
+ */
+/******************************************************************************************/
+void UpdateCNVisibleNode(Node* nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall check whether the CN can implement 0x1F81 object or not
+
+ \param		nodeObj	Class pointer of Node for a CN node
+
+ \return	BOOL
+
+ \retval		TRUE			if a CN can implement 0x1F81 object
+ \retval		FALSE			if a CN cannot implement 0x1F81 object
+ */
+/******************************************************************************************/
+bool IsCNNodeAssignmentValid(Node* nodeObj);
+/*****************************************************************************************/
+/**
+ \brief		This function shall copy the actual value attribute of MN Sub Index into corresponding CN Sub Index
+
+ \param		nodeObj			Class pointer of Node for a CN node
+ \param		indexId			Character pointer to the Index value
+ \param		subIndexId		Character pointer to the Sub Index value
+
+
+ \return	BOOL
+
+ \retval		TRUE			if successfully copied
+ \retval		FALSE			if not copied
+ */
+/******************************************************************************************/
+bool CopyMNSubindexToCN(Node* nodeObj, char* indexId, char* subIndexId);
+/*****************************************************************************************/
+/**
+ \brief		This function shall calculate the PReq and PRes payload value for the nodes
+
+ \return	void
+ */
+/******************************************************************************************/
+void CalculatePayload();
+/*****************************************************************************/
+/**
+ \brief		This function shall set the value '0x50' to the threshold Sub Index of the 0x1COB, 0x1C0C and 0x1C0D Indices for the CN
+
+ \param		nodeId			Integer to hold the Node Id of a node
+ \param		nodeType		Enum to hold the Node type of the node
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetCNLossObjects(INT32 nodeId, NodeType nodeType);
+/*****************************************************************************************/
+/**
+ \brief		This function shall reset the 'include in CDC' flag for all the Sub Indices
+
+ \param		indexObj	Class pointer of Index to get all the Sub Indices
+
+ \return	void
+ */
+/******************************************************************************************/
+void ResetAllSubIndexFlag(Index* indexObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to set any one attribute of a SubIndex of a node
+
+ \param		nodeId				Integer to hold the node ID of a node
+ \param		nodeType			Enum to hold the node type of the node
+ \param		indexId				Character pointer to the index ID
+ \param		sidxId				Character pointer to the sub index ID
+ \param		attributeType		Enum to hold the AttributeType of the sub index
+ \param		attributeValue		Character pointer to the value to be set for the sub index attribute
+
+ \return	ocfmRetCode			ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, AttributeType attributeType, char* attributeValue);
+/*****************************************************************************/
+/**
+ \brief		This function shall set the system time during time of build
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetBuildTime();
+/*****************************************************************************/
+/**
+ \brief		This function shall get the calculated system time during time of build
+
+ \return	const char*
+ */
+/*****************************************************************************/
+const char* GetBuildTime();
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to parse the XML[xdd/xdc] file for the objects of given Node Type and Position
+
+ \param		fileName		Char pointer to the path of the file [XDD or XDC]
+ \param		nodePos			Integer to hold the Node Id of a node
+ \param		nodeType		Enum to hold the Node type of the node
+
+ \return	ocfmRetCode		ConfiguratorErrors
+ */
+/*****************************************************************************/
+ocfmRetCode ParseFile(char* fileName, INT32 nodePos, NodeType nodeType);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the hexadecimal string version of the given string parameter
+
+ \param		srcStr		Character pointer to the string to be converted to hex
+
+ \return	char* / NULL
+ */
+/*****************************************************************************/
+char* ConvertStringToHex(char* srcStr);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to return the alphanumeric string of the given unsigned value parameter
+
+ \param		srcValue		Unsigned Integer to hold the value to be converted to alphanumeric values
+ \param		destStr         Character pointer to the alphanumeric string
+ \param		baseValue       Integer to hold the basevalue
+
+ \return	char* / NULL
+ */
+/*****************************************************************************/
+char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue);
+
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the Parameter object in the calling function
+
+ \param		reader      	xml pointer of xmlTextReaderPtr
+ \param		parameterObj    Class pointer of Parameter
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the Parameter object in the calling function
+
+ \param		reader				xml pointer of xmlTextReaderPtr
+ \param		parameterObj		Class pointer of Parameter
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the ComplexDataType object in the calling function
+
+ \param		reader    	xml pointer of xmlTextReaderPtr
+ \param		cdtObj      Class pointer of ComplexDataType
+ \return	void
+ */
+/*****************************************************************************/
+static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr and size of the varDeclaration structure variable in the calling function
+
+ \param		reader		xml Pointer of xmlTextReaderPtr
+ \param		vdecl		Class Pointer of varDeclaration
+
+ \return	void
+ */
+/*****************************************************************************/
+void SetVarDecAttributes(xmlTextReaderPtr reader, varDeclaration& vdecl);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to process the attributes of given Node Type and Position and add these details to relevant collection lists
+
+ \param		reader         xml pointer of xmlTextReaderPtr
+ \param		nodeType       Enum of NodeType
+ \param		nodePos        Integer to hold the value of node index
+
+ \return	void
+ */
+/*****************************************************************************/
+void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos);
+
+
+static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
 
 #endif // internal_h

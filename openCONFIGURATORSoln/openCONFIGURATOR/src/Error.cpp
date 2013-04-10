@@ -56,38 +56,4 @@
 
 #include "../Include/Declarations.h"
 
-//==========================================================================//
-// 				F U N C T I O N  D E C L A R A T I O N S 					//
-//==========================================================================//
 
-/*****************************************************************************/
-/**
- \brief			ocfmRetValError_getRetValue
- 
- This function returns ocfm return value
- 
- \param			stRetValError	Struct variable of type	ocfmRetValError		
- \return		INT32
- */
-/*****************************************************************************/
-
-INT32 ocfmRetValError_getRetValue(ocfmRetValError stRetValError)
-{
-	return stRetValError.returnValue;
-}
-
-/*****************************************************************************/
-/**
- \brief			ocfmRetValError_getErrorCode
- 
- This function returns ocfm error code
- 
- \param			stRetValError	Struct variable of type	ocfmRetValError			
- \return		INT32
- */
-/*****************************************************************************/
-
-INT32 ocfmRetValError_getErrorCode(ocfmRetValError stRetValError)
-{
-	return stRetValError.errCode.code;
-}

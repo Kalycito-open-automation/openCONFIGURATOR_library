@@ -64,31 +64,84 @@ using namespace std;
 
 /**
  ******************************************************************************************************
- \class			CNetworkManagement
+ \class			NetworkManagement
  \brief			This class handles Feature collection of each node present in the network
  
  ******************************************************************************************************/
-class DllExport CNetworkManagement
+class NetworkManagement
 {
 	public:
-		CNetworkManagement(void);
-		~CNetworkManagement(void);
+		NetworkManagement(void);
+		~NetworkManagement(void);
 
-	public:
-		TCollection<Feature> FeatureCollection;
-	private:
-		INT32 m_NodeID;
-		INT32 m_MaxPDOCount;
-	public:
-		INT32 getMaxPDOCount();
-		void calculateMaxPDOCount();
-		void addFeature(Feature stfeature);
-		INT32 getNodeID();
-		void setNodeID(INT32 NodeID);
-		char* getFeatureValue(EFeatureType featureType, char* featureName);
-		Feature* getFeature(UINT32 iCount);
-		UINT32 getNumberOfFeatures();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to calculate the maximum PDO count value from the PDOTPDOChannels parameter in MN xdd and validate if it exceeds the maximum value 256 as in Powerlink Specification Document
+		 
+		 \return	void
+		 */
+		/*****************************************************************************/		
+		void CalculateMaxPDOCount();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to delete all features from the collection list 
+		 
+		 \return	void
+		 */
+		/*****************************************************************************/		
 		void DeleteFeatureCollections();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to add the given Feature object to the collection list
+		 
+		 \param		objFeature		Structure Variable of Feature to add a feature to collection list
+		 
+		 \return	void
+		 */
+		/*****************************************************************************/
+		void AddFeature(Feature objFeature);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return max PDO count
+
+		 \return	INT32
+		 */
+		/*****************************************************************************/		
+		INT32 GetMaxPDOCount();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the number of features in the collection list
+		 
+		 \return	UINT32
+		 */
+		/*****************************************************************************/		
+		UINT32 GetNumberOfFeatures();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the Feature object at the given position in the collection list
+		 
+		 \param		featurePosition  	Unsigned integer to hold count value
+		 
+		 \return	Feature*
+		 */
+		/*****************************************************************************/
+		Feature* GetFeature(UINT32 featurePosition);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the value of the Feature object in the collection list whose type and name match the given parameters
+		 
+		 \param		featureType		Enum variable of FeatureType to hold the feature type
+		 \param		featureName		Character pointer to the feature name
+
+		 \return	char*
+		 */
+		/*****************************************************************************/
+		char* GetNwMgmtFeatureValue(FeatureType featureType, char* featureName);
+
+		TCollection<Feature> FeatureCollection;
+
+	private:
+		INT32 maxPDOCount;
 };
 
 #endif // NetworkManagement_h

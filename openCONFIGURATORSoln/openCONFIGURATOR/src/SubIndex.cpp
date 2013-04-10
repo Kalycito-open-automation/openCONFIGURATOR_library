@@ -65,13 +65,13 @@
 
 /**
  
- @param void
+
  */
 
-CSubIndex::CSubIndex(void)
+SubIndex::SubIndex(void)
 {
 	//Add constructor code here
-	m_objectType = VAR;
+	objectType = VAR;
 }
 
 /*************************************************************************/
@@ -79,10 +79,10 @@ CSubIndex::CSubIndex(void)
 
 /**
  
- @param void
+
  */
 
-CSubIndex::~CSubIndex(void)
+SubIndex::~SubIndex(void)
 {
 	//Add destructor code here
 }

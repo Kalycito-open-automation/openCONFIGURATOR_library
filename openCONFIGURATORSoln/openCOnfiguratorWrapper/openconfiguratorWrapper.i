@@ -1,28 +1,17 @@
 %module openConfiguratorWrapper
-#define DllExport
+#define DLLEXPORT
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
-	 #undef DllExport
-	 #define DllExport  __declspec(dllexport)
+	 #undef DLLEXPORT
+	 #define DLLEXPORT  __declspec(dllexport)
 	 
 #endif
 
 %{
-#include "../openCONFIGURATOR/Include/ApplicationProcess.h"
-#include "../openCONFIGURATOR/Include/BaseIndex.h"
-#include "../openCONFIGURATOR/Include/ComplexDataType.h"
-#include "../openCONFIGURATOR/Include/Error.h"
 
 #include "../openCONFIGURATOR/Include/Exports.h"
-#include "../openCONFIGURATOR/Include/DataTypeCollection.h"
+#include "../openCONFIGURATOR/Include/Error.h"
 #include "../openCONFIGURATOR/Include/Declarations.h"
-#include "../openCONFIGURATOR/Include/globals.h"
-#include "../openCONFIGURATOR/Include/IndexCollection.h"
-#include "../openCONFIGURATOR/Include/Index.h"
-#include "../openCONFIGURATOR/Include/NodeCollection.h"
-#include "../openCONFIGURATOR/Include/Node.h"
-#include "../openCONFIGURATOR/Include/SubIndex.h"
-
 
 %}
 
@@ -32,106 +21,74 @@
 %pointer_functions(long, longp)
 %pointer_functions(int, intp)
 %pointer_functions(bool, boolp)
-%pointer_functions(EAutoGenerate, EAutoGeneratep)
-%pointer_functions(EAutoSave, EAutoSavep)
-%pointer_functions(EViewMode, EViewModep)
-%pointer_functions(EStationType, EStationTypep)
-%cstring_bounded_output(char *Out_AttributeValue, 512);
-%cstring_bounded_output(char *Out_IndexID, 100);
-%cstring_bounded_output(char *Out_SubIndexID, 100);
-%cstring_bounded_output(char *Out_NodeName, 100);
-%cstring_bounded_output(char *Out_FeatureValue, 512);
-%cstring_bounded_output(char *Out_DataTypes, 1000);
-%cstring_bounded_output(char *Out_ForcedCycle, 10);
+%pointer_functions(AutoGenerate, AutoGeneratep)
+%pointer_functions(AutoSave, AutoSavep)
+%pointer_functions(ViewMode, ViewModep)
+%pointer_functions(StationType, StationTypep)
+%cstring_bounded_output(char *outAttributeValue, 512);
+%cstring_bounded_output(char *outIndexID, 100);
+%cstring_bounded_output(char *outSubIndexID, 100);
+%cstring_bounded_output(char *outNodeName, 100);
+%cstring_bounded_output(char *outFeatureValue, 512);
+%cstring_bounded_output(char *outDataTypes, 1000);
+%cstring_bounded_output(char *outForcedCycle, 10);
 
 
 %include typemaps.i
 %include exception.i
 %include std_except.i
 
-/* Let's just grab the original header file here */
-
-%include "../openCONFIGURATOR/Include/ApplicationProcess.h"
-%include "../openCONFIGURATOR/Include/BaseIndex.h"
-%include "../openCONFIGURATOR/Include/ComplexDataType.h"
-%include "../openCONFIGURATOR/Include/Error.h"
-
-%include "../openCONFIGURATOR/Include/Exports.h"
-%include "../openCONFIGURATOR/Include/DataTypeCollection.h"
 %include "../openCONFIGURATOR/Include/Declarations.h"
-%include "../openCONFIGURATOR/Include/globals.h"
-%include "../openCONFIGURATOR/Include/IndexCollection.h"
-%include "../openCONFIGURATOR/Include/Index.h"
-%include "../openCONFIGURATOR/Include/NodeCollection.h"
-%include "../openCONFIGURATOR/Include/Node.h"
-%include "../openCONFIGURATOR/Include/SubIndex.h"
-
+%include "../openCONFIGURATOR/Include/Error.h"
+%include "../openCONFIGURATOR/Include/Exports.h"
 
 using namespace std; 
 
 
 %inline %{
-
-ocfmRetCode ImportXML(char* fileName, INT32 NodeID, ENodeType NodeType);
-ocfmRetCode ReImportXML(char* fileName, INT32 NodeID, ENodeType NodeType);
-
-ocfmRetCode GenerateXAP(char* fileName);
-ocfmRetCode GenerateCDC(char* fileName);
-
-ocfmRetCode CreateNode(INT32 NodeID, ENodeType NodeType, char* NodeName);
-ocfmRetCode parseFile(char* filename, INT32 NodeID, ENodeType  NodeType);
-ocfmRetCode DeleteNode(INT32 NodeID, ENodeType NodeType);
-ocfmRetCode DeleteNodeObjDict(INT32 NodeID, ENodeType NodeType);
-
-ocfmRetCode DeleteIndex(INT32 NodeID, ENodeType NodeType, char* IndexID);
-ocfmRetCode DeleteSubIndex(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
-ocfmRetCode AddIndex(INT32 NodeID, ENodeType NodeType, char* IndexID);
-ocfmRetCode AddSubIndex(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID);
-ocfmRetCode SetIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
-//ocfmRetCode SetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName);
-ocfmRetCode SetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, char* IndexValue, char* IndexName, EFlag flagIfInCdc);
-
-ocfmRetCode IfNodeExists(INT32 NodeID, ENodeType NodeType, INT32* NodePos, bool& ExistfFlag);
-ocfmRetCode IfIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32* IndexPos);
-ocfmRetCode IfSubIndexExists(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, INT32* SubIndexPos, INT32* IndexPos);
-
-ocfmRetCode GetIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, EAttributeType AttributeType, char* Out_AttributeValue);
-ocfmRetCode GetSubIndexAttributes(INT32 NodeID, ENodeType NodeType, char* IndexID, char* SubIndexID, EAttributeType AttributeType,char* Out_AttributeValue);
-ocfmRetCode GetNodeCount(INT32 MnNodeID, INT32* Out_NodeCount);
-ocfmRetCode GetIndexCount(INT32 NodeID, ENodeType NodeType, INT32* Out_IndexCount);
-ocfmRetCode GetSubIndexCount(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32* Out_SubIndexCount);
-
-ocfmRetCode GetNodeAttributesbyNodePos(INT32 NodePos, INT32* Out_NodeID, char* Out_NodeName, EStationType* Out_eStationType, char* Out_ForcedCycle, bool* bForcedCycleFlag);
-ocfmRetCode GetIndexIDbyIndexPos(INT32 NodeID, ENodeType NodeType, INT32 IndexPos, char* Out_IndexID);
-ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 NodeID, ENodeType NodeType, char* IndexID, INT32 SubIndexPos, char* Out_SubIndexID);
-
-ocfmRetCode GetIndexIDbyPositions(INT32 NodePos, INT32 IndexPos, char* Out_IndexID);
-ocfmRetCode GetSubIndexIDbyPositions(INT32 NodePos, INT32 IndexPos, INT32 SubIndexPos, char* Out_SubIndexID);
-ocfmRetCode GetIndexAttributesbyPositions(INT32 NodePos, INT32 IndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
-ocfmRetCode GetSubIndexAttributesbyPositions(INT32 NodePos, INT32 IndexPos, INT32 SubIndexPos, EAttributeType AttributeType, char* Out_AttributeValue);
-
-void LoadObjectDictionary(char* fileName);
-ocfmRetCode GenerateMNOBD();
-
-ocfmRetCode SetAllIndexAttributes(INT32 NodeID, ENodeType NodeType, 
-char* IndexID, char* ActualValue,
-char* IndexName, char* Access, char* dataTypeValue,
-char* pdoMappingVal, char* defaultValue, char* highLimit,
-char* lowLimit, char* objType, EFlag flagIfIncludedInCdc);
-
-ocfmRetCode SetAllSubIndexAttributes(INT32 NodeID, ENodeType NodeType, 
-char* IndexID, char* SubIndexID, char* ActualValue,
-char* IndexName, char* Access, char* dataTypeValue,
-char* pdoMappingVal, char* defaultValue, char* highLimit,
-char* lowLimit, char* objType, EFlag flagIfIncludedInCdc);
-
-ocfmRetCode GetProjectSettings(EAutoGenerate* autoGen, EAutoSave* autoSave, EViewMode* viewMode, bool* bExpertViewAlreadySet);
-ocfmRetCode SetProjectSettings(EAutoGenerate autoGen, EAutoSave autoSave, EViewMode viewMode, bool bExpertViewAlreadySet);
-
-ocfmRetCode FreeProjectMemory();
-ocfmRetCode GetFeatureValue(INT32 iNodeId, ENodeType eNodeType, EFeatureType eFeatureType, char* FeatureName, char* Out_FeatureValue);
-ocfmRetCode UpdateNodeParams(INT32 iCurrNodeId, INT32 iNewNodeID, ENodeType eNodeType, char* NodeName, EStationType eStationType, char* ForcedCycle , bool ForcedCycleFlag, char* PollResponseTimeout);
-ocfmRetCode GetNodeDataTypes(INT32 iNodeId, ENodeType eNodeType, char* Out_DataTypes);
-ocfmRetCode NewProjectNode(INT32 iNodeID, ENodeType enumNodeType, char* pbNodeName, char * pbImportXmlFile);
+ ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType);
+ ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType);
+ ocfmRetCode GenerateXAP(char* xapFilePath);
+ ocfmRetCode GenerateCDC(char* cdcPath);
+ ocfmRetCode GenerateNET(char* netFilePath);
+ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName);
+ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType);
+ ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType);
+ ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId);
+ ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexID);
+ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId);
+ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexId);
+ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue, char* indexName, Flag includeInCDC);
+ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* indexValue, char* indexName, Flag includeInCDC);
+ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& nodeExist);
+ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 *idxPos);
+ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId, char* sidxId, INT32* sidxPos, INT32* idxPos);
+ ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, AttributeType attributeType, char* outAttributeValue);
+ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, AttributeType attributeType, char* outAttributeValue);
+ ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount);
+ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount);
+ ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId, INT32* outSubIndexCount);
+ ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId, char* outNodeName, StationType* outStationType, char* outForcedCycle, bool* outIsForcedCycle);
+ ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
+ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, char* indexId, INT32 subIndexPos, char* outSubIndexID);
+ ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char* outIndexID);
+ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
+ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, AttributeType attributeType, char* outAttributeValue);
+ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue);
+ void LoadObjectDictionary(char* xmlFilePath);
+ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType);
+ ocfmRetCode SaveProject(char* projectPath, char* projectName);
+ ocfmRetCode OpenProject(char* projectPath, char* projectFileName);
+ ocfmRetCode FreeProjectMemory();
+ ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus, ViewMode *viewMode, bool* isExpertViewAlreadySet);
+ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
+ ocfmRetCode GenerateMNOBD();
+ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+ ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType, FeatureType featureType, char* featureName, char* outFeatureValue);
+ ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName, StationType stationType, char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal);
+ ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
+ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName, char* importXmlFile);
+ INT32 GetDataSize(char* dataTypeVal);
 %}
 

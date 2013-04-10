@@ -66,12 +66,12 @@
 
 /**
  
- @param void
+
  */
 
-CDataTypeCollection::CDataTypeCollection(void)
+DataTypeCollection::DataTypeCollection(void)
 {
-	m_DataTypeCount = collectionObj.Count();
+	dataTypeCollectionCount = dataTypeCollectionObj.Count();
 }
 
 /*************************************************************************/
@@ -79,135 +79,77 @@ CDataTypeCollection::CDataTypeCollection(void)
 
 /**
  
- @param void
+
  */
 
-CDataTypeCollection::~CDataTypeCollection(void)
+DataTypeCollection::~DataTypeCollection(void)
 {
 	//Add destructor code here
 }
 
-/*****************************************************************************/
-/**
- \brief			addDataType
- 
- This is a member Function of CDataTypeCollection to add datatype for objects
- 
- \param			objDataType		Class variable of DataType to include in data type collection	
- \return		void
- */
-/*****************************************************************************/
 
-void CDataTypeCollection::addDataType(DataType objDataType)
+void DataTypeCollection::AddDataType(DataType objDataType)
 {
-	INT32 iItemPosition = collectionObj.Add();
-	collectionObj[iItemPosition] = objDataType;
-	m_DataTypeCount = collectionObj.Count();
+	INT32 itemPosition = dataTypeCollectionObj.Add();
+	dataTypeCollectionObj[itemPosition] = objDataType;
+	dataTypeCollectionCount = dataTypeCollectionObj.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			DeleteDataTypeCollection
- 
- This is a member Function of  CDataTypeCollection clears the datatype collection count
- 
- \return		void
- */
-/*****************************************************************************/
 
-void CDataTypeCollection::DeleteDataTypeCollection()
+void DataTypeCollection::DeleteDataTypeCollection()
 {
-	collectionObj.Clear();
-	m_DataTypeCount = collectionObj.Count();
+	dataTypeCollectionObj.Clear();
+	dataTypeCollectionCount = dataTypeCollectionObj.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			getNumberOfDataTypes
- 
- This is a member Function of  CDataTypeCollection returns the total number object count
- 
- \return		INT32
- */
-/*****************************************************************************/
 
-INT32 CDataTypeCollection::getNumberOfDataTypes()
+INT32 DataTypeCollection::GetNumberOfDataTypes()
 {
-	return collectionObj.Count();
+	return dataTypeCollectionObj.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			getDataTypeElement
- 
- This is a member Function of CDataTypeCollection return the data type ID
- 
- \param			iDataTypeId	Integer Variable to hold the datatype id		
- \return		DataType
- */
-/*****************************************************************************/
 
-DataType* CDataTypeCollection::getDataTypeElement(INT32 iDataTypeId)
+DataType* DataTypeCollection::GetDataTypeElement(INT32 dataTypePosition)
 {
-	return &collectionObj[iDataTypeId];
+	return &dataTypeCollectionObj[dataTypePosition];
 }
 
-/*****************************************************************************/
-/**
- \brief			getDataType
- 
- This is a member Function of CDataTypeCollection return the data type value
- 
- \param			pbDataTypeValue		Character pointer variable to hold datatype value		
- \return		DataType*
- */
-/*****************************************************************************/
 
-DataType* CDataTypeCollection::getDataType(char* pbDataTypeValue)
+DataType* DataTypeCollection::GetDataType(char* dataTypeValue)
 {
-	DataType* pobjDataType = NULL;
+	DataType* objDataType = NULL;
 
-	for (INT32 iLoopCount = 0; iLoopCount < this->getNumberOfDataTypes();
-			iLoopCount++)
+	for (INT32 loopCount = 0; loopCount < this->GetNumberOfDataTypes();
+			loopCount++)
 	{
-		pobjDataType = this->getDataTypeElement(iLoopCount);
+		objDataType = this->GetDataTypeElement(loopCount);
 
-		if (0 == strcmp(pobjDataType->DataTypeValue, pbDataTypeValue))
+		if (0 == strcmp(objDataType->dataTypeValue, dataTypeValue))
 		{
-			return pobjDataType;
+			return objDataType;
 		}
 	}
-	pobjDataType = NULL;
-	return pobjDataType;
+	objDataType = NULL;
+	return objDataType;
 }
 
-/*****************************************************************************/
-/**
- \brief			getDataTypeByName
- 
- This is a member Function of CDataTypeCollection return the data type name
- 
- \param			pbDataTypeValue		Character pointer variable to hold the datatype value		
- \return		DataType*
- */
-/*****************************************************************************/
 
-DataType* CDataTypeCollection::getDataTypeByName(char* pbDataTypeValue)
+DataType* DataTypeCollection::GetDataTypeByName(char* dataTypeValue)
 {
-	DataType* pobjDataType = NULL;
+	DataType* objDataType = NULL;
 
-	for (INT32 iLoopCount = 0; iLoopCount < this->getNumberOfDataTypes();
-			iLoopCount++)
+	for (INT32 loopCount = 0; loopCount < this->GetNumberOfDataTypes();
+			loopCount++)
 	{
-		pobjDataType = this->getDataTypeElement(iLoopCount);
+		objDataType = this->GetDataTypeElement(loopCount);
 
 		if (0
-				== strcmp(StringToUpper(pobjDataType->getName()),
-						StringToUpper(pbDataTypeValue)))
+				== strcmp(StringToUpper(objDataType->GetName()),
+						StringToUpper(dataTypeValue)))
 		{
-			return pobjDataType;
+			return objDataType;
 		}
 	}
-	pobjDataType = NULL;
-	return pobjDataType;
+	objDataType = NULL;
+	return objDataType;
 }

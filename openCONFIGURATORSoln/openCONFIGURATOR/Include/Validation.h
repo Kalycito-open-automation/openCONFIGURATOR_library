@@ -55,10 +55,68 @@
 #ifndef Validation_h
 #define Validation_h
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include "../Include/openCONFIGURATOR.h"
 #include "../Include/Internal.h"
+
+
+/****************************************************************************/
+/* Function Declarations */
+
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the object of given Node ID and datatype is present in the NodeCollection list
+
+ \param		dataValue		Character pointer to hold the datavalue
+ \param		nodeId			Integer Pointer to hold the value of node id
+
+ \return	BOOL
+ \retval	TRUE			if the object of given Node ID and datatype is present in the NodeCollection list
+ \retval	FALSE			if the object of given Node ID and datatype is not present in the NodeCollection list
+ */
+/*****************************************************************************/
+bool CheckIfDataTypeExists(char* dataValue, INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to check if the object of given Node ID and datatype is present in the NodeCollection list
+
+ \param		dtName		Character pointer to the datatype name
+ \param		nodeId		Integer pointer to the value of node id
+
+ \return	BOOL
+ \retval	TRUE		if the object of given Node ID and datatype is present in the NodeCollection list
+ \retval	FALSE		if the object of given Node ID and datatype is not present in the NodeCollection list
+ */
+/*****************************************************************************/
+bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId);
+/*****************************************************************************/
+/**
+ \brief		This API shall be used to check for the presence of SubIndex in Index of given node ID and type in the collection list
+
+ \param		nodeId			Integer to hold the value of node id
+ \param		nodeType		Enum variable of NodeType to hold the value of Node type
+ \param		indexID			Character pointer to the value of Index Id
+ \param		subIndexId		Character pointer to the value of SubIndex Id
+
+ \return	BOOL
+ \retval	TRUE			if the required SubIndex exists
+ \retval	FALSE			if the required SubIndex does not exist
+ */
+/*****************************************************************************/
+bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID, char* subIndexId);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to retrieve the version number of the tool that was used during generation from the XML file contents and checks if it matches with the tool version
+
+ \param		reader		xml Variable of xmlTextReaderPtr
+
+ \return	BOOL
+ \retval	TRUE		if retrieved tool version matches with the tool version
+ \retval	FALSE		if retrieved tool version does not match with the tool version
+ */
+/*****************************************************************************/
+bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
 #endif // Validation_h

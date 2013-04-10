@@ -2,7 +2,7 @@
  ************************************************************************************************
  \file			ProcessImage.cpp
 
- \brief			Handles Inout,offset values for process image
+ \brief
  ************************************************************************************************
  */
 
@@ -73,10 +73,10 @@
 /****************************************************************************************************/
 /* Global Variables */
 
-INT32 iInVars = 0;
-INT32 iOutVars = 0;
+INT32 inVarsGlobal = 0;
+INT32 outVarsGlobal = 0;
 
-static tADDRESSTABLE AddressTable[NO_OF_PI_ENTERIES] =
+static PIIndexTable piIndexTable[NO_OF_PI_ENTERIES] =
 {
 { "A000", INTEGER8, OUTPUT },
 { "A040", UNSIGNED8, OUTPUT },
@@ -98,103 +98,76 @@ static tADDRESSTABLE AddressTable[NO_OF_PI_ENTERIES] =
 { "A8C0", UNSIGNED64, INPUT},
 
 };
-ModuleCol astModuleInfo[TOTAL_MODULES];
+
+ModuleCol moduleColl[TOTAL_MODULES];
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-/*****************************************************************************/
-/**
- \brief			SetPIOffsets
- 
- This function sets offset value for process image
- 
- \param			pobjProcessImage     Class Pointer Variable of ProcessImage
- \param			iStartByteOffset     Integer Variable to hold the value of startbyteoffset  
- \param			iPosition            Integer Variable to hold the value of image position 
- \param			iStartBitOffset      Integer Variable to hold the value of startbitoffset 
- \return		void
- */
-/*****************************************************************************/
 //TODO: Unused function
-void SetPIOffsets(ProcessImage* pobjProcessImage, INT32& iStartByteOffset,
-		INT32 iPosition, INT32& iStartBitOffset)
+void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset, INT32& startBitOffset)
 {
-	if (NULL == pobjProcessImage)
+	if (NULL == piObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
-	if (1 == pobjProcessImage->DataInfo.DataSize)
+	if (1 == piObj->dataInfo.dataSize)
 	{
-		if (-1 == iStartBitOffset)
+		if (-1 == startBitOffset)
 		{
-			pobjProcessImage->ByteOffset = iStartByteOffset;
+			piObj->byteOffset = startByteOffset;
 		}
-		iStartBitOffset = iStartBitOffset + 1;
-		pobjProcessImage->BitOffset = iStartBitOffset;
-		pobjProcessImage->ByteOffset = iStartByteOffset;
+		startBitOffset = startBitOffset + 1;
+		piObj->bitOffset = startBitOffset;
+		piObj->byteOffset = startByteOffset;
 
-		if (7 == iStartBitOffset)
+		if (7 == startBitOffset)
 		{
-			iStartByteOffset = iStartByteOffset + 1;
+			startByteOffset = startByteOffset + 1;
 		}
 	}
 	else
 	{
-		pobjProcessImage->ByteOffset = iStartByteOffset;
-		iStartByteOffset = iStartByteOffset
-				+ (pobjProcessImage->DataInfo.DataSize) / 8;
+		piObj->byteOffset = startByteOffset;
+		startByteOffset = startByteOffset + (piObj->dataInfo.dataSize) / 8;
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			GroupInOutPIVariables
- 
- This function assigns inout values for process image variables
- 
- \param			aobjPIInCol       Class Variable of ProcessImage to hold the value of object
- \param			aobjPIOutCol      Class Variable of ProcessImage to hold the value of object 
- \return		void
- */
-/*****************************************************************************/
-
-void GroupInOutPIVariables(ProcessImage aobjPIInCol[],
-		ProcessImage aobjPIOutCol[])
+void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 {
 
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode = NULL;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	iInVars = 0;
-	iOutVars = 0;
+	NodeCollection* objNodeCol = NULL;
+	Node* objNode = NULL;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	inVarsGlobal = 0;
+	outVarsGlobal = 0;
 
-	for (INT32 iOutLoopCount = 0;
-			iOutLoopCount < pobjNodeCol->getNumberOfNodes(); iOutLoopCount++)
+	for (INT32 nodeLoopCount = 0;
+			nodeLoopCount < objNodeCol->GetNumberOfNodes(); nodeLoopCount++)
 	{
-		objNode = pobjNodeCol->getNodebyColIndex(iOutLoopCount);
+		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
-		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->ProcessImageCollection.Count();
-				iInLoopCount++)
+		for (INT32 piLoopCount = 0;
+				piLoopCount < objNode->PICollection.Count();
+				piLoopCount++)
 		{
 			if (INPUT
-					== objNode->ProcessImageCollection[iInLoopCount].DirectionType)
+					== objNode->PICollection[piLoopCount].directionType)
 			{
-				aobjPIInCol[iInVars] =
-						objNode->ProcessImageCollection[iInLoopCount];
-				iInVars++;
+				piInCol[inVarsGlobal] =
+						objNode->PICollection[piLoopCount];
+				inVarsGlobal++;
 			}
 			else if (OUTPUT
-					== objNode->ProcessImageCollection[iInLoopCount].DirectionType)
+					== objNode->PICollection[piLoopCount].directionType)
 			{
-				aobjPIOutCol[iOutVars] =
-						objNode->ProcessImageCollection[iInLoopCount];
-				iOutVars++;
+				piOutCol[outVarsGlobal] =
+						objNode->PICollection[piLoopCount];
+				outVarsGlobal++;
 			}
 			else
 			{
@@ -204,84 +177,63 @@ void GroupInOutPIVariables(ProcessImage aobjPIInCol[],
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			GroupNETPIVariables
- 
- 
- 
- \param			DirectionType   Class Variable of EPIDirectionType to hold the direction type
- \param			aobjPICol       Class Variable of NETProcessImage to hold the object 
- \return		void
- */
-/*****************************************************************************/
 
-INT32 GroupNETPIVariables(EPIDirectionType DirectionType,
-		NETProcessImage aobjPICol[])
+INT32 GroupNETPIVariables(PIDirectionType directionType, NETProcessImage netPIObj[])
 {
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode = NULL;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	INT32 NetPIVarsCount = 0;
+	NodeCollection* objNodeCol = NULL;
+	Node* objNode = NULL;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	INT32 netPIVarsCount = 0;
 	for (INT32 iOutLoopCount = 0;
-			iOutLoopCount < pobjNodeCol->getNumberOfNodes(); iOutLoopCount++)
+			iOutLoopCount < objNodeCol->GetNumberOfNodes(); iOutLoopCount++)
 	{
-		objNode = pobjNodeCol->getNodebyColIndex(iOutLoopCount);
+		objNode = objNodeCol->GetNodebyColIndex(iOutLoopCount);
 
 		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->NETProcessImageCollection.Count();
+				iInLoopCount < objNode->NETPIColl.Count();
 				iInLoopCount++)
 		{
-			if (objNode->NETProcessImageCollection[iInLoopCount].DirectionType
-					== DirectionType)
+			if (objNode->NETPIColl[iInLoopCount].directionType
+					== directionType)
 			{
-				aobjPICol[NetPIVarsCount] =
-						objNode->NETProcessImageCollection[iInLoopCount];
-				NetPIVarsCount++;
+				netPIObj[netPIVarsCount] =
+						objNode->NETPIColl[iInLoopCount];
+				netPIVarsCount++;
 			}
 		}
 	}
-	return NetPIVarsCount;
+	return netPIVarsCount;
 }
 
-/*****************************************************************************/
-/**
- \brief			SetUniquePIVarName
- 
- This function assigns unique variables for process image
- 
- \return		void
- */
-/*****************************************************************************/
 
 void SetUniquePIVarName()
 {
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode = NULL;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	iInVars = 0;
-	iOutVars = 0;
-	ProcessImage* pPIObjTemp = NULL;
-	ProcessImage* pPIObjTempChk = NULL;
-	const INT32 iUniqNameLen = 2;
+	NodeCollection* objNodeCol = NULL;
+	Node* objNode = NULL;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	inVarsGlobal = 0;
+	outVarsGlobal = 0;
+	ProcessImage* piObjTemp1 = NULL;
+	ProcessImage* piObjTemp2 = NULL;
+	const INT32 uniqNameLen = 2;
 
-	for (INT32 iOutLoopCount = 0;
-			iOutLoopCount < pobjNodeCol->getNumberOfNodes(); iOutLoopCount++)
+	for (INT32 nodeLoopCount = 0;
+			nodeLoopCount < objNodeCol->GetNumberOfNodes(); nodeLoopCount++)
 	{
-		objNode = pobjNodeCol->getNodebyColIndex(iOutLoopCount);
+		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
 		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->ProcessImageCollection.Count();
+				iInLoopCount < objNode->PICollection.Count();
 				iInLoopCount++)
 		{
-			INT32 iUniqNameCnt = 1;
-			bool bMatchFound = false;
+			INT32 uniqNameCnt = 1;
+			bool nameMatched = false;
 
-			pPIObjTemp = &objNode->ProcessImageCollection[iInLoopCount];
+			piObjTemp1 = &objNode->PICollection[iInLoopCount];
 
 			//it is possible that the changed var name matching a previous entry
 			for (INT32 iInChkLoopCount = 0;
-					iInChkLoopCount < objNode->ProcessImageCollection.Count();
+					iInChkLoopCount < objNode->PICollection.Count();
 					iInChkLoopCount++)
 			{
 				if (iInChkLoopCount == iInLoopCount)
@@ -290,942 +242,798 @@ void SetUniquePIVarName()
 					continue;
 				}
 
-				pPIObjTempChk =
-						&objNode->ProcessImageCollection[iInChkLoopCount];
+				piObjTemp2 =
+						&objNode->PICollection[iInChkLoopCount];
 
 				//check module index, module name, directiontype and variable name
 				//if all are same then append count variable to variable name
 				if ((0
-						== strcmp(pPIObjTemp->ModuleIndex,
-								pPIObjTempChk->ModuleIndex))
+						== strcmp(piObjTemp1->moduleIndex,
+								piObjTemp2->moduleIndex))
 						&& (0
-								== strcmp(pPIObjTemp->ModuleName,
-										pPIObjTempChk->ModuleName))
-						&& (pPIObjTemp->DirectionType
-								== pPIObjTempChk->DirectionType)
+								== strcmp(piObjTemp1->moduleName,
+										piObjTemp2->moduleName))
+						&& (piObjTemp1->directionType
+								== piObjTemp2->directionType)
 						&& (0
-								== strcmp(pPIObjTemp->VarName,
-										pPIObjTempChk->VarName)))
+								== strcmp(piObjTemp1->varDeclName,
+										piObjTemp2->varDeclName)))
 				{
 					//change the name of VarName
-					iUniqNameCnt++; //1 is reserved for first matched entry
-					if (NULL != pPIObjTempChk->VarName)
+					uniqNameCnt++; //1 is reserved for first matched entry
+					if (NULL != piObjTemp2->varDeclName)
 					{
-						delete[] pPIObjTempChk->VarName;
+						delete[] piObjTemp2->varDeclName;
 					}
-					pPIObjTempChk->VarName = new char[strlen(
-							pPIObjTemp->VarName) + iUniqNameLen + ALLOC_BUFFER];
-					sprintf(pPIObjTempChk->VarName, "%s%02d",
-							pPIObjTemp->VarName, iUniqNameCnt);
-					bMatchFound = true;
+					piObjTemp2->varDeclName = new char[strlen(
+							piObjTemp1->varDeclName) + uniqNameLen + ALLOC_BUFFER];
+					sprintf(piObjTemp2->varDeclName, "%s%02d",
+							piObjTemp1->varDeclName, uniqNameCnt);
+					nameMatched = true;
 
 					//change the name of Name
-					if (NULL != pPIObjTempChk->Name)
-						delete[] pPIObjTempChk->Name;
+					if (NULL != piObjTemp2->name)
+						delete[] piObjTemp2->name;
 
-					pPIObjTempChk->Name = new char[strlen(
-							pPIObjTempChk->VarName)
-							+ strlen(pPIObjTempChk->ModuleName) + 6
+					piObjTemp2->name = new char[strlen(
+							piObjTemp2->varDeclName)
+							+ strlen(piObjTemp2->moduleName) + 6
 							+ ALLOC_BUFFER];
-					strcpy(pPIObjTempChk->Name,
-							getPIName(objNode->getNodeId()));
-					strcat(pPIObjTempChk->Name, pPIObjTempChk->ModuleName);
-					strcat(pPIObjTempChk->Name, ".");
-					strcat(pPIObjTempChk->Name, pPIObjTempChk->VarName);
+					strcpy(piObjTemp2->name,
+							GetPIName(objNode->GetNodeId()));
+					strcat(piObjTemp2->name, piObjTemp2->moduleName);
+					strcat(piObjTemp2->name, ".");
+					strcat(piObjTemp2->name, piObjTemp2->varDeclName);
 
 				}
 			}
 
-			if (true == bMatchFound)
+			if (true == nameMatched)
 			{
-				char* pcTempVarName = NULL;
-				pcTempVarName = new char[strlen(pPIObjTemp->VarName)
+				char* tempVarName = NULL;
+				tempVarName = new char[strlen(piObjTemp1->varDeclName)
 						+ ALLOC_BUFFER];
-				strcpy(pcTempVarName, pPIObjTemp->VarName);
-				if (NULL != pPIObjTemp->VarName)
+				strcpy(tempVarName, piObjTemp1->varDeclName);
+				if (NULL != piObjTemp1->varDeclName)
 				{
-					delete[] pPIObjTemp->VarName;
+					delete[] piObjTemp1->varDeclName;
 				}
-				pPIObjTemp->VarName = new char[strlen(pcTempVarName)
-						+ iUniqNameLen + ALLOC_BUFFER];
+				piObjTemp1->varDeclName = new char[strlen(tempVarName)
+						+ uniqNameLen + ALLOC_BUFFER];
 
-				sprintf(pPIObjTemp->VarName, "%s%02d", pcTempVarName, 1);
-				delete[] pcTempVarName;
+				sprintf(piObjTemp1->varDeclName, "%s%02d", tempVarName, 1);
+				delete[] tempVarName;
 
 				//change the name of Name
-				if (NULL != pPIObjTemp->Name)
+				if (NULL != piObjTemp1->name)
 				{
-					delete[] pPIObjTemp->Name;
+					delete[] piObjTemp1->name;
 				}
-				pPIObjTemp->Name = new char[strlen(pPIObjTemp->VarName)
-						+ strlen(pPIObjTemp->ModuleName) + 6 + ALLOC_BUFFER];
+				piObjTemp1->name = new char[strlen(piObjTemp1->varDeclName)
+						+ strlen(piObjTemp1->moduleName) + 6 + ALLOC_BUFFER];
 
-				strcpy(pPIObjTemp->Name, getPIName(objNode->getNodeId()));
-				strcat(pPIObjTemp->Name, pPIObjTemp->ModuleName);
-				strcat(pPIObjTemp->Name, ".");
-				strcat(pPIObjTemp->Name, pPIObjTemp->VarName);
+				strcpy(piObjTemp1->name, GetPIName(objNode->GetNodeId()));
+				strcat(piObjTemp1->name, piObjTemp1->moduleName);
+				strcat(piObjTemp1->name, ".");
+				strcat(piObjTemp1->name, piObjTemp1->varDeclName);
 			}
 		}
 	}
-	//return;
 }
 
-/*****************************************************************************/
-/**
- \brief			getIECDT
- 
- 
- \param			pbDataStr       Character Pointer Variable to hold the value of data 
- \param			iDataSize		Integer Variable to hold the value of data size		
- \return		PIDataInfo*
- */
-/*****************************************************************************/
-
-PIDataInfo* getIECDT(char* pbDataStr, INT32 iDataSize)
+PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
 {
-	PIDataInfo *pstDataInfo = new PIDataInfo;
-	pstDataInfo->_dt_Name = new char[strlen(pbDataStr) + 1];
-	strcpy(pstDataInfo->_dt_Name, pbDataStr);
+	PIDataInfo *stDataInfo = new PIDataInfo;
+	stDataInfo->dtName = new char[strlen(iecDataType) + 1];
+	strcpy(stDataInfo->dtName, iecDataType);
 
-	if (NULL != pbDataStr)
+	if (NULL != iecDataType)
 	{
-		if (!strcmp(pbDataStr, "BITSTRING"))
+		if (!strcmp(iecDataType, "BITSTRING"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = BITSTRING;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = BITSTRING;
 		}
-		else if (!strcmp(pbDataStr, "BOOL"))
+		else if (!strcmp(iecDataType, "BOOL"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = BOOL;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = BOOL;
 		}
-		else if (!strcmp(pbDataStr, "_CHAR"))
+		else if (!strcmp(iecDataType, "_CHAR"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = _CHAR;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = _CHAR;
 		}
-		else if (!strcmp(pbDataStr, "WORD"))
+		else if (!strcmp(iecDataType, "WORD"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = BYTE;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = BYTE;
 		}
-		else if (!strcmp(pbDataStr, "DWORD"))
+		else if (!strcmp(iecDataType, "DWORD"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = DWORD;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = DWORD;
 		}
-		else if (!strcmp(pbDataStr, "LWORD"))
+		else if (!strcmp(iecDataType, "LWORD"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = LWORD;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = LWORD;
 		}
-		else if (!strcmp(pbDataStr, "SINT"))
+		else if (!strcmp(iecDataType, "SINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = SINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = SINT;
 		}
-		else if (!strcmp(pbDataStr, "INT"))
+		else if (!strcmp(iecDataType, "INT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = INT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = INT;
 		}
-		else if (!strcmp(pbDataStr, "DINT"))
+		else if (!strcmp(iecDataType, "DINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = DINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = DINT;
 		}
-		else if (!strcmp(pbDataStr, "LINT"))
+		else if (!strcmp(iecDataType, "LINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = LINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = LINT;
 		}
-		else if (!strcmp(pbDataStr, "USINT"))
+		else if (!strcmp(iecDataType, "USINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = USINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = USINT;
 		}
-		else if (!strcmp(pbDataStr, "UINT"))
+		else if (!strcmp(iecDataType, "UINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = UINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = UINT;
 		}
-		else if (strcmp(pbDataStr, "UDINT") == 0)
+		else if (strcmp(iecDataType, "UDINT") == 0)
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = UDINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = UDINT;
 		}
-		else if (!strcmp(pbDataStr, "ULINT"))
+		else if (!strcmp(iecDataType, "ULINT"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = ULINT;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = ULINT;
 		}
-		else if (!strcmp(pbDataStr, "REAL"))
+		else if (!strcmp(iecDataType, "REAL"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = REAL;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = REAL;
 		}
-		else if (!strcmp(pbDataStr, "LREAL"))
+		else if (!strcmp(iecDataType, "LREAL"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = LREAL;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = LREAL;
 		}
-		else if (!strcmp(pbDataStr, "STRING"))
+		else if (!strcmp(iecDataType, "STRING"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = STRING;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = STRING;
 		}
-		else if (!strcmp(pbDataStr, "WSTRING"))
+		else if (!strcmp(iecDataType, "WSTRING"))
 		{
-			pstDataInfo->DataSize = iDataSize;
-			pstDataInfo->_dt_enum = WSTRING;
+			stDataInfo->dataSize = dataSize;
+			stDataInfo->iecDtVar = WSTRING;
 		}
 		else
 		{
 			//TODO: else added. operation to be specified
 		}
 	}
-	return pstDataInfo;
+	return stDataInfo;
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfModuleExists
- 
- This function checks whether the module is present or not
- 
- \param			pbModuleName        Character Pointer Variable to hold the value of Module Name      
- \param			ModuleNo            Integer Variable to hold the value of Module number  
- \param			iNoOfModules        Integer Variable to hold the value of NUmber of modules 
- \param			astModCol           Structure Class Variable of ModuleCol
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
+
 //TODO: Unused function
-bool CheckIfModuleExists(char* pbModuleName, INT32 & ModuleNo,
-		INT32 iNoOfModules, ModuleCol astModCol[])
+bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules, ModuleCol modCollObj[])
 {
-	for (INT32 iLoopCount = 0; iLoopCount <= iNoOfModules; iLoopCount++)
+	for (INT32 moduleLC = 0; moduleLC <= noOfModules; moduleLC++)
 	{
-		if (!strcmp(pbModuleName, astModuleInfo[iLoopCount].ModuleName))
+		if (!strcmp(moduleName, moduleColl[moduleLC].moduleName))
 		{
-			ModuleNo = astModCol[iLoopCount].ModuleNo;
+			moduleNo = modCollObj[moduleLC].moduleNo;
 			return true;
 		}
 	}
 	return false;
 }
 
-/*****************************************************************************/
-/**
- \brief			GenerateXAPHeaderFile
- 
- This function generates the header file
- 
- \param			pbFileName
- \param			objPIInCol
- \param			objPIOutCol
- \param			iInVar
- \param			iOutVar
- \return		void	
- */
-/*****************************************************************************/
-
-void GenerateXAPHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
-		ProcessImage objPIOutCol[], INT32 iInVar, INT32 iOutVar)
+void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar)
 {
-	char* pbXapFileName = new char[strlen(pbFileName) + ALLOC_BUFFER];
-	FILE* fpXapFile = new FILE();
+	char* xapFileName = new char[strlen(fileName) + ALLOC_BUFFER];
+	FILE* xapFile = new FILE();
 
-	strcpy(pbXapFileName, pbFileName);
-	strcat(pbXapFileName, ".h");
+	strcpy(xapFileName, fileName);
+	strcat(xapFileName, ".h");
 
-	if (NULL == (fpXapFile = fopen(pbXapFileName, "w+ ")))
+	if (NULL == (xapFile = fopen(xapFileName, "w+ ")))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_CANNOT_OPEN_FILE);
-		delete[] pbXapFileName;
+		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+		delete[] xapFileName;
 		throw ex;
 	}
 
 	//write comment
-	char* pcComment = new char[strlen(BUILD_COMMENT) + BUILDTIME_BUF_LEN
+	char* varComment = new char[strlen(BUILD_COMMENT) + BUILDTIME_BUF_LEN
 			+ STR_ALLOC_BUFFER + 8]; // 8 is for comment lines
-	strcpy(pcComment, "/* ");
-	strcat(pcComment, BUILD_COMMENT);
-	strcat(pcComment, GetBuildTime());
-	strcat(pcComment, " */\n");
-	UINT32 uiStrLength = strlen(pcComment);
-	if ((uiStrLength != fwrite(pcComment, sizeof(char), uiStrLength, fpXapFile)))
+	strcpy(varComment, "/* ");
+	strcat(varComment, BUILD_COMMENT);
+	strcat(varComment, GetBuildTime());
+	strcat(varComment, " */\n");
+	UINT32 uiStrLength = strlen(varComment);
+	if ((uiStrLength != fwrite(varComment, sizeof(char), uiStrLength, xapFile)))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pcComment;
-		delete[] pbXapFileName;
-		fclose(fpXapFile);
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] varComment;
+		delete[] xapFileName;
+		fclose(xapFile);
 		throw ex;
 	}
-	delete[] pcComment;
+	delete[] varComment;
 	//write include guard for the headerfile
-	char* pbXapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_CHECK)
+	char* xapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_CHECK)
 			+ strlen(INCLUDE_GUARD_START) + ALLOC_BUFFER];
-	if (NULL == pbXapHeaderIncludeGuard)
+	if (NULL == xapHeaderIncludeGuard)
 	{
 #if defined DEBUG
 		cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-		delete[] pbXapFileName;
-		fclose(fpXapFile);
+		ex.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		delete[] xapFileName;
+		fclose(xapFile);
 		throw ex;
 	}
-	strcpy(pbXapHeaderIncludeGuard, INCLUDE_GUARD_CHECK);
-	strcat(pbXapHeaderIncludeGuard, "\n");
-	strcat(pbXapHeaderIncludeGuard, INCLUDE_GUARD_START);
-	strcat(pbXapHeaderIncludeGuard, "\n\n");
-	uiStrLength = strlen(pbXapHeaderIncludeGuard);
+	strcpy(xapHeaderIncludeGuard, INCLUDE_GUARD_CHECK);
+	strcat(xapHeaderIncludeGuard, "\n");
+	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_START);
+	strcat(xapHeaderIncludeGuard, "\n\n");
+	uiStrLength = strlen(xapHeaderIncludeGuard);
 
 	if ((uiStrLength
-			!= fwrite(pbXapHeaderIncludeGuard, sizeof(char), uiStrLength,
-					fpXapFile)))
+			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength,
+					xapFile)))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbXapHeaderIncludeGuard;
-		delete[] pbXapFileName;
-		fclose(fpXapFile);
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] xapHeaderIncludeGuard;
+		delete[] xapFileName;
+		fclose(xapFile);
 		throw ex;
 	}
 
-	delete[] pbXapHeaderIncludeGuard;
+	delete[] xapHeaderIncludeGuard;
 	/* write Input structure */
-	if (0 != iInVar)
+	if (0 != inVar)
 	{
-		WriteXAPHeaderContents(objPIInCol, iInVar, INPUT, fpXapFile);
+		WriteXAPHeaderContents(piInCol, inVar, INPUT, xapFile);
 	}
 
-	fclose(fpXapFile);
+	fclose(xapFile);
 
 	/* write Output structure */
-	if (NULL == (fpXapFile = fopen(pbXapFileName, "a+")))
+	if (NULL == (xapFile = fopen(xapFileName, "a+")))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_CANNOT_OPEN_FILE);
-		delete[] pbXapFileName;
+		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+		delete[] xapFileName;
 		throw ex;
 	}
-	delete[] pbXapFileName;
-	if (0 != iOutVar)
+	delete[] xapFileName;
+	if (0 != outVar)
 	{
-		WriteXAPHeaderContents(objPIOutCol, iOutVar, OUTPUT, fpXapFile);
+		WriteXAPHeaderContents(piOutCol, outVar, OUTPUT, xapFile);
 	}
 
 	//close include guard for the XAP header file
-	pbXapHeaderIncludeGuard =
+	xapHeaderIncludeGuard =
 			new char[strlen(INCLUDE_GUARD_END) + ALLOC_BUFFER];
 
-	strcpy(pbXapHeaderIncludeGuard, "\n");
-	strcat(pbXapHeaderIncludeGuard, INCLUDE_GUARD_END);
-	uiStrLength = strlen(pbXapHeaderIncludeGuard);
+	strcpy(xapHeaderIncludeGuard, "\n");
+	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_END);
+	uiStrLength = strlen(xapHeaderIncludeGuard);
 	if ((uiStrLength
-			!= fwrite(pbXapHeaderIncludeGuard, sizeof(char), uiStrLength,
-					fpXapFile)))
+			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength,
+					xapFile)))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbXapHeaderIncludeGuard;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] xapHeaderIncludeGuard;
 		throw ex;
 	}
 
-	fclose(fpXapFile);
-	delete[] pbXapHeaderIncludeGuard;
+	fclose(xapFile);
+	delete[] xapHeaderIncludeGuard;
 }
 
-/*****************************************************************************/
-/**
- \brief			WriteXAPHeaderContents
- 
- This function writes content into header file
- 
- \param			objProcessImage       Class Variable of ProcessImage to hold the process image value
- \param			iNumberOfVars         Integer variable to hold the value of total number of variables 
- \param			enumDirType           Enum Variable of  EPIDirectionType
- \param			fpXapHeader           File Pointer Varible to hold the header file
- \return		void	
- */
-/*****************************************************************************/
-
-void WriteXAPHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
-		EPIDirectionType enumDirType, FILE* fpXapHeader)
+void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, FILE* xapHeader)
 {
-	char* pbBuffer = new char[HEADER_FILE_BUFFER];
-	char* pbBuffer1 = new char[200];
+	char* mainBuffer = new char[HEADER_FILE_BUFFER];
+	char* tempBuffer = new char[200];
 
-	if (0 != iNumberOfVars)
+	if (0 != noOfVars)
 	{
-		strcpy(pbBuffer, "\ntypedef struct \n{\n");
-		INT32 iHoleFilledIdNo = 1;
-		INT32 iTotalsize = 0;
-		for (INT32 iLoopCount = 0; iLoopCount < iNumberOfVars; iLoopCount++)
+		strcpy(mainBuffer, "\ntypedef struct \n{\n");
+		INT32 holeFilledIdNo = 1;
+		INT32 totalSize = 0;
+		for (INT32 loopCount = 0; loopCount < noOfVars; loopCount++)
 		{
 			//INT32 iNodeId;
-			INT32 iDataSize = 0;
-			char* pbStrCNID = new char[50];
-			char* pbModName = new char[50];
-			char* pbStrModuleNo = new char[20];
+			INT32 dataSize = 0;
+			char* nodeId = new char[50];
+			char* moduleName = new char[50];
+			char* moduleNo = new char[20];
 
-			iDataSize = objProcessImage[iLoopCount].DataInfo.DataSize;
+			dataSize = piObj[loopCount].dataInfo.dataSize;
 			/* Check if 8, 16, 32 bit aligned*/
-			if ((0 == iDataSize % 32) || (0 == iDataSize % 16)
-					|| (0 == iDataSize % 8))
+			if ((0 == dataSize % 32) || (0 == dataSize % 16)
+					|| (0 == dataSize % 8))
 			{
-				if (0 != iTotalsize % iDataSize)
+				if (0 != totalSize % dataSize)
 				{
-					char abHoleid[20];
-					char* pbFbits = new char[2 + ALLOC_BUFFER];
-					INT32 iFilledBits = iDataSize - (iTotalsize % iDataSize);
+					char holeid[20];
+					char* fillBitsStr = new char[2 + ALLOC_BUFFER];
+					INT32 filledBits = dataSize - (totalSize % dataSize);
 
-					iTotalsize = iTotalsize + iFilledBits;
-					strcat(pbBuffer, "\tunsigned");
-					strcat(pbBuffer, " ");
-					strcat(pbBuffer, "PADDING_VAR_");
-					strcat(pbBuffer,
-							_IntToAscii(iHoleFilledIdNo, abHoleid, 10));
-					strcat(pbBuffer, ":");
-					pbFbits = _IntToAscii(iFilledBits, pbFbits, 10);
-					strcat(pbBuffer, pbFbits);
-					strcat(pbBuffer, ";\n");
-					iHoleFilledIdNo = iHoleFilledIdNo + 1;
-					delete[] pbFbits;
+					totalSize = totalSize + filledBits;
+					strcat(mainBuffer, "\tunsigned");
+					strcat(mainBuffer, " ");
+					strcat(mainBuffer, "PADDING_VAR_");
+					strcat(mainBuffer,
+							IntToAscii(holeFilledIdNo, holeid, 10));
+					strcat(mainBuffer, ":");
+					fillBitsStr = IntToAscii(filledBits, fillBitsStr, 10);
+					strcat(mainBuffer, fillBitsStr);
+					strcat(mainBuffer, ";\n");
+					holeFilledIdNo = holeFilledIdNo + 1;
+					delete[] fillBitsStr;
 				}
 			}
 
 			//iNodeId = objProcessImage[iLoopCount].CNNodeID;
 
-			pbStrCNID = _IntToAscii(objProcessImage[iLoopCount].CNNodeID,
-					pbStrCNID, 10);
-			strcpy(pbStrModuleNo,
-					subString(objProcessImage[iLoopCount].ModuleIndex, 2, 2));
-			strcpy(pbModName, objProcessImage[iLoopCount].ModuleName);
+			nodeId = IntToAscii(piObj[loopCount].nodeId,
+					nodeId, 10);
+			strcpy(moduleNo,
+					SubString(piObj[loopCount].moduleIndex, 2, 2));
+			strcpy(moduleName, piObj[loopCount].moduleName);
 
-			strcat(pbBuffer, "\tunsigned");
-			strcat(pbBuffer, " ");
-			char* pbVarName = new char[100];
-			strcpy(pbVarName, "CN");
-			pbStrCNID = _IntToAscii(objProcessImage[iLoopCount].CNNodeID,
-					pbStrCNID, 10);
-			strcat(pbVarName, pbStrCNID);
-			strcat(pbVarName, "_");
+			strcat(mainBuffer, "\tunsigned");
+			strcat(mainBuffer, " ");
+			char* tempName = new char[100];
+			strcpy(tempName, "CN");
+			nodeId = IntToAscii(piObj[loopCount].nodeId,
+					nodeId, 10);
+			strcat(tempName, nodeId);
+			strcat(tempName, "_");
 
 			/* Add Mod NO*/
-			strcat(pbVarName, "M");
-			strcat(pbVarName, pbStrModuleNo);
-			strcat(pbVarName, "_");
+			strcat(tempName, "M");
+			strcat(tempName, moduleNo);
+			strcat(tempName, "_");
 
-			strcat(pbVarName, pbModName);
-			strcat(pbVarName, "_");
-			strcat(pbVarName, objProcessImage[iLoopCount].VarName);
+			strcat(tempName, moduleName);
+			strcat(tempName, "_");
+			strcat(tempName, piObj[loopCount].varDeclName);
 
-			strcat(pbBuffer, pbVarName);
-			strcat(pbBuffer, ":");
+			strcat(mainBuffer, tempName);
+			strcat(mainBuffer, ":");
 
-			char* pbBuff = new char[50];
-			pbBuff = _IntToAscii(iDataSize, pbBuff, 10);
-			iTotalsize = iDataSize + iTotalsize;
-			strcat(pbBuffer, pbBuff);
-			strcat(pbBuffer, ";");
+			char* varTempBuff = new char[50];
+			varTempBuff = IntToAscii(dataSize, varTempBuff, 10);
+			totalSize = dataSize + totalSize;
+			strcat(mainBuffer, varTempBuff);
+			strcat(mainBuffer, ";");
 
-			strcat(pbBuffer, "\n");
-			delete[] pbVarName;
-			delete[] pbModName;
-			delete[] pbStrModuleNo;
-			delete[] pbStrCNID;
+			strcat(mainBuffer, "\n");
+			delete[] tempName;
+			delete[] moduleName;
+			delete[] moduleNo;
+			delete[] nodeId;
 		}
 		/* Check if the whole struct is 32 bit aligned*/
-		if (0 != iTotalsize % 32)
+		if (0 != totalSize % 32)
 		{
-			char abHoleid[20];
-			char* pbFbits = new char[2 + ALLOC_BUFFER];
-			INT32 iFilledBits = 32 - (iTotalsize % 32);
+			char holeid[20];
+			char* fillBitsStr = new char[2 + ALLOC_BUFFER];
+			INT32 filledBits = 32 - (totalSize % 32);
 
-			iTotalsize = iTotalsize + iFilledBits;
-			strcat(pbBuffer, "\tunsigned");
-			strcat(pbBuffer, " ");
-			strcat(pbBuffer, "PADDING_VAR_");
-			strcat(pbBuffer, _IntToAscii(iHoleFilledIdNo, abHoleid, 10));
-			strcat(pbBuffer, ":");
-			pbFbits = _IntToAscii(iFilledBits, pbFbits, 10);
-			strcat(pbBuffer, pbFbits);
-			strcat(pbBuffer, ";\n");
+			totalSize = totalSize + filledBits;
+			strcat(mainBuffer, "\tunsigned");
+			strcat(mainBuffer, " ");
+			strcat(mainBuffer, "PADDING_VAR_");
+			strcat(mainBuffer, IntToAscii(holeFilledIdNo, holeid, 10));
+			strcat(mainBuffer, ":");
+			fillBitsStr = IntToAscii(filledBits, fillBitsStr, 10);
+			strcat(mainBuffer, fillBitsStr);
+			strcat(mainBuffer, ";\n");
 			//iHoleFilledIdNo = iHoleFilledIdNo + 1; Unused operation
 
-			delete[] pbFbits;
+			delete[] fillBitsStr;
 		}
-		strcat(pbBuffer, "}");
+		strcat(mainBuffer, "}");
 
-		if (INPUT == enumDirType)
+		if (INPUT == directionType)
 		{
-			strcpy(pbBuffer1, "# define COMPUTED_PI_OUT_SIZE ");
-			strcat(pbBuffer, " PI_OUT;");
+			strcpy(tempBuffer, "# define COMPUTED_PI_OUT_SIZE ");
+			strcat(mainBuffer, " PI_OUT;");
 		}
-		else if (OUTPUT == enumDirType)
+		else if (OUTPUT == directionType)
 		{
 
-			strcpy(pbBuffer1, "\n\n# define COMPUTED_PI_IN_SIZE ");
-			strcat(pbBuffer, " PI_IN;");
-			strcat(pbBuffer, "\n");
+			strcpy(tempBuffer, "\n\n# define COMPUTED_PI_IN_SIZE ");
+			strcat(mainBuffer, " PI_IN;");
+			strcat(mainBuffer, "\n");
 		}
 		else
 		{
 			//Nothing to do
 		}
 
-		char* pbStrSize = new char[50];
+		char* strSize = new char[50];
 
 		/* write the size in bytes*/
-		iTotalsize = iTotalsize / 8;
-		pbStrSize = _IntToAscii(iTotalsize, pbStrSize, 10);
-		strcat(pbBuffer1, pbStrSize);
-		delete[] pbStrSize;
+		totalSize = totalSize / 8;
+		strSize = IntToAscii(totalSize, strSize, 10);
+		strcat(tempBuffer, strSize);
+		delete[] strSize;
 	}
 	else
 	{
-		strcpy(pbBuffer1, "");
+		strcpy(tempBuffer, "");
 	}
 
-	UINT32 uiStrLength = strlen(pbBuffer1);
+	UINT32 tempBufferLen = strlen(tempBuffer);
 
-	if ((uiStrLength
-			!= fwrite(pbBuffer1, sizeof(char), uiStrLength, fpXapHeader)))
+	if ((tempBufferLen
+			!= fwrite(tempBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbBuffer;
-		delete[] pbBuffer1;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] mainBuffer;
+		delete[] tempBuffer;
 		throw ex;
 	}
-	delete[] pbBuffer1;
+	delete[] tempBuffer;
 
-	uiStrLength = strlen(pbBuffer);
+	tempBufferLen = strlen(mainBuffer);
 
-	if ((uiStrLength != fwrite(pbBuffer, sizeof(char), uiStrLength, fpXapHeader)))
+	if ((tempBufferLen != fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbBuffer;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] mainBuffer;
 		throw ex;
 	}
-	delete[] pbBuffer;
+	delete[] mainBuffer;
 }
 
-/*****************************************************************************/
-/**
- \brief			GenerateNETHeaderFile
- 
- This function generates header file interface
- 
- \param			pbFileName          Character POinter Variable to hold the value of file name
- \param			objPIInCol          Class variable of ProcessImage
- \param			objPIOutCol         Class variable of ProcessImage
- \param			iInVar              Integer Variable to hold input value   
- \param			iOutVar             Integer Variable to hold output value 
- \return		void	
- */
-/*****************************************************************************/
-
-void GenerateNETHeaderFile(char* pbFileName, ProcessImage objPIInCol[],
-		ProcessImage objPIOutCol[], INT32 iInVar, INT32 iOutVar)
+void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar)
 {
-	char* pbNetFileName = new char[strlen(pbFileName) + ALLOC_BUFFER];
-	FILE* fpNetFile = new FILE();
+	char* netFileName = new char[strlen(fileName) + ALLOC_BUFFER];
+	FILE* netFile = new FILE();
+	ocfmException ex;
 
-	strcpy(pbNetFileName, pbFileName);
-	strcat(pbNetFileName, ".cs");
+	strcpy(netFileName, fileName);
+	strcat(netFileName, ".cs");
 	/* write Input structure */
-	if (NULL == (fpNetFile = fopen(pbNetFileName, "w+")))
+	if (NULL == (netFile = fopen(netFileName, "w+")))
 	{
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_CANNOT_OPEN_FILE);
-		delete[] pbNetFileName;
+		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+		delete[] netFileName;
 		throw ex;
 	}
-	delete[] pbNetFileName;
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	for (INT32 iNodeColLoopCount = 0;
-			iNodeColLoopCount < pobjNodeCol->getNumberOfNodes();
-			iNodeColLoopCount++)
+	delete[] netFileName;
+
+	NodeCollection* objNodeCol = NULL;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+
+	for (INT32 nodeLoopCount = 0;
+			nodeLoopCount < objNodeCol->GetNumberOfNodes();
+			nodeLoopCount++)
 	{
-		objNode = pobjNodeCol->getNodebyColIndex(iNodeColLoopCount);
+		Node* objNode = NULL;
+		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 		objNode->DeleteCollectionsForNETPI();
 	}
 	if ((0 != iInVar) || (0 != iOutVar))
 	{
 		/*Writng Header of .NET Interface*/
-		char* pbBuffer = new char[HEADER_FILE_BUFFER];
-		strcpy(pbBuffer, "using System;\n");
-		strcat(pbBuffer, "using System.Runtime.InteropServices;\n");
+		char* mainBuffer = new char[HEADER_FILE_BUFFER];
+		strcpy(mainBuffer, "using System;\n");
+		strcat(mainBuffer, "using System.Runtime.InteropServices;\n");
 		//writing comments
-		strcat(pbBuffer, "/// <summary>\n");
-		strcat(pbBuffer, "/// ");
-		strcat(pbBuffer, BUILD_COMMENT);
-		strcat(pbBuffer, GetBuildTime());
-		strcat(pbBuffer, "\n");
-		strcat(pbBuffer, "/// </summary>\n");
+		strcat(mainBuffer, "/// <summary>\n");
+		strcat(mainBuffer, "/// ");
+		strcat(mainBuffer, BUILD_COMMENT);
+		strcat(mainBuffer, GetBuildTime());
+		strcat(mainBuffer, "\n");
+		strcat(mainBuffer, "/// </summary>\n");
 
-		strcat(pbBuffer, "\nnamespace openPOWERLINK\n");
-		strcat(pbBuffer, "{\n");
-		UINT32 uiStrLength = strlen(pbBuffer);
+		strcat(mainBuffer, "\nnamespace openPOWERLINK\n");
+		strcat(mainBuffer, "{\n");
+		UINT32 mainBufLen = strlen(mainBuffer);
 
-		if ((uiStrLength
-				!= fwrite(pbBuffer, sizeof(char), uiStrLength, fpNetFile)))
+		if ((mainBufLen	!= fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
 		{
-			ocfmException ex;
-			ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-			fclose(fpNetFile);
-			delete[] pbBuffer;
+			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+			fclose(netFile);
+			delete[] mainBuffer;
 			throw ex;
 		}
-		delete[] pbBuffer;
+		delete[] mainBuffer;
 	}
 	if (0 != iInVar)
 	{
-		WriteNETHeaderContents(objPIInCol, iInVar, INPUT, fpNetFile);
+		WriteNETHeaderContents(piInCol, iInVar, INPUT, netFile);
 	}
 
 	/* write Output structure */
 	if (0 != iOutVar)
 	{
-		WriteNETHeaderContents(objPIOutCol, iOutVar, OUTPUT, fpNetFile);
+		WriteNETHeaderContents(piOutCol, iOutVar, OUTPUT, netFile);
 	}
 	if ((0 != iInVar) || (0 != iOutVar))
 	{
-		char* pbBuffer = new char[10];
-		strcpy(pbBuffer, "}\n");
-		UINT32 uiStrLength = strlen(pbBuffer);
+		char* tempBuffer = new char[10];
+		strcpy(tempBuffer, "}\n");
+		UINT32 tempBufLen = strlen(tempBuffer);
 
-		if ((uiStrLength
-				!= fwrite(pbBuffer, sizeof(char), uiStrLength, fpNetFile)))
+		if ((tempBufLen
+				!= fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
 		{
-			ocfmException ex;
-			ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-			fclose(fpNetFile);
-			delete[] pbBuffer;
+			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+			fclose(netFile);
+			delete[] tempBuffer;
 			throw ex;
 		}
-		delete[] pbBuffer;
+		delete[] tempBuffer;
 	}
-	fclose(fpNetFile);
+	fclose(netFile);
 }
 
-/*****************************************************************************/
-/**
- \brief			WriteNETHeaderContents
- 
- This function writes header contents
- 
- \param			objProcessImage       Class Variable of ProcessImage
- \param			iNumberOfVars         Integer Variabl to hold the value of number of variables 
- \param			enumDirType           Enum Variable of EPIDirectionType 
- \param			fpNetHeader           File Pointer Variable to hold the header
- \return		void	
- */
-/*****************************************************************************/
-
-void WriteNETHeaderContents(ProcessImage objProcessImage[], INT32 iNumberOfVars,
-		EPIDirectionType enumDirType, FILE* fpNetHeader)
+void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader)
 {
 
-	char* pbBuffer = new char[HEADER_FILE_BUFFER];
-	pbBuffer[0] = 0;
-	char* pbBuffer1 = new char[200];
-	char* pbBuffer2 = new char[500];
-	char pcOffset[10];
-	INT32 iOffset = 0;
-	NETProcessImage *aobjNetPiCol = NULL;
-	INT32 iTotalsize = GroupNETHeaderContents(objProcessImage, iNumberOfVars,
-			enumDirType, fpNetHeader);
-	//NETProcessImage aobjNetPiCol[PI_VAR_COUNT] =	{ };
-	aobjNetPiCol = new NETProcessImage[PI_VAR_COUNT];
-	INT32 NetPIVarsCount = GroupNETPIVariables(enumDirType, aobjNetPiCol);
-	for (INT32 iLoopCount = 0; iLoopCount < NetPIVarsCount; iLoopCount++)
+	char* mainBuffer = new char[HEADER_FILE_BUFFER];
+	mainBuffer[0] = 0;
+	char* tempBuffer1 = new char[200];
+	char* tempBuffer2 = new char[500];
+	char offsetStr[10];
+	INT32 offsetVal = 0;
+	NETProcessImage *objNetPiCol = NULL;
+	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType, netHeader);
+
+	objNetPiCol = new NETProcessImage[PI_VAR_COUNT];
+	INT32 netPIVarsCount = GroupNETPIVariables(dirType, objNetPiCol);
+	for (INT32 loopCount = 0; loopCount < netPIVarsCount; loopCount++)
 	{
-		strcat(pbBuffer, "\t\t[FieldOffset(");
-		memset(pcOffset, 0, 10);
-		_IntToAscii(iOffset, pcOffset, 10);
-		strcat(pbBuffer, pcOffset);
-		strcat(pbBuffer, ")]\n");
-		strcat(pbBuffer, "\t\tpublic ");
-		strcat(pbBuffer,
-				GetDatatypeNETPI(aobjNetPiCol[iLoopCount].DataInfo._dt_enum));
-		iOffset += GetDatasizeNETPI(aobjNetPiCol[iLoopCount].DataInfo._dt_enum);
-		strcat(pbBuffer, " ");
-		strcat(pbBuffer, aobjNetPiCol[iLoopCount].ModuleName);
-		strcat(pbBuffer, "_");
-		strcat(pbBuffer, aobjNetPiCol[iLoopCount].Name);
-		if (aobjNetPiCol[iLoopCount].count > 0)
+		strcat(mainBuffer, "\t\t[FieldOffset(");
+		memset(offsetStr, 0, 10);
+		IntToAscii(offsetVal, offsetStr, 10);
+		strcat(mainBuffer, offsetStr);
+		strcat(mainBuffer, ")]\n");
+		strcat(mainBuffer, "\t\tpublic ");
+		strcat(mainBuffer,
+				GetDatatypeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar));
+		offsetVal += GetDatasizeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar);
+		strcat(mainBuffer, " ");
+		strcat(mainBuffer, objNetPiCol[loopCount].moduleName);
+		strcat(mainBuffer, "_");
+		strcat(mainBuffer, objNetPiCol[loopCount].name);
+		if (objNetPiCol[loopCount].count > 0)
 		{
-			strcat(pbBuffer, "_to_");
-			strcat(pbBuffer, aobjNetPiCol[iLoopCount].LastName);
+			strcat(mainBuffer, "_to_");
+			strcat(mainBuffer, objNetPiCol[loopCount].lastName);
 		}
-		strcat(pbBuffer, ";\n");
+		strcat(mainBuffer, ";\n");
 
 	}
-	delete[] aobjNetPiCol;
-	char* abTotalsize = new char[20];
-	_IntToAscii(iTotalsize, abTotalsize, 10);
+	delete[] objNetPiCol;
+	char* totalSize = new char[20];
+	IntToAscii(totalSizeVal, totalSize, 10);
 
-	if (INPUT == enumDirType)
+	if (INPUT == dirType)
 	{
-		strcpy(pbBuffer1, "\n\t/// <summary>\n");
-		strcat(pbBuffer1, "\t/// Struct : ProcessImage Out\n");
-		strcat(pbBuffer1, "\t/// </summary>\n");
-		strcat(pbBuffer1,
+		strcpy(tempBuffer1, "\n\t/// <summary>\n");
+		strcat(tempBuffer1, "\t/// Struct : ProcessImage Out\n");
+		strcat(tempBuffer1, "\t/// </summary>\n");
+		strcat(tempBuffer1,
 				"\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = ");
-		strcat(pbBuffer1, abTotalsize);
-		strcat(pbBuffer1, ")]\n");
-		strcat(pbBuffer1, "\tpublic struct AppProcessImageOut\n");
-		strcat(pbBuffer1, "\t{\n");
+		strcat(tempBuffer1, totalSize);
+		strcat(tempBuffer1, ")]\n");
+		strcat(tempBuffer1, "\tpublic struct AppProcessImageOut\n");
+		strcat(tempBuffer1, "\t{\n");
 
-		strcpy(pbBuffer2, "\t}\n");
+		strcpy(tempBuffer2, "\t}\n");
 	}
-	else if (OUTPUT == enumDirType)
+	else if (OUTPUT == dirType)
 	{
 
-		strcpy(pbBuffer1, "\n\t/// <summary>\n");
-		strcat(pbBuffer1, "\t/// Struct : ProcessImage In\n");
-		strcat(pbBuffer1, "\t/// </summary>\n");
-		strcat(pbBuffer1,
+		strcpy(tempBuffer1, "\n\t/// <summary>\n");
+		strcat(tempBuffer1, "\t/// Struct : ProcessImage In\n");
+		strcat(tempBuffer1, "\t/// </summary>\n");
+		strcat(tempBuffer1,
 				"\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = ");
-		strcat(pbBuffer1, abTotalsize);
-		strcat(pbBuffer1, ")]\n");
-		strcat(pbBuffer1, "\tpublic struct AppProcessImageIn\n");
-		strcat(pbBuffer1, "\t{\n");
+		strcat(tempBuffer1, totalSize);
+		strcat(tempBuffer1, ")]\n");
+		strcat(tempBuffer1, "\tpublic struct AppProcessImageIn\n");
+		strcat(tempBuffer1, "\t{\n");
 
-		strcpy(pbBuffer2, "\t}\n");
+		strcpy(tempBuffer2, "\t}\n");
 	}
 	else
 	{
 		//TODO: Else added. Nothing to do
 	}
-	delete[] abTotalsize;
+	delete[] totalSize;
 
-	UINT32 uiStrLength = strlen(pbBuffer1);
+	ocfmException ex;
+	UINT32 tempBuf1Len = strlen(tempBuffer1);
 
-	if ((uiStrLength
-			!= fwrite(pbBuffer1, sizeof(char), uiStrLength, fpNetHeader)))
+	if ((tempBuf1Len
+			!= fwrite(tempBuffer1, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbBuffer;
-		delete[] pbBuffer1;
-		delete[] pbBuffer2;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] mainBuffer;
+		delete[] tempBuffer1;
+		delete[] tempBuffer2;
 		throw ex;
 	}
-	delete[] pbBuffer1;
+	delete[] tempBuffer1;
 
-	uiStrLength = strlen(pbBuffer);
+	tempBuf1Len = strlen(mainBuffer);
 
-	if ((uiStrLength != fwrite(pbBuffer, sizeof(char), uiStrLength, fpNetHeader)))
+	if ((tempBuf1Len != fwrite(mainBuffer, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbBuffer2;
-		delete[] pbBuffer;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] tempBuffer2;
+		delete[] mainBuffer;
 		throw ex;
 	}
-	delete[] pbBuffer;
+	delete[] mainBuffer;
 
-	uiStrLength = strlen(pbBuffer2);
+	tempBuf1Len = strlen(tempBuffer2);
 
-	if ((uiStrLength
-			!= fwrite(pbBuffer2, sizeof(char), uiStrLength, fpNetHeader)))
+	if ((tempBuf1Len
+			!= fwrite(tempBuffer2, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_FILE_CANNOT_OPEN);
-		delete[] pbBuffer2;
+		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		delete[] tempBuffer2;
 		throw ex;
 	}
-	delete[] pbBuffer2;
+	delete[] tempBuffer2;
 
 }
 
-/*****************************************************************************/
-/**
- \brief			GroupNETHeaderContents
- 
- This Function groups the header contents
- 
- This function writes header contents
- 
- \param			objProcessImage       Class Variable of ProcessImage
- \param			iNumberOfVars         Integer Variabl to hold the value of number of variables 
- \param			enumDirType           Enum Variable of EPIDirectionType 
- \param			fpNetHeader           File Pointer Variable to hold the header
- 
- \return		INT32	
- */
-/*****************************************************************************/
-
-INT32 GroupNETHeaderContents(ProcessImage objProcessImage[],
-		INT32 iNumberOfVars, EPIDirectionType enumDirType, FILE* fpNetHeader)
+INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader)
 {
 
-	INT32 iTotalsize = 0;
+	INT32 totalSize = 0;
 
-	if (0 != iNumberOfVars)
+	if (0 != noOfVars)
 	{
 		//iModuleNo = 0;
-		INT32 iHoleFilledIdNo = 1;
-		CNodeCollection* pobjNodeCol = NULL;
-		CNode* objNode = NULL;
-		pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
+		INT32 holeFilledIdNo = 1;
+		NodeCollection* objNodeCol = NULL;
+		Node* objNode = NULL;
+		objNodeCol = NodeCollection::GetNodeColObjectPointer();
 
-		for (INT32 iLoopCount = 0; iLoopCount < iNumberOfVars; iLoopCount++)
+		for (INT32 noVarsLC = 0; noVarsLC < noOfVars; noVarsLC++)
 		{
-			objNode = pobjNodeCol->getNodePtr(CN,
-					objProcessImage[iLoopCount].CNNodeID);
+			objNode = objNodeCol->GetNodePtr(CN,
+					piObject[noVarsLC].nodeId);
 			//INT32 iNodeId;
-			INT32 iDataSize = 0;
-			char* pbStrCNID = new char[50];
-			char* pbModName = new char[50];
-			char* pbStrModuleNo = new char[20];
+			INT32 dataSize = 0;
+			char* nodeIdStr = new char[50];
+			char* moduleName = new char[50];
+			char* moduleNo = new char[20];
 
-			iDataSize = objProcessImage[iLoopCount].DataInfo.DataSize;
+			dataSize = piObject[noVarsLC].dataInfo.dataSize;
 			/* Check if 8, 16, 32 bit aligned*/
-			if ((0 == iDataSize % 32) || (0 == iDataSize % 16)
-					|| (0 == iDataSize % 8))
+			if ((0 == dataSize % 32) || (0 == dataSize % 16)
+					|| (0 == dataSize % 8))
 			{
-				if (0 != iTotalsize % iDataSize)
+				if (0 != totalSize % dataSize)
 				{
-					char* abHoleid = new char[20];
-					char* pbFbits = new char[2 + ALLOC_BUFFER];
-					INT32 iFilledBits = iDataSize - (iTotalsize % iDataSize);
+					char* holeid = new char[20];
+					char* filledBitsStr = new char[2 + ALLOC_BUFFER];
+					INT32 filledBits = dataSize - (totalSize % dataSize);
 
-					iTotalsize = iTotalsize + iFilledBits;
-					for (INT32 iLoopCount = 1; iLoopCount <= (iFilledBits / 8);
-							iLoopCount++)
+					totalSize = totalSize + filledBits;
+					for (INT32 fillBitLoopCount = 1; fillBitLoopCount <= (filledBits / 8);
+							fillBitLoopCount++)
 					{
-						strcpy(abHoleid, "");
-						strcpy(pbFbits, "");
+						strcpy(holeid, "");
+						strcpy(filledBitsStr, "");
 						NETProcessImage objNETProcessImage;
-						abHoleid = _IntToAscii(iHoleFilledIdNo, abHoleid, 10);
-						objNETProcessImage.Name = new char[strlen(abHoleid)
-								+ ALLOC_BUFFER];
-						strcpy(objNETProcessImage.Name, abHoleid);
-						objNETProcessImage.ModuleName = new char[strlen(
-								"PADDING_VAR") + ALLOC_BUFFER];
-						strcpy(objNETProcessImage.ModuleName, "PADDING_VAR");
+						objNETProcessImage.Initialize();
+						holeid = IntToAscii(holeFilledIdNo, holeid, 10);
+						objNETProcessImage.name = new char[strlen(holeid) + ALLOC_BUFFER];
+						strcpy(objNETProcessImage.name, holeid);
+						objNETProcessImage.moduleName = new char[strlen("PADDING_VAR") + ALLOC_BUFFER];
+						strcpy(objNETProcessImage.moduleName, "PADDING_VAR");
 
 						objNETProcessImage.count = 0;
-						objNETProcessImage.DataInfo._dt_enum = BYTE;
-						objNETProcessImage.DataInfo.DataSize = 8;
-						objNETProcessImage.DataInfo._dt_Name = new char[strlen(
-								"byte") + ALLOC_BUFFER];
-						strcpy(objNETProcessImage.DataInfo._dt_Name, "byte");
-						objNETProcessImage.iTotalDataSize = 8;
-						objNETProcessImage.DirectionType = enumDirType;
-						objNode->addNETProcessImage(objNETProcessImage);
-						iHoleFilledIdNo = iHoleFilledIdNo + 1;
+						objNETProcessImage.dataInfo.iecDtVar = BYTE;
+						objNETProcessImage.dataInfo.dataSize = 8;
+						objNETProcessImage.dataInfo.dtName = new char[strlen("byte") + ALLOC_BUFFER];
+						strcpy(objNETProcessImage.dataInfo.dtName, "byte");
+						objNETProcessImage.totalDataSize = 8;
+						objNETProcessImage.directionType = dirType;
+						objNode->AddNETProcessImage(objNETProcessImage);
+						holeFilledIdNo = holeFilledIdNo + 1;
 					}
-					delete[] pbFbits;
-					delete[] abHoleid;
+					delete[] filledBitsStr;
+					delete[] holeid;
 				}
 			}
 
-			//iNodeId = objProcessImage[iLoopCount].CNNodeID;
+			nodeIdStr = IntToAscii(piObject[noVarsLC].nodeId, nodeIdStr, 10);
+			strcpy(moduleNo, SubString(piObject[noVarsLC].moduleIndex, 2, 2));
+			strcpy(moduleName, piObject[noVarsLC].moduleName);
 
-			pbStrCNID = _IntToAscii(objProcessImage[iLoopCount].CNNodeID,
-					pbStrCNID, 10);
-			strcpy(pbStrModuleNo,
-					subString(objProcessImage[iLoopCount].ModuleIndex, 2, 2));
-			strcpy(pbModName, objProcessImage[iLoopCount].ModuleName);
-
-			char* pbVarName = new char[100];
-			strcpy(pbVarName, "CN");
-			pbStrCNID = _IntToAscii(objProcessImage[iLoopCount].CNNodeID,
-					pbStrCNID, 10);
-			strcat(pbVarName, pbStrCNID);
-			strcat(pbVarName, "_");
+			char* varName = new char[100];
+			strcpy(varName, "CN");
+			nodeIdStr = IntToAscii(piObject[noVarsLC].nodeId, nodeIdStr, 10);
+			strcat(varName, nodeIdStr);
+			strcat(varName, "_");
 
 			/* Add Mod NO*/
-			strcat(pbVarName, "M");
-			strcat(pbVarName, pbStrModuleNo);
-			strcat(pbVarName, "_");
+			strcat(varName, "M");
+			strcat(varName, moduleNo);
+			strcat(varName, "_");
+			strcat(varName, moduleName);
 
-			strcat(pbVarName, pbModName);
-
-			if (objProcessImage[iLoopCount].DataInfo._dt_enum == BITSTRING)
+			if (piObject[noVarsLC].dataInfo.iecDtVar == BITSTRING)
 			{
-				INT32 iPIIndexCount = 0;
-				INT32 iNETPIIndex;
-				bool NetPICreated = false;
+				INT32 piPos = 0;
+				bool netPICreated = false;
 				do
 				{
-					iNETPIIndex = SearchModuleNameNETProcessImageCollection(
-							objProcessImage[iLoopCount].CNNodeID, iPIIndexCount,
-							pbVarName);
-					if (-1 == iNETPIIndex)
+					INT32 pos = 0;
+					pos = SearchModuleNameNETProcessImageCollection(piObject[noVarsLC].nodeId, piPos, varName);
+					if (-1 == pos)
 					{
 						//create new
-						NetPICreated = true;
+						netPICreated = true;
 						NETProcessImage objNETProcessImage;
 						objNETProcessImage.Initialize();
-						CopyPItoNETPICollection(objProcessImage[iLoopCount],
-								objNETProcessImage, pbVarName);
+						CopyPItoNETPICollection(piObject[noVarsLC], objNETProcessImage, varName);
 
 					}
-					else if (8
-							> objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize)
+					else if (8 > objNode->NETPIColl[pos].totalDataSize)
 					{
-						NetPICreated = true;
-						objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize =
-								objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize
-										+ iDataSize;
-						objNode->NETProcessImageCollection[iNETPIIndex].count++;
-						objNode->NETProcessImageCollection[iNETPIIndex].LastName =
-								new char[strlen(
-										objProcessImage[iLoopCount].VarName)
-										+ ALLOC_BUFFER];
-						strcpy(
-								objNode->NETProcessImageCollection[iNETPIIndex].LastName,
-								objProcessImage[iLoopCount].VarName);
-						if (8
-								== objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize)
+						netPICreated = true;
+						objNode->NETPIColl[pos].totalDataSize = objNode->NETPIColl[pos].totalDataSize+ dataSize;
+						objNode->NETPIColl[pos].count++;
+						objNode->NETPIColl[pos].lastName = new char[strlen(piObject[noVarsLC].varDeclName) + ALLOC_BUFFER];
+						strcpy(objNode->NETPIColl[pos].lastName, piObject[noVarsLC].varDeclName);
+						if (8 == objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_enum =
-									BYTE;
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name =
-									new char[strlen("byte") + ALLOC_BUFFER];
-							strcpy(
-									objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name,
-									"byte");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar =	BYTE;
+							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("byte") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "byte");
 						}
-						else if (16
-								== objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize)
+						else if (16	== objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_enum =
-									UINT;
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name =
-									new char[strlen("UInt16") + ALLOC_BUFFER];
-							strcpy(
-									objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name,
-									"UInt16");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar =	UINT;
+							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("UInt16") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "UInt16");
 						}
-						else if (32
-								== objNode->NETProcessImageCollection[iNETPIIndex].iTotalDataSize)
+						else if (32 == objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_enum =
-									UDINT;
-							objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name =
-									new char[strlen("UInt32") + ALLOC_BUFFER];
-							strcpy(
-									objNode->NETProcessImageCollection[iNETPIIndex].DataInfo._dt_Name,
-									"UInt32");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar =	UDINT;
+							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("UInt32") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "UInt32");
 						}
 						else
 						{
@@ -1234,290 +1042,244 @@ INT32 GroupNETHeaderContents(ProcessImage objProcessImage[],
 					}
 					else
 					{
-						iPIIndexCount = iNETPIIndex + 1;
+						piPos = pos + 1;
 					}
-				} while (false == NetPICreated);
+				} while (false == netPICreated);
 			}
 			else
 			{
 				//copy as it is
-				NETProcessImage objNETProcessImage;
-				objNETProcessImage.Initialize();
-				CopyPItoNETPICollection(objProcessImage[iLoopCount],
-						objNETProcessImage, pbVarName);
+				NETProcessImage objNETPI;
+				objNETPI.Initialize();
+				CopyPItoNETPICollection(piObject[noVarsLC], objNETPI, varName);
 			}
 
-			iTotalsize = iDataSize + iTotalsize;
+			totalSize = dataSize + totalSize;
 
-			delete[] pbVarName;
-			delete[] pbModName;
-			delete[] pbStrModuleNo;
-			delete[] pbStrCNID;
+			delete[] varName;
+			delete[] moduleName;
+			delete[] moduleNo;
+			delete[] nodeIdStr;
 		}
-		if (0 != iTotalsize % 32)
+		if (0 != totalSize % 32)
 		{
-			char* abHoleid = new char[20];
-			char* pbFbits = new char[2 + ALLOC_BUFFER];
-			INT32 iFilledBits = 32 - (iTotalsize % 32);
+			char* holeid = new char[20];
+			char* filledBitStr = new char[2 + ALLOC_BUFFER];
+			INT32 filledBitsVal = 32 - (totalSize % 32);
 
-			iTotalsize = iTotalsize + iFilledBits;
-			for (INT32 iLoopCount = 1; iLoopCount <= (iFilledBits / 8);
-					iLoopCount++)
+			totalSize = totalSize + filledBitsVal;
+			for (INT32 fillBitsLC = 1; fillBitsLC <= (filledBitsVal / 8); fillBitsLC++)
 			{
-				strcpy(abHoleid, "");
-				strcpy(pbFbits, "");
-				NETProcessImage objNETProcessImage;
-				abHoleid = _IntToAscii(iHoleFilledIdNo, abHoleid, 10);
-				objNETProcessImage.Name = new char[strlen(abHoleid)
-						+ ALLOC_BUFFER];
-				strcpy(objNETProcessImage.Name, abHoleid);
-				objNETProcessImage.ModuleName = new char[strlen("PADDING_VAR")
-						+ ALLOC_BUFFER];
-				strcpy(objNETProcessImage.ModuleName, "PADDING_VAR");
+				strcpy(holeid, "");
+				strcpy(filledBitStr, "");
+				NETProcessImage objNETPI;
+				holeid = IntToAscii(holeFilledIdNo, holeid, 10);
+				objNETPI.name = new char[strlen(holeid) + ALLOC_BUFFER];
+				strcpy(objNETPI.name, holeid);
+				objNETPI.moduleName = new char[strlen("PADDING_VAR") + ALLOC_BUFFER];
+				strcpy(objNETPI.moduleName, "PADDING_VAR");
 
-				objNETProcessImage.count = 0;
-				objNETProcessImage.DataInfo._dt_enum = BYTE;
-				objNETProcessImage.DataInfo.DataSize = 8;
-				objNETProcessImage.DataInfo._dt_Name = new char[strlen("byte")
-						+ ALLOC_BUFFER];
-				strcpy(objNETProcessImage.DataInfo._dt_Name, "byte");
-				objNETProcessImage.iTotalDataSize = 8;
-				objNETProcessImage.DirectionType = enumDirType;
-				objNode->addNETProcessImage(objNETProcessImage);
-				iHoleFilledIdNo = iHoleFilledIdNo + 1;
+				objNETPI.count = 0;
+				objNETPI.dataInfo.iecDtVar = BYTE;
+				objNETPI.dataInfo.dataSize = 8;
+				objNETPI.dataInfo.dtName = new char[strlen("byte") + ALLOC_BUFFER];
+				strcpy(objNETPI.dataInfo.dtName, "byte");
+				objNETPI.totalDataSize = 8;
+				objNETPI.directionType = dirType;
+				objNode->AddNETProcessImage(objNETPI);
+				holeFilledIdNo = holeFilledIdNo + 1;
 			}
-			delete[] pbFbits;
-			delete[] abHoleid;
+			delete[] filledBitStr;
+			delete[] holeid;
 		}
 	}
 
-	iTotalsize = iTotalsize / 8;
+	totalSize = totalSize / 8;
 
-	return iTotalsize;
+	return totalSize;
 }
 
-/*****************************************************************************/
-/**
- \brief			SetSIdxDataType
- 
- This fumction sets index for all data types
- 
- \param			pobjDataType     Class Pointer variable of DataType
- \param			pbIdx            Character Pointer Variable to hold the value of Index
- \param			pbSIdx           Character Pointer Variable to hold the value of Sub Index
- \return		void	
- */
-/*****************************************************************************/
-
-void SetSIdxDataType(DataType *pobjDataType, char* pbIdx, char* pbSIdx)
+void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId)
 {
-	if ((NULL == pobjDataType) || (NULL == pbIdx) || (NULL == pbSIdx))
+	if ((NULL == objDataType) || (NULL == idxId) || (NULL == sIdxId))
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 
-	CNodeCollection *pobjNodeCollection = NULL;
-	CIndexCollection *pobjIndexCol = NULL;
-	CIndex *pobjIndex = NULL;
-	CSubIndex *pobjSIdx = NULL;
-	CNode objNode;
+	NodeCollection *nodeCollObj = NULL;
+	IndexCollection *idxCollObj = NULL;
+	Index *idxObj = NULL;
+	SubIndex *sIdxObj = NULL;
+	Node nodeObj;
 
-	pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
+	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
-	objNode = pobjNodeCollection->getMNNode();
-	pobjIndexCol = objNode.getIndexCollection();
+	nodeObj = nodeCollObj->GetMNNode();
+	idxCollObj = nodeObj.GetIndexCollection();
 
-	pobjIndex = pobjIndexCol->getIndexbyIndexValue(pbIdx);
-	pobjSIdx = pobjIndex->getSubIndexbyIndexValue(pbSIdx);
+	idxObj = idxCollObj->GetIndexbyIndexValue(idxId);
+	sIdxObj = idxObj->GetSubIndexbyIndexValue(sIdxId);
 
-	pobjSIdx->setDataTypeST(*pobjDataType);
+	sIdxObj->SetDataTypeST(*objDataType);
 }
 
-/*****************************************************************************/
-/**
- \brief			AddPDOIndexsToMN
- 
- This function adds PDO indexes to MN
- 
- \param			pbIndex           Character Pointer Variable to hold the value of Index
- \param			pbSubIndex        Character Pointer Variable to hold the value of Sub Index
- \param			enumPdoType       Enum Variable of  EPDOType
- \return		void	
- */
-/*****************************************************************************/
-
-void AddPDOIndexsToMN(char* pbIndex, char* pbSubIndex, EPDOType enumPdoType)
+void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 {
 	ocfmRetCode stRetCode;
-	CNode objMNNode;
-	DataType *pobjDataType = NULL;
-	CIndex *pobjIndex = NULL;
-	CNodeCollection *pobjNodeCol = NULL;
-	CIndexCollection *pobjIdxCol = NULL;
-	CDataTypeCollection *pobjDTCol = NULL;
-	char *pbName = NULL;
+	Node objMNNode;
+	Index *objIndex = NULL;
+	NodeCollection *objNodeCol = NULL;
+	IndexCollection *objIdxCol = NULL;
+	DataTypeCollection *objDTCol = NULL;
 
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	objMNNode = pobjNodeCol->getNode(MN, MN_NODEID);
-	pobjDTCol = objMNNode.getDataTypeCollection();
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	objMNNode = objNodeCol->GetNode(MN, MN_NODEID);
+	objDTCol = objMNNode.GetDataTypeCollection();
 
-	stRetCode = AddIndex(MN_NODEID, MN, pbIndex);
-	pobjIdxCol = objMNNode.getIndexCollection();
-	if (NULL != pobjIdxCol)
+	stRetCode = AddIndex(MN_NODEID, MN, indexId);
+	objIdxCol = objMNNode.GetIndexCollection();
+	if (NULL != objIdxCol)
 	{
-		pobjIndex = pobjIdxCol->getIndexbyIndexValue(pbIndex);
-		if (NULL != pobjIndex
-				&& (OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.code))
+		objIndex = objIdxCol->GetIndexbyIndexValue(indexId);
+		if ((OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.code) && (NULL != objIndex))
 		{
-			char abObjectName[14 + ALLOC_BUFFER];
-			pobjIndex->setObjectType((char*) "ARRAY");
+			char objName[14 + ALLOC_BUFFER];
+			objIndex->SetObjectType((char*) "ARRAY");
 			//name from network point of view
-			if (PDO_RPDO == enumPdoType)
+			if (PDO_RPDO == pdoTypeVal)
 			{
-				strcpy(abObjectName, "PI_INPUTS_A");
-				strcat(abObjectName, getPIName(pbIndex));
-				pobjIndex->setName(abObjectName);
+				strcpy(objName, "PI_INPUTS_A");
+				strcat(objName, GetPIName(indexId));
+				objIndex->SetName(objName);
 			}
-			else if (PDO_TPDO == enumPdoType)
+			else if (PDO_TPDO == pdoTypeVal)
 			{
-				strcpy(abObjectName, "PI_OUTPUTS_A");
-				strcat(abObjectName, getPIName(pbIndex));
-				pobjIndex->setName(abObjectName);
+				strcpy(objName, "PI_OUTPUTS_A");
+				strcat(objName, GetPIName(indexId));
+				objIndex->SetName(objName);
 			}
 			else
 			{
 				cout << "enumPdoType is not TPDO or RPDO _1\n" << endl;
 			}
 			/* Add subindex 00 */
-			stRetCode = AddSubIndex(MN_NODEID, MN, pbIndex, (char*) "00");
+			stRetCode = AddSubIndex(MN_NODEID, MN, indexId, (char*) "00");
 			if (OCFM_ERR_SUCCESS != stRetCode.code)
 			{
 				ocfmException objException;
-				objException.ocfm_Excpetion(stRetCode.code);
+				objException.OCFMException(stRetCode.code);
 				throw objException;
 			}
 		}
 	}
 
-	stRetCode = AddSubIndex(MN_NODEID, MN, pbIndex, pbSubIndex);
+	stRetCode = AddSubIndex(MN_NODEID, MN, indexId, sIdxId);
 	if (OCFM_ERR_SUCCESS != stRetCode.code)
 	{
-		//TODO: Error occurred once while mapping tpdo from cn to mn xdc
-		cout<<__LINE__<<" add subindex error in line"<<endl;
+		cout<<__LINE__<<" AddSubIndex error in line"<<endl;
 		ocfmException objException;
-		objException.ocfm_Excpetion(stRetCode.code);
+		objException.OCFMException(stRetCode.code);
 		throw objException;
 	}
 
-	if (NULL != pobjIndex)
+	if (NULL != objIndex)
 	{
-		CSubIndex *pobjSIdx = NULL;
-		pobjSIdx = pobjIndex->getSubIndexbyIndexValue(pbSubIndex);
-		if (NULL != pobjSIdx)
+		SubIndex *objSIdx = NULL;
+		objSIdx = objIndex->GetSubIndexbyIndexValue(sIdxId);
+		if (NULL != objSIdx)
 		{
-			char abObjectName[14 + ALLOC_BUFFER];
-			char *pbPdoMap = new char[4 + ALLOC_BUFFER];
-			pobjSIdx->setObjectType((char*) "VAR");
+			char objectName[14 + ALLOC_BUFFER];
+			char *pdoMap = new char[4 + ALLOC_BUFFER];
+			objSIdx->SetObjectType((char*) "VAR");
 			/* Its reversed because CN's RPDO is MN's TPDO*/
-			if (PDO_RPDO == enumPdoType)
+			if (PDO_RPDO == pdoTypeVal)
 			{
-				strcpy(pbPdoMap, "TPDO");
-				strcpy(abObjectName, "PI_INPUTS_");
-				strcat(abObjectName, getPIName(pbIndex));
-				pobjSIdx->setAccessType((char*) "ro");
+				strcpy(pdoMap, "TPDO");
+				strcpy(objectName, "PI_INPUTS_");
+				strcat(objectName, GetPIName(indexId));
+				objSIdx->SetAccessType((char*) "ro");
 
-				pobjSIdx->setName(abObjectName);
-				pobjSIdx->setPDOMapping(pbPdoMap);
+				objSIdx->SetName(objectName);
+				objSIdx->SetPDOMapping(pdoMap);
 			}
-			else if (PDO_TPDO == enumPdoType)
+			else if (PDO_TPDO == pdoTypeVal)
 			{
-				strcpy(pbPdoMap, "RPDO");
-				strcpy(abObjectName, "PI_OUTPUTS_");
-				strcat(abObjectName, getPIName(pbIndex));
-				pobjSIdx->setAccessType((char*) "rw");
+				strcpy(pdoMap, "RPDO");
+				strcpy(objectName, "PI_OUTPUTS_");
+				strcat(objectName, GetPIName(indexId));
+				objSIdx->SetAccessType((char*) "rw");
 
-				pobjSIdx->setName(abObjectName);
-				pobjSIdx->setPDOMapping(pbPdoMap);
+				objSIdx->SetName(objectName);
+				objSIdx->SetPDOMapping(pdoMap);
 			}
 			else
 			{
 				cout << "enumPdoType is not TPDO or RPDO _2\n" << endl;
 			}
-			delete[] pbPdoMap;
+			delete[] pdoMap;
 		}
 	}
-	pbName = getPIDataTypeName(pbIndex);
 
-	if (NULL != pbName)
+	char *tempDtName = NULL;
+	DataType *objDataType = NULL;
+
+	tempDtName = GetPIDataTypeName(indexId);
+
+	if (NULL != tempDtName)
 	{
-		pobjDataType = pobjDTCol->getDataTypeByName(pbName);
+		objDataType = objDTCol->GetDataTypeByName(tempDtName);
 	}
 
-	if ((NULL != pobjDataType) && (NULL != pbIndex) && (NULL != pbSubIndex))
+	if ((NULL != objDataType) && (NULL != indexId) && (NULL != sIdxId))
 	{
-		SetSIdxDataType(pobjDataType, pbIndex, pbSubIndex);
+		SetSIdxDataType(objDataType, indexId, sIdxId);
 	}
 
-	if (NULL != pobjIndex)
+	if (NULL != objIndex)
 	{
-		UpdateNumberOfEnteriesSIdx(pobjIndex, MN);
+		UpdateNumberOfEnteriesSIdx(objIndex, MN);
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			getPIAddress
- 
- This function sets process image address
- 
- \param			dt                 Class Variable of PDODataType to hold the datatype
- \param			dirType            Class Variable of EPIDirectionType to hold the value of direction type
- \param			iOffset            Integer Variable to hold offset value
- \param			iDataSize          Integer Varibale to hold the value of datasize   
- \return		stPIObject	
- */
-/*****************************************************************************/
-
-PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
-		INT32 iDataSize)
+PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetVal, INT32 dataSizeBits)
 {
-	INT32 idx;
-	INT32 subIndex;
 	PIObject stPIObject;
+	stPIObject.Initialize();
 #if defined DEBUG
-	cout << __FUNCTION__ << ":: Datatype:" << dt << " DirectionType:" << dirType << " iOffset:" << iOffset << " iDataSize:" << iDataSize << endl;
+	cout << __FUNCTION__ << ":: Datatype:" << dtType << " DirectionType:" << dirType << " iOffset:" << offsetVal << " iDataSize:" << dataSizeBits << endl;
 #endif
-	stPIObject.Index = new char[INDEX_LEN];
-	stPIObject.SubIndex = new char[SUBINDEX_LEN];
+	stPIObject.indexId = new char[INDEX_LEN];
+	stPIObject.sIdxId = new char[SUBINDEX_LEN];
 
-	for (idx = 0; idx < NO_OF_PI_ENTERIES; idx++)
+	for (INT32 idx = 0; idx < NO_OF_PI_ENTERIES; idx++)
 	{
-		if ((AddressTable[idx].dt == dt)
-				&& (AddressTable[idx].Direction == dirType))
+		if ((piIndexTable[idx].dtObj == dtType)
+				&& (piIndexTable[idx].direction == dirType))
 		{
-			INT32 iDataSizeBytes = iDataSize / 8;
-			subIndex = (iOffset / iDataSizeBytes) + 1;
+			INT32 subIndex;
+			INT32 dataSizeBytes = dataSizeBits / 8;
+			subIndex = (offsetVal / dataSizeBytes) + 1;
 			if (subIndex > 254)
 			{
 				INT32 div = subIndex / 254;
 				INT32 mod = subIndex % 254;
 				INT32 iAddress;
-				iAddress = hex2int(AddressTable[idx].Address);
+				iAddress = HexToInt(piIndexTable[idx].addressStr);
 				iAddress = iAddress + div;
-				stPIObject.Index = _IntToAscii(iAddress, stPIObject.Index, 16);
-				stPIObject.SubIndex = _IntToAscii(mod, stPIObject.SubIndex, 16);
-				stPIObject.SubIndex = padLeft(stPIObject.SubIndex, '0', 2);
+				stPIObject.indexId = IntToAscii(iAddress, stPIObject.indexId, 16);
+				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
+				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 
 			}
 			else
 			{
-				strcpy(stPIObject.Index, AddressTable[idx].Address);
-				stPIObject.SubIndex = _IntToAscii(subIndex, stPIObject.SubIndex,
+				strcpy(stPIObject.indexId, piIndexTable[idx].addressStr);
+				stPIObject.sIdxId = IntToAscii(subIndex, stPIObject.sIdxId,
 						16);
-				stPIObject.SubIndex = padLeft(stPIObject.SubIndex, '0', 2);
+				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 
 			}
 		}
@@ -1526,410 +1288,306 @@ PIObject getPIAddress(PDODataType dt, EPIDirectionType dirType, INT32 iOffset,
 	return stPIObject;
 }
 
-/*****************************************************************************/
-/**
- \brief			getPIDataTypeName
- 
- This function sets value for process image datatype
- 
- \param			pbAddress       Character Pointer Variable to hold the Process image address
- \return		char*	
- */
-/*****************************************************************************/
-
-char* getPIDataTypeName(char* pbAddress)
+char* GetPIDataTypeName(char* indexId)
 {
-	char *pbRetString = NULL;
-	PDODataType dt;
+	char *retDataType = NULL;
+	PDODataType tempDataType;
 	for (INT32 iLoopCount = 0; iLoopCount < NO_OF_PI_ENTERIES; iLoopCount++)
 	{
-		if (0 == strcmp(AddressTable[iLoopCount].Address, pbAddress))
+		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			dt = AddressTable[iLoopCount].dt;
-			break;
+			tempDataType = piIndexTable[iLoopCount].dtObj;
 		}
-		else if (0 < strcmp(AddressTable[iLoopCount].Address, pbAddress))
+		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			dt = (0 < iLoopCount) ?
-					AddressTable[iLoopCount - 1].dt :
-					static_cast<PDODataType>(-1);
-			break;
+			tempDataType = (0 < iLoopCount) ? piIndexTable[iLoopCount - 1].dtObj :	static_cast<PDODataType>(-1);
 		}
 		else
 		{
 			//TODO: else added. operation to be specified
 		}
-	}
-		switch (dt)
+
+		switch (tempDataType)
 		{
 		case UNSIGNED8:
 		{
-			pbRetString = (char*) "Unsigned8";
+			retDataType = (char*) "Unsigned8";
 			break;
 		}
 		case INTEGER8:
 		{
-			pbRetString = (char*) "Integer8";
+			retDataType = (char*) "Integer8";
 			break;
 		}
 		case UNSIGNED16:
 		{
-			pbRetString = (char*) "Unsigned16";
+			retDataType = (char*) "Unsigned16";
 			break;
 		}
 		case INTEGER16:
 		{
-			pbRetString = (char*) "Integer8";
+			retDataType = (char*) "Integer8";
 			break;
 		}
 		case UNSIGNED32:
 		{
-			pbRetString = (char*) "Unsigned32";
+			retDataType = (char*) "Unsigned32";
 			break;
 		}
 		case INTEGER32:
 		{
-			pbRetString = (char*) "Integer32";
+			retDataType = (char*) "Integer32";
 			break;
 		}
 		case INTEGER64:
 		{
-			pbRetString = (char*) "Integer64";
+			retDataType = (char*) "Integer64";
 			break;
 		}
 		case UNSIGNED64:
 		{
-			pbRetString = (char*) "Unsigned64";
+			retDataType = (char*) "Unsigned64";
 			break;
 		}
 		default:
 		{
 			//Handled error case and returned dummy value to avoid warning
-			pbRetString = (char*) "Error";
+			retDataType = (char*) "Error";
 			break;
 		}
 		}
 
-#if defined DEBUG
-		cout<<__FUNCTION__<<" pbAddress:"<<pbAddress<<" pbRetString:"<<pbRetString<<endl;
-#endif
-	return pbRetString;
+	}
+	return retDataType;
 }
 
-/*****************************************************************************/
-/**
- \brief			getPIName
- 
- This function returns process image name
- 
- \param			pbAddress  Character Pointer Variable to hold the Process image address
- \return		char*	
- */
-/*****************************************************************************/
-
-char* getPIName(char* pbAddress)
+char* GetPIName(char* indexId)
 {
-	char *pbRetString = NULL;
-	PDODataType dt;
+	char *retPiName = NULL;
+	PDODataType tempDataType;
 	for (INT32 iLoopCount = 0; iLoopCount < NO_OF_PI_ENTERIES; iLoopCount++)
 	{
-		if (0 == strcmp(AddressTable[iLoopCount].Address, pbAddress))
+		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			dt = AddressTable[iLoopCount].dt;
-			break;
+			tempDataType = piIndexTable[iLoopCount].dtObj;
 		}
-		else if (0 < strcmp(AddressTable[iLoopCount].Address, pbAddress))
+		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			dt = (0 < iLoopCount) ?
-					AddressTable[iLoopCount - 1].dt :
-					static_cast<PDODataType>(-1);
-			break;
+			tempDataType = (0 < iLoopCount) ? piIndexTable[iLoopCount - 1].dtObj :	static_cast<PDODataType>(-1);
 		}
 		else
 		{
 			//TOOD: else added, operation to be specified
 		}
-	}
-		switch (dt)
+
+		switch (tempDataType)
 		{
 		case UNSIGNED8:
 		{
-			pbRetString = (char*) "U8";
+			retPiName = (char*) "U8";
 			break;
 		}
 		case INTEGER8:
 		{
-			pbRetString = (char*) "I8";
+			retPiName = (char*) "I8";
 			break;
 		}
 		case UNSIGNED16:
 		{
-			pbRetString = (char*) "U16";
+			retPiName = (char*) "U16";
 			break;
 		}
 		case INTEGER16:
 		{
-			pbRetString = (char*) "I16";
+			retPiName = (char*) "I16";
 			break;
 		}
 		case UNSIGNED32:
 		{
-			pbRetString = (char*) "U32";
+			retPiName = (char*) "U32";
 			break;
 		}
 		case INTEGER32:
 		{
-			pbRetString = (char*) "I32";
+			retPiName = (char*) "I32";
 			break;
 		}
 		case UNSIGNED64:
 		{
-			pbRetString = (char*) "U64";
+			retPiName = (char*) "U64";
 			break;
 		}
 		case INTEGER64:
 		{
-			pbRetString = (char*) "I64";
+			retPiName = (char*) "I64";
 			break;
 		}
 
 		default:
 		{
 			//Handled error case and returned dummy value to avoid warning
-			pbRetString = (char*) "Err";
+			retPiName = (char*) "Err";
 			break;
 		}
 		}
-#if defined DEBUG
-		cout<<__FUNCTION__<<" pbAddress:"<<pbAddress<<" pbRetString:"<<pbRetString<<endl;
-#endif
-	return pbRetString;
+	}
+
+	return retPiName;
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfProcessImageIdx
- 
- This function checks for process image index
- 
- \param			pbIndex       Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
-
-bool CheckIfProcessImageIdx(char* pbIndex)
+bool CheckIfProcessImageIdx(char* idxId)
 {
-	return ((0 <= strcmp(pbIndex, "A000")) && (0 >= strcmp(pbIndex, "AFFF")));
+	return ((0 <= strcmp(idxId, "A000")) && (0 >= strcmp(idxId, "AFFF")));
 }
 
-/*****************************************************************************/
-/**
- \brief			SearchModuleNameNETProcessImageCollection
- 
- This function collects process image based on the module name
- 
- \param			CNNodeID         Integer Variable to hold the node id      
- \param			iItemLoopCount   Integer Variable to hold the value of loop count   
- \param			schModuleName    Character Pointer Variable to hold the name of the search module
- \return		INT32	
- */
-/*****************************************************************************/
-
-INT32 SearchModuleNameNETProcessImageCollection(INT32 CNNodeID,
-		INT32 iItemLoopCount, char* schModuleName)
+INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char* moduleName)
 {
 
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	objNode = pobjNodeCol->getNodePtr(CN, CNNodeID);
+	NodeCollection* objNodeCol = NULL;
+	Node* objNode;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	objNode = objNodeCol->GetNodePtr(CN, nodeId);
 
-	INT32 iItemCount = objNode->NETProcessImageCollection.Count();
-	for (; iItemLoopCount < iItemCount; iItemLoopCount++)
+	INT32 itemTotal = objNode->NETPIColl.Count();
+	for (; itemNo < itemTotal; itemNo++)
 	{
-		if (NULL
-				== objNode->NETProcessImageCollection[iItemLoopCount].ModuleName)
+		if (NULL == objNode->NETPIColl[itemNo].moduleName)
 		{
 			continue;
 		}
 
-		if (0
-				== strcmp(
-						objNode->NETProcessImageCollection[iItemLoopCount].ModuleName,
-						schModuleName))
+		if (0 == strcmp(objNode->NETPIColl[itemNo].moduleName, moduleName))
 		{
-			return iItemLoopCount;
+			return itemNo;
 		}
 
 	}
 	return -1;
 }
 
-/*****************************************************************************/
-/**
- \brief			CopyPItoNETPICollection
- 
- This function copies process image to interface process image collection
- 
- \param			objProcessImage               Class Variable of ProcessImage
- \param			objNETProcessImage            Class Variable of NETProcessImage 
- \param			ModuleName                    Character Pointer Variable to hold the module name
- \return		void	
- */
-/*****************************************************************************/
-
-void CopyPItoNETPICollection(ProcessImage objProcessImage,
-		NETProcessImage objNETProcessImage, char* ModuleName)
+void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char* moduleName)
 {
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* objNode;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	objNode = pobjNodeCol->getNodePtr(CN, objProcessImage.CNNodeID);
+	NodeCollection* objNodeCol = NULL;
+	Node* objNode;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
+	objNode = objNodeCol->GetNodePtr(CN, piObj.nodeId);
 
-	//NETProcessImage objNETProcessImage;
-	if (NULL != objProcessImage.VarName)
+	if (NULL != piObj.varDeclName)
 	{
-		objNETProcessImage.Name = new char[strlen(objProcessImage.VarName)
-				+ ALLOC_BUFFER];
-		strcpy(objNETProcessImage.Name, objProcessImage.VarName);
+		netPIObj.name = new char[strlen(piObj.varDeclName) + ALLOC_BUFFER];
+		strcpy(netPIObj.name, piObj.varDeclName);
 	}
-	objNETProcessImage.ModuleName = new char[strlen(ModuleName) + ALLOC_BUFFER];
-	strcpy(objNETProcessImage.ModuleName, ModuleName);
-	objNETProcessImage.DataInfo._dt_enum = objProcessImage.DataInfo._dt_enum;
-	objNETProcessImage.DataInfo.DataSize = objProcessImage.DataInfo.DataSize;
-	if (NULL != objProcessImage.DataInfo._dt_Name)
+	netPIObj.moduleName = new char[strlen(moduleName) + ALLOC_BUFFER];
+	strcpy(netPIObj.moduleName, moduleName);
+	netPIObj.dataInfo.iecDtVar = piObj.dataInfo.iecDtVar;
+	netPIObj.dataInfo.dataSize = piObj.dataInfo.dataSize;
+	if (NULL != piObj.dataInfo.dtName)
 	{
-		objNETProcessImage.DataInfo._dt_Name = new char[strlen(
-				objProcessImage.DataInfo._dt_Name) + ALLOC_BUFFER];
-		strcpy(objNETProcessImage.DataInfo._dt_Name,
-				objProcessImage.DataInfo._dt_Name);
+		netPIObj.dataInfo.dtName = new char[strlen(piObj.dataInfo.dtName) + ALLOC_BUFFER];
+		strcpy(netPIObj.dataInfo.dtName, piObj.dataInfo.dtName);
 	}
-	objNETProcessImage.CNNodeID = objProcessImage.CNNodeID;
-	objNETProcessImage.DirectionType = objProcessImage.DirectionType;
-	objNETProcessImage.count = 0;
-	objNETProcessImage.iTotalDataSize = objProcessImage.DataInfo.DataSize;
+	netPIObj.nodeId = piObj.nodeId;
+	netPIObj.directionType = piObj.directionType;
+	netPIObj.count = 0;
+	netPIObj.totalDataSize = piObj.dataInfo.dataSize;
 
-	objNode->addNETProcessImage(objNETProcessImage);
+	objNode->AddNETProcessImage(netPIObj);
 }
 
-/*****************************************************************************/
-/**
- \brief			GetDatatypeNETPI
- 
- This function returns data type for process image
- 
- \param			dt_enum       Enum Variable of IEC_Datatype to hold the datatype of process image
- \return		char*	
- */
-/*****************************************************************************/
-
-char* GetDatatypeNETPI(IEC_Datatype dt_enum)
+char* GetDatatypeNETPI(IEC_Datatype dtIEC)
 {
-	char* pcDTNetString;
-	switch (dt_enum)
+	char* retIECdt;
+	switch (dtIEC)
 	{
 	case BITSTRING:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	case BOOL:
-		pcDTNetString = (char*) "byte";
+		retIECdt = (char*) "byte";
 		break;
 	case BYTE:
-		pcDTNetString = (char*) "byte";
+		retIECdt = (char*) "byte";
 		break;
 	case _CHAR:
-		pcDTNetString = (char*) "byte";
+		retIECdt = (char*) "byte";
 		break;
 	case DWORD:
-		pcDTNetString = (char*) "UInt32";
+		retIECdt = (char*) "UInt32";
 		break;
 	case LWORD:
-		pcDTNetString = (char*) "UInt64";
+		retIECdt = (char*) "UInt64";
 		break;
 	case SINT:
-		pcDTNetString = (char*) "sbyte";
+		retIECdt = (char*) "sbyte";
 		break;
 	case INT:
-		pcDTNetString = (char*) "Int16";
+		retIECdt = (char*) "Int16";
 		break;
 	case DINT:
-		pcDTNetString = (char*) "Int32";
+		retIECdt = (char*) "Int32";
 		break;
 	case LINT:
-		pcDTNetString = (char*) "Int64";
+		retIECdt = (char*) "Int64";
 		break;
 	case USINT:
-		pcDTNetString = (char*) "byte";
+		retIECdt = (char*) "byte";
 		break;
 	case UINT:
-		pcDTNetString = (char*) "UInt16";
+		retIECdt = (char*) "UInt16";
 		break;
 	case UDINT:
-		pcDTNetString = (char*) "UInt32";
+		retIECdt = (char*) "UInt32";
 		break;
 	case ULINT:
-		pcDTNetString = (char*) "UInt64";
+		retIECdt = (char*) "UInt64";
 		break;
 	case REAL:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	case LREAL:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	case STRING:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	case WSTRING:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	default:
-		pcDTNetString = (char*) "";
+		retIECdt = (char*) "";
 		break;
 	}
-	return pcDTNetString;
+	return retIECdt;
 }
 
-/*****************************************************************************/
-/**
- \brief			GetDatasizeNETPI
- 
- This function returns data size for process image
- 
- \param			dt_enum Enum Variable of IEC_Datatype to hold the datatype of process image
- \return		INT32	
- */
-/*****************************************************************************/
-
-INT32 GetDatasizeNETPI(IEC_Datatype dt_enum)
+INT32 GetDatasizeNETPI(IEC_Datatype dtIEC)
 {
-	INT32 iDSNetString = 0;
-	switch (dt_enum)
+	INT32 retIECdtVal = 0;
+	switch (dtIEC)
 	{
 	case BOOL:
 	case BYTE:
 	case _CHAR:
 	case SINT:
 	case USINT:
-		iDSNetString = 1;
+		retIECdtVal = 1;
 		break;
 	case INT:
 	case UINT:
-		iDSNetString = 2;
+		retIECdtVal = 2;
 		break;
 	case DINT:
 	case DWORD:
 	case UDINT:
-		iDSNetString = 4;
+		retIECdtVal = 4;
 		break;
 	case LINT:
 	case LWORD:
 	case ULINT:
-		iDSNetString = 8;
+		retIECdtVal = 8;
 		break;
 	default:
 		break;
 	}
-	return iDSNetString;
+	return retIECdtVal;
 }

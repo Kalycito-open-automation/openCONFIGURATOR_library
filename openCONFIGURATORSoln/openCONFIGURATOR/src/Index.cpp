@@ -67,13 +67,13 @@
 
 /**
  
- @param void
+
  */
 
-CIndex::CIndex(void)
+Index::Index(void)
 {
-	m_SubIndexCount = collectionObj.Count();
-	//m_PDOType = 0; //TODO: Review Initialisation
+	sidxCount = subIndexCollection.Count();
+	//pdoType = 0; //TODO: Review Initialisation
 }
 
 /*************************************************************************/
@@ -81,214 +81,116 @@ CIndex::CIndex(void)
 
 /**
  
- @param void
+
  */
 
-CIndex::~CIndex(void)
+Index::~Index(void)
 {
 	//Add destructor code here
 }
 
-/*****************************************************************************/
-/**
- \brief			getPDOType
- 
- This function returns PDO type
- 
- \return		EPDOType
- */
-/*****************************************************************************/
 
-EPDOType CIndex::getPDOType()
+PDOType Index::GetPDOType()
 {
-	return m_PDOType;
+	return pdoType;
 }
 
-/*****************************************************************************/
-/**
- \brief			setPDOType
- 
- This is a member function of setPDOType to assign PDO type
- 
- \param			enumPDOType	Enum Variable of EPDOType to hold the value of PDO type			
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::setPDOType(EPDOType enumPDOType)
+void Index::SetPDOType(PDOType varPDOType)
 {
-	m_PDOType = enumPDOType;
+	pdoType = varPDOType;
 }
 
 #ifndef __GNUC__
 #pragma region MemberFunctions
 #endif
 
-/*****************************************************************************/
-/**
- \brief			addSubIndex
- 
- This is a member function of CIndex to add SubIndex in Index Object
- 
- \param			objSubIndex		Class variable of CSubIndex for object subindex		
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::addSubIndex(CSubIndex objSubIndex)
+void Index::AddSubIndex(SubIndex objSubIndex)
 {
-	INT32 iItemPosition = collectionObj.Add();
-	collectionObj[iItemPosition] = objSubIndex;
-	m_SubIndexCount = collectionObj.Count();
+	INT32 iItemPosition = subIndexCollection.Add();
+	subIndexCollection[iItemPosition] = objSubIndex;
+	sidxCount = subIndexCollection.Count();
 #if defined DEBUG
-	cout << "addSubIndex function:";
-	cout << "\t Index" << CIndex::getIndexValue();
-	cout << "\tSubindex:" << objSubIndex.getIndexValue() << endl;
+	cout << __FUNCTION__ << "\t Index" << Index::GetIndexValue();
+	cout << "\tSubindex:" << objSubIndex.GetIndexValue() << endl;
 #endif
 }
 
-/*****************************************************************************/
-/**
- \brief			deleteSubIndex
- 
- This is a member function of CIndex  to delete the SubIndex in Index Object
- 
- \param			iSubIndexID		Integer Variable to hold the value of subindex id		
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::deleteSubIndex(INT32 iSubIndexID)
+void Index::DeleteSubIndex(INT32 subIndexPosition)
 {
-	collectionObj.Remove(iSubIndexID);
-	m_SubIndexCount = collectionObj.Count();
+	subIndexCollection.Remove(subIndexPosition);
+	sidxCount = subIndexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			deleteSubIndexCollection
- 
- This is a member function of CIndex to delete the SubIndex from Index Object
- 
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::deleteSubIndexCollection()
+void Index::DeleteSubIndexCollection()
 {
-	collectionObj.Clear();
-	m_SubIndexCount = collectionObj.Count();
+	subIndexCollection.Clear();
+	sidxCount = subIndexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			getNumberofSubIndexes
- 
- This is a member function of CIndex returns number of subindexes
- 
- \return		INT32
- */
-/*****************************************************************************/
 
-INT32 CIndex::getNumberofSubIndexes()
+INT32 Index::GetNumberofSubIndexes()
 {
-	return collectionObj.Count();
+	return subIndexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			getSubIndex
- 
- This is a member function of CIndex returns number of subindex ids
- \param         iSubIndexId Integer variable to hold the value of subindex id   
- 
- \return		CSubIndex*
- */
-/*****************************************************************************/
 
-CSubIndex* CIndex::getSubIndex(INT32 iSubIndexId)
+SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
 {
-	return &collectionObj[iSubIndexId];
+	return &subIndexCollection[subIndexPosition];
 }
 
-/*****************************************************************************/
-/**
- \brief			getSubIndexbyIndexValue
- 
- This is a member function of CIndex returns number of subindex value 
- 
- \param			pbIndex		Character pointer to hold index value
- \return		CSubIndex*
- */
-/*****************************************************************************/
 
-CSubIndex* CIndex::getSubIndexbyIndexValue(char* pbIndex)
+SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 {
-	INT32 iLoopCount = 0;
-	CSubIndex* pobjSIndex = NULL;
+	INT32 loopCount = 0;
+	SubIndex* objSidx = NULL;
 
-	for (iLoopCount = 0; iLoopCount < collectionObj.Count(); iLoopCount++)
+	for (loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
 	{
-		pobjSIndex = &collectionObj[iLoopCount];
+		objSidx = &subIndexCollection[loopCount];
 		//Check for null , alignment changes
 		if (0
-				== strcmp(StringToUpper((char*) pobjSIndex->getIndexValue()),
-						StringToUpper(pbIndex)))
+				== strcmp(StringToUpper((char*) objSidx->GetIndexValue()),
+						StringToUpper(subIndexId)))
 		{
-			return pobjSIndex;
+			return objSidx;
 		}
 		else
 		{
-			pobjSIndex = NULL;
+			objSidx = NULL;
 		}
 	}
 
-	pobjSIndex = NULL;
-	return pobjSIndex;
+	objSidx = NULL;
+	return objSidx;
 }
 
-/*****************************************************************************/
-/**
- \brief			SwapSubObjects
- 
- This is a member function of CIndex swaps the subobjects
- 
- \param			ipos1    Integer Variable to hold the subobject data
- \param			ipos2	 Integer Variable to hold the subobject data		
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::SwapSubObjects(INT32 ipos1, INT32 ipos2)
+void Index::SwapSubObjects(INT32 fromPosition, INT32 toPosition)
 {
-	swap(collectionObj[ipos1], collectionObj[ipos2]);
+	swap(subIndexCollection[fromPosition], subIndexCollection[toPosition]);
 }
 
-/*****************************************************************************/
-/**
- \brief			UpdateArraySubObjects
- 
- This is a member function of CIndex updates subobjects in array  
- 
- \return		void
- */
-/*****************************************************************************/
 
-void CIndex::UpdateArraySubObjects()
+void Index::UpdateArraySubObjects()
 {
-	INT32 iLoopCount = 0;
-	CSubIndex* pobjSIndex = NULL;
+	INT32 loopCount = 0;
+	SubIndex* objSidx = NULL;
 
-	for (iLoopCount = 0; iLoopCount < collectionObj.Count(); iLoopCount++)
+	for (loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
 	{
-		pobjSIndex = &collectionObj[iLoopCount];
+		objSidx = &subIndexCollection[loopCount];
 		//Check for null , alignment changes
-		if ((NULL != pobjSIndex->getIndexValue())
-				&& 0 == (strcmp(pobjSIndex->getIndexValue(), "00")))
+		if ((NULL != objSidx->GetIndexValue())
+				&& 0 == (strcmp(objSidx->GetIndexValue(), "00")))
 			continue;
-		pobjSIndex->setDataTypeST(this->getDataType());
+		objSidx->SetDataTypeST(this->GetDataType());
 	}
-	pobjSIndex = NULL;
+	objSidx = NULL;
 }
 #ifndef __GNUC__
 #pragma endregion MemberFunctions

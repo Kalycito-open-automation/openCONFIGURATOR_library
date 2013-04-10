@@ -1,9 +1,9 @@
 /**
- ************************************************************************************************
+ ******************************************************************************
  \file			XdcOperations.cpp
 
  \brief			Handles Parameter,Variable declaration, datatype for Index attributes and Sub-Index attributes
- ************************************************************************************************
+ ******************************************************************************
  */
 /*
  (c) Kalycito Infotech Private Limited
@@ -50,7 +50,7 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Includes */
 
 #include <iostream>
@@ -62,16 +62,17 @@
 #include "../Include/openCONFIGURATOR.h"
 #include "../Include/Declarations.h"
 #include "../Include/Exception.h"
+#include "../Include/Validation.h"
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Defines */
 
 #define MY_ENCODING "UTF-8"
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Global Variables */
 
-INT32 LastIndexParsed = 0;
+INT32 lastIndexParsed = 0;
 static const char *gpa2bSimple[][2] =
 {
 { "BOOL", "1" },
@@ -98,123 +99,106 @@ static const char *gpa2bSimple[][2] =
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-/*****************************************************************************/
-/**
- \brief			setIndexAttributes
- 
- This function shall set Index Attributes
- 
- \param			pxtrReader      xml Pointer Variable of type xmlTextReaderPtr
- \param			pobjIndex       Class Pointer Variable of  CIndex 
- \param			bhasPDO         Boolean Variable to check PDO 
- \return		void
- */
-/*****************************************************************************/
-
-void setIndexAttributes(xmlTextReaderPtr pxtrReader, CIndex *pobjIndex,
-		bool& bhasPDO)
+void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == pobjIndex)
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
+	if (NULL == indexObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	value = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "INDEX"))
+	if (!strcmp(ConvertToUpper((char*) name), "INDEX"))
 	{
 
 		// Setting the Index Value
-		pobjIndex->setIndexValue((char*) pxcValue);
+		indexObj->SetIndexValue((char*) value);
 
 		/*$S Commented out the TPDO and RPDO grouping $S*/
 		//TODO: Check point 1 
-		char* pbTempValue =
-				new char[strlen((char*) pxcValue) + STR_ALLOC_BUFFER];
-		strcpy((char*) pbTempValue, (char*) pxcValue);
-		if ((!strncmp(pbTempValue, "14", 2))
-				|| (!strncmp(pbTempValue, "16", 2)))
+		char* tempValue = new char[strlen((char*) value) + STR_ALLOC_BUFFER];
+		strcpy((char*) tempValue, (char*) value);
+		if ((!strncmp(tempValue, "14", 2)) || (!strncmp(tempValue, "16", 2)))
 		{
-			pobjIndex->setPDOType(PDO_RPDO);
-			bhasPDO = true;
+			indexObj->SetPDOType(PDO_RPDO);
+			hasPDO = true;
 		}
-		else if ((!strncmp(pbTempValue, "18", 2))
-				|| (!strncmp(pbTempValue, "1A", 2)))
+		else if ((!strncmp(tempValue, "18", 2))	|| (!strncmp(tempValue, "1A", 2)))
 		{
-			pobjIndex->setPDOType(PDO_TPDO);
-			bhasPDO = true;
+			indexObj->SetPDOType(PDO_TPDO);
+			hasPDO = true;
 		}
 		else
 		{
 			//No operations for Non-PDO's
 		}
-		delete[] pbTempValue;
+		delete[] tempValue;
 
 	}
-	else if (!(strcmp(ConvertToUpper((char*) pxcName), "NAME")))
+	else if (!(strcmp(ConvertToUpper((char*) name), "NAME")))
 	{
-		checkAndCorrectName((char*) pxcValue);
-		pobjIndex->setName((char*) pxcValue);
+		CheckAndCorrectName((char*) value);
+		indexObj->SetName((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "OBJECTTYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "OBJECTTYPE"))
 	{
-		pobjIndex->setObjectType((char*) pxcValue);
+		indexObj->SetObjectType((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "LOWLIMIT"))
+	else if (!strcmp(ConvertToUpper((char*) name), "LOWLIMIT"))
 	{
-		pobjIndex->setLowLimit((char*) pxcValue);
+		indexObj->SetLowLimit((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "HIGHLIMIT"))
+	else if (!strcmp(ConvertToUpper((char*) name), "HIGHLIMIT"))
 	{
-		pobjIndex->setHighLimit((char*) pxcValue);
+		indexObj->SetHighLimit((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "ACCESSTYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "ACCESSTYPE"))
 	{
-		pobjIndex->setAccessType((char*) pxcValue);
+		indexObj->SetAccessType((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "PDOMAPPING"))
+	else if (!strcmp(ConvertToUpper((char*) name), "PDOMAPPING"))
 	{
-		pobjIndex->setPDOMapping((char*) pxcValue);
+		indexObj->SetPDOMapping((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "DEFAULTVALUE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "DEFAULTVALUE"))
 	{
-		pobjIndex->setDefaultValue((char*) pxcValue);
+		indexObj->SetDefaultValue((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "ACTUALVALUE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "ACTUALVALUE"))
 	{
-		pobjIndex->setActualValue((char*) pxcValue);
+		indexObj->SetActualValue((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "DATATYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "DATATYPE"))
 	{
-		if (CheckIfDataTypeExists((char*) pxcValue, pobjIndex->getNodeID()))
+		if (CheckIfDataTypeExists((char*) value, indexObj->GetNodeID()))
 		{
-			pobjIndex->setDataType((char*) pxcValue);
+			indexObj->SetDataType((char*) value);
 		}
 		else
 		{
 			ocfmException ex;
-			ex.ocfm_Excpetion(OCFM_ERR_DATATYPE_NOT_FOUND);
+			ex.OCFMException(OCFM_ERR_DATATYPE_NOT_FOUND);
 		}
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "UNIQUEIDREF"))
+	else if (!strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
 	{
-		pobjIndex->setUniqueIDRef((char*) pxcValue);
+		indexObj->SetUniqueIDRef((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "CDCFLAG"))
+	else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
 	{
-		if (!strcmp(ConvertToUpper((char*) pxcValue), "FALSE"))
+		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
 		{
-			pobjIndex->setFlagIfIncludedCdc(FALSE);
+			indexObj->SetFlagIfIncludedCdc(FALSE);
 		}
-		else if (!strcmp(ConvertToUpper((char*) pxcValue), "TRUE"))
+		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
 		{
-			pobjIndex->setFlagIfIncludedCdc(TRUE);
+			indexObj->SetFlagIfIncludedCdc(TRUE);
 		}
 		else
 		{
@@ -226,86 +210,76 @@ void setIndexAttributes(xmlTextReaderPtr pxtrReader, CIndex *pobjIndex,
 		//TODO: Else added. Operation to be specified.
 	}
 }
-/*****************************************************************************/
-/**
- \brief			setSubIndexAttributes
- 
- This Functio shall set subindex Attributes
- 
- \param			pxtrReader         xml Pointer of xmlTextReaderPtr
- \param			pobjSubIndex       Class Pointer of CSubIndex 
- \return		void
- */
-/*****************************************************************************/
-void setSubIndexAttributes(xmlTextReaderPtr pxtrReader, CSubIndex *pobjSubIndex)
+
+void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == pobjSubIndex)
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
+	if (NULL == sidxObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	value = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "SUBINDEX"))
+	if (!strcmp(ConvertToUpper((char*) name), "SUBINDEX"))
 	{
-		pobjSubIndex->setIndexValue((char*) pxcValue);
+		sidxObj->SetIndexValue((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "NAME"))
+	else if (!strcmp(ConvertToUpper((char*) name), "NAME"))
 	{
-		checkAndCorrectName((char*) pxcValue);
-		pobjSubIndex->setName((char*) pxcValue);
+		CheckAndCorrectName((char*) value);
+		sidxObj->SetName((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "OBJECTTYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "OBJECTTYPE"))
 	{
-		pobjSubIndex->setObjectType((char*) pxcValue);
+		sidxObj->SetObjectType((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "LOWLIMIT"))
+	else if (!strcmp(ConvertToUpper((char*) name), "LOWLIMIT"))
 	{
-		pobjSubIndex->setLowLimit((char*) pxcValue);
+		sidxObj->SetLowLimit((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "HIGHLIMIT"))
+	else if (!strcmp(ConvertToUpper((char*) name), "HIGHLIMIT"))
 	{
-		pobjSubIndex->setHighLimit((char*) pxcValue);
+		sidxObj->SetHighLimit((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "ACCESSTYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "ACCESSTYPE"))
 	{
-		pobjSubIndex->setAccessType((char*) pxcValue);
+		sidxObj->SetAccessType((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "PDOMAPPING"))
+	else if (!strcmp(ConvertToUpper((char*) name), "PDOMAPPING"))
 	{
-		pobjSubIndex->setPDOMapping((char*) pxcValue);
+		sidxObj->SetPDOMapping((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "DEFAULTVALUE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "DEFAULTVALUE"))
 	{
-		pobjSubIndex->setDefaultValue((char*) pxcValue);
+		sidxObj->SetDefaultValue((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "ACTUALVALUE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "ACTUALVALUE"))
 	{
-		pobjSubIndex->setActualValue((char*) pxcValue);
+		sidxObj->SetActualValue((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "DATATYPE"))
+	else if (!strcmp(ConvertToUpper((char*) name), "DATATYPE"))
 	{
-		pobjSubIndex->setDataType((char*) pxcValue);
+		sidxObj->SetDataType((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "UNIQUEIDREF"))
+	else if (!strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
 	{
-		pobjSubIndex->setUniqueIDRef((char*) pxcValue);
+		sidxObj->SetUniqueIDRef((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "CDCFLAG"))
+	else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
 	{
-		if (!strcmp(ConvertToUpper((char*) pxcValue), "FALSE"))
+		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
 		{
-			pobjSubIndex->setFlagIfIncludedCdc(FALSE);
+			sidxObj->SetFlagIfIncludedCdc(FALSE);
 		}
-		else if (!strcmp(ConvertToUpper((char*) pxcValue), "TRUE"))
+		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
 		{
-			pobjSubIndex->setFlagIfIncludedCdc(TRUE);
+			sidxObj->SetFlagIfIncludedCdc(TRUE);
 		}
 		else
 		{
@@ -320,171 +294,146 @@ void setSubIndexAttributes(xmlTextReaderPtr pxtrReader, CSubIndex *pobjSubIndex)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			setDataTypeAttributes
- 
- This Fuction shall set datatype for the attributes
- 
- \param			pxtrReader      xml Pointer variable of xmlTextReaderPtr
- \param			objDataType     Class Pointer Variable of DataType
- \return		void
- */
-/*****************************************************************************/
-
-void setDataTypeAttributes(xmlTextReaderPtr pxtrReader, DataType *objDataType)
+void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == objDataType)
+	const xmlChar *name = NULL;
+	const xmlChar *xcValue = NULL;
+	if (NULL == dtObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
-	objDataType->Name = NULL;
-	objDataType->DataTypeValue = NULL;
-	objDataType->DataSize = 0;
+	dtObj->dataTypeName = NULL;
+	dtObj->dataTypeValue = NULL;
+	dtObj->dataSize = 0;
 
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	xcValue = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "DATATYPE"))
+	if (!strcmp(ConvertToUpper((char*) name), "DATATYPE"))
 	{
 		INT32 iRetVal;
-		objDataType->DataTypeValue = new char[strlen((char*) pxcValue) + 1];
-		strcpy(objDataType->DataTypeValue, (char*) pxcValue);
+		dtObj->dataTypeValue = new char[strlen((char*) xcValue) + 1];
+		strcpy(dtObj->dataTypeValue, (char*) xcValue);
 		//Read the Equivalent pxcName of a datatype
-		iRetVal = xmlTextReaderRead(pxtrReader);
+		iRetVal = xmlTextReaderRead(reader);
 		if (1 != iRetVal)
 		{
 			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
+			objException.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
 			throw objException;
 		}
-		while (XML_READER_TYPE_ELEMENT != xmlTextReaderNodeType(pxtrReader))
+		while (XML_READER_TYPE_ELEMENT != xmlTextReaderNodeType(reader))
 		{
-			iRetVal = xmlTextReaderRead(pxtrReader);
+			iRetVal = xmlTextReaderRead(reader);
 			if (iRetVal != 1)
 			{
 				ocfmException objException;
-				objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
+				objException.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
 				throw objException;
 			}
 		}
 		//pxcValue 	= xmlTextReaderConstValue(pxtrReader);
-		pxcName = xmlTextReaderConstName(pxtrReader);
+		name = xmlTextReaderConstName(reader);
 
-		objDataType->Name = new char[strlen((char*) pxcName) + ALLOC_BUFFER];
-		strcpy(objDataType->Name, (char*) pxcName);
+		dtObj->dataTypeName = new char[strlen((char*) name) + ALLOC_BUFFER];
+		strcpy(dtObj->dataTypeName, (char*) name);
 
-		objDataType->DataSize = getDataSize(objDataType->Name);
-		if ((0 == strcmp(objDataType->Name, "Unsigned8"))
-				|| (0 == strcmp(objDataType->Name, "UNSIGNED8")))
+		dtObj->dataSize = GetDataSize(dtObj->dataTypeName);
+		if ((0 == strcmp(dtObj->dataTypeName, "Unsigned8"))
+				|| (0 == strcmp(dtObj->dataTypeName, "UNSIGNED8")))
 		{
-			objDataType->IEC_dt = USINT;
+			dtObj->iecDataType = USINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Boolean"))
-				|| (0 == strcmp(objDataType->Name, "BOOLEAN")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Boolean"))
+				|| (0 == strcmp(dtObj->dataTypeName, "BOOLEAN")))
 		{
-			objDataType->IEC_dt = BOOL;
+			dtObj->iecDataType = BOOL;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Integer8"))
-				|| (0 == strcmp(objDataType->Name, "INTEGER8")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Integer8"))
+				|| (0 == strcmp(dtObj->dataTypeName, "INTEGER8")))
 		{
-			objDataType->IEC_dt = SINT;
+			dtObj->iecDataType = SINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Unsigned16"))
-				|| (0 == strcmp(objDataType->Name, "UNSIGNED16")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Unsigned16"))
+				|| (0 == strcmp(dtObj->dataTypeName, "UNSIGNED16")))
 		{
-			objDataType->IEC_dt = UINT;
+			dtObj->iecDataType = UINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Integer16"))
-				|| (0 == strcmp(objDataType->Name, "INTEGER16")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Integer16"))
+				|| (0 == strcmp(dtObj->dataTypeName, "INTEGER16")))
 		{
-			objDataType->IEC_dt = INT;
+			dtObj->iecDataType = INT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Unsigned32"))
-				|| (0 == strcmp(objDataType->Name, "UNSIGNED32")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Unsigned32"))
+				|| (0 == strcmp(dtObj->dataTypeName, "UNSIGNED32")))
 		{
-			objDataType->IEC_dt = UDINT;
+			dtObj->iecDataType = UDINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Integer32"))
-				|| (0 == strcmp(objDataType->Name, "INTEGER32")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Integer32"))
+				|| (0 == strcmp(dtObj->dataTypeName, "INTEGER32")))
 		{
-			objDataType->IEC_dt = DINT;
+			dtObj->iecDataType = DINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Unsigned64"))
-				|| (0 == strcmp(objDataType->Name, "UNSIGNED64")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Unsigned64"))
+				|| (0 == strcmp(dtObj->dataTypeName, "UNSIGNED64")))
 		{
-			objDataType->IEC_dt = ULINT;
+			dtObj->iecDataType = ULINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Integer64"))
-				|| (0 == strcmp(objDataType->Name, "INTEGER64")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Integer64"))
+				|| (0 == strcmp(dtObj->dataTypeName, "INTEGER64")))
 		{
-			objDataType->IEC_dt = LINT;
+			dtObj->iecDataType = LINT;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Real32"))
-				|| (0 == strcmp(objDataType->Name, "REAL32")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Real32"))
+				|| (0 == strcmp(dtObj->dataTypeName, "REAL32")))
 		{
-			objDataType->IEC_dt = REAL;
+			dtObj->iecDataType = REAL;
 		}
-		else if ((0 == strcmp(objDataType->Name, "Real64"))
-				|| (0 == strcmp(objDataType->Name, "REAL64")))
+		else if ((0 == strcmp(dtObj->dataTypeName, "Real64"))
+				|| (0 == strcmp(dtObj->dataTypeName, "REAL64")))
 		{
-			objDataType->IEC_dt = LREAL;
+			dtObj->iecDataType = LREAL;
 		}
 		else
 		{
-			cout << __FUNCTION__ << " unhandled datatype: " << objDataType->Name
+			cout << __FUNCTION__ << " unhandled datatype: " << dtObj->dataTypeName
 					<< endl;
 		}
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			setParameterAttributes
- 
- This Function shall set parameter attributes
- 
- \param			pxtrReader      xml Pointer of xmlTextReaderPtr
- \param			pstParameter    Class Pointer of Parameter
- \return		void
- */
-/*****************************************************************************/
-
-void setParameterAttributes(xmlTextReaderPtr pxtrReader,
-		Parameter *pstParameter)
+void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == pstParameter)
+	const xmlChar *xcName = NULL;
+	const xmlChar *xcValue = NULL;
+	if (NULL == parameterObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	xcValue = xmlTextReaderConstValue(reader);
+	xcName = xmlTextReaderConstName(reader);
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "UNIQUEID"))
+	if (!strcmp(ConvertToUpper((char*) xcName), "UNIQUEID"))
 	{
-		pstParameter->name_id_dt_attr.setUniqueID((char*) pxcValue);
+		parameterObj->nameIdDtAttr.SetUniqueID((char*) xcValue);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "NAME"))
+	else if (!strcmp(ConvertToUpper((char*) xcName), "NAME"))
 	{
-		checkAndCorrectName((char*) pxcValue);
-		pstParameter->name_id_dt_attr.setName((char*) pxcValue);
+		CheckAndCorrectName((char*) xcValue);
+		parameterObj->nameIdDtAttr.SetName((char*) xcValue);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "ACCESS"))
+	else if (!strcmp(ConvertToUpper((char*) xcName), "ACCESS"))
 	{
-		pstParameter->access = new char[strlen((const char*) pxcValue) + 1];
-		strcpy(pstParameter->access, (const char*) pxcValue);
+		parameterObj->accessStr = new char[strlen((const char*) xcValue) + 1];
+		strcpy(parameterObj->accessStr, (const char*) xcValue);
 	}
 	else
 	{
@@ -495,122 +444,89 @@ void setParameterAttributes(xmlTextReaderPtr pxtrReader,
 	 <USINT/>*/
 }
 
-/*****************************************************************************/
-/**
- \brief			getParaDT
- 
- This function shall provide parameter datatype
- 
- \param			pxtrReader        xml Pointer of xmlTextReaderPtr
- \param			pstParameter      Class Pointer of Parameter 
- \return		void
- */
-/*****************************************************************************/
-
-void getParaDT(xmlTextReaderPtr pxtrReader, Parameter* pstParameter)
+void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
 	INT32 iRetVal;
-	if (NULL == pstParameter)
+	ocfmException exceptionObj;
+	if (NULL == parameterObj)
 	{
-		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-		throw objException;
+		throw exceptionObj;
 	}
-	iRetVal = xmlTextReaderRead(pxtrReader);
+	iRetVal = xmlTextReaderRead(reader);
 
 	if (1 != iRetVal)
 	{
-		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
-		throw objException;
+		exceptionObj.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
+		throw exceptionObj;
 	}
 
-	pxcName = xmlTextReaderConstName(pxtrReader);
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
+	name = xmlTextReaderConstName(reader);
+	value = xmlTextReaderConstValue(reader);
 
-	while (!(CheckEndElement(xmlTextReaderNodeType(pxtrReader), (char*) pxcName,
-			(char*) "parameter")))
+	while (!(CheckEndElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "parameter")))
 	{
-		iRetVal = xmlTextReaderRead(pxtrReader);
+		iRetVal = xmlTextReaderRead(reader);
 
 		if (1 != iRetVal)
 		{
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
-			throw objException;
+			exceptionObj.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
+			throw exceptionObj;
 		}
 
-		pxcValue = xmlTextReaderConstValue(pxtrReader);
-		pxcName = xmlTextReaderConstName(pxtrReader);
+		value = xmlTextReaderConstValue(reader);
+		name = xmlTextReaderConstName(reader);
 
 		char abSize[3];
 
-		if (CheckifSimpleDT((char*) pxcName, abSize))
+		if (CheckifSimpleDT((char*) name, abSize))
 		{
-			pstParameter->name_id_dt_attr.setDataType((char*) pxcName);
+			parameterObj->nameIdDtAttr.SetDataType((char*) name);
 		}
-		if (CheckStartElement(xmlTextReaderNodeType(pxtrReader),
-				(char*) pxcName, (char*) "dataTypeIDRef"))
+		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "dataTypeIDRef"))
 		{
-			if (TRUE == xmlTextReaderHasAttributes(pxtrReader))
+			if (TRUE == xmlTextReaderHasAttributes(reader))
 			{
+				xmlTextReaderMoveToNextAttribute(reader);
+				value = xmlTextReaderConstValue(reader);
+				name = xmlTextReaderConstName(reader);
 
-				xmlTextReaderMoveToNextAttribute(pxtrReader);
-				pxcValue = xmlTextReaderConstValue(pxtrReader);
-				pxcName = xmlTextReaderConstName(pxtrReader);
-
-				if (FALSE
-						== strcmp(ConvertToUpper((char*) pxcName),
-								"UNIQUEIDREF"))
+				if (0 == strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
 				{
-					pstParameter->name_id_dt_attr.setDtUniqueRefId(
-							(char*) pxcValue);
+					parameterObj->nameIdDtAttr.SetDtUniqueRefId((char*) value);
 				}
 			}
 		}
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			setCDTAttributes
- 
- This function shall set CDT attributes
- 
- \param			pxtrReader    xml Pointer Variable of xmlTextReaderPtr
- \param			pobjCDT       Class Pointer Variable of CComplexDataType  
- \return		void
- */
-/*****************************************************************************/
-
-static void setCDTAttributes(xmlTextReaderPtr pxtrReader,
-		CComplexDataType *pobjCDT)
+static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == pobjCDT)
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
+	if (NULL == cdtObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	value = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	if (0 == strcmp(ConvertToUpper((char*) pxcName), "UNIQUEID"))
+	if (0 == strcmp(ConvertToUpper((char*) name), "UNIQUEID"))
 	{
-		pobjCDT->name_id_attr->setUniqueID((char*) pxcValue);
+		cdtObj->nameIdAttr->SetUniqueID((char*) value);
 	}
 
-	else if (0 == strcmp(ConvertToUpper((char*) pxcName), "NAME"))
+	else if (0 == strcmp(ConvertToUpper((char*) name), "NAME"))
 	{
-		checkAndCorrectName((char*) pxcValue);
-		pobjCDT->name_id_attr->setName((char*) pxcValue);
+		CheckAndCorrectName((char*) value);
+		cdtObj->nameIdAttr->SetName((char*) value);
 	}
 	else
 	{
@@ -618,101 +534,59 @@ static void setCDTAttributes(xmlTextReaderPtr pxtrReader,
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckifSimpleDT
- 
- This function shall check the data type
- 
- \param			pbName         Character Pointer Variable to hold datatype name
- \param			pbSize         Character Pointer Variable to hold datatype size
-
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool CheckifSimpleDT(char *pbName, char *pbSize)
+bool CheckifSimpleDT(char *datatypeName, char *dataSize)
 {
-	INT32 iLoopCount = 0;
-	char *pbSimpleElement = NULL;
+	INT32 arrSizeLC = 0;
+	char *simpleElement = NULL;
 
-	while (iLoopCount < g_simple_arr_size)
+	while (arrSizeLC < gSimpleArrSize)
 	{
-		pbSimpleElement = (char*) gpa2bSimple[iLoopCount][0];
+		simpleElement = (char*) gpa2bSimple[arrSizeLC][0];
 
-		if (!strcmp(pbSimpleElement, pbName))
+		if (!strcmp(simpleElement, datatypeName))
 		{
-			strcpy(pbSize, (char*) gpa2bSimple[iLoopCount][1]);
+			strcpy(dataSize, (char*) gpa2bSimple[arrSizeLC][1]);
 			return true;
 		}
 
-		iLoopCount++;
+		arrSizeLC++;
 	}
 	return false;
 }
 
-/*****************************************************************************/
-/**
- \brief			setVarDecAttributes
- 
- This function shall set variable declaration for Attributes
- 
- \param			pxtrReader   xml Pointer of xmlTextReaderPtr
- \param			vdecl        Class Pointer of varDeclaration
- \return		void
- */
-/*****************************************************************************/
-
-void setVarDecAttributes(xmlTextReaderPtr pxtrReader, varDeclaration& vdecl)
+void SetVarDecAttributes(xmlTextReaderPtr reader, varDeclaration& vdecl)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
 
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	value = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "UNIQUEID"))
+	if (!strcmp(ConvertToUpper((char*) name), "UNIQUEID"))
 	{
-		vdecl.nam_id_dt_attr->setUniqueID((char*) pxcValue);
+		vdecl.namIdDtAttr->SetUniqueID((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) pxcName), "NAME"))
+	else if (!strcmp(ConvertToUpper((char*) name), "NAME"))
 	{
-		checkAndCorrectName((char*) pxcValue);
-		vdecl.nam_id_dt_attr->setName((char*) pxcValue);
+		CheckAndCorrectName((char*) value);
+		vdecl.namIdDtAttr->SetName((char*) value);
 	}
 	else
 	{
 		//TODO: Else added. Operation to be added.
 	}
 
-	if (!strcmp(ConvertToUpper((char*) pxcName), "SIZE"))
+	if (!strcmp(ConvertToUpper((char*) name), "SIZE"))
 	{
-		strcpy((char*) vdecl.size, (const char*) pxcValue);
+		strcpy((char*) vdecl.size, (const char*) value);
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckEndElement
- 
- This Function shall check end element
- 
- \param			iNodeType         Integer Variable to hold the value of node type
- \param			pbElement         Character Pointer Variable to hold element value 
- \param			pbCompareWith     Character Pointer Variable to hold value of element to compare
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool CheckEndElement(INT32 iNodeType, char *pbElement, char *pbCompareWith)
+bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement)
 {
-	if ((XML_READER_TYPE_END_ELEMENT == iNodeType)
-			&& (!strcmp(pbElement, pbCompareWith)))
+	if ((XML_READER_TYPE_END_ELEMENT == elementId)
+			&& (!strcmp(srcElement, compareElement)))
 	{
 		return true;
 	}
@@ -722,26 +596,10 @@ bool CheckEndElement(INT32 iNodeType, char *pbElement, char *pbCompareWith)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckStartElement
- 
- This Function shall check start element
- 
- \param			iNodeType         Integer Variable to hold the value of node type
- \param			pbElement         Character Pointer Variable to hold element value 
- \param			pbCompareWith     Character Pointer Variable to hold value of element to compare
- 
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool CheckStartElement(INT32 iNodeType, char *pbElement, char *pbCompareWith)
+bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement)
 {
-	if ((XML_READER_TYPE_ELEMENT == iNodeType)
-			&& (!strcmp(pbElement, pbCompareWith)))
+	if ((XML_READER_TYPE_ELEMENT == elementId)
+			&& (!strcmp(srcElement, compareElement)))
 	{
 		return true;
 	}
@@ -750,150 +608,122 @@ bool CheckStartElement(INT32 iNodeType, char *pbElement, char *pbCompareWith)
 		return false;
 	}
 }
-
 /*****************************************************************************/
 /**
- \brief			getVarDeclaration
+ \brief		This Function shall parse and Adds the varDecleration object and its attributes
  
- This Function shall assign Variable declaration
- 
- \param			pxtrReader  xml Pointer variable of xmlTextReaderPtr
- \param			pobjCDT     Class Pointer Variable of CComplexDataType
- \return		void
+ \param		reader		xml pointer of xmlTextReaderPtr
+ \param		cdtObj		Class pointer of ComplexDataType
+
+ \return	void
  */
 /*****************************************************************************/
-
-static void getVarDeclaration(xmlTextReaderPtr pxtrReader,
-		CComplexDataType *pobjCDT)
+static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
+	ocfmException objException;
 
-	if (NULL == pobjCDT)
+	if (NULL == cdtObj)
 	{
-		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 
-	INT32 iRetVal;
-	varDeclaration ObjVarDecl;
-	ObjVarDecl.Initialize();
-	iRetVal = xmlTextReaderRead(pxtrReader);
+	INT32 retValue;
+	varDeclaration varDeclObj;
+	varDeclObj.Initialize();
+	retValue = xmlTextReaderRead(reader);
 
-	if (1 != iRetVal)
+	if (1 != retValue)
 	{
-		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
+		objException.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
 		throw objException;
 	}
 
-	pxcName = xmlTextReaderConstName(pxtrReader);
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
+	name = xmlTextReaderConstName(reader);
+	value = xmlTextReaderConstValue(reader);
 
-	while (!(CheckEndElement(xmlTextReaderNodeType(pxtrReader), (char*) pxcName,
-			(char*) "struct")))
+	while (!(CheckEndElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "struct")))
 	{
 		varDeclaration objTempVarDecl;
 		objTempVarDecl.Initialize();
 
 		try
 		{
-			iRetVal = xmlTextReaderRead(pxtrReader);
+			retValue = xmlTextReaderRead(reader);
 
-			if (1 != iRetVal)
+			if (1 != retValue)
 			{
-				ocfmException objException; // = new ocfmException;
-				objException.ocfm_Excpetion(OCFM_ERR_XML_FILE_CORRUPTED);
+				objException.OCFMException(OCFM_ERR_XML_FILE_CORRUPTED);
 				throw objException;
 			}
 		} catch (ocfmException *ex)
 		{
 			throw ex->_ocfmRetCode;
 		}
-		pxcName = xmlTextReaderConstName(pxtrReader);
-		pxcValue = xmlTextReaderConstValue(pxtrReader);
+		name = xmlTextReaderConstName(reader);
+		value = xmlTextReaderConstValue(reader);
 
-		if (CheckEndElement(xmlTextReaderNodeType(pxtrReader), (char*) pxcName,
-				(char*) "varDeclaration"))
+		if (CheckEndElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "varDeclaration"))
 		{
-			ObjVarDecl.StructUniqueId = new char[strlen(
-					pobjCDT->name_id_attr->getUniqueID()) + 1];
-			strcpy(ObjVarDecl.StructUniqueId,
-					pobjCDT->name_id_attr->getUniqueID());
-			pobjCDT->addVarDeclaration(ObjVarDecl);
-			ObjVarDecl = objTempVarDecl;
+			varDeclObj.structUniqueId = new char[strlen(cdtObj->nameIdAttr->GetUniqueID()) + 1];
+			strcpy(varDeclObj.structUniqueId, cdtObj->nameIdAttr->GetUniqueID());
+			cdtObj->AddVarDeclaration(varDeclObj);
+			varDeclObj = objTempVarDecl;
 		}
-		if (CheckStartElement(xmlTextReaderNodeType(pxtrReader),
-				(char*) pxcName, (char*) "varDeclaration"))
+		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "varDeclaration"))
 		{
-			if (1 == xmlTextReaderHasAttributes(pxtrReader))
+			if (1 == xmlTextReaderHasAttributes(reader))
 			{
-				while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+				while (xmlTextReaderMoveToNextAttribute(reader))
 				{
-					setVarDecAttributes(pxtrReader, ObjVarDecl);
-					pxcValue = xmlTextReaderConstValue(pxtrReader);
-					pxcName = xmlTextReaderConstName(pxtrReader);
+					SetVarDecAttributes(reader, varDeclObj);
+					value = xmlTextReaderConstValue(reader);
+					name = xmlTextReaderConstName(reader);
 				}
 			}
 		}
-		char abSize[3];
+		char sizeStr[3];
 
-		if (CheckifSimpleDT((char*) pxcName, abSize))
+		if (CheckifSimpleDT((char*) name, sizeStr))
 		{
-			ObjVarDecl.nam_id_dt_attr->setDataType((char*) pxcName);
+			varDeclObj.namIdDtAttr->SetDataType((char*) name);
 
-			if (!strcmp(ObjVarDecl.size, ""))
+			if (!strcmp(varDeclObj.size, ""))
 			{
-				strcpy(ObjVarDecl.size, abSize);
+				strcpy(varDeclObj.size, sizeStr);
 			}
 		}
-		if (CheckStartElement(xmlTextReaderNodeType(pxtrReader),
-				(char*) pxcName, (char*) "dataTypeIDRef"))
+		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name, (char*) "dataTypeIDRef"))
 		{
-			if (1 == xmlTextReaderHasAttributes(pxtrReader))
+			if (1 == xmlTextReaderHasAttributes(reader))
 			{
 
-				xmlTextReaderMoveToNextAttribute(pxtrReader);
-				pxcValue = xmlTextReaderConstValue(pxtrReader);
-				pxcName = xmlTextReaderConstName(pxtrReader);
+				xmlTextReaderMoveToNextAttribute(reader);
+				value = xmlTextReaderConstValue(reader);
+				name = xmlTextReaderConstName(reader);
 
-				if (!strcmp(ConvertToUpper((char*) pxcName), "UNIQUEIDREF"))
+				if (!strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
 				{
-					ObjVarDecl.nam_id_dt_attr->setDtUniqueRefId(
-							(char*) pxcValue);
+					varDeclObj.namIdDtAttr->SetDtUniqueRefId((char*) value);
 				}
 			}
 		}
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief		ImportXML
- 
- This API shall be used for parsing the XDC/XDD file and load the objects for 
- the Node ID of Node Type specified as arguments
-
- \param		pbFileName		Char pointer to hold the path of the configuration file[XDD or XDC] to be imported.
- \param		iNodeID			Integer variable to hold the Node Id of a node
- \param		enumNodeType	Enum to hold the Node type of the node
-
- \return	ocfmRetCode
- */
-/*****************************************************************************/
-
-ocfmRetCode ImportXML(char *pbFileName, INT32 iNodeID, ENodeType enumNodeType)
+ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType)
 {
-	ocfmRetCode stErrStruct;
+	ocfmRetCode errCodeObj;
 	try
 	{
-		stErrStruct = parseFile(pbFileName, iNodeID, enumNodeType);
+		errCodeObj = ParseFile(fileName, nodeId, nodeType);
 
-		if (0 != stErrStruct.code)
+		if (0 != errCodeObj.code)
 		{
-			return stErrStruct;
+			return errCodeObj;
 		}
 		xmlCleanupParser();
 		/*
@@ -902,208 +732,192 @@ ocfmRetCode ImportXML(char *pbFileName, INT32 iNodeID, ENodeType enumNodeType)
 		xmlMemoryDump();
 
 		/* Add other required index*/
-		if (CN == enumNodeType)
+		if (CN == nodeType)
 		{
-			setFlagForRequiredCNIndexes(iNodeID);
-			/* Not required only in case of autogenartion 1020 of CN should be updated else it shud be as it is imported*/
+			SetFlagForRequiredCNIndexes(nodeId);
+			/* Not required only in case of auto generation 1020 of CN should be updated else it should be as it is imported*/
 			//AddOtherRequiredCNIndexes(iNodeID);
 		}
-		if (MN == enumNodeType)
+		if (MN == nodeType)
 		{
-			setFlagForRequiredMNIndexes(iNodeID);
+			SetFlagForRequiredMNIndexes(nodeId);
 
 		}
 
 		/* Copy default value of pdos to act value*/
-		copyPDODefToAct(iNodeID, enumNodeType);
-		copyMNPropDefToAct(iNodeID, enumNodeType);
-		calculateCNPollResponse(iNodeID, enumNodeType);
-		SetCNLossObjects(iNodeID, enumNodeType);
-		stErrStruct.code = OCFM_ERR_SUCCESS;
+		CopyPDODefToAct(nodeId, nodeType);
+		CopyMNPropDefToAct(nodeId, nodeType);
+		CalculateCNPollResponse(nodeId, nodeType);
+		SetCNLossObjects(nodeId, nodeType);
+		errCodeObj.code = OCFM_ERR_SUCCESS;
 	} catch (ocfmException& ex)
 	{
 		return ex._ocfmRetCode;
 	}
-	return stErrStruct;
+	return errCodeObj;
 }
 
-/*****************************************************************************/
-/**
- \brief			processNode
- 
- This Function shall Process the Node pxcValue,Name and its attributes
- 
- \param			pxtrReader         xml Pointer of xmlTextReaderPtr
- \param			enumNodeType       Enum Variable of ENodeType 
- \param			iNodeIndex         Integer Variable to hold the value of node index
- \return		void
- */
-/*****************************************************************************/
-
-void processNode(xmlTextReaderPtr pxtrReader, ENodeType enumNodeType,
-		INT32 iNodeIndex)
+void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 {
-	const xmlChar *pxcName = NULL;
-	CNodeCollection *pobjNodeCollection = NULL;
-	CNode *pobjNode = NULL;
+	const xmlChar *name = NULL;
+	NodeCollection *nodeCollObj = NULL;
+	Node *nodeObj = NULL;
 
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	name = xmlTextReaderConstName(reader);
 
 	try
 	{
 		//If the NodeTYPE is ELEMENT
-		if (TRUE == xmlTextReaderNodeType(pxtrReader))
+		if (TRUE == xmlTextReaderNodeType(reader))
 		{
-			if (!strcmp(((char*) pxcName), "defType"))
+			if (!strcmp(((char*) name), "defType"))
 			{
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				CDataTypeCollection* pobjDataTypeCollection;
-				DataType objDataType;
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				DataTypeCollection* dtCollObj;
+				DataType dtObj;
+				dtObj.dataTypeName = NULL;
+				dtObj.dataTypeValue = NULL;
 
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setDataTypeAttributes(pxtrReader, &objDataType);
+						SetDataTypeAttributes(reader, &dtObj);
 					}
 				}
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
-				pobjDataTypeCollection = pobjNode->getDataTypeCollection();
-				pobjDataTypeCollection->addDataType(objDataType);
+				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
+				dtCollObj = nodeObj->GetDataTypeCollection();
+				dtCollObj->AddDataType(dtObj);
 			}
-			else if (!strcmp(((char*) pxcName), "parameter"))
+			else if (!strcmp(((char*) name), "parameter"))
 			{
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				CApplicationProcess* pobjApplicationProcess;
-				Parameter stParameter;
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				ApplicationProcess* appProcessObj;
+				Parameter parameterObj;
 
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				nodeObj = nodeCollObj->GetNodePtr(nodeType,	nodePos);
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setParameterAttributes(pxtrReader, &stParameter);
+						SetParameterAttributes(reader, &parameterObj);
 					}
 				}
-				getParaDT(pxtrReader, &stParameter);
+				SetParaDT(reader, &parameterObj);
 				// Add parameter to the parameter collection of a node
-				pobjApplicationProcess = pobjNode->getApplicationProcess();
-				pobjApplicationProcess->addParameter(stParameter);
+				appProcessObj = nodeObj->GetApplicationProcess();
+				appProcessObj->AddParameter(parameterObj);
 			}
-			else if (!strcmp(((char*) pxcName), "struct"))
+			else if (!strcmp(((char*) name), "struct"))
 			{
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				CApplicationProcess* pobjApplicationProcess;
-				CComplexDataType objCDT;
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				ApplicationProcess* appProcessObj;
+				ComplexDataType cdtObj;
 
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
+				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
 
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setCDTAttributes(pxtrReader, &objCDT);
+						SetCDTAttributes(reader, &cdtObj);
 					}
 				}
 
-				getVarDeclaration(pxtrReader, &objCDT);
-				// Add parameter to the parameter collection of a node
-				pobjApplicationProcess = pobjNode->getApplicationProcess();
-				pobjApplicationProcess->addComplexDataType(objCDT);
-			}
-			else if (!strcmp(((char*) pxcName), "Object"))
-			{
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				CIndexCollection* pobjIndexCollection;
-				CIndex objIndex;
+				SetVarDeclaration(reader, &cdtObj);
 
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
+				appProcessObj = nodeObj->GetApplicationProcess();
+				appProcessObj->AddComplexDataType(cdtObj);
+			}
+			else if (!strcmp(((char*) name), "Object"))
+			{
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				IndexCollection* idxCollObj;
+				Index idxObj;
+
+				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
 				//Set the NodeID
-				objIndex.setNodeID(pobjNode->getNodeId());
+				idxObj.SetNodeID(nodeObj->GetNodeId());
 				bool bhasPDO = false;
 
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setIndexAttributes(pxtrReader, &objIndex, bhasPDO);
+						SetIndexAttributes(reader, &idxObj, bhasPDO);
 					}
 				}
 				if (bhasPDO)
 				{
-					pobjNode->setFlagForPdoObjects(bhasPDO);
+					nodeObj->SetFlagForPdoObjects(bhasPDO);
 				}
-				pobjIndexCollection = pobjNode->getIndexCollection();
+				idxCollObj = nodeObj->GetIndexCollection();
 
 				//Add Index object to the IndexCollection
-				pobjIndexCollection->addIndex(objIndex);
-				LastIndexParsed = pobjIndexCollection->getNumberofIndexes() - 1;
+				idxCollObj->AddIndex(idxObj);
+				lastIndexParsed = idxCollObj->GetNumberofIndexes() - 1;
 			}
-			else if (!strcmp(((char*) pxcName), "SubObject"))
+			else if (!strcmp(((char*) name), "SubObject"))
 			{
-				CIndexCollection* pobjIndexCollection = NULL;
-				CSubIndex objSubIndex;
-				CIndex* pobjIndexPtr = NULL;
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
+				IndexCollection* idxCollObj = NULL;
+				SubIndex sidxObj;
+				Index* idxObj = NULL;
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				nodeObj = nodeCollObj->GetNodePtr(nodeType,	nodePos);
 				//Set the NodeID
-				objSubIndex.setNodeID(pobjNode->getNodeId());
+				sidxObj.SetNodeID(nodeObj->GetNodeId());
 
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setSubIndexAttributes(pxtrReader, &objSubIndex);
+						SetSubIndexAttributes(reader, &sidxObj);
 					}
 				}
 
-				pobjIndexCollection = pobjNode->getIndexCollection();
-				pobjIndexPtr = pobjIndexCollection->getIndex(LastIndexParsed);
-				pobjIndexPtr->addSubIndex(objSubIndex);
+				idxCollObj = nodeObj->GetIndexCollection();
+				idxObj = idxCollObj->GetIndex(lastIndexParsed);
+				idxObj->AddSubIndex(sidxObj);
 			}
-			else if ((!strcmp(((char*) pxcName), "GeneralFeatures"))
-					|| (!strcmp(((char*) pxcName), "MNFeatures"))
-					|| (!strcmp(((char*) pxcName), "CNFeatures")))
+			else if ((!strcmp(((char*) name), "GeneralFeatures"))
+					|| (!strcmp(((char*) name), "MNFeatures"))
+					|| (!strcmp(((char*) name), "CNFeatures")))
 			{
-				pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-				Feature stFeature;
-				EFeatureType eFeatureType;
+				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+				Feature featureObj;
+				FeatureType featureTypeObj;
 
-				pobjNode = pobjNodeCollection->getNodePtr(enumNodeType,
-						iNodeIndex);
+				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
 
 				//Todo: Check case of feature types read from xdd/xdc
-				if (!strcmp(((char*) pxcName), "GeneralFeatures"))
+				if (!strcmp(((char*) name), "GeneralFeatures"))
 				{
-					eFeatureType = GENERAL_FEATURES;
+					featureTypeObj = GENERAL_FEATURES;
 				}
-				else if (!strcmp(((char*) pxcName), "MNFeatures"))
+				else if (!strcmp(((char*) name), "MNFeatures"))
 				{
-					eFeatureType = MN_FEATURES;
+					featureTypeObj = MN_FEATURES;
 				}
-				else if (!strcmp(((char*) pxcName), "CNFeatures"))
+				else if (!strcmp(((char*) name), "CNFeatures"))
 				{
-					eFeatureType = CN_FEATURES;
+					featureTypeObj = CN_FEATURES;
 				}
 				else
 				{
 					//Todo: if no features are here "eFeatureType" is uninitialized. Also this loop will not run unless another feature is added
+					featureTypeObj = GENERAL_FEATURES;
+					//Added other as a general features. To avoid errors
 				}
 
-				if (1 == xmlTextReaderHasAttributes(pxtrReader))
+				if (1 == xmlTextReaderHasAttributes(reader))
 				{
-					CNetworkManagement* pobjNwManagement = NULL;
-					while (xmlTextReaderMoveToNextAttribute(pxtrReader))
+					NetworkManagement* nmtObj = NULL;
+					while (xmlTextReaderMoveToNextAttribute(reader))
 					{
-						setFeatures(pxtrReader, &stFeature);
-						stFeature.m_featureType = eFeatureType;
-						pobjNwManagement = pobjNode->getNetworkManagement();
-						pobjNwManagement->addFeature(stFeature);
+						SetFeatures(reader, &featureObj);
+						featureObj.featureType = featureTypeObj;
+						nmtObj = nodeObj->GetNetworkManagement();
+						nmtObj->AddFeature(featureObj);
 					}
 				}
 
@@ -1115,141 +929,106 @@ void processNode(xmlTextReaderPtr pxtrReader, ENodeType enumNodeType,
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief		parseFile
- 
- Recursiveley parses the Nodes, elements and values from the XML[xdd/xdc] file
-
- \param		pbFileName		Char pointer  to hold the path of the file [XDD or XDC].
- \param		iNodeIndex		Integer variable to hold the Node Id of a node
- \param		enumNodeType	Enum to hold the Node type of the node
-
- \return	ocfmRetCode
- */
-/*****************************************************************************/
-
-ocfmRetCode parseFile(char* pbFileName, INT32 iNodeIndex,
-		ENodeType enumNodeType)
+ocfmRetCode ParseFile(char* fileName, INT32 nodePos, NodeType nodeType)
 {
-	xmlTextReaderPtr pxtrReader;
-	INT32 iRetVal;
+	xmlTextReaderPtr reader;
+	ocfmException objException;
 
-	pxtrReader = xmlReaderForFile(pbFileName, NULL, 0);
+	reader = xmlReaderForFile(fileName, NULL, 0);
 	try
 	{
-		if (NULL != pxtrReader)
+		if (NULL != reader)
 		{
-			iRetVal = xmlTextReaderRead(pxtrReader);
-			while (1 == iRetVal)
+			INT32 retValue;
+			retValue = xmlTextReaderRead(reader);
+			while (1 == retValue)
 			{
-				processNode(pxtrReader, enumNodeType, iNodeIndex);
-				iRetVal = xmlTextReaderRead(pxtrReader);
+				ProcessNode(reader, nodeType, nodePos);
+				retValue = xmlTextReaderRead(reader);
 			}
-			xmlFreeTextReader(pxtrReader);
-			if (0 != iRetVal)
+			xmlFreeTextReader(reader);
+			if (0 != retValue)
 			{
-				ocfmException objException;
-				objException.ocfm_Excpetion(OCFM_ERR_PARSE_XML);
+				objException.OCFMException(OCFM_ERR_PARSE_XML);
 				throw objException;
 			}
 		}
 		else
 		{
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_CANNOT_OPEN_FILE);
+			objException.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
 			throw objException;
 		}
 	} catch (ocfmException& ex)
 	{
-		DeleteNodeObjDict(iNodeIndex, enumNodeType);
+		DeleteNodeObjDict(nodePos, nodeType);
 		return ex._ocfmRetCode;
 	}
 	try
 	{
-		if (MN == enumNodeType)
+		if (MN == nodeType)
 		{
-			ocfmException objException;
-			CNode objNode;
-			CNodeCollection *pobjNodeCollection = NULL;
-			CNetworkManagement *pobjNwManagement = NULL;
-			pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-			if (NULL == pobjNodeCollection)
+			Node nodeObj;
+			NodeCollection *nodeCollObj = NULL;
+			NetworkManagement *nmtObj = NULL;
+			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+			if (NULL == nodeCollObj)
 			{
 #if defined DEBUG
 				cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
-				ocfmException ex;
-				ex.ocfm_Excpetion(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-				throw ex;
+				objException.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+				throw objException;
 			}
-			objNode = pobjNodeCollection->getNode(enumNodeType, iNodeIndex);
-			pobjNwManagement = objNode.getNetworkManagement();
-			if (NULL == pobjNwManagement)
+			nodeObj = nodeCollObj->GetNode(nodeType, nodePos);
+			nmtObj = nodeObj.GetNetworkManagement();
+			if (NULL == nmtObj)
 			{
 #if defined DEBUG
 				cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
-				ocfmException ex;
-				ex.ocfm_Excpetion(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-				throw ex;
+				objException.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+				throw objException;
 			}
-			pobjNwManagement->calculateMaxPDOCount();
+			nmtObj->CalculateMaxPDOCount();
 			return objException._ocfmRetCode;
 		}
 	} catch (ocfmException& ex)
 	{
 		return ex._ocfmRetCode;
 	}
-	ocfmRetCode ErrStruct;
-	ErrStruct.code = OCFM_ERR_SUCCESS;
-	return ErrStruct;
+	ocfmRetCode errCodeObj;
+	errCodeObj.code = OCFM_ERR_SUCCESS;
+	return errCodeObj;
 }
 
-/*****************************************************************************/
-/**
- \brief			ReImportXML
- 
- This API shall be used for parsing the XDC/XDD file and re-load the objects for
- the Node ID of Node Type specified as arguments for this API. This API will not
- delete and create the node. Only the objects for the node are recreated.
-
- \param			pbFileName		Char pointer to hold the path of the configuration file [XDD or XDC] to be reimported for a Node
- \param			iNodeID			Integer variable to hold the Node Id of a node
- \param			enumNodeType	Enum to hold the Node type of the node
-
- \return		ocfmRetCode		
- */
-/*****************************************************************************/
-
-ocfmRetCode ReImportXML(char* pbFileName, INT32 iNodeID, ENodeType enumNodeType)
+ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType)
 {
-	INT32 iNodePos;
-	ocfmRetCode ErrStruct;
+	INT32 nodePos;
+	ocfmRetCode errCodeObj;
 	try
 	{
 		bool bFlag = false;
-		ErrStruct = IfNodeExists(iNodeID, enumNodeType, &iNodePos, bFlag);
-		if ((0 == ErrStruct.code) && (true == bFlag))
+		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, bFlag);
+		if ((0 == errCodeObj.code) && (true == bFlag))
 		{
 
-			ErrStruct = DeleteNodeObjDict(iNodeID, enumNodeType);
-			if (OCFM_ERR_SUCCESS != ErrStruct.code)
+			errCodeObj = DeleteNodeObjDict(nodeId, nodeType);
+			if (OCFM_ERR_SUCCESS != errCodeObj.code)
 			{
 #if defined DEBUG
 				cout << "\nDeleteNodeObjDict in ReImport failed\n" << endl;
 #endif
 			}
-			ErrStruct = parseFile(pbFileName, iNodeID, enumNodeType);
-			if (OCFM_ERR_SUCCESS != ErrStruct.code)
+			errCodeObj = ParseFile(fileName, nodeId, nodeType);
+			if (OCFM_ERR_SUCCESS != errCodeObj.code)
 			{
 #if defined DEBUG
 				cout << "\nparseFile in ReImport failed\n" << endl;
 #endif
-				ErrStruct = DeleteNodeObjDict(iNodeID, enumNodeType);
-				if (OCFM_ERR_SUCCESS != ErrStruct.code)
+				errCodeObj = DeleteNodeObjDict(nodeId, nodeType);
+				if (OCFM_ERR_SUCCESS != errCodeObj.code)
 				{
 #if defined DEBUG
 					cout << "\nDeleteNodeObjDict in ReImport failed\n" << endl;
@@ -1263,258 +1042,229 @@ ocfmRetCode ReImportXML(char* pbFileName, INT32 iNodeID, ENodeType enumNodeType)
 			xmlMemoryDump();
 
 			/* Add other required index*/
-			if (enumNodeType == CN)
+			if (nodeType == CN)
 			{
-				setFlagForRequiredCNIndexes(iNodeID);
+				SetFlagForRequiredCNIndexes(nodeId);
 				/* Not required only in case of autogenartion 1020 of CN should be updated else it shud be as it is imported*/
 			}
-			if (enumNodeType == MN)
+			if (nodeType == MN)
 			{
-				setFlagForRequiredMNIndexes(iNodeID);
+				SetFlagForRequiredMNIndexes(nodeId);
 			}
 			/* Copy default value of pdos to act value*/
-			copyPDODefToAct(iNodeID, enumNodeType);
-			copyMNPropDefToAct(iNodeID, enumNodeType);
-			calculateCNPollResponse(iNodeID, enumNodeType);
-			SetCNLossObjects(iNodeID, enumNodeType);
-			if (enumNodeType == MN)
+			CopyPDODefToAct(nodeId, nodeType);
+			CopyMNPropDefToAct(nodeId, nodeType);
+			CalculateCNPollResponse(nodeId, nodeType);
+			SetCNLossObjects(nodeId, nodeType);
+			if (nodeType == MN)
+			{
 				RecalculateMultiplex();
+			}
 
-			ErrStruct.code = OCFM_ERR_SUCCESS;
+			errCodeObj.code = OCFM_ERR_SUCCESS;
 		}
 		else
 		{
 			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_INVALID_NODEID);
+			objException.OCFMException(OCFM_ERR_INVALID_NODEID);
 			throw objException;
 		}
 	} catch (ocfmException* ex)
 	{
 		return ex->_ocfmRetCode;
 	}
-	return ErrStruct;
+	return errCodeObj;
 }
 
-/*****************************************************************************/
-/**
- \brief		SaveNode
-
- This API shall be used to save a node in xml format. This API saves the all the objects [Index/SubIndex] under the node into a xml file along with all the attributes of the objects.
-
- \param		pbFileName		Char pointer  to hold the path of the file [XDD or XDC]
- \param		NodeID			Integer variable to hold the Node Id of a node
- \param		enumNodeType	Enum to hold the Node type of the node
-
- \return	ocfmRetCode
- */
-/*****************************************************************************/
-ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
-		ENodeType enumNodeType)
+ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 {
-	INT32 iBytesWritten;
-	xmlTextWriterPtr pxtwWriter;
-	xmlDocPtr pxdDoc;
-	ocfmRetCode stErrInfo;
+	INT32 bytesWritten;
+	xmlTextWriterPtr xtwWriter;
+	xmlDocPtr xdDoc;
+	ocfmRetCode errCodeObj;
+	ocfmException objException;
 
 	try
 	{
-		CNode objNode;
-		CNodeCollection *pobjNodeCollection = NULL;
-		CIndexCollection *pobjIndexCollection = NULL;
-		CIndex objIndex;
-		CIndex* pobjIndexPtr = NULL;
-		CApplicationProcess* pobjAppProc = NULL;
-		INT32 iIndexPos = 0;
+		Node nodeObj;
+		NodeCollection *nodeCollObj = NULL;
+		IndexCollection *idxCollObj = NULL;
+		//Index idxObj1;
+		Index* idxObj = NULL;
+		ApplicationProcess* appProcessObj = NULL;
+		INT32 idxLC = 0;
 
-		objIndex.setNodeID(objNode.getNodeId());
-		pobjNodeCollection = CNodeCollection::getNodeColObjectPointer();
-		objNode = pobjNodeCollection->getNode(enumNodeType, NodeID);
+		//idxObj1.SetNodeID(nodeObj.GetNodeId());
+		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
 
-		pobjIndexCollection = objNode.getIndexCollection();
+		idxCollObj = nodeObj.GetIndexCollection();
 
-		if (0 == pobjIndexCollection->getNumberofIndexes())
+		if (0 == idxCollObj->GetNumberofIndexes())
 		{
-			stErrInfo.code = OCFM_ERR_SUCCESS;
-			return stErrInfo;
+			errCodeObj.code = OCFM_ERR_SUCCESS;
+			return errCodeObj;
 		}
 
 		/* Create a new XmlWriter for DOM, with no compression. */
-		pxtwWriter = xmlNewTextWriterDoc(&pxdDoc, 0);
-		if (NULL == pxtwWriter)
+		xtwWriter = xmlNewTextWriterDoc(&xdDoc, 0);
+		if (NULL == xtwWriter)
 		{
 			printf("testXmlpxtwWriterDoc: Error creating the xml pxtwWriter\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_CREATE_XML_WRITER_FAILED);
+			objException.OCFMException(OCFM_ERR_CREATE_XML_WRITER_FAILED);
 			throw objException;
 		}
 		/* Start the document with the xml default for the version,
 		 * encoding UTF-8 and the default for the standalone
 		 * declaration. */
-		iBytesWritten = xmlTextWriterStartDocument(pxtwWriter, NULL,
-				MY_ENCODING, NULL);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterStartDocument(xtwWriter, NULL, MY_ENCODING, NULL);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterStartDocument\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_START_DOC_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_START_DOC_FAILED);
 			throw objException;
 		}
-		iBytesWritten = xmlTextWriterWriteComment(pxtwWriter,
-				BAD_CAST "This file was autogenerated by openCONFIGURATOR");
+		bytesWritten = xmlTextWriterWriteComment(xtwWriter, BAD_CAST "This file was autogenerated by openCONFIGURATOR");
 
 		// Start ISO15745ProfileContainer Tag		
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
-				BAD_CAST "ISO15745ProfileContainer");
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "ISO15745ProfileContainer");
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start ProfileBody Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ProfileBody");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start ApplicationProcess Tag	
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ApplicationProcess");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 
 		// Start dataTypeList Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "dataTypeList");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
-		CComplexDataType* objCDT = NULL;
-		pobjAppProc = objNode.getApplicationProcess();
+		ComplexDataType* objCDT = NULL;
+		appProcessObj = nodeObj.GetApplicationProcess();
 
-		if (0 < pobjAppProc->getCDTCount())
+		if (0 < appProcessObj->GetCDTCount())
 		{
-			for (INT32 iLoopCount = 0; iLoopCount < pobjAppProc->getCDTCount();
-					iLoopCount++)
+			for (INT32 cdtLC = 0; cdtLC < appProcessObj->GetCDTCount(); cdtLC++)
 			{
 				// Start struct Tag
-				iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
-						BAD_CAST "struct");
-				if (0 > iBytesWritten)
+				bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "struct");
+				if (0 > bytesWritten)
 				{
-					printf(
-							"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
-							OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+					printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
+					objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
-				objCDT = pobjAppProc->getCDTbyCount(iLoopCount);
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				objCDT = appProcessObj->GetCDTbyCount(cdtLC);
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "name",
-						BAD_CAST objCDT->name_id_attr->getName());
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						BAD_CAST objCDT->nameIdAttr->GetName());
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "uniqueID",
-						BAD_CAST objCDT->name_id_attr->UniqueId);
+						BAD_CAST objCDT->nameIdAttr->uniqueId);
 
-				for (INT32 tempVarCount = 0;
-						tempVarCount < objCDT->varCollection.Count();
-						tempVarCount++)
+				for (INT32 varDeclLC = 0;
+						varDeclLC < objCDT->varDeclarationCollection.Count();
+						varDeclLC++)
 				{
 					varDeclaration vd;
 					vd.Initialize();
-					vd = objCDT->varCollection[tempVarCount];
+					vd = objCDT->varDeclarationCollection[varDeclLC];
 					// Start varDeclaration Tag
-					iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+					bytesWritten = xmlTextWriterStartElement(xtwWriter,
 							BAD_CAST "varDeclaration");
-					if (0 > iBytesWritten)
+					if (0 > bytesWritten)
 					{
 						printf(
 								"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-						ocfmException objException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "name",
-							BAD_CAST vd.nam_id_dt_attr->getName());
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+							BAD_CAST vd.namIdDtAttr->GetName());
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "uniqueID",
-							BAD_CAST vd.nam_id_dt_attr->UniqueId);
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+							BAD_CAST vd.namIdDtAttr->uniqueId);
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "size", BAD_CAST vd.size);
 
-					if (NULL != vd.nam_id_dt_attr->getDataType())
+					if (NULL != vd.namIdDtAttr->GetDataType())
 					{
-						iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
-								BAD_CAST vd.nam_id_dt_attr->getDataType());
+						bytesWritten = xmlTextWriterStartElement(xtwWriter,
+								BAD_CAST vd.namIdDtAttr->GetDataType());
 
-						if (0 > iBytesWritten)
+						if (0 > bytesWritten)
 						{
 							printf(
 									"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-							ocfmException objException;
-							objException.ocfm_Excpetion(
+							objException.OCFMException(
 									OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 							throw objException;
 						}
 						// End varDeclaration Tag
-						iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-						if (0 > iBytesWritten)
+						bytesWritten = xmlTextWriterEndElement(xtwWriter);
+						if (0 > bytesWritten)
 						{
 							printf(
 									"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-							ocfmException objException;
-							objException.ocfm_Excpetion(
+							objException.OCFMException(
 									OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 							throw objException;
 						}
 					}
-					else if (NULL != vd.nam_id_dt_attr->getDtUniqueRefId())
+					else if (NULL != vd.namIdDtAttr->GetDtUniqueRefId())
 					{
-						iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+						bytesWritten = xmlTextWriterStartElement(xtwWriter,
 								BAD_CAST "dataTypeIDRef");
-						if (0 > iBytesWritten)
+						if (0 > bytesWritten)
 						{
 							printf(
 									"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-							ocfmException objException;
-							objException.ocfm_Excpetion(
+							objException.OCFMException(
 									OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 							throw objException;
 						}
 
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "uniqueIDRef",
-								BAD_CAST vd.nam_id_dt_attr->getDtUniqueRefId());
+								BAD_CAST vd.namIdDtAttr->GetDtUniqueRefId());
 
 						// End dataTypeIDRef Tag
-						iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-						if (0 > iBytesWritten)
+						bytesWritten = xmlTextWriterEndElement(xtwWriter);
+						if (0 > bytesWritten)
 						{
 							printf(
 									"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
 							ocfmException objException;
-							objException.ocfm_Excpetion(
+							objException.OCFMException(
 									OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 							throw objException;
 						}
@@ -1525,26 +1275,24 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 					}
 
 					// End varDeclaration Tag
-					iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-					if (0 > iBytesWritten)
+					bytesWritten = xmlTextWriterEndElement(xtwWriter);
+					if (0 > bytesWritten)
 					{
 						printf(
 								"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-						ocfmException objException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw objException;
 					}
 				}
 
 				// End struct Tag
-				iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-				if (0 > iBytesWritten)
+				bytesWritten = xmlTextWriterEndElement(xtwWriter);
+				if (0 > bytesWritten)
 				{
 					printf(
 							"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
@@ -1552,342 +1300,317 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 		}
 
 		// End dataTypeList Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start parameterList Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
-				BAD_CAST "parameterList");
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "parameterList");
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
-		if (NULL != objNode.getApplicationProcess())
+		if (NULL != nodeObj.GetApplicationProcess())
 		{
-			pobjAppProc = objNode.getApplicationProcess();
+			appProcessObj = nodeObj.GetApplicationProcess();
 
-			for (INT32 iLoopCount = 0;
-					iLoopCount < pobjAppProc->ParameterCollection.Count();
-					iLoopCount++)
+			for (INT32 parameterLC = 0;
+					parameterLC < appProcessObj->ParameterCollection.Count();
+					parameterLC++)
 			{
-				Parameter Param;
-				Param = pobjAppProc->get_UniqueIDRef_by_ParameterIndex(
-						iLoopCount);
+				Parameter parameterObj;
+				parameterObj = appProcessObj->GetUniqueIDRefbyParameterIndex(
+						parameterLC);
 				// Start parameter Tag
-				iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+				bytesWritten = xmlTextWriterStartElement(xtwWriter,
 						BAD_CAST "parameter");
-				if (0 > iBytesWritten)
+				if (0 > bytesWritten)
 				{
 					printf(
 							"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "uniqueID",
-						BAD_CAST Param.name_id_dt_attr.getUniqueID());
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-						BAD_CAST "access", BAD_CAST Param.access);
+						BAD_CAST parameterObj.nameIdDtAttr.GetUniqueID());
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+						BAD_CAST "access", BAD_CAST parameterObj.accessStr);
 
 				// Start dataTypeIDRef Tag
-				iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+				bytesWritten = xmlTextWriterStartElement(xtwWriter,
 						BAD_CAST "dataTypeIDRef");
-				if (0 > iBytesWritten)
+				if (0 > bytesWritten)
 				{
 					printf(
 							"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "uniqueIDRef",
-						BAD_CAST Param.name_id_dt_attr.getDtUniqueRefId());
+						BAD_CAST parameterObj.nameIdDtAttr.GetDtUniqueRefId());
 				// End dataTypeIDRef Tag
-				iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-				if (0 > iBytesWritten)
+				bytesWritten = xmlTextWriterEndElement(xtwWriter);
+				if (0 > bytesWritten)
 				{
 					printf(
 							"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
 
 				// End parameter Tag
-				iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-				if (0 > iBytesWritten)
+				bytesWritten = xmlTextWriterEndElement(xtwWriter);
+				if (0 > bytesWritten)
 				{
 					printf(
 							"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
 			}
 		}
 		// End parameterList Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
 		// End ApplicationProcess Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
 		// End ProfileBody Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start ProfileBody Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ProfileBody");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start ApplicationLayers Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ApplicationLayers");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
 		// Start DataTypeList Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "DataTypeList");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
-		CDataTypeCollection *pobjDataTypeCollection = NULL;
+		DataTypeCollection *dtCollObj = NULL;
 
-		pobjDataTypeCollection = objNode.getDataTypeCollection();
+		dtCollObj = nodeObj.GetDataTypeCollection();
 
-		for (INT32 iLoopCount = 0;
-				iLoopCount < pobjDataTypeCollection->getNumberOfDataTypes();
-				iLoopCount++)
+		for (INT32 dtLC = 0; dtLC < dtCollObj->GetNumberOfDataTypes(); dtLC++)
 		{
-			DataType* dt = NULL;
-			dt = pobjDataTypeCollection->getDataTypeElement(iLoopCount);
+			DataType* dtObj = NULL;
+			dtObj = dtCollObj->GetDataTypeElement(dtLC);
 
 			// Start defType Tag
-			iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+			bytesWritten = xmlTextWriterStartElement(xtwWriter,
 					BAD_CAST "defType");
-			if (0 > iBytesWritten)
+			if (0 > bytesWritten)
 			{
 				printf(
 						"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(
+				objException.OCFMException(
 						OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
 
-			iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-					BAD_CAST "dataType", BAD_CAST dt->DataTypeValue);
+			bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+					BAD_CAST "dataType", BAD_CAST dtObj->dataTypeValue);
 			// Start DataType Tag
-			iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
-					BAD_CAST dt->getName());
-			if (0 > iBytesWritten)
+			bytesWritten = xmlTextWriterStartElement(xtwWriter,
+					BAD_CAST dtObj->GetName());
+			if (0 > bytesWritten)
 			{
 				printf(
 						"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(
+				objException.OCFMException(
 						OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			xmlTextWriterSetIndent(pxtwWriter, 1);
+			xmlTextWriterSetIndent(xtwWriter, 1);
 			// End DataType Tag
-			iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-			if (0 > iBytesWritten)
+			bytesWritten = xmlTextWriterEndElement(xtwWriter);
+			if (0 > bytesWritten)
 			{
 				printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+				objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
-			xmlTextWriterSetIndent(pxtwWriter, 1);
+			xmlTextWriterSetIndent(xtwWriter, 1);
 			// End defType Tag
-			iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-			if (0 > iBytesWritten)
+			bytesWritten = xmlTextWriterEndElement(xtwWriter);
+			if (0 > bytesWritten)
 			{
 				printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+				objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
 		}
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End DataTypeList Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (0 > iBytesWritten)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
-		if (0 == pobjIndexCollection->getNumberofIndexes())
+		if (0 == idxCollObj->GetNumberofIndexes())
 		{
 			printf("SaveNode: No Indexes Found\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_NO_INDEX_FOUND);
+			objException.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
 			throw objException;
 		}
 
 		// Start ObjectList Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ObjectList");
-		if (0 > iBytesWritten)
+		if (0 > bytesWritten)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
-		for (iIndexPos = 0;
-				iIndexPos < pobjIndexCollection->getNumberofIndexes();
-				iIndexPos++)
+		for (idxLC = 0; idxLC < idxCollObj->GetNumberofIndexes(); idxLC++)
 		{
 			// Start Object Tag
-			iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+			bytesWritten = xmlTextWriterStartElement(xtwWriter,
 					BAD_CAST "Object");
-			if (0 > iBytesWritten)
+			if (0 > bytesWritten)
 			{
 				printf(
 						"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(
+				objException.OCFMException(
 						OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
 
-			pobjIndexPtr = pobjIndexCollection->getIndex(iIndexPos);
+			idxObj = idxCollObj->GetIndex(idxLC);
 
-			if (NULL != pobjIndexPtr->getIndexValue())
+			if (NULL != idxObj->GetIndexValue())
 			{
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "index",
-						BAD_CAST pobjIndexPtr->getIndexValue());
+						BAD_CAST idxObj->GetIndexValue());
 			}
-			if (NULL != pobjIndexPtr->getName())
+			if (NULL != idxObj->GetName())
 			{
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-						BAD_CAST "name", BAD_CAST pobjIndexPtr->getName());
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+						BAD_CAST "name", BAD_CAST idxObj->GetName());
 			}
-			if (NULL != pobjIndexPtr->getObjectType())
+			if (NULL != idxObj->GetObjectType())
 			{
-				char *str_EObjectType = new char[10];
-				str_EObjectType = _IntToAscii(pobjIndexPtr->getEObjectType(),
-						str_EObjectType, 10);
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-						BAD_CAST "objectType", BAD_CAST str_EObjectType);
-				delete[] str_EObjectType;
+				char *strObjectType = new char[10];
+				strObjectType = IntToAscii(idxObj->GetEObjectType(),
+						strObjectType, 10);
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+						BAD_CAST "objectType", BAD_CAST strObjectType);
+				delete[] strObjectType;
 			}
-			DataType objTmpDataType;
-			objTmpDataType = pobjIndexPtr->getDataType();
-			if (NULL != objTmpDataType.DataTypeValue)
-				if (strlen(objTmpDataType.DataTypeValue) != 0)
+			DataType dtObj;
+			dtObj = idxObj->GetDataType();
+			if (NULL != dtObj.dataTypeValue)
+				if (strlen(dtObj.dataTypeValue) != 0)
 				{
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "dataType",
-							BAD_CAST objTmpDataType.DataTypeValue);
+							BAD_CAST dtObj.dataTypeValue);
 				}
-			if ((pobjIndexPtr->getAccessType() != NULL))
-				if (strlen(pobjIndexPtr->getAccessType()) != 0)
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+			if ((idxObj->GetAccessType() != NULL))
+				if (strlen(idxObj->GetAccessType()) != 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "accessType",
-							BAD_CAST pobjIndexPtr->getAccessType());
-			if ((pobjIndexPtr->getDefaultValue() != NULL))
-				if (strlen(pobjIndexPtr->getDefaultValue()) != 0)
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+							BAD_CAST idxObj->GetAccessType());
+			if ((idxObj->GetDefaultValue() != NULL))
+				if (strlen(idxObj->GetDefaultValue()) != 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "defaultValue",
-							BAD_CAST pobjIndexPtr->getDefaultValue());
-			if ((pobjIndexPtr->getActualValue() != NULL))
-				if (strlen(pobjIndexPtr->getActualValue()) != 0)
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+							BAD_CAST idxObj->GetDefaultValue());
+			if ((idxObj->GetActualValue() != NULL))
+				if (strlen(idxObj->GetActualValue()) != 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "actualValue",
-							BAD_CAST pobjIndexPtr->getActualValue());
-			if (pobjIndexPtr->getLowLimit() != NULL)
-				if (strlen(pobjIndexPtr->getLowLimit()) != 0)
+							BAD_CAST idxObj->GetActualValue());
+			if (idxObj->GetLowLimit() != NULL)
+				if (strlen(idxObj->GetLowLimit()) != 0)
 				{
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "lowLimit",
-							BAD_CAST pobjIndexPtr->getLowLimit());
+							BAD_CAST idxObj->GetLowLimit());
 				}
-			if (pobjIndexPtr->getHighLimit() != NULL)
-				if (strlen(pobjIndexPtr->getHighLimit()) != 0)
+			if (idxObj->GetHighLimit() != NULL)
+				if (strlen(idxObj->GetHighLimit()) != 0)
 				{
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "highLimit",
-							BAD_CAST pobjIndexPtr->getHighLimit());
+							BAD_CAST idxObj->GetHighLimit());
 				}
-			if ((pobjIndexPtr->getPDOMapping() != NULL))
-				if (strlen(pobjIndexPtr->getPDOMapping()) != 0)
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+			if ((idxObj->GetPDOMapping() != NULL))
+				if (strlen(idxObj->GetPDOMapping()) != 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "PDOmapping",
-							BAD_CAST pobjIndexPtr->getPDOMapping());
-			if (pobjIndexPtr->getUniqueIDRef() != NULL)
-				if (strlen(pobjIndexPtr->getUniqueIDRef()) != 0)
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+							BAD_CAST idxObj->GetPDOMapping());
+			if (idxObj->GetUniqueIDRef() != NULL)
+				if (strlen(idxObj->GetUniqueIDRef()) != 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 							BAD_CAST "uniqueIDRef",
-							BAD_CAST pobjIndexPtr->getUniqueIDRef());
-			if (pobjIndexPtr->getFlagIfIncludedCdc() == 0)
+							BAD_CAST idxObj->GetUniqueIDRef());
+			if (idxObj->GetFlagIfIncludedCdc() == 0)
 			{
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "CDCFlag", BAD_CAST "FALSE");
 			}
-			else if (pobjIndexPtr->getFlagIfIncludedCdc() == 1)
+			else if (idxObj->GetFlagIfIncludedCdc() == 1)
 			{
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "CDCFlag", BAD_CAST "TRUE");
 			}
 			else
@@ -1895,112 +1618,109 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 				//Nothing to do.
 			}
 
-			xmlTextWriterSetIndent(pxtwWriter, 1);
+			xmlTextWriterSetIndent(xtwWriter, 1);
 
-			if (!(pobjIndexPtr->getNumberofSubIndexes() <= 0))
+			if (!(idxObj->GetNumberofSubIndexes() <= 0))
 			{
-				INT32 SubIndexPos = 0;
-				for (SubIndexPos = 0;
-						SubIndexPos < pobjIndexPtr->getNumberofSubIndexes();
-						SubIndexPos++)
+				 //SubIndexPos = 0;
+				for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes(); sidxLC++)
 				{
 					// Start SubObject Tag
-					iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+					bytesWritten = xmlTextWriterStartElement(xtwWriter,
 							BAD_CAST "SubObject");
-					if (iBytesWritten < 0)
+					if (bytesWritten < 0)
 					{
 						printf(
 								"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-						ocfmException objException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
-					CSubIndex* objSubIndexPtr = NULL;
-					objSubIndexPtr = pobjIndexPtr->getSubIndex(SubIndexPos);
-					if (objSubIndexPtr->getIndexValue() != NULL)
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					SubIndex* sidxObj = NULL;
+					sidxObj = idxObj->GetSubIndex(sidxLC);
+					if (sidxObj->GetIndexValue() != NULL)
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "subIndex",
-								BAD_CAST objSubIndexPtr->getIndexValue());
-					if (objSubIndexPtr->getName() != NULL)
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+								BAD_CAST sidxObj->GetIndexValue());
+					if (sidxObj->GetName() != NULL)
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "name",
-								BAD_CAST objSubIndexPtr->getName());
-					if (objSubIndexPtr->getObjectType() != NULL)
+								BAD_CAST sidxObj->GetName());
+					if (sidxObj->GetObjectType() != NULL)
 					{
-						char *str_EObjectType = new char[10];
-						str_EObjectType = _IntToAscii(
-								objSubIndexPtr->getEObjectType(),
-								str_EObjectType, 10);
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						char *objectTypeStr = new char[10];
+						objectTypeStr = IntToAscii(
+								sidxObj->GetEObjectType(),
+								objectTypeStr, 10);
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "objectType",
-								BAD_CAST str_EObjectType);
-						delete[] str_EObjectType;
+								BAD_CAST objectTypeStr);
+						delete[] objectTypeStr;
 					}
-					DataType objTempDataType;
-					objTempDataType = objSubIndexPtr->getDataType();
-					if (objTempDataType.DataTypeValue != NULL)
-						if (strlen(objTempDataType.DataTypeValue) != 0)
-							iBytesWritten = xmlTextWriterWriteAttribute(
-									pxtwWriter, BAD_CAST "dataType",
-									BAD_CAST objTempDataType.DataTypeValue);
-					if (objSubIndexPtr->getAccessType() != NULL)
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+					DataType dtObject;
+					dtObject = sidxObj->GetDataType();
+					if (dtObject.dataTypeValue != NULL)
+						if (strlen(dtObject.dataTypeValue) != 0)
+							bytesWritten = xmlTextWriterWriteAttribute(
+									xtwWriter, BAD_CAST "dataType",
+									BAD_CAST dtObject.dataTypeValue);
+					if (sidxObj->GetAccessType() != NULL)
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "accessType",
-								BAD_CAST objSubIndexPtr->getAccessType());
-					if (objSubIndexPtr->getDefaultValue() != NULL)
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+								BAD_CAST sidxObj->GetAccessType());
+					if (sidxObj->GetDefaultValue() != NULL)
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "defaultValue",
-								BAD_CAST objSubIndexPtr->getDefaultValue());
-					if (objSubIndexPtr->getActualValue() != NULL)
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+								BAD_CAST sidxObj->GetDefaultValue());
+					if (sidxObj->GetActualValue() != NULL)
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "actualValue",
-								BAD_CAST objSubIndexPtr->getActualValue());
-					if (objSubIndexPtr->getLowLimit() != NULL)
+								BAD_CAST sidxObj->GetActualValue());
+					if (sidxObj->GetLowLimit() != NULL)
 					{
-						if (strlen(objSubIndexPtr->getLowLimit()) != 0)
+						if (strlen(sidxObj->GetLowLimit()) != 0)
 						{
-							iBytesWritten = xmlTextWriterWriteAttribute(
-									pxtwWriter, BAD_CAST "lowLimit",
-									BAD_CAST objSubIndexPtr->getLowLimit());
+							bytesWritten = xmlTextWriterWriteAttribute(
+									xtwWriter, BAD_CAST "lowLimit",
+									BAD_CAST sidxObj->GetLowLimit());
 						}
 					}
 
-					if (objSubIndexPtr->getHighLimit() != NULL)
+					if (sidxObj->GetHighLimit() != NULL)
 					{
-						if (strlen(objSubIndexPtr->getHighLimit()) != 0)
+						if (strlen(sidxObj->GetHighLimit()) != 0)
 						{
-							iBytesWritten = xmlTextWriterWriteAttribute(
-									pxtwWriter, BAD_CAST "highLimit",
-									BAD_CAST objSubIndexPtr->getHighLimit());
-						}
-					}
-//TODO: Index checked for null. Fixit strcmp 0 sidx
-					if ((pobjIndexPtr->getPDOMapping() != NULL))
-					{
-						if (objSubIndexPtr->getPDOMapping() != NULL)
-						{
-							iBytesWritten = xmlTextWriterWriteAttribute(
-									pxtwWriter, BAD_CAST "PDOmapping",
-									BAD_CAST objSubIndexPtr->getPDOMapping());
+							bytesWritten = xmlTextWriterWriteAttribute(
+									xtwWriter, BAD_CAST "highLimit",
+									BAD_CAST sidxObj->GetHighLimit());
 						}
 					}
 
-					if (objSubIndexPtr->getUniqueIDRef() != NULL)
+					if ((idxObj->GetPDOMapping() != NULL))
 					{
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						if (sidxObj->GetPDOMapping() != NULL)
+						{
+							bytesWritten = xmlTextWriterWriteAttribute(
+									xtwWriter, BAD_CAST "PDOmapping",
+									BAD_CAST sidxObj->GetPDOMapping());
+						}
+					}
+
+					if (sidxObj->GetUniqueIDRef() != NULL)
+					{
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "uniqueIDRef",
-								BAD_CAST objSubIndexPtr->getUniqueIDRef());
+								BAD_CAST sidxObj->GetUniqueIDRef());
 					}
 
-					if (objSubIndexPtr->getFlagIfIncludedCdc() == 0)
+					if (sidxObj->GetFlagIfIncludedCdc() == 0)
 					{
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "CDCFlag", BAD_CAST "FALSE");
 					}
-					else if (objSubIndexPtr->getFlagIfIncludedCdc() == 1)
+					else if (sidxObj->GetFlagIfIncludedCdc() == 1)
 					{
-						iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
+						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 								BAD_CAST "CDCFlag", BAD_CAST "TRUE");
 					}
 					else
@@ -2008,13 +1728,12 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 						//Nothing to do. 
 					}
 					// End SubObject Tag
-					iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-					if (iBytesWritten < 0)
+					bytesWritten = xmlTextWriterEndElement(xtwWriter);
+					if (bytesWritten < 0)
 					{
 						printf(
 								"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-						ocfmException objException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw objException;
 					}
@@ -2023,282 +1742,255 @@ ocfmRetCode SaveNode(const char* pbFileName, INT32 NodeID,
 			}
 
 			// End Object Tag
-			iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-			if (iBytesWritten < 0)
+			bytesWritten = xmlTextWriterEndElement(xtwWriter);
+			if (bytesWritten < 0)
 			{
 				printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+				objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
 
 		}
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End ObjectList Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (iBytesWritten < 0)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End ApplicationLayers Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (iBytesWritten < 0)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 		// Start Network Management Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "NetworkManagement");
-		if (iBytesWritten < 0)
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 
 		// Start General Features Tag
-		iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "GeneralFeatures");
-		if (iBytesWritten < 0)
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
-		CNetworkManagement *pobjNwManagement = NULL;
-		pobjNwManagement = objNode.getNetworkManagement();
+		NetworkManagement *nmtObj = NULL;
+		nmtObj = nodeObj.GetNetworkManagement();
 
-		for (UINT32 uiLoopCount = 0;
-				uiLoopCount < pobjNwManagement->getNumberOfFeatures();
-				uiLoopCount++)
+		for (UINT32 featureLC = 0;
+				featureLC < nmtObj->GetNumberOfFeatures();
+				featureLC++)
 		{
-			Feature* feature = NULL;
-			feature = pobjNwManagement->getFeature(uiLoopCount);
+			Feature* featureObj = NULL;
+			featureObj = nmtObj->GetFeature(featureLC);
 
-			if (feature->m_featureType == GENERAL_FEATURES)
+			if (featureObj->featureType == GENERAL_FEATURES)
 			{
-				iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-						BAD_CAST feature->m_Name, BAD_CAST feature->m_Value);
-				if (iBytesWritten < 0)
+				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+						BAD_CAST featureObj->name, BAD_CAST featureObj->value);
+				if (bytesWritten < 0)
 				{
 					printf(
 							"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-					ocfmException objException;
-					objException.ocfm_Excpetion(
+					objException.OCFMException(
 							OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
 			}
 		}
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End General Features Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 
 		//Write MN Features for MN Node
-		if (objNode.getNodeType() == MN)
+		if (nodeObj.GetNodeType() == MN)
 		{
 			//Start MN Features Tag			
-			iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+			bytesWritten = xmlTextWriterStartElement(xtwWriter,
 					BAD_CAST "MNFeatures");
-			if (iBytesWritten < 0)
+			if (bytesWritten < 0)
 			{
 				printf(
 						"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(
+				objException.OCFMException(
 						OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			CNetworkManagement *pobjNwManagement = NULL;
-			pobjNwManagement = objNode.getNetworkManagement();
+			NetworkManagement *nmtObj = NULL;
+			nmtObj = nodeObj.GetNetworkManagement();
 
-			for (UINT32 uiLoopCount = 0;
-					uiLoopCount < pobjNwManagement->getNumberOfFeatures();
-					uiLoopCount++)
+			for (UINT32 featureLC = 0;
+					featureLC < nmtObj->GetNumberOfFeatures();
+					featureLC++)
 			{
-				Feature* feature = NULL;
-				feature = pobjNwManagement->getFeature(uiLoopCount);
+				Feature* featureObj = NULL;
+				featureObj = nmtObj->GetFeature(featureLC);
 
-				if (feature->m_featureType == MN_FEATURES)
+				if (featureObj->featureType == MN_FEATURES)
 				{
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-							BAD_CAST feature->m_Name,
-							BAD_CAST feature->m_Value);
-					if (iBytesWritten < 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							BAD_CAST featureObj->name,
+							BAD_CAST featureObj->value);
+					if (bytesWritten < 0)
 					{
 						printf(
 								"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-						ocfmException objException; // = new ocfmException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
 				}
 			}
-			xmlTextWriterSetIndent(pxtwWriter, 1);
+			xmlTextWriterSetIndent(xtwWriter, 1);
 			// End MN Features Tag
-			iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
+			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 
 		}
 
 		//Write CN Features for CN Node
-		else if (objNode.getNodeType() == CN)
+		else if (nodeObj.GetNodeType() == CN)
 		{
 			//Start CN Features Tag
 			//Start MN Features Tag			
-			iBytesWritten = xmlTextWriterStartElement(pxtwWriter,
+			bytesWritten = xmlTextWriterStartElement(xtwWriter,
 					BAD_CAST "CNFeatures");
-			if (iBytesWritten < 0)
+			if (bytesWritten < 0)
 			{
 				printf(
 						"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-				ocfmException objException;
-				objException.ocfm_Excpetion(
+				objException.OCFMException(
 						OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			CNetworkManagement *pobjNwManagement = NULL;
-			pobjNwManagement = objNode.getNetworkManagement();
+			NetworkManagement *nmtObj = NULL;
+			nmtObj = nodeObj.GetNetworkManagement();
 
-			for (UINT32 uiLoopCount = 0;
-					uiLoopCount < pobjNwManagement->getNumberOfFeatures();
-					uiLoopCount++)
+			for (UINT32 featureLC = 0;
+					featureLC < nmtObj->GetNumberOfFeatures();
+					featureLC++)
 			{
-				Feature* feature = NULL;
-				feature = pobjNwManagement->getFeature(uiLoopCount);
+				Feature* featureObj = NULL;
+				featureObj = nmtObj->GetFeature(featureLC);
 
-				if (feature->m_featureType == CN_FEATURES)
+				if (featureObj->featureType == CN_FEATURES)
 				{
-					iBytesWritten = xmlTextWriterWriteAttribute(pxtwWriter,
-							BAD_CAST feature->m_Name,
-							BAD_CAST feature->m_Value);
-					if (iBytesWritten < 0)
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							BAD_CAST featureObj->name,
+							BAD_CAST featureObj->value);
+					if (bytesWritten < 0)
 					{
 						printf(
 								"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-						ocfmException objException;
-						objException.ocfm_Excpetion(
+						objException.OCFMException(
 								OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
 				}
 			}
-			xmlTextWriterSetIndent(pxtwWriter, 1);
+			xmlTextWriterSetIndent(xtwWriter, 1);
 			//End CN Features Tag
-			iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
+			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		}
 		else
 		{
 			//Nothing other than MN & CN
 		}
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		//End Network Management Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End ProfileBody Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (iBytesWritten < 0)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
-		xmlTextWriterSetIndent(pxtwWriter, 1);
+		xmlTextWriterSetIndent(xtwWriter, 1);
 		// End ISO15745ProfileContainer Tag
-		iBytesWritten = xmlTextWriterEndElement(pxtwWriter);
-		if (iBytesWritten < 0)
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
-		iBytesWritten = xmlTextWriterEndDocument(pxtwWriter);
-		if (iBytesWritten < 0)
+		bytesWritten = xmlTextWriterEndDocument(xtwWriter);
+		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndDocument\n");
-			ocfmException objException;
-			objException.ocfm_Excpetion(OCFM_ERR_XML_END_DOC_FAILED);
+			objException.OCFMException(OCFM_ERR_XML_END_DOC_FAILED);
 			throw objException;
 		}
 
-		xmlFreeTextWriter(pxtwWriter);
+		xmlFreeTextWriter(xtwWriter);
 
-		xmlSaveFileEnc(pbFileName, pxdDoc, MY_ENCODING);
+		xmlSaveFileEnc(fileName, xdDoc, MY_ENCODING);
 
-		xmlFreeDoc(pxdDoc);
+		xmlFreeDoc(xdDoc);
 	} catch (ocfmException *ex)
 	{
 		throw ex->_ocfmRetCode;
 	}
 
-	stErrInfo.code = OCFM_ERR_SUCCESS;
-	return stErrInfo;
+	errCodeObj.code = OCFM_ERR_SUCCESS;
+	return errCodeObj;
 }
 
-/*****************************************************************************/
-/**
- \brief			setFlagForRequiredCNIndexes
- 
- This function shall set the flag for CN indexs
- 
- \param			iNodeId     Integer Variable to hold the value of nodeid
- \return		void
- */
-/*****************************************************************************/
-
-void setFlagForRequiredCNIndexes(INT32 iNodeId)
+void SetFlagForRequiredCNIndexes(INT32 nodeId)
 {
-	CIndex* pobjIndex = NULL;
-	CIndexCollection* pobjIdxCol = NULL;
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* pobjNode = NULL;
-	CSubIndex* pobjSIdx = NULL;
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	pobjNode = pobjNodeCol->getNodePtr(CN, iNodeId);
-	pobjIdxCol = pobjNode->getIndexCollection();
+	Index* idxObj = NULL;
+	IndexCollection* idxCollObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
+	Node* nodeObj = NULL;
+	SubIndex* sidxObj = NULL;
+	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+	nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
+	idxCollObj = nodeObj->GetIndexCollection();
 
-	INT32 iIndexCount = pobjIdxCol->getNumberofIndexes();
+	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
 
-	for (INT32 iLoopCount = 0; iLoopCount < iIndexCount; iLoopCount++)
+	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
 	{
-		pobjIndex = pobjIdxCol->getIndex(iLoopCount);
+		idxObj = idxCollObj->GetIndex(idxLC);
 
-		if ((CheckIfNotPDO((char*) pobjIndex->getIndexValue()) == false)
-				|| (strcmp((char*) pobjIndex->getIndexValue(), "1F98") == 0)
-				|| (strcmp((char*) pobjIndex->getIndexValue(), "1C14") == 0)
-				|| (strcmp((char*) pobjIndex->getIndexValue(), "1020") == 0)
-				|| (strcmp((char*) pobjIndex->getIndexValue(), "1006") == 0)
-				|| CheckIfManufactureSpecificObject(
-						(char*) pobjIndex->getIndexValue()))
+		if ((CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false)
+				|| (strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
+				|| (strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0)
+				|| (strcmp((char*) idxObj->GetIndexValue(), "1020") == 0)
+				|| (strcmp((char*) idxObj->GetIndexValue(), "1006") == 0)
+				|| CheckIfManufactureSpecificObject((char*) idxObj->GetIndexValue()))
 		{
-			pobjIndex->setFlagIfIncludedCdc(TRUE);
-			for (INT32 iSIDxCount = 0;
-					iSIDxCount < pobjIndex->getNumberofSubIndexes();
-					iSIDxCount++)
+			idxObj->SetFlagIfIncludedCdc(TRUE);
+			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes(); sidxLC++)
 			{
-				pobjSIdx = pobjIndex->getSubIndex(iSIDxCount);
-				if (pobjSIdx != NULL)
+				sidxObj = idxObj->GetSubIndex(sidxLC);
+				if (sidxObj != NULL)
 				{
-					pobjSIdx->setFlagIfIncludedCdc(TRUE);
+					sidxObj->SetFlagIfIncludedCdc(TRUE);
 				}
 
 			}
@@ -2306,71 +1998,60 @@ void setFlagForRequiredCNIndexes(INT32 iNodeId)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			setFlagForRequiredMNIndexes
- 
- This Function shall set flag for MN indexs
- 
- \param			iNodeId   Integer Variable to hold the value of node id
- \return		void
- */
-/*****************************************************************************/
-
-void setFlagForRequiredMNIndexes(INT32 iNodeId)
+void SetFlagForRequiredMNIndexes(INT32 nodeId)
 {
-	CIndex* pobjIndex = NULL;
-	CIndexCollection* pobjIdxCol = NULL;
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* pobjNode = NULL;
+	Index* idxObj = NULL;
+	IndexCollection* idxCollObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
+	Node* nodeObj = NULL;
 
-	pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-	pobjNode = pobjNodeCol->getNodePtr(MN, iNodeId);
-	pobjIdxCol = pobjNode->getIndexCollection();
+	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+	nodeObj = nodeCollObj->GetNodePtr(MN, nodeId);
+	idxCollObj = nodeObj->GetIndexCollection();
 
-	INT32 iIndexCount = pobjIdxCol->getNumberofIndexes();
+	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
 
-	for (INT32 iLoopCount = 0; iLoopCount < iIndexCount; iLoopCount++)
+	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
 	{
-		pobjIndex = pobjIdxCol->getIndex(iLoopCount);
+		idxObj = idxCollObj->GetIndex(idxLC);
 
-		if (CheckIfNotPDO((char*) pobjIndex->getIndexValue()) == false
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1006") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1020") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1300") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1C02") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1C09") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1C14") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F26") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F27") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F84") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F8B") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F8D") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F92") == 0
-				|| strcmp((char*) pobjIndex->getIndexValue(), "1F98") == 0)
+		if (CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false
+				|| strcmp((char*) idxObj->GetIndexValue(), "1006") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1020") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1300") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1C02") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1C09") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F26") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F27") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F84") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F8B") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F8D") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F92") == 0
+				|| strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
 		{
-			pobjIndex->setFlagIfIncludedCdc(TRUE);
-			for (INT32 iSIDxCount = 0;
-					iSIDxCount < pobjIndex->getNumberofSubIndexes();
-					iSIDxCount++)
+			idxObj->SetFlagIfIncludedCdc(TRUE);
+			for (INT32 sidxLC = 0;
+					sidxLC < idxObj->GetNumberofSubIndexes();
+					sidxLC++)
 			{
-				CSubIndex* pobjSIdx = NULL;
-				pobjSIdx = pobjIndex->getSubIndex(iSIDxCount);
-				pobjSIdx->setFlagIfIncludedCdc(TRUE);
+				SubIndex* sidxObj = NULL;
+				sidxObj = idxObj->GetSubIndex(sidxLC);
+				sidxObj->SetFlagIfIncludedCdc(TRUE);
 			}
 		}
-		else if (strcmp((char*) pobjIndex->getIndexValue(), "1F8A") == 0)
+		else if (strcmp((char*) idxObj->GetIndexValue(), "1F8A") == 0)
 		{
-			pobjIndex->setFlagIfIncludedCdc(TRUE);
-			for (INT32 iSIDxCount = 0;
-					iSIDxCount < pobjIndex->getNumberofSubIndexes();
-					iSIDxCount++)
+			idxObj->SetFlagIfIncludedCdc(TRUE);
+			for (INT32 sidxLC = 0;
+					sidxLC < idxObj->GetNumberofSubIndexes();
+					sidxLC++)
 			{
-				CSubIndex* pobjSIdx = NULL;
-				pobjSIdx = pobjIndex->getSubIndex(iSIDxCount);
-				if (strcmp((char*) pobjSIdx->getIndexValue(), "02") == 0)
+				SubIndex* sidxObj = NULL;
+				sidxObj = idxObj->GetSubIndex(sidxLC);
+				if (strcmp((char*) sidxObj->GetIndexValue(), "02") == 0)
 				{
-					pobjSIdx->setFlagIfIncludedCdc(TRUE);
+					sidxObj->SetFlagIfIncludedCdc(TRUE);
 					break;
 				}
 			}
@@ -2382,80 +2063,60 @@ void setFlagForRequiredMNIndexes(INT32 iNodeId)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			AddOtherRequiredCNIndexes
- 
- This function shall add required CN indexes
- 
- \param			iNodeId          Integer Variable to hold the value of node id
- \return		ocfmRetCode
- */
-/*****************************************************************************/
 //TODO: unused function
-ocfmRetCode AddOtherRequiredCNIndexes(INT32 iNodeId)
+ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 {
-	ocfmRetCode stRetCode;
-	char* MNIndex = new char[INDEX_LEN];
-	char* Sidx = new char[SUBINDEX_LEN];
-	CIndexCollection* pobjIdxCol = NULL;
-	CNodeCollection* pobjNodeCol = NULL;
-	CNode* pobjNode = NULL;
+	ocfmRetCode errCodeObj;
+	char* mnIndex = new char[INDEX_LEN];
+	char* sIdx = new char[SUBINDEX_LEN];
+	IndexCollection* idxCollObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
+	Node* nodeObj = NULL;
 
 	try
 	{
-		pobjNodeCol = CNodeCollection::getNodeColObjectPointer();
-		pobjNode = pobjNodeCol->getNodePtr(CN, iNodeId);
-		pobjIdxCol = pobjNode->getIndexCollection();
+		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+		nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
+		idxCollObj = nodeObj->GetIndexCollection();
 
 		/* Add 1006*/
-		strcpy(MNIndex, "1020");
+		strcpy(mnIndex, "1020");
 #if defined DEBUG	
 		cout << "string copied" << endl;
 #endif
-		stRetCode = AddIndex(pobjNode->getNodeId(), CN, MNIndex);
+		errCodeObj = AddIndex(nodeObj->GetNodeId(), CN, mnIndex);
 #if defined DEBUG	
-		cout << "stRetCode" << stRetCode.code << endl;
+		cout << "stRetCode" << errCodeObj.code << endl;
 		cout << "1020 added" << endl;
 #endif
-		if ((stRetCode.code != 0)
-				&& (stRetCode.code != OCFM_ERR_INDEX_ALREADY_EXISTS))
-			return stRetCode;
+		if ((errCodeObj.code != 0) && (errCodeObj.code != OCFM_ERR_INDEX_ALREADY_EXISTS))
+		{
+			return errCodeObj;
+		}
 
-		char* Val = new char[16];
-		Val = _IntToAscii(iConfigDate, Val, 10);
+		char* valueStr = new char[16];
+		valueStr = IntToAscii(configDateGlobal, valueStr, 10);
 
 		/* Set 5ms pxcValue*/
 		/* Set subindex pxcValue 40 or 0000028 */
-		strcpy(Sidx, "01");
-		SetSIdxValue(MNIndex, Sidx, Val, pobjIdxCol, pobjNode->getNodeId(), CN,
-				false);
+		strcpy(sIdx, "01");
+		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(), CN,	false);
 
-		Val = _IntToAscii(iConfigTime, Val, 10);
+		valueStr = IntToAscii(configTimeGlobal, valueStr, 10);
 
-		strcpy(Sidx, "02");
-		SetSIdxValue(MNIndex, Sidx, Val, pobjIdxCol, pobjNode->getNodeId(), CN,
-				false);
+		strcpy(sIdx, "02");
+		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(), CN,	false);
+
+		delete[] valueStr;
 	} catch (ocfmException& ex)
 	{
 		return ex._ocfmRetCode;
 	}
-	stRetCode.code = OCFM_ERR_SUCCESS;
-	return stRetCode;
+	errCodeObj.code = OCFM_ERR_SUCCESS;
+	return errCodeObj;
 }
 
-/*****************************************************************************/
-/**
- \brief			getDataSize
- 
- This Function shall provide datasize of the variable
- 
- \param			dataTypeVal     Character Pointer Variable to hold datatype value
- \return		INT32
- */
-/*****************************************************************************/
-
-INT32 getDataSize(char* dataTypeVal)
+INT32 GetDataSize(char* dataTypeVal)
 {
 	if (strcmp(StringToUpper(dataTypeVal), "UNSIGNED8") == 0
 			|| strcmp(StringToUpper(dataTypeVal), "BOOLEAN") == 0
@@ -2543,61 +2204,36 @@ INT32 getDataSize(char* dataTypeVal)
 	return 1; //by default
 }
 
-/*****************************************************************************/
-/**
- \brief			checkIfStringDatatypes
- 
- This function shall check for string datatypes
- 
- \param			datatypeValue     Character Pointer Variable to hold datatype value
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool checkIfStringDatatypes(char* datatypeValue)
+bool CheckIfStringDatatypes(char* dataTypeValue)
 {
-	if (strcmp(StringToUpper(datatypeValue), "VISIBLE_STRING") == 0
-			|| strcmp(StringToUpper(datatypeValue), "OCTET_STRING") == 0
-			|| strcmp(StringToUpper(datatypeValue), "UNICODE_STRING") == 0)
+	if (strcmp(StringToUpper(dataTypeValue), "VISIBLE_STRING") == 0
+			|| strcmp(StringToUpper(dataTypeValue), "OCTET_STRING") == 0
+			|| strcmp(StringToUpper(dataTypeValue), "UNICODE_STRING") == 0)
 		return true;
 	else
 		return false;
 }
 
-/*****************************************************************************/
-/**
- \brief			setFeature
- 
- This Function shall set the features
- 
- \param			pxtrReader  xml Pointer Variable of xmlTextReaderPtr
- \param			pstFeature  struct Pointer Variable of type Feature
- \return		void			
- */
-/*****************************************************************************/
-
-void setFeatures(xmlTextReaderPtr pxtrReader, Feature *pstFeature)
+void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)
 {
-	const xmlChar *pxcName = NULL;
-	const xmlChar *pxcValue = NULL;
-	if (NULL == pstFeature)
+	const xmlChar *name = NULL;
+	const xmlChar *value = NULL;
+	if (NULL == featureObj)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
-	pxcValue = xmlTextReaderConstValue(pxtrReader);
-	pxcName = xmlTextReaderConstName(pxtrReader);
+	value = xmlTextReaderConstValue(reader);
+	name = xmlTextReaderConstName(reader);
 
-	pstFeature->m_Name = new char[strlen((char*) pxcName) + STR_ALLOC_BUFFER];
-	strcpy(pstFeature->m_Name, (const char*) pxcName);
+	featureObj->name = new char[strlen((char*) name) + STR_ALLOC_BUFFER];
+	strcpy(featureObj->name, (const char*) name);
 
-	pstFeature->m_Value = new char[strlen((char*) pxcValue) + STR_ALLOC_BUFFER];
-	strcpy(pstFeature->m_Value, (const char*) pxcValue);
+	featureObj->value = new char[strlen((char*) value) + STR_ALLOC_BUFFER];
+	strcpy(featureObj->value, (const char*) value);
 
 }
 

@@ -1,8 +1,8 @@
 /**
  *****************************************************************************************************
- \file			NodeCollecction.h
+ \file			NodeCollection.h
 
- \brief			Hanldes collection of each node's information on id,name,type present inside the network	
+ \brief			Handles collection of each node's information on id,name,type present inside the network
  *****************************************************************************************************
  */
 
@@ -61,33 +61,137 @@
 
 /**
  ******************************************************************************************************
- \class			CNodeCollection
- \brief			Hanldes collection of each node's information on id,name,type present inside the network	
+ \class			NodeCollection
+ \brief			Handles collection of each node's information on id,name,type present inside the network
  
  ******************************************************************************************************/
-class DllExport CNodeCollection
+class NodeCollection
 {
 	public:
-		CNodeCollection(void);
-		~CNodeCollection(void);
+		NodeCollection(void);
+		~NodeCollection(void);
+
+	public:
+
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the count of Node objects in the collection list
+		 
+		 \return	INT32
+		 */
+		/*****************************************************************************/	
+		INT32 GetNumberOfNodes();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to add a Node object to a collection list and update the count
+		 
+		 \param		nodeObj       Class Variable of Node to hold the Node object
+		 
+		 \return	void
+		 */
+		/*****************************************************************************/
+		void AddNode(Node nodeObj);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to delete the Node objects at given position in the collection list
+		 
+		 \param		nodePos    Integer to hold the position of Node object to be deleted
+		 
+		 \return	void
+		 */
+		/*****************************************************************************/
+		void DeleteNode(INT32 nodePos);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the pointer to NodeCollection object to be used as the collection list
+		 
+		 \return	NodeCollection*
+		 */
+		/*****************************************************************************/
+		static NodeCollection* GetNodeColObjectPointer();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the Node object of given type and ID from the collection list
+		 
+		 \param		nodeType  	Enum variable of NodeType to hold the value of Node type
+		 \param		nodeId		Integer to hold the value of Node id
+		 
+		 \return	Node
+		 */
+		/*****************************************************************************/
+		Node GetNode(NodeType nodeType, INT32 nodeId);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the Node object of ID from the collection list
+		 
+		 \param		nodeId		Integer to hold the value of Node ID
+		 
+		 \return	Node
+		 */
+		/*****************************************************************************/
+		Node GetNode(INT32 nodeId);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the Node object at the given position from the collection list
+		 
+		 \param		position    Integer to hold value of column index
+		 
+		 \return	Node
+		 */
+		/*****************************************************************************/
+		Node GetNodebyCollectionIndex(INT32 position);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the MN Node object from the collection list
+		 
+		 \return	Node
+		 */
+		/*****************************************************************************/
+		Node GetMNNode();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return pointer to the Node object of given type and ID from the collection list
+
+		 \param		nodeType  	Enum variable of NodeType to hold the value of Node type
+		 \param		nodeId		Integer to hold the value of Node id
+
+		 \return	Node* / NULL
+		 */
+		/*****************************************************************************/
+		Node* GetNodePtr(NodeType nodeType, INT32 nodeId);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return pointer to the Node object at the given position from the collection list
+		 
+		 \param		position   Integer to hold value of column index
+		 
+		 \return	Node*
+		 */
+		/*****************************************************************************/
+		Node* GetNodebyColIndex(INT32 position);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the count of CN objects in the collection list
+		 
+		 This is a member function of CNodeCollection collects the CN node count 
+
+		 \return	INT32
+		 */
+		/*****************************************************************************/
+		INT32 GetCNNodesCount();
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to return the NodeCollection object to be used as the collection list
+		 
+		 \return	NodeCollection
+		 */
+		/*****************************************************************************/		
+		static NodeCollection GetNodeColObject();
 
 	private:
-		TCollection<CNode> collectionObj;
-		INT32 m_NodeCount;
 		static bool instanceFlag;
-		static CNodeCollection *objNodeCollection;
-	public:
-		INT32 getNumberOfNodes();
-		void addNode(CNode objNode);
-		void deleteNode(INT32 NodeID);
-		static CNodeCollection* getNodeColObjectPointer();
-		CNode getNode(ENodeType nodeType, INT32 NodeId);
-		CNode getNode(INT32 NodeId);
-		CNode getNodebyCollectionIndex(INT32 ColIndex);
-		CNode getMNNode();
-		CNode* getNodePtr(ENodeType nodeType, INT32 NodeId);
-		CNode* getNodebyColIndex(INT32 ColIndex);
-		INT32 getCNNodesCount();
-		static CNodeCollection getNodeColObject();
+		static NodeCollection *objNodeColl;
+		TCollection<Node> nodeCollObj;
+		INT32 nodeCount;
 };
 #endif // NodeCollection_h

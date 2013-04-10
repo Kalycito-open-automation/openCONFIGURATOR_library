@@ -123,21 +123,16 @@ typedef enum
 	OCFM_ERR_INVALID_PARAMETER, /*54*/ 
 	OCFM_ERR_INVALID_SIZE_MAPPED, /*55*/
 	OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO /*56*/
-} EConfiuguratorErrors;
+} ConfiguratorErrors;
 
 /************************************************************************************************/
 /* Structures */
 
-DllExport typedef struct ocfmRetCode
+DLLEXPORT typedef struct ocfmRetCode
 {
-		EConfiuguratorErrors code;/* Error code from EConfiuguratorErrors*/
+		ConfiguratorErrors code;/* Error code from ConfiguratorErrors*/
 		char* errorString; /* String Describes the error */
 } ocfmRetCode;
 
-typedef struct ocfmRetValError
-{
-		ocfmRetCode errCode;
-		int returnValue;
-} ocfmRetValError;
 
 #endif // Error_h

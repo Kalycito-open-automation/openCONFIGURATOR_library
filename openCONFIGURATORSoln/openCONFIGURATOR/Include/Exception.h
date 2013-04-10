@@ -73,7 +73,16 @@ class ocfmException: public std::exception
 	public:
 		ocfmRetCode _ocfmRetCode;
 	public:
-		void ocfm_Excpetion(EConfiuguratorErrors errcode);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to copy the error statment string(corresponding to the given error code parameter) to the _ocfmRetCode.errorString member
+		 
+		 \param		errCode		 Enum Variable of ConfiguratorErrors to hold the error code		
+
+		 \return	void
+		 */
+		/*****************************************************************************/
+		void OCFMException(ConfiguratorErrors errCode);
 };
 
 #endif // exception_h

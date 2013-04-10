@@ -51,7 +51,7 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <iostream>
@@ -67,324 +67,214 @@ using namespace std;
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-/*****************************************************************************/
-/**
- \brief			ConvertToUpper
- 
- This function converts received string to upper case
- 
- \param			pbStrBuffer         Character pointer variable to hold the value of string
- \return		char*
- */
-/*****************************************************************************/
-
-char* ConvertToUpper(char* pbStrBuffer)
+char* ConvertToUpper(char* str)
 {
-	if (NULL == pbStrBuffer)
+	if (NULL == str)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
-	UINT32 uiLoopCount = 0;
+	UINT32 loopCount = 0;
 
-	for (uiLoopCount = 0; pbStrBuffer[uiLoopCount]; ++uiLoopCount)
+	for (loopCount = 0; str[loopCount]; ++loopCount)
 	{
-		pbStrBuffer[uiLoopCount] = toupper(pbStrBuffer[uiLoopCount]);
+		str[loopCount] = toupper(str[loopCount]);
 	}
-	return pbStrBuffer;
+	return str;
 }
 
-/*****************************************************************************/
-/**
- \brief			StringToUpper
- 
- This function checks string length,allocate buffer and covert the string to upper case
- 
- \param			pbStrBuffer   Character pointer variable to hold the string length
- \return		char*
- */
-/*****************************************************************************/
-
 //TODO: To add a parameter for destination to avoid new delete memory leak.
-char* StringToUpper(char* pbStrBuffer)
+char* StringToUpper(char* srcStr)
 {
-	if (NULL == pbStrBuffer)
+	if (NULL == srcStr)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 	UINT32 uiLoopCount;
-	UINT32 uiStringLen = strlen(pbStrBuffer);
+	UINT32 uiStringLen = strlen(srcStr);
 
-	char* pbStrUpp = new char[uiStringLen + STR_ALLOC_BUFFER];
+	char* strUpp = new char[uiStringLen + STR_ALLOC_BUFFER];
 
 	for (uiLoopCount = 0; uiLoopCount < uiStringLen; ++uiLoopCount)
 	{
-		pbStrUpp[uiLoopCount] = toupper(pbStrBuffer[uiLoopCount]);
+		strUpp[uiLoopCount] = toupper(srcStr[uiLoopCount]);
 	}
 
-	pbStrUpp[uiLoopCount] = '\0';
-	return pbStrUpp;
+	strUpp[uiLoopCount] = '\0';
+	return strUpp;
 }
 
-/*****************************************************************************/
-/**
- \brief			reverse
- 
- This function reverses the received string
- 
- \param			pbStrBuffer  Character pointer variable to hold the string
- \return		char*
- */
-/*****************************************************************************/
-
-char* reverse(char* pbStrBuffer)
+char* Reverse(char* str)
 {
-	if (NULL == pbStrBuffer)
+	if (NULL == str)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
-	char* pbCharLeft = pbStrBuffer;
-	char* pbCharRight = pbCharLeft + strlen(pbStrBuffer) - 1;
+	char* charLeft = str;
+	char* charRight = charLeft + strlen(str) - 1;
 	char cTemp;
 
-	while (pbCharLeft < pbCharRight)
+	while (charLeft < charRight)
 	{
-		cTemp = *pbCharLeft;
-		*pbCharLeft++ = *pbCharRight;
-		*pbCharRight-- = cTemp;
+		cTemp = *charLeft;
+		*charLeft++ = *charRight;
+		*charRight-- = cTemp;
 	}
-	return pbStrBuffer;
+	return str;
 }
 
-/*****************************************************************************/
-/**
- \brief			padLeft
- 
- This function pads left of the string with 0's
- 
- \param			pbStrBuffer      Character pointer variable to hold the string length
- \param			cPadChar         Character Variable to hold the value of padding string  
- \param			iPadLength       Integer Variable to hold the value of Pad Length
- \return		char*
- */
-/*****************************************************************************/
-
-char* padLeft(char* pbStrBuffer, char cPadChar, INT32 iPadLength)
+char* PadLeft(char* str, char padChar, INT32 padLength)
 {
-	if (NULL == pbStrBuffer)
+	if (NULL == str)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
 
-	INT32 iStringLen = strlen(pbStrBuffer);
+	INT32 iStringLen = strlen(str);
 
-	if (iStringLen < iPadLength)
+	if (iStringLen < padLength)
 	{
 		char abTempBuff[50];
 		INT32 iLoopCount = 0;
-		pbStrBuffer = reverse(pbStrBuffer);
-		while (iLoopCount < (iPadLength - iStringLen))
+		str = Reverse(str);
+		while (iLoopCount < (padLength - iStringLen))
 		{
-			abTempBuff[iLoopCount] = cPadChar;
+			abTempBuff[iLoopCount] = padChar;
 			iLoopCount++;
 		}
 
 		abTempBuff[iLoopCount] = '\0';
-		strcat(pbStrBuffer, abTempBuff);
-		pbStrBuffer = reverse(pbStrBuffer);
+		strcat(str, abTempBuff);
+		str = Reverse(str);
 	}
-	return pbStrBuffer;
+	return str;
 }
 
-/*****************************************************************************/
-/**
- \brief			subString
- 
- This function returns substring
- 
- \param			pbStrBuffer    Character pointer variable to hold the string length
- \param			iStartPos      Integer Variable to hold the value of starting position of the string 
- \param			iStringLen     Integer Variable to hold the value of string length
- \return		char*
- */
-/*****************************************************************************/
-
 //TODO: Another parameter to be added for substring to avoid new delete memory issues.
-char* subString(char* pbStrBuffer, INT32 iStartPos, INT32 iStringLen)
+char* SubString(char* str, INT32 startPos, INT32 len)
 {
-	if (NULL == pbStrBuffer)
+	if (NULL == str)
 	{
 		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
+		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 		throw objException;
 	}
-	char* pbSubStrBuffer = NULL;
+	char* strTemp = NULL;
 
-	pbSubStrBuffer = new char[iStringLen + 1];
-	strncpy(pbSubStrBuffer, (const char*) (pbStrBuffer + iStartPos),
-			iStringLen);
-	pbSubStrBuffer[iStringLen] = '\0';
-	return pbSubStrBuffer;
+	strTemp = new char[len + 1];
+	strncpy(strTemp, (const char*) (str + startPos), len);
+	strTemp[len] = '\0';
+	return strTemp;
 }
 
-/*****************************************************************************/
-/**
- \brief			utoa
- 
- This function converts unsigned values to alphanumeric values
- 
- \param			uValue           Unsigned Integer Variable to hold the value to be converted to alphanumeric values
- \param			pbDigits         Character Pointer Variable to hold the digits
- \param			iBaseValue       Integer Variable to hold the basevalue
- \return		char * / NULL
- */
-/*****************************************************************************/
-
-char *utoa(unsigned uValue, char *pbDigits, INT32 iBaseValue)
+char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
 {
-	char *pbAlphNum = NULL;
+	char *alphNum = NULL;
 
-	pbAlphNum = (char *) "0123456789abcdefghijklmnopqrstuvwxyz";
-	if (0 == iBaseValue)
+	alphNum = (char *) "0123456789abcdefghijklmnopqrstuvwxyz";
+	if (0 == baseValue)
 	{
-		iBaseValue = 10;
+		baseValue = 10;
 	}
-	if ((NULL == pbDigits) || (2 > iBaseValue) || (36 < iBaseValue))
+	if ((NULL == destStr) || (2 > baseValue) || (36 < baseValue))
 	{
 		return NULL;
 	}
-	if (uValue < (unsigned) iBaseValue)
+	if (srcValue < (unsigned) baseValue)
 	{
-		pbDigits[0] = pbAlphNum[uValue];
-		pbDigits[1] = '\0';
+		destStr[0] = alphNum[srcValue];
+		destStr[1] = '\0';
 	}
 	else
 	{
-		char *pbTempBuffer = NULL;
-		for (pbTempBuffer = utoa(uValue / ((unsigned) iBaseValue), pbDigits,
-				iBaseValue); *pbTempBuffer; pbTempBuffer++)
+		char *tempBuffer = NULL;
+		for (tempBuffer = UnsignedToAlphaNumeric(srcValue / ((unsigned) baseValue), destStr,
+				baseValue); *tempBuffer; tempBuffer++)
 			;
 		{
-			utoa(uValue % ((unsigned) iBaseValue), pbTempBuffer, iBaseValue);
+			UnsignedToAlphaNumeric(srcValue % ((unsigned) baseValue), tempBuffer, baseValue);
 		}
 	}
-	return pbDigits;
+	return destStr;
 
 }
 
-/*****************************************************************************/
-/**
- \brief			_IntToAscii
- 
- This function converts INT values to ASCII value
- 
- \param			iValue          Long Integer Variable to hold the value to be converted to ASCII value
- \param			pbDigits        Character Pointer Variable to hold the digits
- \param			iBaseValue      Integer Variable to hold the basevalue
- \return		char *
- */
-/*****************************************************************************/
-
-char* _IntToAscii(LONG iValue, char *pbDigits, INT32 iBaseValue)
+char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
 {
-	char *pbDigit = NULL;
+	char *tempStr = NULL;
 	ULONG uiValue; /* assume unsigned is big enough to hold all the
 	 * unsigned values -x could possibly be -- don't
 	 * know how well this assumption holds on the
 	 * DeathStation 9000, so beware of nasal demons
 	 */
 
-	pbDigit = pbDigits;
-	if (0 == iBaseValue)
+	tempStr = destStr;
+	if (0 == baseValue)
 	{
-		iBaseValue = 10;
+		baseValue = 10;
 	}
-	if ((NULL == pbDigits) || (2 > iBaseValue) || (36 < iBaseValue))
+	if ((NULL == destStr) || (2 > baseValue) || (36 < baseValue))
 	{
 		return NULL;
 	}
-	if (iValue < 0)
+	if (srcValue < 0)
 	{
-		uiValue = -(iValue);
+		uiValue = -(srcValue);
 		uiValue = ~uiValue + 1; // two's complement
 	}
 	else
 	{
-		uiValue = iValue;
+		uiValue = srcValue;
 	}
 
-	utoa(uiValue, pbDigit, iBaseValue);
+	UnsignedToAlphaNumeric(uiValue, tempStr, baseValue);
 
-	return pbDigits;
+	return destStr;
 }
 
-/*****************************************************************************/
-/**
- \brief			hex2int
- 
- This function converts hex values to int values
- 
- \param			pbStrBuffer   Character pointer variable to hold the hex value to be converted to Int
- \return		Unsigned long int
- */
-/*****************************************************************************/
-
-ULONG hex2int(char *pbStrBuffer)
+ULONG HexToInt(char *hexStr)
 {
-	UINT32 uiLoopCount = 0;
-	UINT32 uiValue = 0;
-	UINT32 uiStrLen = strlen(pbStrBuffer);
+	UINT32 loopCount = 0;
+	UINT32 retValue = 0;
+	UINT32 hexStrLen = strlen(hexStr);
 
-	for (uiLoopCount = 0; uiLoopCount < uiStrLen; uiLoopCount++)
+	for (loopCount = 0; loopCount < hexStrLen; loopCount++)
 	{
-		if (IsAscii(pbStrBuffer[uiLoopCount]))
+		if (IsAscii(hexStr[loopCount]))
 		{
-			pbStrBuffer[uiLoopCount] = toupper(pbStrBuffer[uiLoopCount]);
+			hexStr[loopCount] = toupper(hexStr[loopCount]);
 		}
-		if (pbStrBuffer[uiLoopCount] <= 57)
+		if (hexStr[loopCount] <= 57)
 		{
-			uiValue += (pbStrBuffer[uiLoopCount] - 48)
-					* (1 << (4 * ((uiStrLen - 1) - uiLoopCount)));
+			retValue += (hexStr[loopCount] - 48)
+					* (1 << (4 * ((hexStrLen - 1) - loopCount)));
 		}
 		else
 		{
-			uiValue += (pbStrBuffer[uiLoopCount] - 55)
-					* (1 << (4 * ((uiStrLen - 1) - uiLoopCount)));
+			retValue += (hexStr[loopCount] - 55)
+					* (1 << (4 * ((hexStrLen - 1) - loopCount)));
 		}
 	}
-	return uiValue;
+	return retValue;
 }
 
-/*****************************************************************************/
-/**
- \brief			IsAscii
- 
- This function checks whether the given character is ascii
- 
- \param			cArg        Characer Variable to hold the ASCII value
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
-
-bool IsAscii(char cArg)
+bool IsAscii(char argVar)
 {
 	UINT32 uiCount;
 
-	uiCount = cArg;
+	uiCount = argVar;
 
 	if (48 <= uiCount && 57 >= uiCount)
 	{
@@ -396,24 +286,12 @@ bool IsAscii(char cArg)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfNotPDO
- 
- This function checks whether the given index value is PDO or not
- 
- \param			pbIndex         Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
-
-bool CheckIfNotPDO(char* pbIndex)
+bool CheckIfNotPDO(char* indexId)
 {
-	if ((0 == strncmp(pbIndex, "14xx", 2)) || (0 == strncmp(pbIndex, "16xx", 2))
-			|| (0 == strncmp(pbIndex, "18xx", 2))
-			|| (0 == strncmp(pbIndex, "1Axx", 2)))
+	//TODO: fails for 1a00
+	if ((0 == strncmp(indexId, "14xx", 2)) || (0 == strncmp(indexId, "16xx", 2))
+			|| (0 == strncmp(indexId, "18xx", 2))
+			|| (0 == strncmp(indexId, "1Axx", 2)))
 	{
 		return false;
 	}
@@ -423,25 +301,12 @@ bool CheckIfNotPDO(char* pbIndex)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfManufactureSpecificObject
- 
- This function checks whether the device index is manufacturer spcific or not
- 
- \param			pbIndex     Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
-
-bool CheckIfManufactureSpecificObject(char* pbIndex)
+bool CheckIfManufactureSpecificObject(char* indexId)
 {
-	UINT32 uiDeviceIndex;
+	UINT32 manufactureIndexid;
 
-	uiDeviceIndex = hex2int((char *) "2000");
-	if (hex2int(pbIndex) >= uiDeviceIndex)
+	manufactureIndexid = HexToInt((char *) "2000");
+	if (HexToInt(indexId) >= manufactureIndexid)
 	{
 		return true;
 	}
@@ -451,22 +316,9 @@ bool CheckIfManufactureSpecificObject(char* pbIndex)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfMappingPDO
- 
- This function checks index for PDO mapping
- 
- \param			pbIndex            Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
-
-bool CheckIfMappingPDO(char* pbIndex)
+bool CheckIfMappingPDO(char* indexId)
 {
-	if ((0 == strncmp(pbIndex, "1A", 2)) || (0 == strncmp(pbIndex, "16", 2)))
+	if ((0 == strncmp(indexId, "1A", 2)) || (0 == strncmp(indexId, "16", 2)))
 	{
 		return true;
 	}
@@ -475,30 +327,17 @@ bool CheckIfMappingPDO(char* pbIndex)
 		return false;
 	}
 }
-
-/*****************************************************************************/
-/**
- \brief			CheckAllowedCNIndexes
- 
- This function checks whether received CN index falls in the allowed CN indexs
- 
- \param			pbIndexValue      Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
 
 //TODO: Function is not used.
-bool CheckAllowedCNIndexes(char* pbIndexValue)
+bool CheckAllowedCNIndexes(char* indexId)
 {
-	if ((false == CheckIfNotPDO((char*) pbIndexValue))
-			|| CheckIfManufactureSpecificObject((char*) pbIndexValue)
-			|| (0 == strcmp(pbIndexValue, "1F98"))
-			|| (0 == strcmp(pbIndexValue, "1020"))
-			|| (0 == strcmp(pbIndexValue, "1F9B"))
-			|| (0 == strcmp(pbIndexValue, "1F81"))
-			|| (0 == strcmp(pbIndexValue, "1006")))
+	if ((false == CheckIfNotPDO((char*) indexId))
+			|| CheckIfManufactureSpecificObject((char*) indexId)
+			|| (0 == strcmp(indexId, "1F98"))
+			|| (0 == strcmp(indexId, "1020"))
+			|| (0 == strcmp(indexId, "1F9B"))
+			|| (0 == strcmp(indexId, "1F81"))
+			|| (0 == strcmp(indexId, "1006")))
 	{
 		return true;
 	}
@@ -507,24 +346,11 @@ bool CheckAllowedCNIndexes(char* pbIndexValue)
 		return false;
 	}
 }
-
-/*****************************************************************************/
-/**
- \brief			CheckBlockedMNIndexes
- 
- This function checks whether received MN index is blocked or not
- 
- \param			pbIndexValue        Character Pointer Variable to hold the value of index
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending	
- */
-/*****************************************************************************/
 
 //TODO: function is not used.
-bool CheckBlockedMNIndexes(char* pbIndexValue)
+bool CheckBlockedMNIndexes(char* indexId)
 {
-	if (0 == strcmp(pbIndexValue, "1F81"))
+	if (0 == strcmp(indexId, "1F81"))
 	{
 		return true;
 	}
@@ -534,101 +360,62 @@ bool CheckBlockedMNIndexes(char* pbIndexValue)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			ConvertStringToHex
- 
- Converts the string to hexadecimal for strings of string Datatype
- 
- \param			actString          Character pointer variable to hold the value of string to be converted to hex
- \return		char*			
- */
-/*****************************************************************************/
-
-char* ConvertStringToHex(char* actString)
+char* ConvertStringToHex(char* srcStr)
 {
-	INT32 ilen = 0;
+	INT32 srcStrLen = 0;
 
-	if (NULL == actString)
+	if (NULL == srcStr)
 	{
-		ocfmException objException;
-		objException.ocfm_Excpetion(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
-		throw objException;
+		return NULL;
 	}
-	ilen = strlen(actString);
-	char* actStringBuffer = new char[ilen + 1];
-	char* tempbufHex = new char[(ilen * 2) + 1];
-	if ((NULL == actStringBuffer) || (NULL == tempbufHex))
+	srcStrLen = strlen(srcStr);
+	char* tempSrcStr = new char[srcStrLen + 1];
+	char* tempHexStr = new char[(srcStrLen * 2) + 1];
+	if ((NULL == tempSrcStr) || (NULL == tempHexStr))
 	{
 #if defined DEBUG
-		cout << "Memory allocation error" << endl;
+		cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
 		ocfmException ex;
-		ex.ocfm_Excpetion(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 		throw ex;
 	}
-	strcpy(actStringBuffer, (char*) actString);
-	strcpy(actString, "");
-	for (INT32 iloopCntr = 0; iloopCntr < ilen; iloopCntr++)
+	strcpy(tempSrcStr, (char*) srcStr);
+	strcpy(srcStr, "");
+	for (INT32 iloopCntr = 0; iloopCntr < srcStrLen; iloopCntr++)
 	{
-		sprintf(tempbufHex, "%X", actStringBuffer[iloopCntr]);
-		strcat(actString, (char*) tempbufHex);
+		sprintf(tempHexStr, "%X", tempSrcStr[iloopCntr]);
+		strcat(srcStr, (char*) tempHexStr);
 	}
-	delete[] actStringBuffer;
-	delete[] tempbufHex;
-	return actString;
+	delete[] tempSrcStr;
+	delete[] tempHexStr;
+	return srcStr;
 }
 
-/*****************************************************************************/
-/**
- \brief			ConvertToHexformat
- 
- This function converts to hex value
- 
- \param			pbHexValue       Character Pointer to hold the hex value
- \param			iPadLength       Integer variable to hold value of padding length
- \param			bDoPadding       Boolean Variable to decide padding to be carried out or not 
- \return		char*			
- */
-/*****************************************************************************/
-
-char* ConvertToHexformat(char* pbHexValue, INT32 iPadLength, bool bDoPadding)
+char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding)
 {
-	char* pbHexTemp = NULL;
+	char* hexTemp = NULL;
 
-	pbHexTemp = new char[iPadLength + 2 + STR_ALLOC_BUFFER];
+	hexTemp = new char[padLength + 2 + STR_ALLOC_BUFFER];
 
-	strcpy(pbHexTemp, "0x");
+	strcpy(hexTemp, "0x");
 
-	if (bDoPadding)
+	if (doPadding)
 	{
-		pbHexValue = padLeft(pbHexValue, '0', iPadLength);
+		hexValue = PadLeft(hexValue, '0', padLength);
 	}
-	strcat(pbHexTemp, pbHexValue);
+	strcat(hexTemp, hexValue);
 
-	return pbHexTemp;
+	return hexTemp;
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckIfHex
- 
- This function checks whether hex or not
- 
- \param			pbValue    Character Pointer variable to hold the value of hex
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending			
- */
-/*****************************************************************************/
-
-bool CheckIfHex(char* pbValue)
+bool CheckIfHex(char* srcStr)
 {
-	if (NULL == strchr(pbValue, 'x'))
+	if (NULL == strchr(srcStr, 'x'))
 	{
-		if (NULL == strchr(pbValue, 'X'))
+		if (NULL == strchr(srcStr, 'X'))
 		{
 			return false;
 		}
@@ -644,136 +431,91 @@ bool CheckIfHex(char* pbValue)
 
 }
 
-/*****************************************************************************/
-/**
- \brief			getConfigDate
- 
- This function returns configuration date
- 
- \return		INT32						
- */
-/*****************************************************************************/
 
-INT32 getConfigDate()
+INT32 GetConfigDate()
 {
 	// to have the total number of days Since 1984
-	INT32 iDays = 0;
+	INT32 daysCount = 0;
 	// to have the total number of years Since 1984  
-	INT32 iYearSince = 0;
+	INT32 yearsSince = 0;
 	// to have the current Year
 	//  INT32 iCurrentYear = 0;
-	time_t rawtime;
-	struct tm *pstTimeInfo;
+	time_t rawTime;
+	struct tm *timeInfo;
 
-	time(&rawtime);
-	pstTimeInfo = localtime(&rawtime);
+	time(&rawTime);
+	timeInfo = localtime(&rawTime);
 
-	iYearSince = ((pstTimeInfo->tm_year) - 84);
+	yearsSince = ((timeInfo->tm_year) - 84);
 	//  iCurrentYear = ((pstTimeInfo->tm_year) + 1900);
 
 	// Loops thru all the years except the curent year
-	for (INT32 iLoopCount = 0; iLoopCount < iYearSince; iLoopCount++)
+	for (INT32 loopCount = 0; loopCount < yearsSince; loopCount++)
 	{
-		INT32 iTmpYear = 0;
-		INT32 iTmpDays = 0;
-		iTmpYear = (1984 + iLoopCount);
-		if ((0 == iTmpYear % 4) && !(0 == iTmpYear % 100)
-				&& (0 != iTmpYear % 400))
+		INT32 tempYear = 0;
+		INT32 tempDays = 0;
+		tempYear = (1984 + loopCount);
+		if ((0 == tempYear % 4) && !(0 == tempYear % 100)
+				&& (0 != tempYear % 400))
 		{
-			iTmpDays = 366;
+			tempDays = 366;
 		}
 		else
 		{
-			iTmpDays = 365;
+			tempDays = 365;
 		}
-		iDays += iTmpDays;
+		daysCount += tempDays;
 	}
 	// To calculate number of days since Jan 1 of current year
-	iDays += pstTimeInfo->tm_yday;
-	return iDays;
+	daysCount += timeInfo->tm_yday;
+	return daysCount;
 }
 
-/*****************************************************************************/
-/**
- \brief			getConfigTime
- 
- This function returns configuration time
- 
- \return		INT32						
- */
-/*****************************************************************************/
 
-INT32 getConfigTime()
+INT32 GetConfigTime()
 {
 	time_t rawtime;
-	struct tm *pstTimeInfo;
-	INT32 iMSeconds = 0;
+	struct tm *timeInfo;
+	INT32 milliSeconds = 0;
 
 	time(&rawtime);
-	pstTimeInfo = localtime(&rawtime);
+	timeInfo = localtime(&rawtime);
 
-	iMSeconds += (pstTimeInfo->tm_hour) * 3600000;
-	iMSeconds += (pstTimeInfo->tm_min) * 60000;
-	iMSeconds += (pstTimeInfo->tm_sec) * 1000;
+	milliSeconds += (timeInfo->tm_hour) * 3600000;
+	milliSeconds += (timeInfo->tm_min) * 60000;
+	milliSeconds += (timeInfo->tm_sec) * 1000;
 
-	return iMSeconds;
+	return milliSeconds;
 }
 
-/*****************************************************************************/
-/**
- \brief			reversedata
- 
- This function reverses the data
- 
- \param			pbArg1       Unsigned integer pointer variable to hold value of the data
- \param			pbArg2       Unsigned integer pointer variable to hold value of the data
- \param			uiSize		 Unsigned integer pointer variable to hold size of the data	
- \return		INT32						
- */
-/*****************************************************************************/
-
 //TODO: function is not used.
-INT32 reversedata(UINT8 *pbArg1, UINT8 *pbArg2, UINT32 uiSize)
+INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen)
 {
 	UINT32 uiLoopCount;
 
-	if (NULL == pbArg1 || NULL == pbArg2)
+	if (NULL == destData || NULL == srcData)
 	{
 		return -1;
 	}
 
-	for (uiLoopCount = 0; uiLoopCount < uiSize; uiLoopCount++)
+	for (uiLoopCount = 0; uiLoopCount < srcLen; uiLoopCount++)
 	{
-		*(pbArg1 + uiLoopCount) = *(pbArg2 + (uiSize - 1) - uiLoopCount);
+		*(destData + uiLoopCount) = *(srcData + (srcLen - 1) - uiLoopCount);
 	}
 
 	return 0;
 }
 
-/*****************************************************************************/
-/**
- \brief		CheckAllowedDTForMapping
- 
- This function checks for the datatype allowed for mapping
- 
- \param		dtName	Character Pointer variable to hold datatype name
-
- \return	BOOL
- \retval		TRUE			if Allowed Datatype for Mapping
- \retval		FALSE			if not allowed
- */
-/*****************************************************************************/
-
-bool CheckAllowedDTForMapping(char* dtName)
+bool CheckAllowedDTForMapping(char* dataTypeName)
 {
-	if (0 == strcmp(StringToUpper(dtName), "INTEGER8")
-			|| 0 == strcmp(StringToUpper(dtName), "INTEGER16")
-			|| 0 == strcmp(StringToUpper(dtName), "INTEGER32")
-			|| 0 == strcmp(StringToUpper(dtName), "INTEGER64")
-			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED8")
-			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED16")
-			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED32")
-			|| 0 == strcmp(StringToUpper(dtName), "UNSIGNED64"))
+	if (0 == strcmp(StringToUpper(dataTypeName), "INTEGER8")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER16")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER32")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER64")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED8")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED16")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED32")
+			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED64"))
 	{
 		return true;
 
@@ -784,53 +526,44 @@ bool CheckAllowedDTForMapping(char* dtName)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			getLastAvailableCycleNumber
- 
- This function returns last available cycle number
- 
- \return		char*
- */
-/*****************************************************************************/
 
 //TODO: Add a parameter to return the value to avoid new delete memory issues
-char* getLastAvailableCycleNumber()
+char* GetLastAvailableCycleNumber()
 {
-	char* ForcedCycle = new char[20];
-	ocfmRetCode Ret;
-	INT32 IndexPos;
+	char* retForcedCycleValue = new char[20];
+	ocfmRetCode retCode;
+	INT32 indexPos;
 	INT32 subIndexPos;
-	Ret = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07", &subIndexPos,
-			&IndexPos);
-	if (OCFM_ERR_SUCCESS != Ret.code)
+	retCode = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07", &subIndexPos,
+			&indexPos);
+	if (OCFM_ERR_SUCCESS != retCode.code)
 	{
-		strcpy(ForcedCycle, "");
-		return ForcedCycle;
+		strcpy(retForcedCycleValue, "");
+		return retForcedCycleValue;
 	}
 	char* actValue = new char[20];
-	Ret = GetSubIndexAttributes(240, MN, (char*) "1F98", (char*) "07",
+	retCode = GetSubIndexAttributes(240, MN, (char*) "1F98", (char*) "07",
 			ACTUALVALUE, actValue);
-	UINT32 uiTempCycleNumber = uiCycleNumber;
-	if (OCFM_ERR_SUCCESS != Ret.code)
+	UINT32 tempCycleNumber = cycleNumberGlobal;
+	if (OCFM_ERR_SUCCESS != retCode.code)
 	{
 
-		UINT32 iCycleValue;
+		UINT32 cycleValue;
 		if (0 == strncmp(actValue, "0x", 2) || 0 == strncmp(actValue, "0X", 2))
-			iCycleValue = hex2int(subString(actValue, 2, strlen(actValue) - 2));
+			cycleValue = HexToInt(SubString(actValue, 2, strlen(actValue) - 2));
 		else
-			iCycleValue = atoi(actValue);
+			cycleValue = atoi(actValue);
 
-		if (iCycleValue > uiTempCycleNumber + 1)
+		if (cycleValue > tempCycleNumber + 1)
 		{
-			uiTempCycleNumber += 1;
+			tempCycleNumber += 1;
 		}
 		else
 		{
-			uiTempCycleNumber += 1;
-			while (iCycleValue < uiTempCycleNumber)
+			tempCycleNumber += 1;
+			while (cycleValue < tempCycleNumber)
 			{
-				uiTempCycleNumber = uiTempCycleNumber - iCycleValue;
+				tempCycleNumber = tempCycleNumber - cycleValue;
 			}
 
 		}
@@ -838,86 +571,61 @@ char* getLastAvailableCycleNumber()
 	}
 	delete[] actValue;
 
-	UINT32 uiFreeCycleNumber = getFreeCycleNumber(uiTempCycleNumber);
-	if (uiFreeCycleNumber == uiTempCycleNumber)
+	UINT32 freeCycleNumber = GetFreeCycleNumber(tempCycleNumber);
+	if (freeCycleNumber == tempCycleNumber)
 	{
-		uiCycleNumber = uiTempCycleNumber;
-		ForcedCycle = _IntToAscii(uiTempCycleNumber, ForcedCycle, 16);
+		cycleNumberGlobal = tempCycleNumber;
+		retForcedCycleValue = IntToAscii(tempCycleNumber, retForcedCycleValue, 16);
 	}
 	else
 	{
-		ForcedCycle = _IntToAscii(uiFreeCycleNumber, ForcedCycle, 16);
+		retForcedCycleValue = IntToAscii(freeCycleNumber, retForcedCycleValue, 16);
 	}
-	return ForcedCycle;
+	return retForcedCycleValue;
 }
 
-/*****************************************************************************/
-/**
- \brief			checkAndCorrectName
- 
- This function corrects the name by adding '_'
- 
- \param			checkName		Character Pointer variable to hold the name		
- \return		void
- */
-/*****************************************************************************/
-
-void checkAndCorrectName(char* checkName)
+void CheckAndCorrectName(char* srcStr)
 {
-	if (NULL == checkName)
+	if (NULL == srcStr)
 	{
 		return;
 	}
 
-	UINT32 uiStrLen = strlen(checkName);
-	for (UINT32 uiLoopCount = 0; uiLoopCount < uiStrLen; uiLoopCount++)
+	UINT32 srcStrLen = strlen(srcStr);
+	for (UINT32 loopCount = 0; loopCount < srcStrLen; loopCount++)
 	{
-		if ((48 <= checkName[uiLoopCount] && 57 >= checkName[uiLoopCount])
-				|| (65 <= checkName[uiLoopCount] && 90 >= checkName[uiLoopCount])
-				|| (97 <= checkName[uiLoopCount]
-						&& 122 >= checkName[uiLoopCount])
-				|| 95 == checkName[uiLoopCount])
+		if ((48 <= srcStr[loopCount] && 57 >= srcStr[loopCount])
+				|| (65 <= srcStr[loopCount] && 90 >= srcStr[loopCount])
+				|| (97 <= srcStr[loopCount]
+						&& 122 >= srcStr[loopCount])
+				|| 95 == srcStr[loopCount])
 		{
 		}
 		else
 		{
-			checkName[uiLoopCount] = '_';
+			srcStr[loopCount] = '_';
 		}
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			checkIfValueZero
- 
- This function checks for zero value
- 
- \param			pcValue				Character Pointer Variable to hold the value
-
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool checkIfValueZero(char* pcValue)
+bool CheckIfValueZero(char* srcStr)
 {
-	if (NULL == pcValue || 0 == strcmp(pcValue, ""))
+	if (NULL == srcStr || 0 == strcmp(srcStr, ""))
 	{
 		return false;
 	}
 
-	INT32 iValue = 0;
-	if (0 == strncmp(pcValue, "0x", 2) || 0 == strncmp(pcValue, "0X", 2))
+	INT32 srcValue = 0;
+	if (0 == strncmp(srcStr, "0x", 2) || 0 == strncmp(srcStr, "0X", 2))
 	{
-		iValue = hex2int(subString(pcValue, 2, strlen(pcValue) - 2));
+		srcValue = HexToInt(SubString(srcStr, 2, strlen(srcStr) - 2));
 	}
 	else
 	{
-		iValue = atoi(pcValue);
+		srcValue = atoi(srcStr);
 	}
 
-	if (0 == iValue)
+	if (0 == srcValue)
 	{
 		return true;
 	}
@@ -927,115 +635,67 @@ bool checkIfValueZero(char* pcValue)
 	}
 }
 
-/*****************************************************************************/
-/**
- \brief			GetDecimalValue
- 
- This function returns decimal value
- 
- \param			pcValue			Character Pointer Variable to hold the value	
- \return		INT32			
- */
-/*****************************************************************************/
-
-INT32 GetDecimalValue(char* pcValue)
+INT32 GetDecimalValue(char* srcStr)
 {
-	if (NULL == pcValue || 0 == strcmp(pcValue, ""))
+	if (NULL == srcStr || 0 == strcmp(srcStr, ""))
 	{
 		return 0;
 	}
 
-	INT32 iValue = 0;
-	if (0 == strncmp(pcValue, "0x", 2) || 0 == strncmp(pcValue, "0X", 2))
+	INT32 srcValue = 0;
+	if (0 == strncmp(srcStr, "0x", 2) || 0 == strncmp(srcStr, "0X", 2))
 	{
-		iValue = hex2int(subString(pcValue, 2, strlen(pcValue) - 2));
+		srcValue = HexToInt(SubString(srcStr, 2, strlen(srcStr) - 2));
 	}
 	else
 	{
-		iValue = atoi(pcValue);
+		srcValue = atoi(srcStr);
 	}
 
-	return iValue;
+	return srcValue;
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckAccessTypeForInclude
- 
- This function checks for access type
- 
- \param			pcAccesstype		Character Pointer Variable to hold the Access type 
-
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool CheckAccessTypeForInclude(char* pcAccesstype)
+bool CheckAccessTypeForInclude(char* accessType)
 {
-	bool bInclude;
-	if (NULL == pcAccesstype)
+	bool retInclude;
+	if (NULL == accessType)
 	{
-		bInclude = true;
+		retInclude = true;
 	}
 	else
 	{
-		char* pcUpperAccesstype = StringToUpper(pcAccesstype);
-		if ((0 == strcmp(pcUpperAccesstype, "CONST"))
-				|| (0 == strcmp(pcUpperAccesstype, "RO")))
+		char* tempAccesstype = StringToUpper(accessType);
+		if ((0 == strcmp(tempAccesstype, "CONST"))
+				|| (0 == strcmp(tempAccesstype, "RO")))
 		{
-			bInclude = false;
+			retInclude = false;
 		}
 		else
 		{
-			bInclude = true;
+			retInclude = true;
 		}
-		//pcUpperAccesstype shoul be deleted if stringtoupper function parameters changed
-		delete[] pcUpperAccesstype;
+		//UpperAccesstype should not be deleted if StringToUpper function parameters changed
+		delete[] tempAccesstype;
 	}
-	return bInclude;
+	return retInclude;
 }
 
-/*****************************************************************************/
-/**
- \brief			CheckToolVersion
- 
- This function checks for tool version
- 
- \param			pcCurrentToolVersion		Character Pointer Variable to hold the value of current tool version		
- \return		BOOL
- \retval			TRUE			if successful
- \retval			FALSE			if there is already a message pending
- */
-/*****************************************************************************/
-
-bool CheckToolVersion(char* pcCurrentToolVersion)
+bool CheckToolVersion(char* currentToolVersion)
 {
-	char* pcUpperCurrentToolVersion = ConvertToUpper(pcCurrentToolVersion);
-	if ((FALSE == strcmp(pcUpperCurrentToolVersion, TOOL_VERSION))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_1))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_2))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_3))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_4))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_5))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, PREV_TOOL_VERSION_6))
-			|| (FALSE == strcmp(pcUpperCurrentToolVersion, LAST_TOOL_VERSION))
-			|| (FALSE
-					== strcmp(pcUpperCurrentToolVersion,
-							TOOL_INTER_REL_VERSION_1))
-			|| (FALSE
-					== strcmp(pcUpperCurrentToolVersion,
-							TOOL_INTER_REL_VERSION_2))
-			|| (FALSE
-					== strcmp(pcUpperCurrentToolVersion,
-							TOOL_INTER_REL_VERSION_3))
-			|| (FALSE
-					== strcmp(pcUpperCurrentToolVersion,
-							TOOL_INTER_REL_VERSION_4))
-			|| (FALSE
-					== strcmp(pcUpperCurrentToolVersion,
-							TOOL_INTER_REL_VERSION_5)))
+	char* tempToolVersion = ConvertToUpper(currentToolVersion);
+	if ((FALSE == strcmp(tempToolVersion, TOOL_VERSION))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_1))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_2))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_3))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
+			|| (FALSE == strcmp(tempToolVersion, LAST_TOOL_VERSION))
+			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
+			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))
+			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_3))
+			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_4))
+			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_5)))
 	{
 		return true;
 	}

@@ -2,7 +2,7 @@
  ************************************************************************************************
  \file			IndexCollection.cpp
 
- \brief			Hanldes Index collection for all Indexes
+ \brief			Handles Index collection for all Indexes
  ************************************************************************************************
  */
 
@@ -67,12 +67,12 @@
 
 /**
  
- @param void
+
  */
 
-CIndexCollection::CIndexCollection(void)
+IndexCollection::IndexCollection(void)
 {
-	m_IndexCount = 0;
+	indexCount = 0;
 }
 
 /*************************************************************************/
@@ -80,199 +80,117 @@ CIndexCollection::CIndexCollection(void)
 
 /**
  
- @param void
+
  */
 
-CIndexCollection::~CIndexCollection(void)
+IndexCollection::~IndexCollection(void)
 {
 	//Add destructor code here
 }
 
-/*****************************************************************************/
-/**
- \brief			addIndex
- 
- This is a member function of CIndexCollection collects the objindex
-
- \param			objIndex	Class variable of CIndex for object index		
- \return		void
- */
-/*****************************************************************************/
-
-void CIndexCollection::addIndex(CIndex objIndex)
+void IndexCollection::AddIndex(Index objIndex)
 {
-	INT32 iItemPosition = collectionObj.Add();
-	char* substr = NULL;
-	substr = subString((char*) objIndex.getIndexValue(), 0, 2);
-	if ((0 == strcmp(substr, "14")) || (0 == strcmp(substr, "16")))
+	INT32 itemPosition = indexCollection.Add();
+	char* subStr = NULL;
+	subStr = SubString((char*) objIndex.GetIndexValue(), 0, 2);
+	if ((0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16")))
 	{
-		objIndex.setPDOType(PDO_RPDO);
+		objIndex.SetPDOType(PDO_RPDO);
 	}
-	else if ((0 == strcmp(substr, "18")) || (0 == strcmp(substr, "1A"))
-			|| (0 == strcmp(substr, "1a")))
+	else if ((0 == strcmp(subStr, "18")) || (0 == strcmp(subStr, "1A"))
+			|| (0 == strcmp(subStr, "1a")))
 	{
-		objIndex.setPDOType(PDO_TPDO);
+		objIndex.SetPDOType(PDO_TPDO);
 	}
 	else
 	{
 		//Nothing to be added.
 	}
-	collectionObj[iItemPosition] = objIndex;
+	indexCollection[itemPosition] = objIndex;
 	//cout << "iItemPosition" << iItemPosition << endl;
-	m_IndexCount = collectionObj.Count();
+	indexCount = indexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			deleteIndex
- 
- This is a member function of CIndexCollection deletes the index value
-
- \param			iIndexID	Integer Variable to hold index id			
- \return		void
- */
-/*****************************************************************************/
-
-void CIndexCollection::deleteIndex(INT32 iIndexID)
+void IndexCollection::DeleteIndex(INT32 indexPosition)
 {
-	collectionObj.Remove(iIndexID);
-	m_IndexCount = collectionObj.Count();
+	indexCollection.Remove(indexPosition);
+	indexCount = indexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			DeleteIndexCollection
- 
- This is a member function of CIndexCollection clears the indexcollection 
-
- \return		void
- */
-/*****************************************************************************/
-
-void CIndexCollection::DeleteIndexCollection()
+void IndexCollection::DeleteIndexCollection()
 {
-	collectionObj.Clear();
-	m_IndexCount = collectionObj.Count();
+	indexCollection.Clear();
+	indexCount = indexCollection.Count();
 }
 
-/*****************************************************************************/
-/**
- \brief			DeletePDOs
- 
- This is a member function of CIndexCollection deletes PDOs(14xx, 16xx, 18xx, 1Axx) indexes
-
- \return		void
- */
-/*****************************************************************************/
-
-void CIndexCollection::DeletePDOs()
+//TODO: unused function
+void IndexCollection::DeletePDOs()
 {
-	INT32 iLoopCount;
-	char* substr = new char[SUBINDEX_LEN];
-	CIndex objIndex;
-	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
+	INT32 loopCount;
+	char* subStr = new char[SUBINDEX_LEN];
+	Index objIndex;
+	for (loopCount = 0; loopCount < indexCount; loopCount++)
 	{
-		objIndex = collectionObj[iLoopCount];
-		substr = subString((char*) objIndex.getIndexValue(), 0, 2);
-		if ((0 == strcmp(substr, "1A")) || (0 == strcmp(substr, "1a"))
-				|| (0 == strcmp(substr, "14")) || (0 == strcmp(substr, "16"))
-				|| (0 == strcmp(substr, "18")))
+		objIndex = indexCollection[loopCount];
+		subStr = SubString((char*) objIndex.GetIndexValue(), 0, 2);
+		if ((0 == strcmp(subStr, "1A")) || (0 == strcmp(subStr, "1a"))
+				|| (0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16"))
+				|| (0 == strcmp(subStr, "18")))
 		{
-			collectionObj.Remove(iLoopCount);
-			m_IndexCount = collectionObj.Count();
-			iLoopCount = 0;
+			indexCollection.Remove(loopCount);
+			indexCount = indexCollection.Count();
+			loopCount = 0;
 		}
 	}
-	delete[] substr;
+	delete[] subStr;
 }
 
-/*****************************************************************************/
-/**
- \brief			DeletePIObjects
- 
- This is a member function of CIndexCollection deletes PIObjects
-
- \return		void
- */
-/*****************************************************************************/
-
-void CIndexCollection::DeletePIObjects()
+void IndexCollection::DeletePIObjects()
 {
 	INT32 iLoopCount = 0;
-	char* substr = new char[2];
+	char* subStr = new char[2];
 
-	CIndex objIndex;
-	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
+	Index objIndex;
+	for (iLoopCount = 0; iLoopCount < indexCount; iLoopCount++)
 	{
-		objIndex = collectionObj[iLoopCount];
-		substr = subString((char*) objIndex.getIndexValue(), 0, 1);
-		if ((0 == strcmp(substr, "A")) || (0 == strcmp(substr, "a")))
+		objIndex = indexCollection[iLoopCount];
+		subStr = SubString((char*) objIndex.GetIndexValue(), 0, 1);
+		if ((0 == strcmp(subStr, "A")) || (0 == strcmp(subStr, "a")))
 		{
-			collectionObj.Remove(iLoopCount);
-			m_IndexCount = collectionObj.Count();
+			indexCollection.Remove(iLoopCount);
+			indexCount = indexCollection.Count();
 			iLoopCount = 0;
 		}
 	}
-	delete[] substr;
+	delete[] subStr;
 }
 
-/*****************************************************************************/
-/**
- \brief			getIndex
- 
- This is a member function of CIndexCollection collects index count 
-
- \param			iCount    Integer Variable to hold index count
- \return		CIndex*
- */
-/*****************************************************************************/
-
-CIndex* CIndexCollection::getIndex(INT32 iCount)
+Index* IndexCollection::GetIndex(INT32 indexPosition)
 {
-	return &collectionObj[iCount];
+	return &indexCollection[indexPosition];
 }
 
-/*****************************************************************************/
-/**
- \brief			getIndexbyIndexValue
- 
- This is a member function of CIndexCollection collects index values 
-
- \param			pbIndex    Character pointer to hold index value
- \return		CIndex*
- */
-/*****************************************************************************/
-
-CIndex* CIndexCollection::getIndexbyIndexValue(char* pbIndex)
+Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
 {
-	INT32 iLoopCount;
-	CIndex objIndex;
-	for (iLoopCount = 0; iLoopCount < m_IndexCount; iLoopCount++)
+	INT32 loopCount;
+	Index objIndex;
+	for (loopCount = 0; loopCount < indexCount; loopCount++)
 	{
-		objIndex = collectionObj[iLoopCount];
+		objIndex = indexCollection[loopCount];
 		//NULL check values 
 		if (0
-				== strcmp(StringToUpper((char*) objIndex.getIndexValue()),
-						StringToUpper(pbIndex)))
+				== strcmp(StringToUpper((char*) objIndex.GetIndexValue()),
+						StringToUpper(indexId)))
 		{
-			return &collectionObj[iLoopCount];
+			return &indexCollection[loopCount];
 		}
 	}
 	return NULL;
 }
 
-/*****************************************************************************/
-/**
- \brief			getNumberofIndexes
- 
- This is a member function of CIndexCollection returns total number of index 
 
- \return		INT32
- */
-/*****************************************************************************/
-
-INT32 CIndexCollection::getNumberofIndexes()
+INT32 IndexCollection::GetNumberofIndexes()
 {
-	return m_IndexCount;
+	return indexCount;
 }
 

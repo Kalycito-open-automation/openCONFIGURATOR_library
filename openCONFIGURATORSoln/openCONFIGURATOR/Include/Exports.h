@@ -57,12 +57,12 @@
 /************************************************************************************************/
 /* Defines */
 
-#define DllExport
-//#define DEBUG
+#define DLLEXPORT
+#define DEBUG
 
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
-#undef DllExport
-#define DllExport  __declspec(dllexport)
+#undef DLLEXPORT
+#define DLLEXPORT  __declspec(dllexport)
 #endif 
 #endif // Exports_h
