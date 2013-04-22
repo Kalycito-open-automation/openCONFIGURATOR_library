@@ -105,7 +105,6 @@ ObjectDictionary::~ObjectDictionary(void)
 	//Add destructor code here
 }
 
-
 ObjectDictionary* ObjectDictionary::GetObjDictPtr()
 {
 	if (!instanceFlag)
@@ -115,7 +114,6 @@ ObjectDictionary* ObjectDictionary::GetObjDictPtr()
 	}
 	return objectDictionary;
 }
-
 
 void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 {
@@ -167,15 +165,22 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 						value = xmlTextReaderConstValue(reader);
 						name = xmlTextReaderConstName(reader);
 
-						if (0 == strcmp(ConvertToUpper((char*) name), "DATATYPE"))
+						if (0
+								== strcmp(ConvertToUpper((char*) name),
+										"DATATYPE"))
 						{
 							DataType *dt = NULL;
-							dt = objDictNode->GetDataTypeCollection()->GetDataType((char*) value);
+							dt =
+									objDictNode->GetDataTypeCollection()->GetDataType(
+											(char*) value);
 							idxObj.SetDataTypeST(*dt);
 						}
-						else if (0 == strcmp(ConvertToUpper((char*) name), "RANGE"))
+						else if (0
+								== strcmp(ConvertToUpper((char*) name),
+										"RANGE"))
 						{
-							CreateSameattrObject((char*) value, INDEX, (char*) idxObj.GetIndexValue());
+							CreateSameattrObject((char*) value, INDEX,
+									(char*) idxObj.GetIndexValue());
 						}
 						else
 						{
@@ -207,15 +212,22 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 					{
 						value = xmlTextReaderConstValue(reader);
 						name = xmlTextReaderConstName(reader);
-						if (0 == strcmp(ConvertToUpper((char*) name), "DATATYPE"))
+						if (0
+								== strcmp(ConvertToUpper((char*) name),
+										"DATATYPE"))
 						{
 							DataType *dt = NULL;
-							dt = objDictNode->GetDataTypeCollection()->GetDataType((char*) value);
+							dt =
+									objDictNode->GetDataTypeCollection()->GetDataType(
+											(char*) value);
 							sidxObj.SetDataTypeST(*dt);
 						}
-						else if (0 == strcmp(ConvertToUpper((char*) name), "RANGE"))
+						else if (0
+								== strcmp(ConvertToUpper((char*) name),
+										"RANGE"))
 						{
-							CreateSameattrObject((char*) value, SUBINDEX, (char*) idxObj->GetIndexValue());
+							CreateSameattrObject((char*) value, SUBINDEX,
+									(char*) idxObj->GetIndexValue());
 						}
 						else
 						{
@@ -236,8 +248,6 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 	}
 }
 
-
-
 void ObjectDictionary::AddSameAttributesObjects(sattrIdxSIdx attrIdxPos)
 {
 	INT32 itemPos = attribCollObj.Add();
@@ -246,8 +256,8 @@ void ObjectDictionary::AddSameAttributesObjects(sattrIdxSIdx attrIdxPos)
 	varsattrIdxSIdx = attribCollObj.Count();
 }
 
-
-void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType, char* idxId)
+void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
+		char* idxId)
 {
 	sattrIdxSIdx stAttrIdx;
 	char* subIdx = new char[RANGE_INDEX];
@@ -284,8 +294,6 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType, cha
 	delete[] subIdx;
 }
 
-
-
 Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
 {
 	Index* idxObj = NULL;
@@ -301,16 +309,19 @@ Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
 	}
 	else
 	{
-		for (INT32 iLoopCount = 0; iLoopCount < attribCollObj.Count(); iLoopCount++)
+		for (INT32 iLoopCount = 0; iLoopCount < attribCollObj.Count();
+				iLoopCount++)
 		{
 			sattrIdxSIdx stAttrIdx;
 			stAttrIdx = attribCollObj[iLoopCount];
 
 			if (stAttrIdx.objectType == INDEX)
 			{
-				if (CheckInTheRange(indexId, stAttrIdx.startIndex, stAttrIdx.endIndex))
+				if (CheckInTheRange(indexId, stAttrIdx.startIndex,
+						stAttrIdx.endIndex))
 				{
-					idxObj = idxCollObj->GetIndexbyIndexValue(stAttrIdx.startIndex);
+					idxObj = idxCollObj->GetIndexbyIndexValue(
+							stAttrIdx.startIndex);
 					return idxObj;
 				}
 			}
@@ -318,8 +329,6 @@ Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
 		return NULL;
 	}
 }
-
-
 
 SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
 {
@@ -357,11 +366,14 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
 			sattrIdxSIdx attribObj;
 			attribObj = attribCollObj[attribLC];
 
-			if ((attribObj.objectType == SUBINDEX) && (strcmp(attribObj.Idx, idxId) == 0))
+			if ((attribObj.objectType == SUBINDEX)
+					&& (strcmp(attribObj.Idx, idxId) == 0))
 			{
-				if (CheckInTheRange(sIdxId, attribObj.startIndex, attribObj.endIndex))
+				if (CheckInTheRange(sIdxId, attribObj.startIndex,
+						attribObj.endIndex))
 				{
-					sidxObj = idxObj->GetSubIndexbyIndexValue(attribObj.startIndex);
+					sidxObj = idxObj->GetSubIndexbyIndexValue(
+							attribObj.startIndex);
 					if (NULL != sidxObj)
 					{
 						return sidxObj;
@@ -373,10 +385,11 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
 	}
 }
 
-
-bool ObjectDictionary::CheckInTheRange(char* idxId, char* startIdx, char* endIdx)
+bool ObjectDictionary::CheckInTheRange(char* idxId, char* startIdx,
+		char* endIdx)
 {
-	if (HexToInt(idxId) >= HexToInt(startIdx) && (HexToInt(idxId) <= HexToInt(endIdx)))
+	if (HexToInt(idxId) >= HexToInt(startIdx)
+			&& (HexToInt(idxId) <= HexToInt(endIdx)))
 	{
 		return true;
 	}
@@ -385,7 +398,6 @@ bool ObjectDictionary::CheckInTheRange(char* idxId, char* startIdx, char* endIdx
 		return false;
 	}
 }
-
 
 //TODO: Unused function
 INT32 ObjectDictionary::IfObjectDictIndexExists(char* idxId)
@@ -405,7 +417,6 @@ INT32 ObjectDictionary::IfObjectDictIndexExists(char* idxId)
 		return FALSE;
 	}
 }
-
 
 //TODO: Unused function
 INT32 ObjectDictionary::IfObjectDictSubIndexExists(char* idxId, char* sIdxId)
@@ -434,8 +445,6 @@ INT32 ObjectDictionary::IfObjectDictSubIndexExists(char* idxId, char* sIdxId)
 	}
 }
 
-
-
 char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 {
 	char* tempObjName = NULL;
@@ -458,9 +467,11 @@ char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 		INT32 pos = strlen(tempObjName);
 		INT32 count = strlen(idxId) - len;
 		char* modifiedName = new char[strlen(objectName) + STR_ALLOC_BUFFER];
-		strcpy(modifiedName, SubString(objectName, 0, strlen(objectName) - pos));
+		strcpy(modifiedName,
+				SubString(objectName, 0, strlen(objectName) - pos));
 		strcat(modifiedName, SubString(idxId, count, len));
-		strcat(modifiedName, SubString(tempObjName, len, strlen(tempObjName) - len));
+		strcat(modifiedName,
+				SubString(tempObjName, len, strlen(tempObjName) - len));
 		return modifiedName;
 	}
 	else

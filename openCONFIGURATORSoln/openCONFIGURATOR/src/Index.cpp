@@ -89,12 +89,10 @@ Index::~Index(void)
 	//Add destructor code here
 }
 
-
 PDOType Index::GetPDOType()
 {
 	return pdoType;
 }
-
 
 void Index::SetPDOType(PDOType varPDOType)
 {
@@ -104,7 +102,6 @@ void Index::SetPDOType(PDOType varPDOType)
 #ifndef __GNUC__
 #pragma region MemberFunctions
 #endif
-
 
 void Index::AddSubIndex(SubIndex objSubIndex)
 {
@@ -117,13 +114,11 @@ void Index::AddSubIndex(SubIndex objSubIndex)
 #endif
 }
 
-
 void Index::DeleteSubIndex(INT32 subIndexPosition)
 {
 	subIndexCollection.Remove(subIndexPosition);
 	sidxCount = subIndexCollection.Count();
 }
-
 
 void Index::DeleteSubIndexCollection()
 {
@@ -131,18 +126,15 @@ void Index::DeleteSubIndexCollection()
 	sidxCount = subIndexCollection.Count();
 }
 
-
 INT32 Index::GetNumberofSubIndexes()
 {
 	return subIndexCollection.Count();
 }
 
-
 SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
 {
 	return &subIndexCollection[subIndexPosition];
 }
-
 
 SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 {
@@ -169,12 +161,10 @@ SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 	return objSidx;
 }
 
-
 void Index::SwapSubObjects(INT32 fromPosition, INT32 toPosition)
 {
 	swap(subIndexCollection[fromPosition], subIndexCollection[toPosition]);
 }
-
 
 void Index::UpdateArraySubObjects()
 {

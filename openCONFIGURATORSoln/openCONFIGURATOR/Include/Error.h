@@ -120,7 +120,7 @@ typedef enum
 	OCFM_ERR_MEMORY_ALLOCATION_ERROR, /*51*/
 	OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS, /*52*/
 	OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND, /*53*/
-	OCFM_ERR_INVALID_PARAMETER, /*54*/ 
+	OCFM_ERR_INVALID_PARAMETER, /*54*/
 	OCFM_ERR_INVALID_SIZE_MAPPED, /*55*/
 	OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO /*56*/
 } ConfiguratorErrors;
@@ -133,6 +133,5 @@ DLLEXPORT typedef struct ocfmRetCode
 		ConfiguratorErrors code;/* Error code from ConfiguratorErrors*/
 		char* errorString; /* String Describes the error */
 } ocfmRetCode;
-
 
 #endif // Error_h

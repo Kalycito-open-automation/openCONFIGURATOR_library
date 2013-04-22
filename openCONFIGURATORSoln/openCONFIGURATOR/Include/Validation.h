@@ -61,7 +61,6 @@
 #include "../Include/openCONFIGURATOR.h"
 #include "../Include/Internal.h"
 
-
 /****************************************************************************/
 /* Function Declarations */
 
@@ -105,7 +104,8 @@ bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId);
  \retval	FALSE			if the required SubIndex does not exist
  */
 /*****************************************************************************/
-bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID, char* subIndexId);
+bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
+		char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to retrieve the version number of the tool that was used during generation from the XML file contents and checks if it matches with the tool version

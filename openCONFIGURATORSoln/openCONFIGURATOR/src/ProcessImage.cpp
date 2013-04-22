@@ -84,18 +84,18 @@ static PIIndexTable piIndexTable[NO_OF_PI_ENTERIES] =
 { "A100", UNSIGNED16, OUTPUT },
 { "A1C0", INTEGER32, OUTPUT },
 { "A200", UNSIGNED32, OUTPUT },
-{ "A240", REAL32, OUTPUT},
-{ "A400", INTEGER64, OUTPUT},
-{ "A440", UNSIGNED64, OUTPUT},
+{ "A240", REAL32, OUTPUT },
+{ "A400", INTEGER64, OUTPUT },
+{ "A440", UNSIGNED64, OUTPUT },
 { "A480", INTEGER8, INPUT },
 { "A4C0", UNSIGNED8, INPUT },
 { "A540", INTEGER16, INPUT },
 { "A580", UNSIGNED16, INPUT },
 { "A640", INTEGER32, INPUT },
 { "A680", UNSIGNED32, INPUT },
-{ "A6C0", REAL32, INPUT},
-{ "A880", INTEGER64, INPUT},
-{ "A8C0", UNSIGNED64, INPUT},
+{ "A6C0", REAL32, INPUT },
+{ "A880", INTEGER64, INPUT },
+{ "A8C0", UNSIGNED64, INPUT },
 
 };
 
@@ -106,7 +106,8 @@ ModuleCol moduleColl[TOTAL_MODULES];
 //==========================================================================//
 
 //TODO: Unused function
-void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset, INT32& startBitOffset)
+void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset,
+		INT32& startBitOffset)
 {
 	if (NULL == piObj)
 	{
@@ -151,22 +152,17 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 	{
 		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
-		for (INT32 piLoopCount = 0;
-				piLoopCount < objNode->PICollection.Count();
+		for (INT32 piLoopCount = 0; piLoopCount < objNode->PICollection.Count();
 				piLoopCount++)
 		{
-			if (INPUT
-					== objNode->PICollection[piLoopCount].directionType)
+			if (INPUT == objNode->PICollection[piLoopCount].directionType)
 			{
-				piInCol[inVarsGlobal] =
-						objNode->PICollection[piLoopCount];
+				piInCol[inVarsGlobal] = objNode->PICollection[piLoopCount];
 				inVarsGlobal++;
 			}
-			else if (OUTPUT
-					== objNode->PICollection[piLoopCount].directionType)
+			else if (OUTPUT == objNode->PICollection[piLoopCount].directionType)
 			{
-				piOutCol[outVarsGlobal] =
-						objNode->PICollection[piLoopCount];
+				piOutCol[outVarsGlobal] = objNode->PICollection[piLoopCount];
 				outVarsGlobal++;
 			}
 			else
@@ -177,8 +173,8 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 	}
 }
 
-
-INT32 GroupNETPIVariables(PIDirectionType directionType, NETProcessImage netPIObj[])
+INT32 GroupNETPIVariables(PIDirectionType directionType,
+		NETProcessImage netPIObj[])
 {
 	NodeCollection* objNodeCol = NULL;
 	Node* objNode = NULL;
@@ -189,22 +185,18 @@ INT32 GroupNETPIVariables(PIDirectionType directionType, NETProcessImage netPIOb
 	{
 		objNode = objNodeCol->GetNodebyColIndex(iOutLoopCount);
 
-		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->NETPIColl.Count();
+		for (INT32 iInLoopCount = 0; iInLoopCount < objNode->NETPIColl.Count();
 				iInLoopCount++)
 		{
-			if (objNode->NETPIColl[iInLoopCount].directionType
-					== directionType)
+			if (objNode->NETPIColl[iInLoopCount].directionType == directionType)
 			{
-				netPIObj[netPIVarsCount] =
-						objNode->NETPIColl[iInLoopCount];
+				netPIObj[netPIVarsCount] = objNode->NETPIColl[iInLoopCount];
 				netPIVarsCount++;
 			}
 		}
 	}
 	return netPIVarsCount;
 }
-
 
 void SetUniquePIVarName()
 {
@@ -223,8 +215,7 @@ void SetUniquePIVarName()
 		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
 		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->PICollection.Count();
-				iInLoopCount++)
+				iInLoopCount < objNode->PICollection.Count(); iInLoopCount++)
 		{
 			INT32 uniqNameCnt = 1;
 			bool nameMatched = false;
@@ -242,8 +233,7 @@ void SetUniquePIVarName()
 					continue;
 				}
 
-				piObjTemp2 =
-						&objNode->PICollection[iInChkLoopCount];
+				piObjTemp2 = &objNode->PICollection[iInChkLoopCount];
 
 				//check module index, module name, directiontype and variable name
 				//if all are same then append count variable to variable name
@@ -266,7 +256,8 @@ void SetUniquePIVarName()
 						delete[] piObjTemp2->varDeclName;
 					}
 					piObjTemp2->varDeclName = new char[strlen(
-							piObjTemp1->varDeclName) + uniqNameLen + ALLOC_BUFFER];
+							piObjTemp1->varDeclName) + uniqNameLen
+							+ ALLOC_BUFFER];
 					sprintf(piObjTemp2->varDeclName, "%s%02d",
 							piObjTemp1->varDeclName, uniqNameCnt);
 					nameMatched = true;
@@ -275,12 +266,11 @@ void SetUniquePIVarName()
 					if (NULL != piObjTemp2->name)
 						delete[] piObjTemp2->name;
 
-					piObjTemp2->name = new char[strlen(
-							piObjTemp2->varDeclName)
-							+ strlen(piObjTemp2->moduleName) + 6
-							+ ALLOC_BUFFER];
-					strcpy(piObjTemp2->name,
-							GetPIName(objNode->GetNodeId()));
+					piObjTemp2->name =
+							new char[strlen(piObjTemp2->varDeclName)
+									+ strlen(piObjTemp2->moduleName) + 6
+									+ ALLOC_BUFFER];
+					strcpy(piObjTemp2->name, GetPIName(objNode->GetNodeId()));
 					strcat(piObjTemp2->name, piObjTemp2->moduleName);
 					strcat(piObjTemp2->name, ".");
 					strcat(piObjTemp2->name, piObjTemp2->varDeclName);
@@ -427,9 +417,9 @@ PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
 	return stDataInfo;
 }
 
-
 //TODO: Unused function
-bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules, ModuleCol modCollObj[])
+bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules,
+		ModuleCol modCollObj[])
 {
 	for (INT32 moduleLC = 0; moduleLC <= noOfModules; moduleLC++)
 	{
@@ -442,7 +432,8 @@ bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules, M
 	return false;
 }
 
-void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar)
+void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
+		ProcessImage piOutCol[], INT32 inVar, INT32 outVar)
 {
 	char* xapFileName = new char[strlen(fileName) + ALLOC_BUFFER];
 	FILE* xapFile = new FILE();
@@ -498,8 +489,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 	uiStrLength = strlen(xapHeaderIncludeGuard);
 
 	if ((uiStrLength
-			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength,
-					xapFile)))
+			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
 		ocfmException ex;
 		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
@@ -533,15 +523,13 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 	}
 
 	//close include guard for the XAP header file
-	xapHeaderIncludeGuard =
-			new char[strlen(INCLUDE_GUARD_END) + ALLOC_BUFFER];
+	xapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_END) + ALLOC_BUFFER];
 
 	strcpy(xapHeaderIncludeGuard, "\n");
 	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_END);
 	uiStrLength = strlen(xapHeaderIncludeGuard);
 	if ((uiStrLength
-			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength,
-					xapFile)))
+			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
 		ocfmException ex;
 		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
@@ -553,7 +541,8 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 	delete[] xapHeaderIncludeGuard;
 }
 
-void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, FILE* xapHeader)
+void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
+		PIDirectionType directionType, FILE* xapHeader)
 {
 	char* mainBuffer = new char[HEADER_FILE_BUFFER];
 	char* tempBuffer = new char[200];
@@ -586,8 +575,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 					strcat(mainBuffer, "\tunsigned");
 					strcat(mainBuffer, " ");
 					strcat(mainBuffer, "PADDING_VAR_");
-					strcat(mainBuffer,
-							IntToAscii(holeFilledIdNo, holeid, 10));
+					strcat(mainBuffer, IntToAscii(holeFilledIdNo, holeid, 10));
 					strcat(mainBuffer, ":");
 					fillBitsStr = IntToAscii(filledBits, fillBitsStr, 10);
 					strcat(mainBuffer, fillBitsStr);
@@ -599,18 +587,15 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 
 			//iNodeId = objProcessImage[iLoopCount].CNNodeID;
 
-			nodeId = IntToAscii(piObj[loopCount].nodeId,
-					nodeId, 10);
-			strcpy(moduleNo,
-					SubString(piObj[loopCount].moduleIndex, 2, 2));
+			nodeId = IntToAscii(piObj[loopCount].nodeId, nodeId, 10);
+			strcpy(moduleNo, SubString(piObj[loopCount].moduleIndex, 2, 2));
 			strcpy(moduleName, piObj[loopCount].moduleName);
 
 			strcat(mainBuffer, "\tunsigned");
 			strcat(mainBuffer, " ");
 			char* tempName = new char[100];
 			strcpy(tempName, "CN");
-			nodeId = IntToAscii(piObj[loopCount].nodeId,
-					nodeId, 10);
+			nodeId = IntToAscii(piObj[loopCount].nodeId, nodeId, 10);
 			strcat(tempName, nodeId);
 			strcat(tempName, "_");
 
@@ -705,7 +690,8 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 
 	tempBufferLen = strlen(mainBuffer);
 
-	if ((tempBufferLen != fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
+	if ((tempBufferLen
+			!= fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
 		ocfmException ex;
 		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
@@ -715,7 +701,8 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 	delete[] mainBuffer;
 }
 
-void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar)
+void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
+		ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar)
 {
 	char* netFileName = new char[strlen(fileName) + ALLOC_BUFFER];
 	FILE* netFile = new FILE();
@@ -737,8 +724,7 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 	objNodeCol = NodeCollection::GetNodeColObjectPointer();
 
 	for (INT32 nodeLoopCount = 0;
-			nodeLoopCount < objNodeCol->GetNumberOfNodes();
-			nodeLoopCount++)
+			nodeLoopCount < objNodeCol->GetNumberOfNodes(); nodeLoopCount++)
 	{
 		Node* objNode = NULL;
 		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
@@ -762,7 +748,7 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 		strcat(mainBuffer, "{\n");
 		UINT32 mainBufLen = strlen(mainBuffer);
 
-		if ((mainBufLen	!= fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
+		if ((mainBufLen != fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
 		{
 			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
 			fclose(netFile);
@@ -787,8 +773,7 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 		strcpy(tempBuffer, "}\n");
 		UINT32 tempBufLen = strlen(tempBuffer);
 
-		if ((tempBufLen
-				!= fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
+		if ((tempBufLen != fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
 		{
 			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
 			fclose(netFile);
@@ -800,7 +785,8 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
 	fclose(netFile);
 }
 
-void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader)
+void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
+		PIDirectionType dirType, FILE* netHeader)
 {
 
 	char* mainBuffer = new char[HEADER_FILE_BUFFER];
@@ -810,7 +796,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 	char offsetStr[10];
 	INT32 offsetVal = 0;
 	NETProcessImage *objNetPiCol = NULL;
-	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType, netHeader);
+	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType,
+			netHeader);
 
 	objNetPiCol = new NETProcessImage[PI_VAR_COUNT];
 	INT32 netPIVarsCount = GroupNETPIVariables(dirType, objNetPiCol);
@@ -914,7 +901,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
 
 }
 
-INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader)
+INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
+		PIDirectionType dirType, FILE* netHeader)
 {
 
 	INT32 totalSize = 0;
@@ -929,8 +917,7 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 
 		for (INT32 noVarsLC = 0; noVarsLC < noOfVars; noVarsLC++)
 		{
-			objNode = objNodeCol->GetNodePtr(CN,
-					piObject[noVarsLC].nodeId);
+			objNode = objNodeCol->GetNodePtr(CN, piObject[noVarsLC].nodeId);
 			//INT32 iNodeId;
 			INT32 dataSize = 0;
 			char* nodeIdStr = new char[50];
@@ -949,7 +936,8 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 					INT32 filledBits = dataSize - (totalSize % dataSize);
 
 					totalSize = totalSize + filledBits;
-					for (INT32 fillBitLoopCount = 1; fillBitLoopCount <= (filledBits / 8);
+					for (INT32 fillBitLoopCount = 1;
+							fillBitLoopCount <= (filledBits / 8);
 							fillBitLoopCount++)
 					{
 						strcpy(holeid, "");
@@ -957,15 +945,18 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 						NETProcessImage objNETProcessImage;
 						objNETProcessImage.Initialize();
 						holeid = IntToAscii(holeFilledIdNo, holeid, 10);
-						objNETProcessImage.name = new char[strlen(holeid) + ALLOC_BUFFER];
+						objNETProcessImage.name = new char[strlen(holeid)
+								+ ALLOC_BUFFER];
 						strcpy(objNETProcessImage.name, holeid);
-						objNETProcessImage.moduleName = new char[strlen("PADDING_VAR") + ALLOC_BUFFER];
+						objNETProcessImage.moduleName = new char[strlen(
+								"PADDING_VAR") + ALLOC_BUFFER];
 						strcpy(objNETProcessImage.moduleName, "PADDING_VAR");
 
 						objNETProcessImage.count = 0;
 						objNETProcessImage.dataInfo.iecDtVar = BYTE;
 						objNETProcessImage.dataInfo.dataSize = 8;
-						objNETProcessImage.dataInfo.dtName = new char[strlen("byte") + ALLOC_BUFFER];
+						objNETProcessImage.dataInfo.dtName = new char[strlen(
+								"byte") + ALLOC_BUFFER];
 						strcpy(objNETProcessImage.dataInfo.dtName, "byte");
 						objNETProcessImage.totalDataSize = 8;
 						objNETProcessImage.directionType = dirType;
@@ -1000,40 +991,52 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 				do
 				{
 					INT32 pos = 0;
-					pos = SearchModuleNameNETProcessImageCollection(piObject[noVarsLC].nodeId, piPos, varName);
+					pos = SearchModuleNameNETProcessImageCollection(
+							piObject[noVarsLC].nodeId, piPos, varName);
 					if (-1 == pos)
 					{
 						//create new
 						netPICreated = true;
 						NETProcessImage objNETProcessImage;
 						objNETProcessImage.Initialize();
-						CopyPItoNETPICollection(piObject[noVarsLC], objNETProcessImage, varName);
+						CopyPItoNETPICollection(piObject[noVarsLC],
+								objNETProcessImage, varName);
 
 					}
 					else if (8 > objNode->NETPIColl[pos].totalDataSize)
 					{
 						netPICreated = true;
-						objNode->NETPIColl[pos].totalDataSize = objNode->NETPIColl[pos].totalDataSize+ dataSize;
+						objNode->NETPIColl[pos].totalDataSize =
+								objNode->NETPIColl[pos].totalDataSize
+										+ dataSize;
 						objNode->NETPIColl[pos].count++;
-						objNode->NETPIColl[pos].lastName = new char[strlen(piObject[noVarsLC].varDeclName) + ALLOC_BUFFER];
-						strcpy(objNode->NETPIColl[pos].lastName, piObject[noVarsLC].varDeclName);
+						objNode->NETPIColl[pos].lastName = new char[strlen(
+								piObject[noVarsLC].varDeclName) + ALLOC_BUFFER];
+						strcpy(objNode->NETPIColl[pos].lastName,
+								piObject[noVarsLC].varDeclName);
 						if (8 == objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETPIColl[pos].dataInfo.iecDtVar =	BYTE;
-							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("byte") + ALLOC_BUFFER];
-							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "byte");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar = BYTE;
+							objNode->NETPIColl[pos].dataInfo.dtName =
+									new char[strlen("byte") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName,
+									"byte");
 						}
-						else if (16	== objNode->NETPIColl[pos].totalDataSize)
+						else if (16 == objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETPIColl[pos].dataInfo.iecDtVar =	UINT;
-							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("UInt16") + ALLOC_BUFFER];
-							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "UInt16");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar = UINT;
+							objNode->NETPIColl[pos].dataInfo.dtName =
+									new char[strlen("UInt16") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName,
+									"UInt16");
 						}
 						else if (32 == objNode->NETPIColl[pos].totalDataSize)
 						{
-							objNode->NETPIColl[pos].dataInfo.iecDtVar =	UDINT;
-							objNode->NETPIColl[pos].dataInfo.dtName =	new char[strlen("UInt32") + ALLOC_BUFFER];
-							strcpy(objNode->NETPIColl[pos].dataInfo.dtName, "UInt32");
+							objNode->NETPIColl[pos].dataInfo.iecDtVar = UDINT;
+							objNode->NETPIColl[pos].dataInfo.dtName =
+									new char[strlen("UInt32") + ALLOC_BUFFER];
+							strcpy(objNode->NETPIColl[pos].dataInfo.dtName,
+									"UInt32");
 						}
 						else
 						{
@@ -1068,7 +1071,8 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 			INT32 filledBitsVal = 32 - (totalSize % 32);
 
 			totalSize = totalSize + filledBitsVal;
-			for (INT32 fillBitsLC = 1; fillBitsLC <= (filledBitsVal / 8); fillBitsLC++)
+			for (INT32 fillBitsLC = 1; fillBitsLC <= (filledBitsVal / 8);
+					fillBitsLC++)
 			{
 				strcpy(holeid, "");
 				strcpy(filledBitStr, "");
@@ -1076,13 +1080,15 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectio
 				holeid = IntToAscii(holeFilledIdNo, holeid, 10);
 				objNETPI.name = new char[strlen(holeid) + ALLOC_BUFFER];
 				strcpy(objNETPI.name, holeid);
-				objNETPI.moduleName = new char[strlen("PADDING_VAR") + ALLOC_BUFFER];
+				objNETPI.moduleName = new char[strlen("PADDING_VAR")
+						+ ALLOC_BUFFER];
 				strcpy(objNETPI.moduleName, "PADDING_VAR");
 
 				objNETPI.count = 0;
 				objNETPI.dataInfo.iecDtVar = BYTE;
 				objNETPI.dataInfo.dataSize = 8;
-				objNETPI.dataInfo.dtName = new char[strlen("byte") + ALLOC_BUFFER];
+				objNETPI.dataInfo.dtName = new char[strlen("byte")
+						+ ALLOC_BUFFER];
 				strcpy(objNETPI.dataInfo.dtName, "byte");
 				objNETPI.totalDataSize = 8;
 				objNETPI.directionType = dirType;
@@ -1144,7 +1150,8 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 	if (NULL != objIdxCol)
 	{
 		objIndex = objIdxCol->GetIndexbyIndexValue(indexId);
-		if ((OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.code) && (NULL != objIndex))
+		if ((OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.code)
+				&& (NULL != objIndex))
 		{
 			char objName[14 + ALLOC_BUFFER];
 			objIndex->SetObjectType((char*) "ARRAY");
@@ -1179,7 +1186,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 	stRetCode = AddSubIndex(MN_NODEID, MN, indexId, sIdxId);
 	if (OCFM_ERR_SUCCESS != stRetCode.code)
 	{
-		cout<<__LINE__<<" AddSubIndex error in line"<<endl;
+		cout << __LINE__ << " AddSubIndex error in line" << endl;
 		ocfmException objException;
 		objException.OCFMException(stRetCode.code);
 		throw objException;
@@ -1244,7 +1251,8 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 	}
 }
 
-PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetVal, INT32 dataSizeBits)
+PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
+		INT32 offsetVal, INT32 dataSizeBits)
 {
 	PIObject stPIObject;
 	stPIObject.Initialize();
@@ -1269,7 +1277,8 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetV
 				INT32 iAddress;
 				iAddress = HexToInt(piIndexTable[idx].addressStr);
 				iAddress = iAddress + div;
-				stPIObject.indexId = IntToAscii(iAddress, stPIObject.indexId, 16);
+				stPIObject.indexId = IntToAscii(iAddress, stPIObject.indexId,
+						16);
 				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 
@@ -1277,8 +1286,7 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetV
 			else
 			{
 				strcpy(stPIObject.indexId, piIndexTable[idx].addressStr);
-				stPIObject.sIdxId = IntToAscii(subIndex, stPIObject.sIdxId,
-						16);
+				stPIObject.sIdxId = IntToAscii(subIndex, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 
 			}
@@ -1300,7 +1308,10 @@ char* GetPIDataTypeName(char* indexId)
 		}
 		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			tempDataType = (0 < iLoopCount) ? piIndexTable[iLoopCount - 1].dtObj :	static_cast<PDODataType>(-1);
+			tempDataType =
+					(0 < iLoopCount) ?
+							piIndexTable[iLoopCount - 1].dtObj :
+							static_cast<PDODataType>(-1);
 		}
 		else
 		{
@@ -1373,7 +1384,10 @@ char* GetPIName(char* indexId)
 		}
 		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
-			tempDataType = (0 < iLoopCount) ? piIndexTable[iLoopCount - 1].dtObj :	static_cast<PDODataType>(-1);
+			tempDataType =
+					(0 < iLoopCount) ?
+							piIndexTable[iLoopCount - 1].dtObj :
+							static_cast<PDODataType>(-1);
 		}
 		else
 		{
@@ -1440,7 +1454,8 @@ bool CheckIfProcessImageIdx(char* idxId)
 	return ((0 <= strcmp(idxId, "A000")) && (0 >= strcmp(idxId, "AFFF")));
 }
 
-INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char* moduleName)
+INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo,
+		char* moduleName)
 {
 
 	NodeCollection* objNodeCol = NULL;
@@ -1465,7 +1480,8 @@ INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char
 	return -1;
 }
 
-void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char* moduleName)
+void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj,
+		char* moduleName)
 {
 	NodeCollection* objNodeCol = NULL;
 	Node* objNode;
@@ -1483,7 +1499,8 @@ void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char*
 	netPIObj.dataInfo.dataSize = piObj.dataInfo.dataSize;
 	if (NULL != piObj.dataInfo.dtName)
 	{
-		netPIObj.dataInfo.dtName = new char[strlen(piObj.dataInfo.dtName) + ALLOC_BUFFER];
+		netPIObj.dataInfo.dtName = new char[strlen(piObj.dataInfo.dtName)
+				+ ALLOC_BUFFER];
 		strcpy(netPIObj.dataInfo.dtName, piObj.dataInfo.dtName);
 	}
 	netPIObj.nodeId = piObj.nodeId;

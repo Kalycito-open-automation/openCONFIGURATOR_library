@@ -71,7 +71,7 @@ class BaseIndex
 	public:
 		BaseIndex(void);
 		~BaseIndex(void);
-		
+
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the name of the Index
@@ -116,7 +116,7 @@ class BaseIndex
 		 
 		 \return	const char*
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		const char* GetDefaultValue();
 		/*****************************************************************************/
 		/**
@@ -135,7 +135,7 @@ class BaseIndex
 		 
 		 \return	const char*
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		const char* GetActualValue();
 		/*****************************************************************************/
 		/**
@@ -166,7 +166,6 @@ class BaseIndex
 		 */
 		/*****************************************************************************/
 		void SetAccessType(char* accessStr);
-		
 
 		/*****************************************************************************/
 		/**
@@ -174,7 +173,7 @@ class BaseIndex
 		 
 		 \return	const char*
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		const char* GetLowLimit();
 		/*****************************************************************************/
 		/**
@@ -185,8 +184,8 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetLowLimit(char* lowLimitStr);		
-		
+		void SetLowLimit(char* lowLimitStr);
+
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the HighLimit value of the Index
@@ -204,8 +203,8 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetHighLimit(char* highLimitStr);		
-		
+		void SetHighLimit(char* highLimitStr);
+
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return the DataType of the Index
@@ -251,7 +250,7 @@ class BaseIndex
 		 
 		 \return	const char*
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		const char* GetPDOMapping();
 		/******************************************************************************/
 		/**
@@ -270,7 +269,7 @@ class BaseIndex
 		 
 		 \return	const char*
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		const char* GetObjectType();
 		/*****************************************************************************/
 		/**
@@ -278,7 +277,7 @@ class BaseIndex
 		 
 		 \return	ObjectType
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		ObjectType GetEObjectType();
 		/******************************************************************************/
 		/**
@@ -392,20 +391,20 @@ class BaseIndex
 		void SetFlagIfIncludedCdc(Flag flagVal);
 
 	protected:
-			const char* name;
-			const char* indexId;
-			const char* lowLimit;
-			const char* highLimit;
-			const char* accessType;
-			const char* defaultValue;
-			char* uniqueIdRef;
-			char* actualValue;
-			char* dataTypeValue; /* Only used for ObjectDictionary*/
-			ObjectType objectType;
-			DataType dataType;
-			PDOMapping pdoMapping;
-			INT32 nodeId;
-			INT32 parameterIndex;
-			Flag includeInCDC;
+		const char* name;
+		const char* indexId;
+		const char* lowLimit;
+		const char* highLimit;
+		const char* accessType;
+		const char* defaultValue;
+		char* uniqueIdRef;
+		char* actualValue;
+		char* dataTypeValue; /* Only used for ObjectDictionary*/
+		ObjectType objectType;
+		DataType dataType;
+		PDOMapping pdoMapping;
+		INT32 nodeId;
+		INT32 parameterIndex;
+		Flag includeInCDC;
 };
 #endif //BaseIndex_h

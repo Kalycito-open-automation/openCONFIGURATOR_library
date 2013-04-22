@@ -366,7 +366,6 @@ typedef enum
 /******************************************************************************
  * Function Declarations
  *****************************************************************************/
-
 /*****************************************************************************/
 /**
  \brief		This API shall be usd to parse the XDC/XDD file and load the objects for given Node ID and Type parameters
@@ -377,8 +376,8 @@ typedef enum
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/DLLEXPORT ocfmRetCode ImportXML(
+		char *fileName, INT32 nodeId, NodeType nodeType);
 /*****************************************************************************/
 /**
  \brief		This API shall be used for parsing the XDC/XDD file and re-loading the objects for the given Node ID and Type. This API will not delete and create the node. Only the objects for the node are recreated
@@ -389,19 +388,19 @@ DLLEXPORT ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType)
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/DLLEXPORT ocfmRetCode ReImportXML(
+		char* fileName, INT32 nodeId, NodeType nodeType);
 /*****************************************************************************************/
 /**
  \brief		This API shall write the process image variables to the XAP files [.h and .xml] in the location specified
- 	 	 	Note: This API is recommended to be called after the GenerateCDC API.
+ Note: This API is recommended to be called after the GenerateCDC API.
 
  \param		xapFilePath		Char pointer to the path to which the generated xap contents will be written
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/******************************************************************************************/
-DLLEXPORT ocfmRetCode GenerateXAP(char* xapFilePath);
+/******************************************************************************************/DLLEXPORT ocfmRetCode GenerateXAP(
+		char* xapFilePath);
 /*****************************************************************************************/
 /**
  \brief		This API shall be used to generate the CDC for the project. This API writes the compiled CDC into the mnobd.txt file. The generated mnobd.txt is converted into binary [mnobd.cdc] file using txt2cdc [elf].
@@ -410,19 +409,19 @@ DLLEXPORT ocfmRetCode GenerateXAP(char* xapFilePath);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/******************************************************************************************/
-DLLEXPORT ocfmRetCode GenerateCDC(char* cdcPath);
+/******************************************************************************************/DLLEXPORT ocfmRetCode GenerateCDC(
+		char* cdcPath);
 /*****************************************************************************************/
 /**
  \brief		This API shall be used to generate the process image variables in a C# .NET usable format
- 	 	 	Note: This API is recommended to be called after the GenerateCDC API.
+ Note: This API is recommended to be called after the GenerateCDC API.
 
  \param		netFilePath		Char pointer to the path to which the generated NET contents will be written
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/******************************************************************************************/
-DLLEXPORT ocfmRetCode GenerateNET(char* netFilePath);
+/******************************************************************************************/DLLEXPORT ocfmRetCode GenerateNET(
+		char* netFilePath);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to create a node [MN/CN] with the given node ID, node type and node name.
@@ -433,9 +432,8 @@ DLLEXPORT ocfmRetCode GenerateNET(char* netFilePath);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName);
-
+/*****************************************************************************/DLLEXPORT ocfmRetCode CreateNode(
+		INT32 nodeId, NodeType nodeType, char* nodeName);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to delete a node with the given respective node ID and node type. Deleting a node will also delete the object dictionary for the corresponding node.
@@ -445,8 +443,8 @@ DLLEXPORT ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/DLLEXPORT ocfmRetCode DeleteNode(
+		INT32 nodeId, NodeType nodeType);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to delete the object dictionary of a node. This API will not delete the node
@@ -456,9 +454,8 @@ DLLEXPORT ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType);
-
+/*****************************************************************************/DLLEXPORT ocfmRetCode DeleteNodeObjDict(
+		INT32 nodeId, NodeType nodeType);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to delete an Index of a node given the respective IndexID, the node ID and node type
@@ -469,9 +466,8 @@ DLLEXPORT ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId);
-
+/*****************************************************************************/DLLEXPORT ocfmRetCode DeleteIndex(
+		INT32 nodeId, NodeType nodeType, char* indexId);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to delete a SubIndex in an Index of a node given the respective SubIndexID, IndexID, the node ID and node type
@@ -483,9 +479,8 @@ DLLEXPORT ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId
 
  \return	ocfmRetCode
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexID);
-
+/*****************************************************************************/DLLEXPORT ocfmRetCode DeleteSubIndex(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexID);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to add an Index to a node
@@ -496,10 +491,8 @@ DLLEXPORT ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* inde
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId);
-
-
+/*****************************************************************************/DLLEXPORT ocfmRetCode AddIndex(
+		INT32 nodeId, NodeType nodeType, char* indexId);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to add a particular SubIndex to an Index of a node given the respective SubIndexID, IndexID, the node ID and node type
@@ -511,8 +504,8 @@ DLLEXPORT ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId);
 
  \return	ocfmRetCode
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexId);
+/*****************************************************************************/DLLEXPORT ocfmRetCode AddSubIndex(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to set the attributes [IndexValue, IndexName & flagIfInCdc] of an index for a node
@@ -526,8 +519,9 @@ DLLEXPORT ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue, char* indexName, Flag includeInCDC);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SetBasicIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue,
+		char* indexName, Flag includeInCDC);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to set the attributes [IndexValue, IndexName & flagIfInCdc] of a sub index for a node
@@ -542,8 +536,9 @@ DLLEXPORT ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, c
 
  \return	ocfmRetCode				ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* indexValue, char* indexName, Flag includeInCDC);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SetBasicSubIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId,
+		char* indexValue, char* indexName, Flag includeInCDC);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to check for the presence of a Node of given node ID and type in the collection list. If the node is present, the nodePos and nodeExist parameters are updated to reflect this in the calling function
@@ -555,8 +550,8 @@ DLLEXPORT ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& nodeExist);
+/*****************************************************************************/DLLEXPORT ocfmRetCode IfNodeExists(
+		INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& nodeExist);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to check for the presence of Index of given node ID and type in the collection list. If the Index is present, the indexId and idxPos parameters are updated to reflect this in the calling function
@@ -568,8 +563,8 @@ DLLEXPORT ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodeP
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 *idxPos);
+/*****************************************************************************/DLLEXPORT ocfmRetCode IfIndexExists(
+		INT32 nodeId, NodeType nodeType, char* indexId, INT32 *idxPos);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to check for the presence of SubIndex in Index of given node ID and type in the collection list. If the SubIndex is present, the sidxPos and idxPos parameters are updated to reflect this in the calling function
@@ -583,8 +578,9 @@ DLLEXPORT ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* index
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId, char* sidxId, INT32* sidxPos, INT32* idxPos);
+/*****************************************************************************/DLLEXPORT ocfmRetCode IfSubIndexExists(
+		INT32 nodeId, NodeType nodeType, char* idxId, char* sidxId,
+		INT32* sidxPos, INT32* idxPos);
 /*****************************************************************************************/
 /**
  \brief		This API shall be used to get the attributes of an Index
@@ -597,8 +593,9 @@ DLLEXPORT ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* id
 
  \return	ocfmRetCode				ConfiguratorErrors
  */
-/******************************************************************************************/
-DLLEXPORT ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, AttributeType attributeType, char* outAttributeValue);
+/******************************************************************************************/DLLEXPORT ocfmRetCode GetIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId,
+		AttributeType attributeType, char* outAttributeValue);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the attributes of a SubIndex
@@ -612,8 +609,9 @@ DLLEXPORT ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* 
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, AttributeType attributeType, char* outAttributeValue);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetSubIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId,
+		AttributeType attributeType, char* outAttributeValue);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the number of controlled nodes under a MN
@@ -623,8 +621,8 @@ DLLEXPORT ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, cha
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetNodeCount(
+		INT32 nodeId, INT32* outNodeCount);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the number of Indexes under a node
@@ -635,8 +633,8 @@ DLLEXPORT ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount);
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetIndexCount(
+		INT32 nodeId, NodeType nodeType, INT32* outIndexCount);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the number of Sub Indexes under an Index
@@ -648,12 +646,13 @@ DLLEXPORT ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outI
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId, INT32* outSubIndexCount);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetSubIndexCount(
+		INT32 nodeId, NodeType nodeType, char* indexId,
+		INT32* outSubIndexCount);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the node attributes [NodeID, NodeName, Stationtype, Forcedcycle_value, Forcedcycle_flag] of a node given the position of the node under a MN
-			Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
+ Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
 
  \param		nodePos				Integer to hold the position of the node
  \param		outNodeId			Integer pointer to the NodeID
@@ -664,12 +663,14 @@ DLLEXPORT ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* in
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId, char* outNodeName, StationType* outStationType, char* outForcedCycle, bool* outIsForcedCycle);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetNodeAttributesbyNodePos(
+		INT32 nodePos, INT32* outNodeId, char* outNodeName,
+		StationType* outStationType, char* outForcedCycle,
+		bool* outIsForcedCycle);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the Index ID of an Index, given the position of the Index under a node and the Node ID
-			Note: The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
+ Note: The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
 
  \param		nodeId			Integer to hold the Node Id of a node
  \param		nodeType		Enum to hold the Node type of the node
@@ -678,12 +679,12 @@ DLLEXPORT ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetIndexIDbyIndexPos(
+		INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the Sub Index ID of a Sub Index
-			Note: The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
+ Note: The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
 
  \param		nodeId			Integer to hold the Node Id of a node
  \param		nodeType		Enum to hold the Node type of the node
@@ -693,13 +694,14 @@ DLLEXPORT ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT3
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, char* indexId, INT32 subIndexPos, char* outSubIndexID);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetSubIndexIDbySubIndexPos(
+		INT32 nodeId, NodeType nodeType, char* indexId, INT32 subIndexPos,
+		char* outSubIndexID);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the Index ID of an Index given the position of the Index under a node and the position of the node
-			Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
-				  The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
+ Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
+ The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
 
  \param		nodePos			Integer to hold the position of the node
  \param		indexPos		Integer to hold the position of the Index
@@ -707,14 +709,14 @@ DLLEXPORT ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char* outIndexID);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetIndexIDbyPositions(
+		INT32 nodePos, INT32 indexPos, char* outIndexID);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the Sub Index ID of a Sub Index
-			Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
-				  The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
-				  The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
+ Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
+ The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
+ The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
 
  \param		nodePos			Integer to hold the position of the node
  \param		indexPos		Integer to hold the position of the Index
@@ -723,13 +725,13 @@ DLLEXPORT ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char*
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetSubIndexIDbyPositions(
+		INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
 /*****************************************************************************************/
 /**
  \brief		This API shall be used to get the attributes of an Index of a node given the Node and Index position
-			Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
-				  The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
+ Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
+ The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
 
  \param		nodePos				Integer to hold the position of the node
  \param		indexPos			Integer to hold the position of the Index
@@ -738,14 +740,15 @@ DLLEXPORT ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, IN
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/******************************************************************************************/
-DLLEXPORT ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, AttributeType attributeType, char* outAttributeValue);
+/******************************************************************************************/DLLEXPORT ocfmRetCode GetIndexAttributesbyPositions(
+		INT32 nodePos, INT32 indexPos, AttributeType attributeType,
+		char* outAttributeValue);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the attributes of an Sub Index of a Node given the Node, Index, Sub Index position
-			Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
-				  The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
-				  The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
+ Note: The IfNodeExists() API should be called and iNodePos is passed as a parameter to this function
+ The IfIndexExists() API should be called and iIndexPos is passed as a parameter to this function
+ The IfSubIndexExists() API should be called and iSubIndexPos is passed as a parameter to this function
 
  \param		nodePos				Integer to hold the position of the node
  \param		indexPos			Integer to hold the position of the Index
@@ -755,8 +758,9 @@ DLLEXPORT ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPo
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetSubIndexAttributesbyPositions(
+		INT32 nodePos, INT32 indexPos, INT32 subIndexPos,
+		AttributeType attributeType, char* outAttributeValue);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to load the predefined object dictionary xml and loads the objects that the tool will refer to when adding/editing an Index and/or a SubIndex
@@ -765,8 +769,8 @@ DLLEXPORT ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 inde
 
  \return	void
  */
-/*****************************************************************************/
-DLLEXPORT void LoadObjectDictionary(char* xmlFilePath);
+/*****************************************************************************/DLLEXPORT void LoadObjectDictionary(
+		char* xmlFilePath);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to save all the objects [Index/SubIndex] under the node into a xml file along with all the attributes of the objects
@@ -777,8 +781,8 @@ DLLEXPORT void LoadObjectDictionary(char* xmlFilePath);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SaveNode(
+		const char* fileName, INT32 nodeId, NodeType nodeType);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to save the project
@@ -788,8 +792,8 @@ DLLEXPORT ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType node
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SaveProject(char* projectPath, char* projectName);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SaveProject(
+		char* projectPath, char* projectName);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to open a previously saved openCONFIGURATOR project
@@ -799,16 +803,15 @@ DLLEXPORT ocfmRetCode SaveProject(char* projectPath, char* projectName);
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode OpenProject(char* projectPath, char* projectFileName);
+/*****************************************************************************/DLLEXPORT ocfmRetCode OpenProject(
+		char* projectPath, char* projectFileName);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to free the memory occupied by the shared library objects for the current project & settings. After calling this API, the project configurations & setting are no longer valid
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode FreeProjectMemory();
+/*****************************************************************************/DLLEXPORT ocfmRetCode FreeProjectMemory();
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the Project settings information [auto save, auto generate] for the active project
@@ -820,8 +823,9 @@ DLLEXPORT ocfmRetCode FreeProjectMemory();
 
  \return	ocfmRetCode					ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus, ViewMode *viewMode, bool* isExpertViewAlreadySet);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetProjectSettings(
+		AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus,
+		ViewMode *viewMode, bool* isExpertViewAlreadySet);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to set the Project settings information [auto save, auto generate] for the active project
@@ -833,16 +837,16 @@ DLLEXPORT ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *
 
  \return	ocfmRetCode					ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SetProjectSettings(
+		AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode,
+		bool isExpertViewAlreadySet);
 /*****************************************************************************/
 /**
  \brief		This API shall auto generate the MN's object dictionary
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GenerateMNOBD();
+/*****************************************************************************/DLLEXPORT ocfmRetCode GenerateMNOBD();
 /*****************************************************************************/
 /**
  \brief		This API shall be used to set all the attributes of an Index for a node
@@ -863,8 +867,11 @@ DLLEXPORT ocfmRetCode GenerateMNOBD();
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SetAllIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue,
+		char* indexName, char* accessType, char* dataTypeName,
+		char* pdoMappingVal, char* defaultValue, char* highLimitVal,
+		char* lowLimitVal, char* objectType, Flag includeInCDC);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to set all the attributes of a Sub Index for a node
@@ -886,8 +893,12 @@ DLLEXPORT ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, cha
 
  \return	ocfmRetCode			ConfigurationErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+/*****************************************************************************/DLLEXPORT ocfmRetCode SetAllSubIndexAttributes(
+		INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId,
+		char* actualValue, char* indexName, char* accessType,
+		char* dataTypeName, char* pdoMappingVal, char* defaultValue,
+		char* highLimitVal, char* lowLimitVal, char* objectType,
+		Flag includeInCDC);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get the specific network management feature value for a node
@@ -900,8 +911,9 @@ DLLEXPORT ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, 
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType, FeatureType featureType, char* featureName, char* outFeatureValue);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetFeatureValue(
+		INT32 nodeId, NodeType nodeType, FeatureType featureType,
+		char* featureName, char* outFeatureValue);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to update all the attributes of a node including the Node ID
@@ -917,8 +929,10 @@ DLLEXPORT ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType, FeatureTy
 
  \return	ocfmRetCode				ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName, StationType stationType, char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal);
+/*****************************************************************************/DLLEXPORT ocfmRetCode UpdateNodeParams(
+		INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName,
+		StationType stationType, char* forcedCycleVal, bool isForcedCycle,
+		char* presTimeoutVal);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to get all the datatypes available for a node
@@ -929,8 +943,8 @@ DLLEXPORT ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, Nod
 
  \return	ocfmRetCode			ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
+/*****************************************************************************/DLLEXPORT ocfmRetCode GetNodeDataTypes(
+		INT32 nodeId, NodeType nodeType, char* outDataTypes);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to create a node [MN/CN] and to set the Index/SubIndexes from the XDD specified to the specified node ID, node type and node name
@@ -942,8 +956,8 @@ DLLEXPORT ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* ou
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
-/*****************************************************************************/
-DLLEXPORT ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName, char* importXmlFile);
+/*****************************************************************************/DLLEXPORT ocfmRetCode NewProjectNode(
+		INT32 nodeId, NodeType nodeType, char* nodeName, char* importXmlFile);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the data size of the given datatype
@@ -952,11 +966,10 @@ DLLEXPORT ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* node
 
  \return	INT32
  */
-/*****************************************************************************/
-DLLEXPORT INT32 GetDataSize(char* dataTypeVal);
+/*****************************************************************************/DLLEXPORT INT32 GetDataSize(
+		char* dataTypeVal);
 
 #ifndef __GNUC__
 #pragma warning( disable: 4251 )
 #endif
 #endif // declarations_h
-

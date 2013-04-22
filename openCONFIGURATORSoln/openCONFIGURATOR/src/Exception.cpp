@@ -90,7 +90,6 @@ ocfmException::~ocfmException(void) throw ()
 	//Add destructor code here	
 }
 
-
 void ocfmException::OCFMException(ConfiguratorErrors errCode)
 {
 	_ocfmRetCode.code = errCode;
@@ -257,16 +256,14 @@ void ocfmException::OCFMException(ConfiguratorErrors errCode)
 				"Memory allocation failed. Try restarting the application");
 		break;
 	case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
-		strcpy(_ocfmRetCode.errorString,
-				"Number of TPDO channels exceeded");
+		strcpy(_ocfmRetCode.errorString, "Number of TPDO channels exceeded");
 		break;
 	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString,
-				"NoOfEntries SubIndex not present");
+		strcpy(_ocfmRetCode.errorString, "NoOfEntries SubIndex not present");
 		break;
 	case OCFM_ERR_INVALID_PARAMETER:
 		strcpy(_ocfmRetCode.errorString,
-			"Invalid parameter: Internal Error. Try restarting the Application");
+				"Invalid parameter: Internal Error. Try restarting the Application");
 		break;
 	case OCFM_ERR_INVALID_SIZE_MAPPED:
 		strcpy(_ocfmRetCode.errorString,

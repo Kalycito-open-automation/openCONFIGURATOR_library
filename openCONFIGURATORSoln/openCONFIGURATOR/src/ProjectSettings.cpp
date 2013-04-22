@@ -106,7 +106,6 @@ PjtSettings::~PjtSettings(void)
 #endif
 }
 
-
 PjtSettings* PjtSettings::GetPjtSettingsPtr()
 {
 	if (!instanceFlag)
@@ -120,7 +119,6 @@ PjtSettings* PjtSettings::GetPjtSettingsPtr()
 	return pjtSettingsObj;
 }
 
-
 AutoSave PjtSettings::GetSaveAttr()
 {
 	return saveMode;
@@ -130,7 +128,6 @@ void PjtSettings::SetSaveAttr(AutoSave autoSaveMode)
 {
 	saveMode = autoSaveMode;
 }
-
 
 AutoGenerate PjtSettings::GetGenerateAttr()
 {
@@ -171,7 +168,6 @@ const char* PjtSettings::GetIP()
 	}
 }
 
-
 ViewMode PjtSettings::GetViewMode()
 {
 	return viewMode;
@@ -181,7 +177,6 @@ void PjtSettings::SetViewMode(ViewMode viewModeTemp)
 {
 	viewMode = viewModeTemp;
 }
-
 
 bool PjtSettings::GetExpertViewSelectedFlag()
 {

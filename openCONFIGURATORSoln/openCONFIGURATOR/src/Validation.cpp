@@ -65,7 +65,8 @@
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& nodeExist)
+ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
+		bool& nodeExist)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
@@ -91,12 +92,10 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& 
 
 		if (nodeCollObj->GetNumberOfNodes() > 0)
 		{
-			for (INT32 nodeLC = 0;
-					nodeLC < nodeCollObj->GetNumberOfNodes();
+			for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
 					nodeLC++)
 			{
-				nodeObj = nodeCollObj->GetNodebyCollectionIndex(
-						nodeLC);
+				nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodeLC);
 
 				if (nodeObj.GetNodeType() == nodeType)
 				{
@@ -125,7 +124,8 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& 
 	//return stErrStruct;
 }
 
-ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 *idxPos)
+ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
+		INT32 *idxPos)
 {
 	ocfmRetCode errCodeObj;
 	INT32 nodePos;
@@ -167,8 +167,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 
 		else if (idxCollObj->GetNumberofIndexes() > 0)
 		{
 			//Check for existance of the Index
-			for (INT32 idxLC = 0;
-					idxLC < idxCollObj->GetNumberofIndexes();
+			for (INT32 idxLC = 0; idxLC < idxCollObj->GetNumberofIndexes();
 					idxLC++)
 			{
 				Index *idxObj = NULL;
@@ -176,10 +175,12 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 
 
 				idxObj = idxCollObj->GetIndex(idxLC);
 				tempIndexId = new char[strlen((char*) idxObj->GetIndexValue())
-								+ STR_ALLOC_BUFFER];
+						+ STR_ALLOC_BUFFER];
 				strcpy(tempIndexId, (char*) idxObj->GetIndexValue());
 
-				if (0 == strcmp(StringToUpper(tempIndexId), StringToUpper(indexId)))
+				if (0
+						== strcmp(StringToUpper(tempIndexId),
+								StringToUpper(indexId)))
 				{
 					Index *objIndexPtr = NULL;
 
@@ -188,8 +189,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 
 					errCodeObj.code = OCFM_ERR_SUCCESS;
 					return errCodeObj;
 				}
-				else if (idxLC
-						== (idxCollObj->GetNumberofIndexes() - 1))
+				else if (idxLC == (idxCollObj->GetNumberofIndexes() - 1))
 				{
 					// Index Doesn't Exist
 					errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
@@ -213,14 +213,15 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 
 	return errCodeObj;
 }
 
-ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId, char* sidxId, INT32* sidxPos, INT32* idxPos)
+ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
+		char* sidxId, INT32* sidxPos, INT32* idxPos)
 {
 	ocfmRetCode errCodeObj;
 	ocfmException objException;
 	try
 	{
-		if ((NULL == idxId) || (NULL == sidxId)
-				|| (NULL == idxPos) || (NULL == sidxPos))
+		if ((NULL == idxId) || (NULL == sidxId) || (NULL == idxPos)
+				|| (NULL == sidxPos))
 		{
 			objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
@@ -252,21 +253,20 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId, char*
 		else if (idxObj->GetNumberofSubIndexes() > 0)
 		{
 			//Check for existance of the SubIndex
-			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes(); sidxLC++)
+			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
+					sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
 
 				sidxObj = idxObj->GetSubIndex(sidxLC);
-				if ((strcmp(
-						StringToUpper((char*) sidxObj->GetIndexValue()),
+				if ((strcmp(StringToUpper((char*) sidxObj->GetIndexValue()),
 						StringToUpper(sidxId)) == 0))
 				{
 					errCodeObj.code = OCFM_ERR_SUCCESS;
 					*sidxPos = sidxLC;
 					return errCodeObj;
 				}
-				else if (sidxLC
-						== (idxObj->GetNumberofSubIndexes() - 1))
+				else if (sidxLC == (idxObj->GetNumberofSubIndexes() - 1))
 				{
 					// SubIndex Doesn't Exist
 					errCodeObj.code = OCFM_ERR_SUBINDEXID_NOT_FOUND;
@@ -330,7 +330,8 @@ bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId)
 	}
 }
 
-bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID, char* subIndexId)
+bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
+		char* subIndexId)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
@@ -349,7 +350,8 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID, char*
 	else if (idxObj->GetNumberofSubIndexes() > 0)
 	{
 		//Check for existance of the SubIndex
-		for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes(); sidxLC++)
+		for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
+				sidxLC++)
 		{
 			SubIndex* objSubIndexPtr;
 			objSubIndexPtr = idxObj->GetSubIndex(sidxLC);

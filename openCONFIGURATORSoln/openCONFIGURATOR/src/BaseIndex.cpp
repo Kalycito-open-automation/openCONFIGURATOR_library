@@ -109,8 +109,6 @@ BaseIndex::~BaseIndex(void)
 #pragma region Properties
 #endif
 
-
-
 const char* BaseIndex::GetName()
 {
 	return name;
@@ -118,7 +116,7 @@ const char* BaseIndex::GetName()
 
 void BaseIndex::SetName(char* nameStr)
 {
-	if(NULL != name)
+	if (NULL != name)
 	{
 		delete[] name;
 	}
@@ -134,25 +132,20 @@ void BaseIndex::SetName(char* nameStr)
 	}
 }
 
-
-
 const char* BaseIndex::GetIndexValue()
 {
 	return indexId;
 }
 
-
 void BaseIndex::SetIndexValue(char* idxId)
 {
-	if(NULL != indexId)
+	if (NULL != indexId)
 	{
 		delete[] indexId;
 	}
 	indexId = new char[strlen(idxId) + STR_ALLOC_BUFFER];
 	strcpy((char*) indexId, idxId);
 }
-
-
 
 const char* BaseIndex::GetLowLimit()
 {
@@ -166,17 +159,15 @@ const char* BaseIndex::GetLowLimit()
 	}
 }
 
-
 void BaseIndex::SetLowLimit(char* lowLimitStr)
 {
-	if(NULL != lowLimit)
+	if (NULL != lowLimit)
 	{
 		delete[] lowLimit;
 	}
 	lowLimit = new char[strlen(lowLimitStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) lowLimit, lowLimitStr);
 }
-
 
 const char* BaseIndex::GetHighLimit()
 {
@@ -190,10 +181,9 @@ const char* BaseIndex::GetHighLimit()
 	}
 }
 
-
 void BaseIndex::SetHighLimit(char* highLimitStr)
 {
-	if(NULL != highLimit)
+	if (NULL != highLimit)
 	{
 		delete[] highLimit;
 	}
@@ -201,24 +191,20 @@ void BaseIndex::SetHighLimit(char* highLimitStr)
 	strcpy((char*) highLimit, highLimitStr);
 }
 
-
-
 const char* BaseIndex::GetDefaultValue()
 {
 	return defaultValue;
 }
 
-
 void BaseIndex::SetDefaultValue(char* value)
 {
-	if(NULL != defaultValue)
+	if (NULL != defaultValue)
 	{
 		delete[] defaultValue;
 	}
 	defaultValue = new char[strlen(value) + STR_ALLOC_BUFFER];
 	strcpy((char*) defaultValue, value);
 }
-
 
 const char* BaseIndex::GetActualValue()
 {
@@ -229,10 +215,9 @@ const char* BaseIndex::GetActualValue()
 	return actualValue;
 }
 
-
 void BaseIndex::SetActualValue(char* value)
 {
-	if(NULL != actualValue)
+	if (NULL != actualValue)
 	{
 		delete[] actualValue;
 	}
@@ -240,23 +225,20 @@ void BaseIndex::SetActualValue(char* value)
 	strcpy((char*) actualValue, value);
 }
 
-
 const char* BaseIndex::GetAccessType()
 {
 	return accessType;
 }
 
-
 void BaseIndex::SetAccessType(char* accessStr)
 {
-	if(NULL != accessType)
+	if (NULL != accessType)
 	{
 		delete[] accessType;
 	}
 	accessType = new char[strlen(accessStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) accessType, accessStr);
 }
-
 
 const char* BaseIndex::GetObjectType()
 {
@@ -277,12 +259,10 @@ const char* BaseIndex::GetObjectType()
 	}
 }
 
-
 ObjectType BaseIndex::GetEObjectType()
 {
 	return objectType;
 }
-
 
 void BaseIndex::SetObjectType(char* objTypeStr)
 {
@@ -299,11 +279,13 @@ void BaseIndex::SetObjectType(char* objTypeStr)
 	{
 		objectType = DEFSTRUCT;
 	}
-	else if ((0 == strcmp(tempObjtype, "7")) || (0 == strcmp(tempObjtype, "VAR")))
+	else if ((0 == strcmp(tempObjtype, "7"))
+			|| (0 == strcmp(tempObjtype, "VAR")))
 	{
 		objectType = VAR;
 	}
-	else if ((0 == strcmp(tempObjtype, "8")) || (0 == strcmp(tempObjtype, "ARRAY")))
+	else if ((0 == strcmp(tempObjtype, "8"))
+			|| (0 == strcmp(tempObjtype, "ARRAY")))
 	{
 		objectType = ARRAY;
 	}
@@ -320,7 +302,6 @@ void BaseIndex::SetObjectType(char* objTypeStr)
 	}
 	delete[] tempObjtype;
 }
-
 
 const char* BaseIndex::GetPDOMapping()
 {
@@ -340,7 +321,6 @@ const char* BaseIndex::GetPDOMapping()
 		return NULL;
 	}
 }
-
 
 void BaseIndex::SetPDOMapping(char* pdoMappingStr)
 {
@@ -376,12 +356,10 @@ void BaseIndex::SetPDOMapping(char* pdoMappingStr)
 	delete[] varStrBuff;
 }
 
-
 DataType BaseIndex::GetDataType()
 {
 	return dataType;
 }
-
 
 void BaseIndex::SetDataType(char* dataTypeName)
 {
@@ -417,31 +395,26 @@ void BaseIndex::SetDataTypeName(char* dataTypeName, INT32 nodeIdVal)
 	dataType = *objDataType;
 }
 
-
 INT32 BaseIndex::GetNodeID()
 {
 	return nodeId;
 }
-
 
 void BaseIndex::SetNodeID(INT32 nodeIdVal)
 {
 	nodeId = nodeIdVal;
 }
 
-
 char* BaseIndex::GetUniqueIDRef()
 {
 	return uniqueIdRef;
 }
-
 
 void BaseIndex::SetUniqueIDRef(char* uniqueIdStr)
 {
 	uniqueIdRef = new char[strlen(uniqueIdStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) uniqueIdRef, uniqueIdStr);
 }
-
 
 char* BaseIndex::GetDataTypeValue()
 {
@@ -455,13 +428,11 @@ char* BaseIndex::GetDataTypeValue()
 	}
 }
 
-
 void BaseIndex::SetDataTypeValue(char* dataTypeStr)
 {
 	dataTypeValue = new char[strlen(dataTypeStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) dataTypeValue, dataTypeStr);
 }
-
 
 void BaseIndex::SetDataTypeST(DataType dtObj)
 {
@@ -475,13 +446,11 @@ void BaseIndex::SetDataTypeST(DataType dtObj)
 #pragma region MemberFunctions
 #endif
 
-
 void BaseIndex::SaveChanges(char* idxIdStr, char* nameStr)
 {
 	indexId = idxIdStr;
 	name = nameStr;
 }
-
 
 bool BaseIndex::IsIndexValueValid(char* hexValue)
 {
@@ -510,8 +479,7 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 			if (CheckIfHex((char*) this->lowLimit))
 			{
 				lowlimitValue = HexToInt(
-						SubString((char*) lowLimit, 2,
-								strlen(lowLimit) - 2));
+						SubString((char*) lowLimit, 2, strlen(lowLimit) - 2));
 			}
 			else
 			{
@@ -575,13 +543,10 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 	return retFlag;
 }
 
-
 void BaseIndex::SetFlagIfIncludedCdc(Flag flagVal)
 {
 	includeInCDC = flagVal;
 }
-
-
 
 Flag BaseIndex::GetFlagIfIncludedCdc()
 {

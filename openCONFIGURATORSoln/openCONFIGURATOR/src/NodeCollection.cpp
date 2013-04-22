@@ -58,7 +58,6 @@
 #include "../Include/NodeCollection.h"
 #include "../Include/Node.h"
 
-
 /****************************************************************************************************/
 /* Global Variables */
 
@@ -95,8 +94,6 @@ NodeCollection::~NodeCollection(void)
 	instanceFlag = false;
 }
 
-
-
 INT32 NodeCollection::GetNumberOfNodes()
 {
 	return nodeCount;
@@ -116,8 +113,6 @@ void NodeCollection::DeleteNode(INT32 nodePos)
 	nodeCount = nodeCollObj.Count();
 }
 
-
-
 NodeCollection* NodeCollection::GetNodeColObjectPointer()
 {
 	if (!instanceFlag)
@@ -127,8 +122,6 @@ NodeCollection* NodeCollection::GetNodeColObjectPointer()
 	}
 	return objNodeColl;
 }
-
-
 
 NodeCollection NodeCollection::GetNodeColObject()
 {
@@ -149,7 +142,8 @@ Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
 	{
 		objNode = objNodeColl->nodeCollObj[nodeLC];
 
-		if ((objNode.GetNodeType() == nodeType ) && (objNode.GetNodeId() == nodeId))
+		if ((objNode.GetNodeType() == nodeType)
+				&& (objNode.GetNodeId() == nodeId))
 		{
 			return objNode;
 		}
@@ -166,14 +160,14 @@ Node* NodeCollection::GetNodePtr(NodeType nodeType, INT32 nodeId)
 	{
 		objNode = &(objNodeColl->nodeCollObj[nodeLC]);
 
-		if ((objNode->GetNodeType() == nodeType) && (objNode->GetNodeId() == nodeId))
+		if ((objNode->GetNodeType() == nodeType)
+				&& (objNode->GetNodeId() == nodeId))
 		{
 			return objNode;
 		}
 	}
 	return NULL;
 }
-
 
 //TODO: unused function
 Node NodeCollection::GetNode(INT32 nodeId)
@@ -192,7 +186,6 @@ Node NodeCollection::GetNode(INT32 nodeId)
 	}
 	return objNode;
 }
-
 
 Node NodeCollection::GetMNNode()
 {
@@ -222,13 +215,12 @@ Node* NodeCollection::GetNodebyColIndex(INT32 position)
 	return &nodeCollObj[position];
 }
 
-
-
 INT32 NodeCollection::GetCNNodesCount()
 {
 	INT32 cnNodeCount = 0;
 
-	for (INT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.Count(); nodeCountLC++)
+	for (INT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.Count();
+			nodeCountLC++)
 	{
 		if (nodeCollObj[nodeCountLC].GetNodeType() == CN)
 		{

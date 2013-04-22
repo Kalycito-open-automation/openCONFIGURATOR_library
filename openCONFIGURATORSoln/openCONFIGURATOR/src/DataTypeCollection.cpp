@@ -87,7 +87,6 @@ DataTypeCollection::~DataTypeCollection(void)
 	//Add destructor code here
 }
 
-
 void DataTypeCollection::AddDataType(DataType objDataType)
 {
 	INT32 itemPosition = dataTypeCollectionObj.Add();
@@ -95,25 +94,21 @@ void DataTypeCollection::AddDataType(DataType objDataType)
 	dataTypeCollectionCount = dataTypeCollectionObj.Count();
 }
 
-
 void DataTypeCollection::DeleteDataTypeCollection()
 {
 	dataTypeCollectionObj.Clear();
 	dataTypeCollectionCount = dataTypeCollectionObj.Count();
 }
 
-
 INT32 DataTypeCollection::GetNumberOfDataTypes()
 {
 	return dataTypeCollectionObj.Count();
 }
 
-
 DataType* DataTypeCollection::GetDataTypeElement(INT32 dataTypePosition)
 {
 	return &dataTypeCollectionObj[dataTypePosition];
 }
-
 
 DataType* DataTypeCollection::GetDataType(char* dataTypeValue)
 {
@@ -132,7 +127,6 @@ DataType* DataTypeCollection::GetDataType(char* dataTypeValue)
 	objDataType = NULL;
 	return objDataType;
 }
-
 
 DataType* DataTypeCollection::GetDataTypeByName(char* dataTypeValue)
 {

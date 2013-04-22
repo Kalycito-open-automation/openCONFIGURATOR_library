@@ -106,8 +106,7 @@ char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
 		if (objFeature.featureType == featureType
 				&& (!strcmp(featureName, objFeature.name)))
 		{
-			retString =
-					new char[strlen(objFeature.value) + STR_ALLOC_BUFFER];
+			retString = new char[strlen(objFeature.value) + STR_ALLOC_BUFFER];
 			strcpy(retString, objFeature.value);
 			return retString;
 		}
@@ -116,7 +115,6 @@ char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
 	strcpy((char*) retString, "");
 	return retString;
 }
-
 
 UINT32 NetworkManagement::GetNumberOfFeatures()
 {
@@ -128,7 +126,6 @@ Feature* NetworkManagement::GetFeature(UINT32 featurePosition)
 	return &FeatureCollection[featurePosition];
 }
 
-
 void NetworkManagement::DeleteFeatureCollections()
 {
 	if (0 != FeatureCollection.Count())
@@ -137,12 +134,10 @@ void NetworkManagement::DeleteFeatureCollections()
 	}
 }
 
-
 INT32 NetworkManagement::GetMaxPDOCount()
 {
 	return maxPDOCount;
 }
-
 
 void NetworkManagement::CalculateMaxPDOCount()
 {
@@ -162,7 +157,8 @@ void NetworkManagement::CalculateMaxPDOCount()
 	else
 	{
 		strcpy(featureName, "PDOTPDOChannels");
-		strcpy(tpdoChannelValue, GetNwMgmtFeatureValue(MN_FEATURES, featureName));
+		strcpy(tpdoChannelValue,
+				GetNwMgmtFeatureValue(MN_FEATURES, featureName));
 		maxPDOCount = atoi((char*) tpdoChannelValue);
 		//check is made for validating the value in MN xdd
 		//Min value = 0; Maxvalue = 256 (EPSG specification)

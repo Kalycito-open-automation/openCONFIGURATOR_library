@@ -74,7 +74,15 @@ typedef enum PIDirectionType
 /*! Enum PDODataType*/
 typedef enum PDODataType
 {
-	UNSIGNED8 = 0, INTEGER8, UNSIGNED16, INTEGER16,	UNSIGNED32, INTEGER32, REAL32, INTEGER64, UNSIGNED64
+	UNSIGNED8 = 0,
+	INTEGER8,
+	UNSIGNED16,
+	INTEGER16,
+	UNSIGNED32,
+	INTEGER32,
+	REAL32,
+	INTEGER64,
+	UNSIGNED64
 } PDODataType;
 
 /*! Enum PIDataInfo*/
@@ -159,7 +167,6 @@ typedef struct piIndexTable
 		PIDirectionType direction;
 } PIIndexTable;
 
-
 /* struct stOffsets */
 struct Offsets
 {
@@ -215,7 +222,7 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[]);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the pointer to structure variable of PIDataInfo whose datatype matches the given parameter
-  
+ 
  \param		iecDataType		Character pointer to the value of data
  \param		dataSize		Integer to hold the value of data size
 
@@ -256,7 +263,8 @@ INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType);
  \return	void
  */
 /*****************************************************************************/
-void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset, INT32& startBitOffset);
+void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset,
+		INT32& startBitOffset);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to generate the XAP header file
@@ -270,7 +278,8 @@ void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset, INT32& startBitOf
  \return	void	
  */
 /*****************************************************************************/
-void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar);
+void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
+		ProcessImage piOutCol[], INT32 inVar, INT32 outVar);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to add PDO index to MN based on the given Index and SubIndex IDs
@@ -295,7 +304,8 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal);
  \return	PIObject	
  */
 /*****************************************************************************/
-PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetVal, INT32 dataSizeBits);
+PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
+		INT32 offsetVal, INT32 dataSizeBits);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the DataType of the ProcessImage Index at given IndexID in the collection list
@@ -340,7 +350,8 @@ bool CheckIfProcessImageIdx(char* idxId);
  \return	void	
  */
 /*****************************************************************************/
-void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, FILE* xapHeader);
+void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
+		PIDirectionType directionType, FILE* xapHeader);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
@@ -354,7 +365,8 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
  \return	void	
  */
 /*****************************************************************************/
-void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar);
+void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
+		ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
@@ -367,7 +379,8 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage 
  \return	void	
  */
 /*****************************************************************************/
-void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader);
+void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
+		PIDirectionType dirType, FILE* netHeader);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the item number at which the NET ProcessImage object has the same module number as the given parameter in the Node collection list
@@ -379,7 +392,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
  \return	INT32	
  */
 /*****************************************************************************/
-INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char* moduleName);
+INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo,
+		char* moduleName);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign NETProcessImage objects to the given netPIObj array from the NETPICollection list based directionType matching the given parameter
@@ -390,7 +404,8 @@ INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char
  \return	void
  */
 /*****************************************************************************/
-INT32 GroupNETPIVariables(PIDirectionType directionType, NETProcessImage netPIObj[]);
+INT32 GroupNETPIVariables(PIDirectionType directionType,
+		NETProcessImage netPIObj[]);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign unique variable name to ProcessImage objects in the collection list
@@ -410,11 +425,12 @@ void SetUniquePIVarName();
  \return	void	
  */
 /*****************************************************************************/
-void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char* moduleName);
+void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj,
+		char* moduleName);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to group the contents of ProcessImage object for .NET header file generation
-  
+ 
  \param		piObject		Class variable of ProcessImage
  \param		noOfVars        Integer to hold the value of number of variables to be written to header
  \param		dirType         Enum variable of PIDirectionType
@@ -423,7 +439,8 @@ void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char*
  \return	INT32	
  */
 /*****************************************************************************/
-INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader);
+INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
+		PIDirectionType dirType, FILE* netHeader);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the Datatype string corresponding to the given IEC_Dataype
@@ -458,7 +475,8 @@ INT32 GetDatasizeNETPI(IEC_Datatype dtIEC);
  \retval	FALSE			if the module is not present in the collection	
  */
 /*****************************************************************************/
-bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules, ModuleCol modCollObj[]);
+bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules,
+		ModuleCol modCollObj[]);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to set the DataType of a SubIndex belonging to the Index according to the given parameters

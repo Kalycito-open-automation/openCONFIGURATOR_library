@@ -105,8 +105,6 @@ Node::~Node(void)
 #pragma region Properties
 #endif
 
-
-
 NodeType Node::GetNodeType()
 {
 	return nodeType;
@@ -116,8 +114,6 @@ void Node::SetNodeType(NodeType objNodeType)
 {
 	nodeType = objNodeType;
 }
-
-
 
 INT32 Node::GetNodeId()
 {
@@ -130,7 +126,6 @@ void Node::SetNodeId(INT32 nodeID)
 
 }
 
-
 INT32 Node::GetNodeIndex()
 {
 	return nodePosition;
@@ -141,13 +136,10 @@ void Node::SetNodeIndex(INT32 nodePos)
 	nodePosition = nodePos;
 }
 
-
-
 char* Node::GetNodeName()
 {
 	return nodeName;
 }
-
 
 void Node::SetNodeName(char* nodeNameStr)
 {
@@ -159,7 +151,6 @@ void Node::SetNodeName(char* nodeNameStr)
 	strcpy((char*) nodeName, nodeNameStr);
 }
 
-
 bool Node::HasPdoObjects()
 {
 	return hasPdoObjects;
@@ -170,30 +161,25 @@ void Node::SetFlagForPdoObjects(bool flag)
 	hasPdoObjects = flag;
 }
 
-
 IndexCollection* Node::GetIndexCollection()
 {
 	return indexCollObj;
 }
-
 
 ApplicationProcess* Node::GetApplicationProcess()
 {
 	return appProcessObj;
 }
 
-
 NetworkManagement* Node::GetNetworkManagement()
 {
 	return nmtObj;
 }
 
-
 DataTypeCollection* Node::GetDataTypeCollection()
 {
 	return dtCollObj;
 }
-
 
 void Node::CreateIndexCollection()
 {
@@ -201,7 +187,6 @@ void Node::CreateIndexCollection()
 	objIndexCollection = new IndexCollection();
 	indexCollObj = objIndexCollection;
 }
-
 
 void Node::CreateDataTypeCollection()
 {
@@ -240,7 +225,6 @@ void Node::AddMNPDOvar(MNPdoVariable pdoVarObj, PDOType pdotype)
 	}
 }
 
-
 void Node::CreateApplicationProcess()
 {
 	ApplicationProcess* appProcess = NULL;
@@ -248,7 +232,6 @@ void Node::CreateApplicationProcess()
 	appProcess = new ApplicationProcess();
 	appProcessObj = appProcess;
 }
-
 
 void Node::CreateNetworkManagement()
 {
@@ -262,7 +245,8 @@ IndexCollection* Node::GetPDOIndexCollection(PDOType pdotype)
 {
 	IndexCollection* objPdoIndexCollection = new IndexCollection();
 	Index* objIndex = NULL;
-	for (INT32 iLoopCount = 0; iLoopCount < indexCollObj->GetNumberofIndexes(); iLoopCount++)
+	for (INT32 iLoopCount = 0; iLoopCount < indexCollObj->GetNumberofIndexes();
+			iLoopCount++)
 	{
 		objIndex = indexCollObj->GetIndex(iLoopCount);
 
@@ -279,18 +263,20 @@ IndexCollection* Node::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
 	IndexCollection* pdoIndexCollObj = new IndexCollection();
 	Index* indexObj = NULL;
 
-	for (INT32 indexLC = 0;	indexLC < indexCollObj->GetNumberofIndexes(); indexLC++)
+	for (INT32 indexLC = 0; indexLC < indexCollObj->GetNumberofIndexes();
+			indexLC++)
 	{
 		indexObj = indexCollObj->GetIndex(indexLC);
 		if ((indexObj->GetPDOType() == PDO_TPDO))
 		{
-			if ((0 == strncmp(indexObj->GetIndexValue(), "1A", 2)) || 0 == strncmp(indexObj->GetIndexValue(), "1a", 2))
+			if ((0 == strncmp(indexObj->GetIndexValue(), "1A", 2))
+					|| 0 == strncmp(indexObj->GetIndexValue(), "1a", 2))
 			{
 				*tpdoCount = *tpdoCount + 1;
 			}
 			pdoIndexCollObj->AddIndex(*indexObj);
 		}
-		else if((indexObj->GetPDOType() == PDO_RPDO))
+		else if ((indexObj->GetPDOType() == PDO_RPDO))
 		{
 			if (0 == strncmp(indexObj->GetIndexValue(), "16", 2))
 			{
@@ -307,12 +293,12 @@ IndexCollection* Node::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
 	return pdoIndexCollObj;
 }
 
-
 IndexCollection* Node::GetIndexCollectionWithoutPDO()
 {
 	IndexCollection* indexCollObject = new IndexCollection();
 	Index* indexObj = NULL;
-	for (INT32 indexLC = 0;	indexLC < indexCollObj->GetNumberofIndexes(); indexLC++)
+	for (INT32 indexLC = 0; indexLC < indexCollObj->GetNumberofIndexes();
+			indexLC++)
 	{
 		indexObj = indexCollObj->GetIndex(indexLC);
 		if (CheckIfNotPDO((char*) indexObj->GetIndexValue()))
@@ -322,7 +308,6 @@ IndexCollection* Node::GetIndexCollectionWithoutPDO()
 	}
 	return indexCollObject;
 }
-
 
 bool Node::IsNull()
 {
@@ -340,7 +325,7 @@ ProcessImage* Node::GetPIbyParaIndex(INT32 paramerterPos)
 {
 	ProcessImage* piObj = NULL;
 
-	for (INT32 piLC = 0; piLC < PICollection.Count();	piLC++)
+	for (INT32 piLC = 0; piLC < PICollection.Count(); piLC++)
 	{
 		piObj = PICollection.GetAddress(piLC);
 
@@ -351,7 +336,6 @@ ProcessImage* Node::GetPIbyParaIndex(INT32 paramerterPos)
 	}
 	return piObj;
 }
-
 
 void Node::DeleteCollectionsForPI()
 {
@@ -369,7 +353,6 @@ void Node::DeleteCollectionsForPI()
 	}
 }
 
-
 void Node::DeleteCollectionsForNETPI()
 {
 	if (0 != NETPIColl.Count())
@@ -377,7 +360,6 @@ void Node::DeleteCollectionsForNETPI()
 		NETPIColl.Clear();
 	}
 }
-
 
 StationType Node::GetStationType()
 {
@@ -388,7 +370,6 @@ void Node::SetStationType(StationType stationtype)
 {
 	stationType = stationtype;
 }
-
 
 char* Node::GetForcedCycleValue()
 {
@@ -419,9 +400,12 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 	sidxId = IntToAscii(this->GetNodeId(), sidxId, 16);
 	sidxId = PadLeft(sidxId, '0', 2);
 
-	errReslt2 = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sIdxPos, &idxPos);
-	errReslt3 = IfSubIndexExists(this->GetNodeId(), CN,	indexId, sidxId, &sIdxPos, &idxPos);
-	if ((OCFM_ERR_SUCCESS == errReslt2.code) && (OCFM_ERR_SUCCESS == errReslt3.code))
+	errReslt2 = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sIdxPos,
+			&idxPos);
+	errReslt3 = IfSubIndexExists(this->GetNodeId(), CN, indexId, sidxId,
+			&sIdxPos, &idxPos);
+	if ((OCFM_ERR_SUCCESS == errReslt2.code)
+			&& (OCFM_ERR_SUCCESS == errReslt3.code))
 	{
 		// both the index and subindex are present continue
 	}
@@ -433,15 +417,21 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 		}
 		if (OCFM_ERR_INDEXID_NOT_FOUND == errReslt3.code)
 		{
-			sprintf((char*) customErr3, "The Index 1F9B does not exist in CN node id:%d. ", this->GetNodeId());
+			sprintf((char*) customErr3,
+					"The Index 1F9B does not exist in CN node id:%d. ",
+					this->GetNodeId());
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt2.code)
 		{
-			sprintf(customErr2,	"The Subindex %s in Index 1F9B does not exist in MN. ",	sidxId);
+			sprintf(customErr2,
+					"The Subindex %s in Index 1F9B does not exist in MN. ",
+					sidxId);
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt3.code)
 		{
-			sprintf(customErr3,	"The Subindex %s in Index 1F9B does not exist in CN node id:%d. ", sidxId, this->GetNodeId());
+			sprintf(customErr3,
+					"The Subindex %s in Index 1F9B does not exist in CN node id:%d. ",
+					sidxId, this->GetNodeId());
 		}
 		strcpy(customErr1, customErr2);
 		strcat(customErr1, customErr3);
@@ -455,8 +445,9 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 	char* sidxName = new char[50];
 	sidxName[0] = 0;
 
-	GetSubIndexAttributes(240, MN, indexId, sidxId,	NAME, sidxName);
-	SetBasicSubIndexAttributes(240, MN, indexId, sidxId,	tempForcedCycleVal, sidxName, TRUE);
+	GetSubIndexAttributes(240, MN, indexId, sidxId, NAME, sidxName);
+	SetBasicSubIndexAttributes(240, MN, indexId, sidxId, tempForcedCycleVal,
+			sidxName, TRUE);
 
 	Index* idxObj1 = NULL;
 	idxObj1 = GetMNIndexValues(indexId);
@@ -466,13 +457,16 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 		idxObj1->SetFlagIfIncludedCdc(TRUE);
 		if (NULL != idxObj1->GetSubIndexbyIndexValue((char*) "00"))
 		{
-			idxObj1->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(TRUE);
+			idxObj1->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
+					TRUE);
 		}
 	}
 
 	strcpy(sidxName, "");
-	GetSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId, NAME, sidxName);
-	SetBasicSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId, tempForcedCycleVal, sidxName, TRUE);
+	GetSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId, NAME,
+			sidxName);
+	SetBasicSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId,
+			tempForcedCycleVal, sidxName, TRUE);
 
 	Index* idxObj;
 	idxObj = this->indexCollObj->GetIndexbyIndexValue(indexId);
@@ -481,7 +475,8 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 		idxObj->SetFlagIfIncludedCdc(TRUE);
 		if (NULL != idxObj->GetSubIndexbyIndexValue((char*) "00"))
 		{
-			idxObj->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(TRUE);
+			idxObj->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
+					TRUE);
 		}
 	}
 
@@ -491,7 +486,6 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 	delete[] sidxName;
 	return errReslt1;
 }
-
 
 void Node::ResetForcedCycleValue()
 {
@@ -505,8 +499,10 @@ void Node::ResetForcedCycleValue()
 	sidxId = IntToAscii(nodeId, sidxId, 16);
 	sidxId = PadLeft(sidxId, '0', 2);
 
-	SetSubIndexAttribute(MN_NODEID, MN,	(char *) MULTIPL_CYCLE_ASSIGN_OBJECT, sidxId, ACTUALVALUE, forcedCycle);
-	SetSubIndexAttribute(nodeId, nodeType, (char *) MULTIPL_CYCLE_ASSIGN_OBJECT, sidxId, ACTUALVALUE, forcedCycle);
+	SetSubIndexAttribute(MN_NODEID, MN, (char *) MULTIPL_CYCLE_ASSIGN_OBJECT,
+			sidxId, ACTUALVALUE, forcedCycle);
+	SetSubIndexAttribute(nodeId, nodeType, (char *) MULTIPL_CYCLE_ASSIGN_OBJECT,
+			sidxId, ACTUALVALUE, forcedCycle);
 
 	delete[] sidxId;
 }
@@ -530,7 +526,8 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 	sidxId = IntToAscii(this->GetNodeId(), sidxId, 16);
 	sidxId = PadLeft(sidxId, '0', 2);
 
-	stErrorInfo = IfSubIndexExists(MN_NODEID, MN, indexId,	sidxId, &sidxPos, &idxPos);
+	stErrorInfo = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sidxPos,
+			&idxPos);
 	if (OCFM_ERR_SUCCESS != stErrorInfo.code)
 	{
 		return;
@@ -539,8 +536,9 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 	char* subIndName = new char[50];
 	subIndName[0] = 0;
 
-	GetSubIndexAttributes(240, MN, indexId,	sidxId, NAME, subIndName);
-	SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, sidxId, presTimoutVal, subIndName, TRUE);
+	GetSubIndexAttributes(240, MN, indexId, sidxId, NAME, subIndName);
+	SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, sidxId, presTimoutVal,
+			subIndName, TRUE);
 
 	Index* idxObj = NULL;
 	idxObj = GetMNIndexValues(indexId);
@@ -552,7 +550,6 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 
 	delete[] subIndName;
 }
-
 
 bool Node::GetForceCycleFlag()
 {
@@ -579,7 +576,6 @@ void Node::SetPReqActPayloadValue(INT32 value)
 	preqActualPayload = value;
 
 }
-
 
 INT32 Node::GetPReqActPayloadValue()
 {

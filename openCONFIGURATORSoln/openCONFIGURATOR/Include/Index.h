@@ -116,7 +116,7 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to swap the position of two SubIndex objects in the collection list 
-		  
+		 
 		 \param		fromPosition	Integer to hold the from SubIndex object position
 		 \param		toPosition		Integer to hold the to SubIndex object position
 
@@ -146,7 +146,7 @@ class Index: public BaseIndex
 		 
 		 \return	PDOType
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		PDOType GetPDOType();
 		/*****************************************************************************/
 		/**

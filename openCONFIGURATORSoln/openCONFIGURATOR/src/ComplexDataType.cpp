@@ -93,7 +93,6 @@ ComplexDataType::~ComplexDataType(void)
 	//Add destructor code here
 }
 
-
 void ComplexDataType::AddVarDeclaration(varDeclaration varDeclarationObject)
 {
 	INT32 itemPosition = varDeclarationCollection.Add();

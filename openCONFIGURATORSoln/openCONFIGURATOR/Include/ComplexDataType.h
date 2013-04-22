@@ -83,7 +83,7 @@ class ComplexDataType
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to add an object of varDeclaration to a collection list and update the count
-		  
+		 
 		 \param			varDeclarationObject
 		 
 		 \return		void
@@ -92,7 +92,7 @@ class ComplexDataType
 		void AddVarDeclaration(varDeclaration varDeclarationObject);
 
 	private:
-			INT32 varDeclarationCollCount;
+		INT32 varDeclarationCollCount;
 
 };
 #endif // complexdatatype_h

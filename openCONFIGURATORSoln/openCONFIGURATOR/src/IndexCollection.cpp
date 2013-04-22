@@ -188,7 +188,6 @@ Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
 	return NULL;
 }
 
-
 INT32 IndexCollection::GetNumberofIndexes()
 {
 	return indexCount;

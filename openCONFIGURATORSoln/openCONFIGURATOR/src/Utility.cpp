@@ -200,11 +200,13 @@ char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
 	else
 	{
 		char *tempBuffer = NULL;
-		for (tempBuffer = UnsignedToAlphaNumeric(srcValue / ((unsigned) baseValue), destStr,
-				baseValue); *tempBuffer; tempBuffer++)
+		for (tempBuffer = UnsignedToAlphaNumeric(
+				srcValue / ((unsigned) baseValue), destStr, baseValue);
+				*tempBuffer; tempBuffer++)
 			;
 		{
-			UnsignedToAlphaNumeric(srcValue % ((unsigned) baseValue), tempBuffer, baseValue);
+			UnsignedToAlphaNumeric(srcValue % ((unsigned) baseValue),
+					tempBuffer, baseValue);
 		}
 	}
 	return destStr;
@@ -333,10 +335,8 @@ bool CheckAllowedCNIndexes(char* indexId)
 {
 	if ((false == CheckIfNotPDO((char*) indexId))
 			|| CheckIfManufactureSpecificObject((char*) indexId)
-			|| (0 == strcmp(indexId, "1F98"))
-			|| (0 == strcmp(indexId, "1020"))
-			|| (0 == strcmp(indexId, "1F9B"))
-			|| (0 == strcmp(indexId, "1F81"))
+			|| (0 == strcmp(indexId, "1F98")) || (0 == strcmp(indexId, "1020"))
+			|| (0 == strcmp(indexId, "1F9B")) || (0 == strcmp(indexId, "1F81"))
 			|| (0 == strcmp(indexId, "1006")))
 	{
 		return true;
@@ -431,7 +431,6 @@ bool CheckIfHex(char* srcStr)
 
 }
 
-
 INT32 GetConfigDate()
 {
 	// to have the total number of days Since 1984
@@ -470,7 +469,6 @@ INT32 GetConfigDate()
 	daysCount += timeInfo->tm_yday;
 	return daysCount;
 }
-
 
 INT32 GetConfigTime()
 {
@@ -526,7 +524,6 @@ bool CheckAllowedDTForMapping(char* dataTypeName)
 	}
 }
 
-
 //TODO: Add a parameter to return the value to avoid new delete memory issues
 char* GetLastAvailableCycleNumber()
 {
@@ -534,8 +531,8 @@ char* GetLastAvailableCycleNumber()
 	ocfmRetCode retCode;
 	INT32 indexPos;
 	INT32 subIndexPos;
-	retCode = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07", &subIndexPos,
-			&indexPos);
+	retCode = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07",
+			&subIndexPos, &indexPos);
 	if (OCFM_ERR_SUCCESS != retCode.code)
 	{
 		strcpy(retForcedCycleValue, "");
@@ -575,11 +572,13 @@ char* GetLastAvailableCycleNumber()
 	if (freeCycleNumber == tempCycleNumber)
 	{
 		cycleNumberGlobal = tempCycleNumber;
-		retForcedCycleValue = IntToAscii(tempCycleNumber, retForcedCycleValue, 16);
+		retForcedCycleValue = IntToAscii(tempCycleNumber, retForcedCycleValue,
+				16);
 	}
 	else
 	{
-		retForcedCycleValue = IntToAscii(freeCycleNumber, retForcedCycleValue, 16);
+		retForcedCycleValue = IntToAscii(freeCycleNumber, retForcedCycleValue,
+				16);
 	}
 	return retForcedCycleValue;
 }
@@ -596,8 +595,7 @@ void CheckAndCorrectName(char* srcStr)
 	{
 		if ((48 <= srcStr[loopCount] && 57 >= srcStr[loopCount])
 				|| (65 <= srcStr[loopCount] && 90 >= srcStr[loopCount])
-				|| (97 <= srcStr[loopCount]
-						&& 122 >= srcStr[loopCount])
+				|| (97 <= srcStr[loopCount] && 122 >= srcStr[loopCount])
 				|| 95 == srcStr[loopCount])
 		{
 		}

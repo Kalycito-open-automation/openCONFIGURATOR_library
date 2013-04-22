@@ -74,7 +74,7 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to add an object of DataType to a collection list and update the count
-		  
+		 
 		 \param			objDataType		Class variable of DataType to include in data type collection	
 		 
 		 \return		void
@@ -92,15 +92,15 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return number of DataType objects in the DataType collection list
-		  
+		 
 		 \return		INT32
 		 */
-		/*****************************************************************************/		
+		/*****************************************************************************/
 		INT32 GetNumberOfDataTypes();
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return the DataType object at the given position in the collection list
-		  
+		 
 		 \param			dataTypePosition	Integer to hold the datatype id
 		 
 		 \return		DataType
