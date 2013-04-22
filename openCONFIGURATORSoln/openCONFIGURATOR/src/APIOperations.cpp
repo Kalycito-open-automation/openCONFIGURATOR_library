@@ -1875,7 +1875,8 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj, cha
 		sidxObj = indexObj->GetSubIndexbyIndexValue((char*) "00");
 		if (NULL != sidxObj)
 		{
-			if (NULL != sidxObj->GetActualValue())
+			//if (NULL != sidxObj->GetActualValue())
+			if ((NULL != sidxObj->GetActualValue()) && (0 != strcmp(sidxObj->GetActualValue(), "")) && !(CheckIfValueZero((char*) sidxObj->GetActualValue())) )
 			{
 				INT32 noOfSubIndexes = 0; //= pobjIndex->getNumberofSubIndexes();
 				if (true == CheckIfHex((char*) sidxObj->GetActualValue()))
