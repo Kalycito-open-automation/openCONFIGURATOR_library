@@ -336,7 +336,10 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 
 	try
 	{
+		#if defined DEBUG
 		cout << __FUNCTION__ << ": " << nodeType << endl;
+		#endif
+
 		if (MN == nodeType)
 		{
 			if (!objectDictLoadedGlobal)
@@ -359,9 +362,7 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 		{
 			INT32 nodePos = 0;
 			bool nodeExistFlag = false;
-			cout << "Entering If Node Exists" << endl;
 			errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, nodeExistFlag);
-			cout << "Completed If Node Exists" << endl;
 			if ((errCodeObj.code == OCFM_ERR_SUCCESS) && (nodeExistFlag == true))
 			{
 				objException.OCFMException(OCFM_ERR_NODE_ALREADY_EXISTS);
@@ -1134,7 +1135,7 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 				{
 					exceptionObj.OCFMException(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
 					char customErrStr[200] = { 0 };
-					sprintf(customErrStr, "CN cannot have more than one TPDO Channel");
+					sprintf(customErrStr, "Node id: %d (CN) cannot have more than one TPDO Channel", nodeObj.GetNodeId());
 					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customErrStr);
 					throw exceptionObj;
 				}
@@ -2844,7 +2845,7 @@ void UpdateCNVisibleNode(Node* nodeObj)
 									exceptionObj._ocfmRetCode.code = OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN;
 									char acCustomError[200];
 									INT32 status = 0;
-									status = sprintf(acCustomError, "The cross traffic in CN Node ID:%d exceeds the maximum permissible station %d", nodeObj->GetNodeId(), MAX_CN_CROSS_TRAFFIC_STN);
+									status = sprintf(acCustomError, "The CN node id: %d has been configured with more than the permissible number of cross traffic stations. The maximum permitted is %d", nodeObj->GetNodeId(), MAX_CN_CROSS_TRAFFIC_STN);
 									if (status < 0)
 									{
 										cout << "Error in sprintf" << __LINE__ << endl;
@@ -5521,7 +5522,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								//Mapped length in bits
 								INT32 mappedLength = 0;
 								mappedLength = HexToInt(SubString((char*) actualVal, 2, 4));
+								#if defined DEBUG
 								cout<<" IntMapLength:"<<mappedLength<<endl;
+								#endif
 
 								Index *moduleIndexObj = NULL;
 								SubIndex *moduleSidxObj = NULL;
@@ -5540,10 +5543,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 											OCFM_ERR_MODULE_INDEX_NOT_FOUND);
 									char acCustomError[200] =
 									{ 0 };
-									sprintf(acCustomError,
-											"PDO Mapped Module Index Not Found, Index:%s in Node ID:%d",
-											moduleIndex,
-											nodeObj->GetNodeId());
+									sprintf(acCustomError, "In node id: %d, Index: %s which is mapped as a PDO module does not exist", nodeObj->GetNodeId(), moduleIndex );
 									CopyCustomErrorString(
 											&(exceptionObj._ocfmRetCode),
 											acCustomError);
@@ -5596,7 +5596,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									{
 										exceptionObj.OCFMException(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
 										char acCustomError[200] = { 0 };
-										sprintf(acCustomError, "PDO Mapped Module SubIndex Not Found, Index:%s Subindex:%s in Node ID:%d", moduleIndex, varSubIndex, nodeObj->GetNodeId());
+										sprintf(acCustomError, "In node id: %d, Index: %s with SubIndex: %s which is mapped as a PDO module does not exist", nodeObj->GetNodeId(), moduleIndex, varSubIndex);
 										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
 										if (moduleName != NULL)
 										{
@@ -11775,7 +11775,7 @@ ocfmRetCode CheckMutliplexAssigned()
 		{
 			errCodeObj.code = OCFM_ERR_MULTIPLEX_ASSIGN_ERROR;
 			CopyCustomErrorString(&errCodeObj,
-					(char*) "The Subindex 07 of Index 1F98 does not exist Multiplexing not supported");
+					(char*) "In MN the SubIndex 07 of the Index 1F98 does not exist. So multiplexing cannot be supported");
 			delete[] actValue;
 			return errCodeObj;
 		}

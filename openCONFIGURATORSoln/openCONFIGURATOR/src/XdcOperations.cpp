@@ -400,8 +400,10 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 		}
 		else
 		{
+			#ifdef DEBUG
 			cout << __FUNCTION__ << " unhandled datatype: " << dtObj->dataTypeName
 					<< endl;
+			#endif
 		}
 	}
 }
@@ -2198,8 +2200,9 @@ INT32 GetDataSize(char* dataTypeVal)
 	}
 	else
 	{
-		//TODO: Else added. 
+		#if defined DEBUG
 		cout << __FUNCTION__ << " Unhandled datatype:" << dataTypeVal << endl;
+		#endif
 	}
 	return 1; //by default
 }

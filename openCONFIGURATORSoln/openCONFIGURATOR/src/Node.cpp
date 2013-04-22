@@ -433,7 +433,7 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 		}
 		if (OCFM_ERR_INDEXID_NOT_FOUND == errReslt3.code)
 		{
-			strcpy((char*) customErr3, "The Index 1F9B does not exist in CN. ");
+			sprintf((char*) customErr3, "The Index 1F9B does not exist in CN node id:%d. ", this->GetNodeId());
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt2.code)
 		{
@@ -441,7 +441,7 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt3.code)
 		{
-			sprintf(customErr3,	"The Subindex %s in Index 1F9B does not exist in CN. ",	sidxId);
+			sprintf(customErr3,	"The Subindex %s in Index 1F9B does not exist in CN node id:%d. ", sidxId, this->GetNodeId());
 		}
 		strcpy(customErr1, customErr2);
 		strcat(customErr1, customErr3);
