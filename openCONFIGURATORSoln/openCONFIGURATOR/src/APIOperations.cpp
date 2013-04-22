@@ -5643,6 +5643,14 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								}
 
 								PDOType pdoType = indexObj.GetPDOType();
+								if ((NULL == moduleSidxObj->GetPDOMapping()) || (0 == strcmp(moduleSidxObj->GetPDOMapping(), "")) )
+								{
+									exceptionObj.OCFMException(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+									char acCustomError[200] = { 0 };
+									sprintf(acCustomError, "Node: %d has invalid object mapped in %s / %s. \n The object %s / %s has no pdo mapping set", nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue(), moduleIndex, varSubIndex);
+									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+									throw exceptionObj;
+								}
 								char* pdoMappingType = new char[strlen(moduleSidxObj->GetPDOMapping()) + STR_ALLOC_BUFFER];
 								pdoMappingType = strcpy(pdoMappingType, moduleSidxObj->GetPDOMapping());
 
