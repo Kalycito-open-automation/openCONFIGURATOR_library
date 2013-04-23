@@ -1710,14 +1710,11 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						}
 					}
 
-					if ((idxObj->GetPDOMapping() != NULL))
+					if (sidxObj->GetPDOMapping() != NULL)
 					{
-						if (sidxObj->GetPDOMapping() != NULL)
-						{
-							bytesWritten = xmlTextWriterWriteAttribute(
-									xtwWriter, BAD_CAST "PDOmapping",
-									BAD_CAST sidxObj->GetPDOMapping());
-						}
+						bytesWritten = xmlTextWriterWriteAttribute(
+								xtwWriter, BAD_CAST "PDOmapping",
+								BAD_CAST sidxObj->GetPDOMapping());
 					}
 
 					if (sidxObj->GetUniqueIDRef() != NULL)
