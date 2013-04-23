@@ -1305,6 +1305,7 @@ char* GetPIDataTypeName(char* indexId)
 		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
 			tempDataType = piIndexTable[iLoopCount].dtObj;
+			break;
 		}
 		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
@@ -1312,63 +1313,63 @@ char* GetPIDataTypeName(char* indexId)
 					(0 < iLoopCount) ?
 							piIndexTable[iLoopCount - 1].dtObj :
 							static_cast<PDODataType>(-1);
+			break;
 		}
 		else
 		{
 			//TODO: else added. operation to be specified
 		}
-
-		switch (tempDataType)
-		{
-		case UNSIGNED8:
-		{
-			retDataType = (char*) "Unsigned8";
-			break;
-		}
-		case INTEGER8:
-		{
-			retDataType = (char*) "Integer8";
-			break;
-		}
-		case UNSIGNED16:
-		{
-			retDataType = (char*) "Unsigned16";
-			break;
-		}
-		case INTEGER16:
-		{
-			retDataType = (char*) "Integer8";
-			break;
-		}
-		case UNSIGNED32:
-		{
-			retDataType = (char*) "Unsigned32";
-			break;
-		}
-		case INTEGER32:
-		{
-			retDataType = (char*) "Integer32";
-			break;
-		}
-		case INTEGER64:
-		{
-			retDataType = (char*) "Integer64";
-			break;
-		}
-		case UNSIGNED64:
-		{
-			retDataType = (char*) "Unsigned64";
-			break;
-		}
-		default:
-		{
-			//Handled error case and returned dummy value to avoid warning
-			retDataType = (char*) "Error";
-			break;
-		}
-		}
-
 	}
+	switch (tempDataType)
+	{
+	case UNSIGNED8:
+	{
+		retDataType = (char*) "Unsigned8";
+		break;
+	}
+	case INTEGER8:
+	{
+		retDataType = (char*) "Integer8";
+		break;
+	}
+	case UNSIGNED16:
+	{
+		retDataType = (char*) "Unsigned16";
+		break;
+	}
+	case INTEGER16:
+	{
+		retDataType = (char*) "Integer8";
+		break;
+	}
+	case UNSIGNED32:
+	{
+		retDataType = (char*) "Unsigned32";
+		break;
+	}
+	case INTEGER32:
+	{
+		retDataType = (char*) "Integer32";
+		break;
+	}
+	case INTEGER64:
+	{
+		retDataType = (char*) "Integer64";
+		break;
+	}
+	case UNSIGNED64:
+	{
+		retDataType = (char*) "Unsigned64";
+		break;
+	}
+	default:
+	{
+		//Handled error case and returned dummy value to avoid warning
+		retDataType = (char*) "Error";
+		break;
+	}
+	}
+
 	return retDataType;
 }
 
@@ -1381,6 +1382,7 @@ char* GetPIName(char* indexId)
 		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
 			tempDataType = piIndexTable[iLoopCount].dtObj;
+			break;
 		}
 		else if (0 < strcmp(piIndexTable[iLoopCount].addressStr, indexId))
 		{
@@ -1388,62 +1390,62 @@ char* GetPIName(char* indexId)
 					(0 < iLoopCount) ?
 							piIndexTable[iLoopCount - 1].dtObj :
 							static_cast<PDODataType>(-1);
+			break;
 		}
 		else
 		{
 			//TOOD: else added, operation to be specified
 		}
+	}
+	switch (tempDataType)
+	{
+	case UNSIGNED8:
+	{
+		retPiName = (char*) "U8";
+		break;
+	}
+	case INTEGER8:
+	{
+		retPiName = (char*) "I8";
+		break;
+	}
+	case UNSIGNED16:
+	{
+		retPiName = (char*) "U16";
+		break;
+	}
+	case INTEGER16:
+	{
+		retPiName = (char*) "I16";
+		break;
+	}
+	case UNSIGNED32:
+	{
+		retPiName = (char*) "U32";
+		break;
+	}
+	case INTEGER32:
+	{
+		retPiName = (char*) "I32";
+		break;
+	}
+	case UNSIGNED64:
+	{
+		retPiName = (char*) "U64";
+		break;
+	}
+	case INTEGER64:
+	{
+		retPiName = (char*) "I64";
+		break;
+	}
 
-		switch (tempDataType)
-		{
-		case UNSIGNED8:
-		{
-			retPiName = (char*) "U8";
-			break;
-		}
-		case INTEGER8:
-		{
-			retPiName = (char*) "I8";
-			break;
-		}
-		case UNSIGNED16:
-		{
-			retPiName = (char*) "U16";
-			break;
-		}
-		case INTEGER16:
-		{
-			retPiName = (char*) "I16";
-			break;
-		}
-		case UNSIGNED32:
-		{
-			retPiName = (char*) "U32";
-			break;
-		}
-		case INTEGER32:
-		{
-			retPiName = (char*) "I32";
-			break;
-		}
-		case UNSIGNED64:
-		{
-			retPiName = (char*) "U64";
-			break;
-		}
-		case INTEGER64:
-		{
-			retPiName = (char*) "I64";
-			break;
-		}
-
-		default:
-		{
-			//Handled error case and returned dummy value to avoid warning
-			retPiName = (char*) "Err";
-			break;
-		}
-		}
+	default:
+	{
+		//Handled error case and returned dummy value to avoid warning
+		retPiName = (char*) "Err";
+		break;
+	}
 	}
 
 	return retPiName;
