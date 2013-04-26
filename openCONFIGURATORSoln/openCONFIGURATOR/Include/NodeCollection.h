@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			NodeCollection.h
+ *****************************************************************************
+ \file		NodeCollection.h
 
- \brief			Handles collection of each node's information on id,name,type present inside the network
- *****************************************************************************************************
+ \brief		This file contains the class declaration to manage the inclusion and retrieval of Nodes in the collection list
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -53,18 +53,18 @@
 #ifndef NodeCollection_h
 #define NodeCollection_h
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include "Declarations.h"
 #include "Node.h"
 
 /**
- ******************************************************************************************************
- \class			NodeCollection
- \brief			Handles collection of each node's information on id,name,type present inside the network
+ *****************************************************************************
+ \class		NodeCollection
+ \brief		Handles collection of each node's information on id,name,type present inside the network
  
- ******************************************************************************************************/
+ *****************************************************************************/
 class NodeCollection
 {
 	public:

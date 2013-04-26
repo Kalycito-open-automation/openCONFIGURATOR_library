@@ -1,13 +1,13 @@
 /**
  *****************************************************************************************************
- \file			TCollection.h
+ \file		TCollection.h
 
- \brief			Handles collections of base items
+ \brief		This file contains the class declaration that is used to generate the template collection for a given base class item
  *****************************************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

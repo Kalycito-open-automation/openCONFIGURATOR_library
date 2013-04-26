@@ -1,14 +1,14 @@
 /**
- *****************************************************************************************************
- \file			Error.h
+ ******************************************************************************
+ \file		Error.h
 
- \brief			Handles the definitions of error messages for the Application
- *****************************************************************************************************
+ \brief		This file contains the declaration of the error codes that are used in this application
+ ******************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

@@ -1,14 +1,14 @@
 /**
- *****************************************************************************************************
- \file			Exception.h
+ ******************************************************************************
+ \file		Exception.h
 
- \brief			Handles the exception error messages
- *****************************************************************************************************
+ \brief		This file contains the class declaration that is used to throw exception to the GUI when an error occurs
+ ******************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

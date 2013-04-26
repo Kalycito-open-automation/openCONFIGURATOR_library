@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			IndexCollection.cpp
+ ******************************************************************************
+ \file		IndexCollection.cpp
 
- \brief			Handles Index collection for all Indexes
- ************************************************************************************************
+ \brief		This file contains the class member definitions to handle the properties of objects of the Index Collection
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			NetworkManagement.h
+ *****************************************************************************
+ \file		NetworkManagement.h
 
- \brief			Handles Feature collection of each node present in the network
- *****************************************************************************************************
+ \brief		This file contains class declaration to handle the network management features of a Node
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

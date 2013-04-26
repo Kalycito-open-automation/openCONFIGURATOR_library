@@ -1,8 +1,8 @@
 /**
  ************************************************************************************************
- \file			BaseIndex.h
+ \file		BaseIndex.h
 
- \brief			BaseClass for Index/SubIndex
+ \brief		This file contains the class declaration that is used for handling the attributes of an Index/SubIndex object 
  ************************************************************************************************
  */
 

@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			Utility.cpp
+ *****************************************************************************
+ \file		Utility.cpp
 
- \brief			Handles datatype conversion 
- ************************************************************************************************
+ \brief		This file contains the definitions that are used as utility functions to support operations such as string manipulation, number to string conversions, etc
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -216,11 +216,7 @@ char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
 char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
 {
 	char *tempStr = NULL;
-	ULONG uiValue; /* assume unsigned is big enough to hold all the
-	 * unsigned values -x could possibly be -- don't
-	 * know how well this assumption holds on the
-	 * DeathStation 9000, so beware of nasal demons
-	 */
+	ULONG uiValue;
 
 	tempStr = destStr;
 	if (0 == baseValue)
@@ -234,7 +230,8 @@ char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
 	if (srcValue < 0)
 	{
 		uiValue = -(srcValue);
-		uiValue = ~uiValue + 1; // two's complement
+		//Two's complement of that number
+		uiValue = ~uiValue + 1;
 	}
 	else
 	{
@@ -290,10 +287,10 @@ bool IsAscii(char argVar)
 
 bool CheckIfNotPDO(char* indexId)
 {
-	//TODO: fails for 1a00
 	if ((0 == strncmp(indexId, "14xx", 2)) || (0 == strncmp(indexId, "16xx", 2))
 			|| (0 == strncmp(indexId, "18xx", 2))
-			|| (0 == strncmp(indexId, "1Axx", 2)))
+			|| (0 == strncmp(indexId, "1Axx", 2))
+			|| (0 == strncmp(indexId, "1axx", 2)))
 	{
 		return false;
 	}
@@ -433,12 +430,10 @@ bool CheckIfHex(char* srcStr)
 
 INT32 GetConfigDate()
 {
-	// to have the total number of days Since 1984
+//Time & date are calculated since 1984
 	INT32 daysCount = 0;
-	// to have the total number of years Since 1984  
 	INT32 yearsSince = 0;
-	// to have the current Year
-	//  INT32 iCurrentYear = 0;
+
 	time_t rawTime;
 	struct tm *timeInfo;
 
@@ -446,9 +441,8 @@ INT32 GetConfigDate()
 	timeInfo = localtime(&rawTime);
 
 	yearsSince = ((timeInfo->tm_year) - 84);
-	//  iCurrentYear = ((pstTimeInfo->tm_year) + 1900);
 
-	// Loops thru all the years except the curent year
+	//Except the curent year calculate all the values
 	for (INT32 loopCount = 0; loopCount < yearsSince; loopCount++)
 	{
 		INT32 tempYear = 0;
@@ -465,7 +459,7 @@ INT32 GetConfigDate()
 		}
 		daysCount += tempDays;
 	}
-	// To calculate number of days since Jan 1 of current year
+	//Calculate the number of days from January 1 of current year
 	daysCount += timeInfo->tm_yday;
 	return daysCount;
 }
@@ -688,6 +682,7 @@ bool CheckToolVersion(char* currentToolVersion)
 			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
 			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
 			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
+			|| (FALSE == strcmp(tempToolVersion, PREV_TOOL_VERSION_7))
 			|| (FALSE == strcmp(tempToolVersion, LAST_TOOL_VERSION))
 			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
 			|| (FALSE == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))

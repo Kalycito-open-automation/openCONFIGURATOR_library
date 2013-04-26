@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			Index.cpp
+ ******************************************************************************
+ \file		Index.cpp
 
- \brief			Handles adding index to all PDO types
- ************************************************************************************************
+ \brief		This file contains the class member definitions to handle the properties of an Index Object. This is inherited from the BaseIndex class
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

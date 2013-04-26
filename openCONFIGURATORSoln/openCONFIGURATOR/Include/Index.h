@@ -1,14 +1,14 @@
 /**
- *****************************************************************************************************
- \file			Index.h
+ *****************************************************************************
+ \file		Index.h
 
- \brief			Handles definitions of Index collection,PDO type for all datatypes	
- *****************************************************************************************************
+ \brief		This file contains the class declaration to handle the properties of an Index Object. This is inherited from the BaseIndex class
+ *****************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -54,7 +54,7 @@
 #ifndef Index_h
 #define Index_h
 
-/****************************************************************************************************/
+/*****************************************************************************/
 /* Includes */
 
 #include "TCollection.h"
@@ -63,11 +63,11 @@
 #include "SubIndex.h"
 
 /**
- ******************************************************************************************************
- \class			Index
- \brief			This function has the definitions of Index collection,PDO type for all datatypes			  
+ *****************************************************************************
+ \class		Index
+ \brief		This function has the definitions of Index collection,PDO type for all datatypes
  
- ******************************************************************************************************/
+ *****************************************************************************/
 
 class Index: public BaseIndex
 {

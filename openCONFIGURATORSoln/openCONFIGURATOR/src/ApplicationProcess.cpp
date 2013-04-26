@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			ApplicationProcess.cpp
+ ******************************************************************************
+ \file		ApplicationProcess.cpp
 
- \brief			Handles the collection of complex data type 
- ************************************************************************************************
+ \brief		This file contains the class member definitions that are used for handling the objects within the 'Application Process' tag in the XML configuration file(XDD/XDC) 
+ ******************************************************************************
 
  */
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

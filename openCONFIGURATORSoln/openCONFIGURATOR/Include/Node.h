@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			Node.h
+ *****************************************************************************
+ \file		Node.h
 
- \brief			Handles each node's information on id,name,type present inside the network
- *****************************************************************************************************
+ \brief		This file contains the class declaration to handle the functional properties of the Node such as datatype collection,Index collection, network management collection
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

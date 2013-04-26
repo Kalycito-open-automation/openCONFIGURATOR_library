@@ -1,14 +1,14 @@
 /**
  ******************************************************************************
- \file			APIOperations.h
+ \file		APIOperations.h
 
- \brief			 
+ \brief		This file contains the non API function declarations that are used to support the API functions in APIOperations.cpp
  ******************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -60,33 +60,6 @@
 /*****************************************************************************/
 /* Function Declarations */
 
-/****************************************************************************/
-/**
- \brief		Default attributes to an Index are set from the object dictionary
-
- \param		indexId				Character pointer to hold the IndexID
- \param		indexObj			Class pointer of Index to add the attributes
- \param		dictIndexObj		Class pointer of Index form object dictionary
-
- \return	void
- */
-/****************************************************************************/
-static void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
-		Index* dictIndexObj);
-
-/*****************************************************************************/
-/**
- \brief		Default attributes to a SubIndex are set from the object dictionary
-
- \param		subIndexId		Character pointer to hold the IndexID
- \param		sidxObj			Class pointer of SubIndex to add the attributes
- \param		dictSidxObj		Class pointer of SubIndex from object dictionary
-
- \return	void
- */
-/*****************************************************************************/
-static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
-		SubIndex* dictSidxObj);
 /*****************************************************************************/
 /**
  \brief		This function resets the values in all the PDO(0x14XX, 0x16XX, 0x18XX, 0x1AXX) Indices and Sub Indices to 0

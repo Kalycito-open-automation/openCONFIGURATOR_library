@@ -1,4 +1,57 @@
-%module openConfiguratorWrapper
+/**
+ ******************************************************************************
+ \file			openConfiguratorWrapper.i
+
+ \brief			An TCL wrapper interface configuration file for the openCONFIGURATOR.dll 
+ ******************************************************************************
+ */
+
+/*
+ © Kalycito Infotech Private Limited
+
+ License:
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ its contributors may be used to endorse or promote products derived
+ from this software without prior written permission. For written
+ permission, please contact info@kalycito.com.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+ Severability Clause:
+
+ If a provision of this License is or becomes illegal, invalid or
+ unenforceable in any jurisdiction, that shall not affect:
+ 1. the validity or enforceability in that jurisdiction of any other
+ provision of this License; or
+ 2. the validity or enforceability in other jurisdictions of that or
+ any other provision of this License.
+
+ ****************************************************************************/
+ 
+ %module openConfiguratorWrapper
 #define DLLEXPORT
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
@@ -8,15 +61,21 @@
 #endif
 
 %{
-
+/* Simply include the header definitions for the SWIG */
 #include "../openCONFIGURATOR/Include/Exports.h"
 #include "../openCONFIGURATOR/Include/Error.h"
 #include "../openCONFIGURATOR/Include/Declarations.h"
 
 %}
 
+/* Include all the required SWIG interfaces */
 %include cpointer.i
 %include cstring.i
+%include typemaps.i
+%include exception.i
+%include std_except.i
+
+/* Conversions for pointer output to handled in TCL */
 %pointer_functions(char, charp)
 %pointer_functions(long, longp)
 %pointer_functions(int, intp)
@@ -34,10 +93,6 @@
 %cstring_bounded_output(char *outForcedCycle, 10);
 
 
-%include typemaps.i
-%include exception.i
-%include std_except.i
-
 %include "../openCONFIGURATOR/Include/Declarations.h"
 %include "../openCONFIGURATOR/Include/Error.h"
 %include "../openCONFIGURATOR/Include/Exports.h"
@@ -46,6 +101,8 @@ using namespace std;
 
 
 %inline %{
+
+/* Copy all the API declarations here */
  ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType);
  ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType);
  ocfmRetCode GenerateXAP(char* xapFilePath);
@@ -90,5 +147,6 @@ using namespace std;
  ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
  ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName, char* importXmlFile);
  INT32 GetDataSize(char* dataTypeVal);
+ 
 %}
 

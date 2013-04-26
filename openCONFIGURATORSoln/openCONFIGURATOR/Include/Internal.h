@@ -1,14 +1,14 @@
 /**
- *****************************************************************************************************
- \file			Internal.h
+ *****************************************************************************
+ \file		Internal.h
 
- \brief			Handles function definitions and constant defintions used internally
- *****************************************************************************************************
+ \brief		This file contains the declaration of supporting functions that are used internally in the openCONFIGURATOR project
+ *****************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -74,14 +74,15 @@
 /*****************************************************************************/
 /* Defines */
 
-#define TOOL_VERSION "1.2.2"
-#define LAST_TOOL_VERSION "1.2.1"
+#define TOOL_VERSION "1.3.0"
+#define LAST_TOOL_VERSION "1.2.2"
 #define PREV_TOOL_VERSION_1 "1.1.0"
 #define PREV_TOOL_VERSION_2 "1.0.1"
 #define PREV_TOOL_VERSION_3 "1.0.0"
 #define PREV_TOOL_VERSION_4 "1.1.1"
 #define PREV_TOOL_VERSION_5 "1.1.2"
 #define PREV_TOOL_VERSION_6 "1.2.0"
+#define PREV_TOOL_VERSION_7 "1.2.1"
 #define TOOL_INTER_REL_VERSION_1 "1.1.2.1"
 #define TOOL_INTER_REL_VERSION_2 "1.1.2.2"
 #define TOOL_INTER_REL_VERSION_3 "1.1.2.3"
@@ -187,7 +188,6 @@ char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue);
  */
 /*****************************************************************************/
 bool CheckIfNotPDO(char* indexId);
-void ProcessUniqueIDRefs();
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return a substring of the input parameter string from the given startPos for given len
@@ -1475,16 +1475,6 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj);
 void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj);
 /*****************************************************************************/
 /**
- \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the ComplexDataType object in the calling function
-
- \param		reader    	xml pointer of xmlTextReaderPtr
- \param		cdtObj      Class pointer of ComplexDataType
- \return	void
- */
-/*****************************************************************************/
-static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
-/*****************************************************************************/
-/**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr and size of the varDeclaration structure variable in the calling function
 
  \param		reader		xml Pointer of xmlTextReaderPtr
@@ -1506,7 +1496,5 @@ void SetVarDecAttributes(xmlTextReaderPtr reader, varDeclaration& vdecl);
  */
 /*****************************************************************************/
 void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos);
-
-static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
 
 #endif // internal_h

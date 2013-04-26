@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			NodeCollection.cpp
+ *****************************************************************************
+ \file		NodeCollection.cpp
 
- \brief			Collects node id,count,location of all nodes present in the network
- ************************************************************************************************
+ \brief		This file contains the class member definitions to manage the inclusion and retrieval of Nodes in the collection list
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -51,14 +51,14 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <stdio.h>
 #include "../Include/NodeCollection.h"
 #include "../Include/Node.h"
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Global Variables */
 
 bool NodeCollection::instanceFlag = false;

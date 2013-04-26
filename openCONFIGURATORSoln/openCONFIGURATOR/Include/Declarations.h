@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			Declarations.h
+ *****************************************************************************
+ \file		Declarations.h
 
- \brief			Handles the API declarations and other supporting declarations of all API functions and used in this application
- *****************************************************************************************************
+ \brief		This file contains the defines, enumerations, structure and function declarations that are exposed to the GUI developer who is interested in integrating openCONFIGURATOR into their tool
+ *****************************************************************************
  */
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

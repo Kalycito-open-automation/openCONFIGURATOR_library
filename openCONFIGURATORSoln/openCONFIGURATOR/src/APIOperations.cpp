@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
+ ******************************************************************************
  \file		APIOperations.cpp
 
- \brief		This file handles all the operations regarding the API calls
- ************************************************************************************************
+ \brief		This file contains the functions that are exposed as an API for handling Project settings, Node and Object operations
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
 
  License:
@@ -108,6 +108,39 @@ char abC_DLL_ISOCHR_MAX_PAYL[5] = "1490";
 INT32 configDateGlobal; //global used in xdcoperations
 INT32 configTimeGlobal; //global used in xdcoperations
 UINT32 cycleNumberGlobal; //global used in Utility
+
+/*****************************************************************************/
+/* Function Declarations */
+
+/****************************************************************************/
+/**
+ \brief		Default attributes to an Index are set from the object dictionary
+
+ \param		indexId				Character pointer to hold the IndexID
+ \param		indexObj			Class pointer of Index to add the attributes
+ \param		dictIndexObj		Class pointer of Index form object dictionary
+
+ \return	void
+ */
+/****************************************************************************/
+static void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
+		Index* dictIndexObj);
+
+/*****************************************************************************/
+/**
+ \brief		Default attributes to a SubIndex are set from the object dictionary
+
+ \param		subIndexId		Character pointer to hold the IndexID
+ \param		sidxObj			Class pointer of SubIndex to add the attributes
+ \param		dictSidxObj		Class pointer of SubIndex from object dictionary
+
+ \return	void
+ */
+/*****************************************************************************/
+static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
+		SubIndex* dictSidxObj);
+
+
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -1006,7 +1039,9 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
 			throw exceptionObj;
 		}
-
+#if defined DEBUG
+		cout<<"Adding 00 subindex. IndexId: "<<indexId<<endl;
+#endif
 		errCodeObj = AddSubIndex(nodeId, nodeType, indexId, (char*) "00");
 		if ((OCFM_ERR_SUCCESS == errCodeObj.code)
 				&& (true == CheckIfManufactureSpecificObject(indexId)))
@@ -1174,21 +1209,26 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 				for (INT32 idxLC = 0;
 						idxLC < dictIndexObj->GetNumberofSubIndexes(); idxLC++)
 				{
-					SubIndex* objSIdx = NULL;
-					objSIdx->SetNodeID(nodeId);
+					SubIndex* objSIdx;
 					objSIdx = dictIndexObj->GetSubIndex(idxLC);
+					//objSIdx->SetNodeID(nodeId);
 					if (NULL != objSIdx)
 					{
 						indexObj.AddSubIndex(*objSIdx);
 					}
 				}
-				//TODO: NULL check for getName
-				indexObj.SetName(
-						dictObj->GetIndexName(SubString(indexId, 2, 4),
-								(char*) indexObj.GetName()));
+				char *newIndexName = new char[50];
+				char indexSubStr[4];
+				strcpy(indexSubStr, SubString(indexId, 2, 4));
+				newIndexName = dictObj->GetIndexName((char*)indexSubStr,(char*) indexObj.GetName());
+				if( newIndexName != NULL)
+				{
+					indexObj.SetName(newIndexName);
+				}
 				//updates the no of entries for the subindex added
 				UpdateNumberOfEnteriesSIdx(&indexObj, nodeType);
 				indexCollObj->AddIndex(indexObj);
+				delete[] newIndexName;
 			}
 			else if ((MN == nodeType)
 					&& (true == CheckIfProcessImageIdx(indexId)))
@@ -5481,7 +5521,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 	{
 		if (nodesCount == 0)
 		{
-			exit(0);
+			//exit(0);
+			exceptionObj.OCFMException(OCFM_ERR_NO_CN_NODES_FOUND);
+			throw exceptionObj;
 		}
 
 		size8INOffset.currOffset = 0;
@@ -6286,7 +6328,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 			}
 
 		}
-		delete[] nodeIDbyStnArranged;
+		//delete[] nodeIDbyStnArranged;
 		//The PI variable name should be unique
 		SetUniquePIVarName();
 		//find the time of build
@@ -7781,14 +7823,22 @@ ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId,
 		nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodePos);
 		*outNodeId = nodeObj.GetNodeId();
 		if (nodeObj.GetNodeName() != NULL)
+		{
 			strcpy(outNodeName, nodeObj.GetNodeName());
+		}
 		else
+		{
 			outNodeName = NULL;
+		}
 
 		if (nodeObj.GetForcedCycleValue() != NULL)
+		{
 			strcpy(outForcedCycle, nodeObj.GetForcedCycleValue());
+		}
 		else
+		{
 			outForcedCycle = NULL;
+		}
 
 		*outStationType = nodeObj.GetStationType();
 		*outIsForcedCycle = nodeObj.GetForceCycleFlag();
@@ -8839,7 +8889,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		INT32* arrangedNodeIDbyStation = NULL;
 		Node nodeObj;
 		arrangedNodeIDbyStation = ArrangeNodeIDbyStation();
-
+#if defined DEBUG
+			cout << "NodeID Aarranged by Station" << endl;
+#endif
 		for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
 				nodeLC++)
 		{
@@ -9067,7 +9119,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						if (errCodeObj.code != OCFM_ERR_SUCCESS)
 						{
 							exceptionObj.OCFMException(errCodeObj.code);
-							//delete[] pArrangedNodeIDbyStation; no new so no delete
+							delete[] arrangedNodeIDbyStation;
 							throw exceptionObj;
 						}
 					}
@@ -12948,10 +13000,10 @@ INT32* ArrangeNodeIDbyStation(void)
 		exit(0);
 	}
 
-	INT32 *nodeIdColl = new INT32[nodesCNCount];
+	INT32 *nodeIdColl = new INT32[nodesCNCount+1];
 	INT32 arrangedNodeIdCount = 0;
-	INT32 *arrangedNodeIdColl = new INT32[nodesCNCount];
-	StationType *stationTypeColl = new StationType[nodesCNCount];
+	INT32 *arrangedNodeIdColl = new INT32[nodesCNCount+1];
+	StationType *stationTypeColl = new StationType[nodesCNCount+1];
 	INT32 nodesCount = nodeCollObj->GetNumberOfNodes();
 	INT32 loopCount = 0;
 	INT32 tempVal = 0;

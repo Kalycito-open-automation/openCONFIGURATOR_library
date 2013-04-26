@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			ProjectSettings.h
+ *****************************************************************************
+ \file		ProjectSettings.h
 
- \brief
- *****************************************************************************************************
+ \brief		This file contains the class declaration used to handle the 'Auto Generate', 'View mode' and 'Save mode' options under Project Settings
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -53,17 +53,17 @@
 #ifndef ProjectSettings_h
 #define ProjectSettings_h
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include "Declarations.h"
 
 /**
- ******************************************************************************************************
- \class			PjtSettings
- \brief			This handles Powerlink IP settings details	
+ ****************************************************************************
+ \class		PjtSettings
+ \brief		This handles Project settings details
  
- ******************************************************************************************************/
+ ****************************************************************************/
 
 class PjtSettings
 {

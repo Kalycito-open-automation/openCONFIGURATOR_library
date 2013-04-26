@@ -1,9 +1,9 @@
 /**
- ************************************************************************************************
- \file			DataTypeCollection.cpp
+ ******************************************************************************
+ \file		DataTypeCollection.cpp
 
- \brief			Handles collection of datatype with reference to index
- ************************************************************************************************
+ \brief		This file contains the class member definitions that are used for handling complex datatype collection in XML configuration file(XDD/XDC)
+ ******************************************************************************
  */
 
 /*

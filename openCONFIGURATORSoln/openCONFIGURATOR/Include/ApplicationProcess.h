@@ -1,14 +1,14 @@
 /**
  ******************************************************************************
- \file			ApplicationProcess.h
+ \file		ApplicationProcess.h
 
- \brief			The collection of all the objects within the Application Process tag xdd/xdc file 
+ \brief		This file contains the class declaration that is used for handling the objects within the 'Application Process' tag in the XML configuration file(XDD/XDC) 
  ******************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -66,8 +66,8 @@ using namespace std;
 
 /**
  *******************************************************************************************************
- \class			ApplicationProcess
- \brief			The collection of all the objects within the Application Process tag xdd/xdc file  
+ \class		ApplicationProcess
+ \brief		The collection of all the objects within the Application Process tag xdd/xdc file
 
  ********************************************************************************************************/
 class ApplicationProcess

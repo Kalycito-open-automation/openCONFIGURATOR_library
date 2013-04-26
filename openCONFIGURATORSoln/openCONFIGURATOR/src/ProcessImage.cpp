@@ -1,13 +1,13 @@
 /**
  ************************************************************************************************
- \file			ProcessImage.cpp
+ \file		ProcessImage.cpp
 
- \brief
+ \brief		This file contains the function definitions and Process Image type structure variables to handle operations on the ProcessImage objects in the collection
  ************************************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -534,6 +534,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 		ocfmException ex;
 		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] xapHeaderIncludeGuard;
+		fclose(xapFile);
 		throw ex;
 	}
 
@@ -1257,7 +1258,7 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 	PIObject stPIObject;
 	stPIObject.Initialize();
 #if defined DEBUG
-	cout << __FUNCTION__ << ":: Datatype:" << dtType << " DirectionType:" << dirType << " iOffset:" << offsetVal << " iDataSize:" << dataSizeBits << endl;
+	cout << __FUNCTION__ << ":: dtType:" << dtType << " dirType:" << dirType << " offsetVal:" << offsetVal << " dataSizeBits:" << dataSizeBits << endl;
 #endif
 	stPIObject.indexId = new char[INDEX_LEN];
 	stPIObject.sIdxId = new char[SUBINDEX_LEN];
@@ -1273,14 +1274,29 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 			if (subIndex > 254)
 			{
 				INT32 div = subIndex / 254;
+
+				#if defined DEBUG
+				cout << "subIndex: "<<subIndex<<" dataSizeBytes:"<<dataSizeBytes<<endl;
+				#endif
+
+				subIndex = subIndex + (div - 1);
 				INT32 mod = subIndex % 254;
-				INT32 iAddress;
-				iAddress = HexToInt(piIndexTable[idx].addressStr);
-				iAddress = iAddress + div;
-				stPIObject.indexId = IntToAscii(iAddress, stPIObject.indexId,
+
+				#if defined DEBUG
+				cout << "subIndex: "<<subIndex<<" mod:"<<mod<<endl;
+				#endif
+
+				INT32 addressVal;
+				addressVal = HexToInt(piIndexTable[idx].addressStr);
+				addressVal = addressVal + div;
+				stPIObject.indexId = IntToAscii(addressVal, stPIObject.indexId,
 						16);
 				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
+
+				#if defined DEBUG
+				cout << "indexId: "<<stPIObject.indexId<<" sIdxId:"<<stPIObject.sIdxId<<endl;
+				#endif
 
 			}
 			else

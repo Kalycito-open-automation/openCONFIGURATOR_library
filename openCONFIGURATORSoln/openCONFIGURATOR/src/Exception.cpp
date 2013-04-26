@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			Exception.cpp
+ ******************************************************************************
+ \file		Exception.cpp
 
- \brief			Displays the error code
- ************************************************************************************************
+ \brief		This file contains the class member definitions that are used to throw exception to the GUI when an error occurs
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

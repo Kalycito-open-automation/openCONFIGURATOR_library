@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			Node.cpp
+ *****************************************************************************
+ \file		Node.cpp
 
- \brief			Handles information of node which inclues id,name,type
- ************************************************************************************************
+ \brief		This file contains the class member definitions to handle the functional properties of the Node such as datatype collection,Index collection, network management collection
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -51,7 +51,7 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <stdio.h>

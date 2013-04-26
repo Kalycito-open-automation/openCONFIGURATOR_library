@@ -1,13 +1,13 @@
 /**
  ************************************************************************************************
- \file			Validation.cpp
+ \file		Validation.cpp
 
- \brief			Validates Index,Subindex,node id,datatype and Projectversion
+ \brief		This file contains the non API definitions that are used in checking existence of datatypes, SubIndices in collection list and version number of tool
  ************************************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -182,9 +182,9 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 						== strcmp(StringToUpper(tempIndexId),
 								StringToUpper(indexId)))
 				{
-					Index *objIndexPtr = NULL;
+					//Index *objIndexPtr = NULL;
 
-					objIndexPtr = idxCollObj->GetIndex(idxLC);
+					//objIndexPtr = idxCollObj->GetIndex(idxLC);
 					*idxPos = idxLC;
 					errCodeObj.code = OCFM_ERR_SUCCESS;
 					return errCodeObj;

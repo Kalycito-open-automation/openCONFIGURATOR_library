@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			ProjectSettings.cpp
+ *****************************************************************************
+ \file		ProjectSettings.cpp
 
- \brief			Handles project settings such as view mode,new settings,generate,ip address.
- ************************************************************************************************
+ \brief		This file contains the class member definitions used to handle the 'Auto Generate', 'View mode' and 'Save mode' options under Project Settings
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -51,7 +51,7 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <iostream>
@@ -60,7 +60,7 @@
 
 using namespace std;
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Global Variables */
 
 bool PjtSettings::instanceFlag = false;

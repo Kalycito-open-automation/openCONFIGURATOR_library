@@ -1,14 +1,14 @@
 /**
- *****************************************************************************************************
- \file			validation.h
+ *****************************************************************************
+ \file		validation.h
 
- \brief			Validation
- *****************************************************************************************************
+ \brief		This file contains the non API declarations that are used in checking existence of datatypes, SubIndices in collection list and version number of tool
+ *****************************************************************************
  */
 
 /*
 
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

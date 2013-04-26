@@ -1,14 +1,14 @@
 /**
- ************************************************************************************************
- \file			BaseIndex.cpp
+ ******************************************************************************
+ \file		BaseIndex.cpp
 
- \brief			This adds the feature details reference to the index for each datatype 
- ************************************************************************************************
+ \brief		This file contains the class member definitions that are used for handling the attributes of an Index/SubIndex object 
+ ******************************************************************************
 
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

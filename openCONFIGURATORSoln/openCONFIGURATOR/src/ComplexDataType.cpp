@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			ComplexDataType.cpp
+ ******************************************************************************
+ \file		ComplexDataType.cpp
 
- \brief			Handles variable declarations for complex datatype
- ************************************************************************************************
+ \brief		This file contains the class member definitions that are used for handling complex datatypes in XML configuration file(XDD/XDC)
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

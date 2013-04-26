@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			NetworkManagement.cpp
+ ******************************************************************************
+ \file		NetworkManagement.cpp
 
- \brief			Handles information of each object node present in the network
- ************************************************************************************************
+ \brief		This file contains class member definitions to handle the network management features of a Node
+ ******************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ ©) Kalycito Infotech Private Limited
 
  License:
 

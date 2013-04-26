@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			ObjectDictionary.h
+ *****************************************************************************
+ \file		ObjectDictionary.h
 
- \brief			Handles the object dictionary for each index
- *****************************************************************************************************
+ \brief		This file contains the class declaration to handle operations on the object dictionary template od.xml which is used as a template for creating objects for all nodes
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -53,7 +53,7 @@
 #ifndef ObjectDictionary_h
 #define ObjectDictionary_h
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <libxml/xmlreader.h>
@@ -66,11 +66,11 @@
 #include "Internal.h"
 
 /**
- ******************************************************************************************************
+ *****************************************************************************
  \class			ObjectDictionary
  \brief			Handles the object dictionary for each index	
  
- ******************************************************************************************************/
+ *****************************************************************************/
 class ObjectDictionary
 {
 	public:

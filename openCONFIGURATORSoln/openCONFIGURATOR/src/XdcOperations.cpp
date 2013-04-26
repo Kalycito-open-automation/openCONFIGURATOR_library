@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- \file			XdcOperations.cpp
+ \file		XdcOperations.cpp
 
- \brief			Handles Parameter,Variable declaration, datatype for Index attributes and Sub-Index attributes
+ \brief		This file contains the definitions that are used to handle the xml parsing and convert each tag in the XML file to a collection of objects
  ******************************************************************************
  */
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -96,7 +96,32 @@ static const char *gpa2bSimple[][2] =
 { "WSTRING", "1" } }; //array size in g_simple_arr_size
 
 //==========================================================================//
-// 				F U N C T I O N  D E F I N I T I O N S  					//
+// 					F U N C T I O N  D E C L E R A T I O N S		   		//
+//==========================================================================//
+
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the ComplexDataType object in the calling function
+
+ \param		reader    	xml pointer of xmlTextReaderPtr
+ \param		cdtObj      Class pointer of ComplexDataType
+ \return	void
+ */
+/*****************************************************************************/
+static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
+/*****************************************************************************/
+/**
+ \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the ComplexDataType object in the calling function
+
+ \param		reader		xml pointer of xmlTextReaderPtr
+ \param		cdtObj      Class pointer of ComplexDataType
+ \return	void
+ */
+/*****************************************************************************/
+static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
+
+//==========================================================================//
+// 					F U N C T I O N  D E F I N I T I O N S				    //
 //==========================================================================//
 
 void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
@@ -615,7 +640,7 @@ bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement)
 }
 /*****************************************************************************/
 /**
- \brief		This Function shall parse and Adds the varDecleration object and its attributes
+ \brief		This Function shall parse and Adds the varDeclaration object and its attributes
  
  \param		reader		xml pointer of xmlTextReaderPtr
  \param		cdtObj		Class pointer of ComplexDataType

@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			DataTypeCollection.h
+ *****************************************************************************
+ \file		DataTypeCollection.h
 
- \brief			This class is to handle complex datatype collection in xdd/xdc file
- *****************************************************************************************************
+ \brief		This file contains the class declaration that is used for handling complex datatype collection in XML configuration file(XDD/XDC)
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -53,18 +53,18 @@
 #ifndef DataTypeCollection_h
 #define DataTypeCollection_h
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include "Declarations.h"
 #include "TCollection.h"
 
 /**
- ******************************************************************************************************
+ ****************************************************************************
  \class			DataTypeCollection
  \brief			This class is to handle complex datatype collection in xdd/xdc file
  
- *******************************************************************************************************/
+ ****************************************************************************/
 class DataTypeCollection
 {
 	public:

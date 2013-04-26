@@ -1,13 +1,13 @@
 /**
- ************************************************************************************************
- \file			ObjectDictionary.cpp
+ *****************************************************************************
+ \file		ObjectDictionary.cpp
 
- \brief			Creats object dictionary for each node and Process the Node value,Name and its attributes
- ************************************************************************************************
+ \brief		This file contains the class member definitions to handle operations on the object dictionary template od.xml which is used as a template for creating objects for all nodes
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 
@@ -51,7 +51,7 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Includes */
 
 #include <iostream>
@@ -61,7 +61,7 @@
 
 using namespace std;
 
-/****************************************************************************************************/
+/****************************************************************************/
 /* Global Variables */
 
 INT32 lastObjDictIdxParsed = 0;

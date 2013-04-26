@@ -1,13 +1,13 @@
 /**
- *****************************************************************************************************
- \file			IndexCollection.h
+ *****************************************************************************
+ \file		IndexCollection.h
 
- \brief			Handles definition of Index collection for all datatypes	
- *****************************************************************************************************
+ \brief		This file contains the class declaration to handle the properties of objects of the Index Collection
+ *****************************************************************************
  */
 
 /*
- (c) Kalycito Infotech Private Limited
+ © Kalycito Infotech Private Limited
 
  License:
 

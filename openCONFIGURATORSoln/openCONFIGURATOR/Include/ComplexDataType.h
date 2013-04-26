@@ -1,8 +1,8 @@
 /**
  ************************************************************************************************
- n \file			ComplexDataType.h
+ \file		ComplexDataType.h
 
- \brief			This class is to handle complex datatypes in xdd/xdc file
+ \brief		This file contains the class declaration that is used for handling complex datatypes in XML configuration file(XDD/XDC)
  ************************************************************************************************
  */
 
