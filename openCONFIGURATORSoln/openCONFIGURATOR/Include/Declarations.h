@@ -274,15 +274,17 @@ struct varDeclaration
 typedef struct Parameter
 {
 		AppProcessCommon nameIdDtAttr;
-		char* dataType;	//TODO: unused
-		INT32 structIndex; //TODO: unused
+		//char* dataType;	//TODO: unused
+		//INT32 structIndex; //TODO: unused
+		INT32 size;
 		char* accessStr;
-		INT32 paraIndex;
+		//INT32 paraIndex;
 		void Initialize()
 		{
 			nameIdDtAttr.Initialize();
-			dataType = NULL;
+			//dataType = NULL;
 			accessStr = NULL;
+			size = 0;
 		}
 } Parameter;
 

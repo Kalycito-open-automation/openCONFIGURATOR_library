@@ -511,9 +511,13 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 
 		char abSize[3];
 
-		if (CheckifSimpleDT((char*) name, abSize))
+		if (CheckifSimpleDT((char*) name, (char*) abSize))
 		{
 			parameterObj->nameIdDtAttr.SetDataType((char*) name);
+			parameterObj->size = atoi((char*) abSize);
+			#if defined DEBUG
+				cout<<"Setting DataType:"<<parameterObj->nameIdDtAttr.GetDataType()<<" Size:"<<parameterObj->size<<endl;
+			#endif
 		}
 		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name,
 				(char*) "dataTypeIDRef"))
@@ -830,7 +834,7 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 				ApplicationProcess* appProcessObj;
 				Parameter parameterObj;
-
+				parameterObj.Initialize();
 				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
 				if (1 == xmlTextReaderHasAttributes(reader))
 				{
@@ -1169,21 +1173,32 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				BAD_CAST "ISO15745ProfileContainer");
 		if (0 > bytesWritten)
 		{
-			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
+			printf("Error at xmlTextWriterStartElement: ISO15745ProfileContainer\n");
 			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
+		xmlTextWriterSetIndent(xtwWriter, 1);
+		bytesWritten = xmlTextWriterStartElement(xtwWriter,
+				BAD_CAST "ISO15745Profile");
+		if (0 > bytesWritten)
+		{
+			printf("Error at xmlTextWriterStartElement: ISO15745Profile\n");
+			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			throw objException;
+		}
+		xmlTextWriterSetIndent(xtwWriter, 1);
 
 		// Start ProfileBody Tag
 		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ProfileBody");
 		if (0 > bytesWritten)
 		{
-			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
+			printf("Error at xmlTextWriterStartElement: ProfileBody\n");
 			objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
-
+		xmlTextWriterSetIndent(xtwWriter, 1);
+		
 		// Start ApplicationProcess Tag	
 		bytesWritten = xmlTextWriterStartElement(xtwWriter,
 				BAD_CAST "ApplicationProcess");
@@ -1388,39 +1403,51 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						BAD_CAST "access", BAD_CAST parameterObj.accessStr);
 
-				// Start dataTypeIDRef Tag
-				bytesWritten = xmlTextWriterStartElement(xtwWriter,
-						BAD_CAST "dataTypeIDRef");
-				if (0 > bytesWritten)
+				if(parameterObj.nameIdDtAttr.GetDataType() != NULL)
 				{
-					printf(
-							"testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-					objException.OCFMException(
-							OCFM_ERR_XML_WRITER_START_ELT_FAILED);
-					throw objException;
+					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST parameterObj.nameIdDtAttr.GetDataType());
+					if (bytesWritten < 0) 
+					{
+						printf("Error at xmlTextWriterStartElement: Parameter - Datatype\n");
+						objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+						throw &objException;
+					}
+					bytesWritten = xmlTextWriterEndElement(xtwWriter);
+					if (bytesWritten < 0)
+					{
+						printf("Error at xmlTextWriterEndElement: Parameter - Datatype\n");
+						objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+						throw &objException;
+					}
 				}
-				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						BAD_CAST "uniqueIDRef",
-						BAD_CAST parameterObj.nameIdDtAttr.GetDtUniqueRefId());
-				// End dataTypeIDRef Tag
-				bytesWritten = xmlTextWriterEndElement(xtwWriter);
-				if (0 > bytesWritten)
+
+				if(parameterObj.nameIdDtAttr.GetDtUniqueRefId() != NULL)
 				{
-					printf(
-							"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-					objException.OCFMException(
-							OCFM_ERR_XML_WRITER_END_ELT_FAILED);
-					throw objException;
+					// Start dataTypeIDRef Tag
+					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "dataTypeIDRef");
+					if (0 > bytesWritten)
+					{
+						printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
+						objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+						throw objException;
+					}
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter, BAD_CAST "uniqueIDRef", BAD_CAST parameterObj.nameIdDtAttr.GetDtUniqueRefId());
+					// End dataTypeIDRef Tag
+					bytesWritten = xmlTextWriterEndElement(xtwWriter);
+					if (0 > bytesWritten)
+					{
+						printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
+						objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+						throw objException;
+					}
 				}
 
 				// End parameter Tag
 				bytesWritten = xmlTextWriterEndElement(xtwWriter);
 				if (0 > bytesWritten)
 				{
-					printf(
-							"testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-					objException.OCFMException(
-							OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+					printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
+					objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
 			}
@@ -1957,6 +1984,16 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		if (bytesWritten < 0)
 		{
 			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
+			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+			throw objException;
+		}
+
+		xmlTextWriterSetIndent(xtwWriter, 1);
+		// End ISO15745Profile Tag
+		bytesWritten = xmlTextWriterEndElement(xtwWriter);
+		if (bytesWritten < 0)
+		{
+			printf("Error at xmlTextWriterEndElement: ISO15745Profile\n");
 			objException.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}

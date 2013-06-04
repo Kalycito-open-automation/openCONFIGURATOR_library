@@ -5434,6 +5434,11 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 	ApplicationProcess* appProcessObj = NULL;
 	ComplexDataType* cdtObj = NULL;
 	INT32 totalBytesMapped = 0;
+	INT32 iStartBitOffset =  0;
+	INT32 iOffset;
+	bool bIsNewBitStringVar = false;
+	INT32 iDataSize = 0;
+	//cout<<"DecodeUniqiueIDRef"<<endl;
 	try
 	{
 		if (nodeObj->GetApplicationProcess() != NULL)
@@ -5441,41 +5446,130 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 			appProcessObj = nodeObj->GetApplicationProcess();
 			if (appProcessObj->ParameterCollection.Count() != 0)
 			{
-				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(
-						uniquedIdref);
+				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniquedIdref);
 				if (parameterObj == NULL)
 				{
-					exceptionObj.OCFMException(
-							OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
+					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
+					char customError[200] = { 0 };
+					sprintf(customError, "In node id: %d object %s with unique id: %s  reference not found", nodeObj->GetNodeId(), moduleName, uniquedIdref);
+					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
 					throw exceptionObj;
 				}
-
+				cout<<"Parameter Found"<<" Uid: "<<uniquedIdref<<endl;
 				// Check if DataTypeUniqueIDref exists
-				if (parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL)
+				//if (parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL)
+				if((parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataTypeUniqueIDRef, "") != 0))
 				{
-
-					cdtObj = appProcessObj->GetCDTbyUniqueID(
-							parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
+					cout<<"Inside CDT calculation"<<endl;
+					cdtObj = appProcessObj->GetCDTbyUniqueID(parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
 					if (cdtObj == NULL)
 					{
-						exceptionObj.OCFMException(
-								OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
+						exceptionObj.OCFMException(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
+						char customError[200] = { 0 };
+						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleName, uniquedIdref, parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
+						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
 						throw exceptionObj;
 					}
-					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj,
-							nodeObj, parameterObj, pdoType, moduleName,
-							moduleIndex);
+					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, pdoType, moduleName, moduleIndex);
+					lastVarIndexGlobal = -1;
+					cdtCompletedGlobal = false;
+				}
+				else if ((parameterObj->nameIdDtAttr.dataType != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataType, "") != 0))
+				{
+					cout<<"Dt: "<<parameterObj->nameIdDtAttr.dataType<<" ModName:"<<moduleName<<" moduleIndex:"<<moduleIndex<<endl;
+					//pobjAppProc, nodeObj, parameterObj, pdoType, moduleName, moduleIndex
+					ProcessImage objProcessImage;
+					objProcessImage.Initialize();
+					objProcessImage.bitOffset = -1;
+					objProcessImage.byteOffset = 0;
+					if(parameterObj->accessStr != NULL)
+					{
+						strcpy(objProcessImage.direction, GetParameterAccess(parameterObj->accessStr));
+					}
+					cout<<"Access:"<<objProcessImage.direction<<endl;
+					if(pdoType == PDO_TPDO)
+					{
+						objProcessImage.directionType = INPUT;
+					}
+					else if(pdoType == PDO_RPDO)
+					{
+						objProcessImage.directionType = OUTPUT;
+					}
+					objProcessImage.nodeId = nodeObj->GetNodeId();
+
+					objProcessImage.name = new char[strlen(uniquedIdref) + strlen(moduleName) + 6 + ALLOC_BUFFER];
+					strcpy(objProcessImage.name, GetPIName(nodeObj->GetNodeId()));
+					strcat(objProcessImage.name, moduleName);
+					strcat(objProcessImage.name, ".");
+					strcat(objProcessImage.name, uniquedIdref);
+					
+					objProcessImage.moduleName = new char[strlen(moduleName) + ALLOC_BUFFER];
+					strcpy(objProcessImage.moduleName, moduleName);
+					
+					objProcessImage.moduleIndex = new char[strlen(moduleIndex) + ALLOC_BUFFER];
+					strcpy(objProcessImage.moduleIndex, moduleIndex);
+
+					//objProcessImage.varDeclName = (char*)malloc(strlen(uniquedIdref) + ALLOC_BUFFER);
+					//strcpy(objProcessImage.varDeclName, uniquedIdref);
+					cout<<"Name: "<<objProcessImage.name<<endl;
+
+					objProcessImage.dataInfo = *(GetIECDT(parameterObj->nameIdDtAttr.dataType, parameterObj->size));
+
+					cout<<objProcessImage.dataInfo.dtName<<" "<<objProcessImage.dataInfo.dataSize<<" "<<objProcessImage.dataInfo.iecDtVar<<endl;
+					if( ((objProcessImage.dataInfo.iecDtVar != BITSTRING) && (objProcessImage.dataInfo.dataSize >= 8 )) 
+						//|| ((objProcessImage.dataInfo.iecDtVar == BITSTRING) && (iStartBitOffset == 0 || iStartBitOffset == 8 || iStartBitOffset == 16 || iStartBitOffset == 32 || iStartBitOffset == 64)))
+						)
+					{
+						//bIsNewBitStringVar =  true;
+						//if(objProcessImage.dataInfo.iecDtVar == BITSTRING) 
+						//{
+							iStartBitOffset = 0;
+							iDataSize =  0;
+						//}
+						//else
+						//{
+							iDataSize =  objProcessImage.dataInfo.dataSize;
+						//}
+
+						if(pdoType == PDO_RPDO)
+						{
+							iOffset =  ComputeOUTOffset(iDataSize, pdoType);
+						}
+						else if(pdoType == PDO_TPDO)
+						{
+							iOffset =  ComputeINOffset(iDataSize, pdoType);
+						}
+					}
+					
+					cout<<"iOffset"<<iOffset<<endl;
+					objProcessImage.byteOffset = iOffset;
+
+					 totalBytesMapped = totalBytesMapped + (iDataSize / 8);
+					cout<<"Create MN pdo Var"<<" iOffset:"<<iOffset<<" iDataSize:"<<iDataSize<<endl;
+					CreateMNPDOVar(iOffset, iDataSize, objProcessImage.dataInfo.iecDtVar, pdoType, nodeObj);
+					if((objProcessImage.dataInfo.dataSize >= 8) && (iStartBitOffset!= 0 ) && (objProcessImage.dataInfo.iecDtVar != BITSTRING))
+					{
+						iStartBitOffset = 0;
+					}
+					else if(objProcessImage.dataInfo.iecDtVar == BITSTRING)
+					{
+						objProcessImage.bitOffset = iStartBitOffset;
+						iStartBitOffset = iStartBitOffset + objProcessImage.dataInfo.dataSize;
+						objProcessImage.byteOffset = iOffset;
+						//bIsNewBitStringVar =  false;
+					}
+
+					nodeObj->AddProcessImage(objProcessImage);
 					lastVarIndexGlobal = -1;
 					cdtCompletedGlobal = false;
 				}
 				else
 				{
 #if defined DEBUG
-					cout << "Data type of unique id does not exists" << endl;
+					cout << "Data type of unique id & datatype does not exists" << endl;
 #endif
 				}
 			}
-
 		}
 
 	} catch (ocfmException& ex)
@@ -6770,7 +6864,7 @@ void WriteXAPElements(ProcessImage piCollObj[], xmlTextWriterPtr& xmlWriter,
 		for (INT32 varCountLC = 0; varCountLC < varCount; varCountLC++)
 		{
 			ProcessImage piObj;
-			piObj.Initialize();
+			//piObj.Initialize();
 			piObj = piCollObj[varCountLC];
 
 			if (highBitOffset <= ((piObj.byteOffset * 8) + piObj.bitOffset))
@@ -6795,7 +6889,7 @@ void WriteXAPElements(ProcessImage piCollObj[], xmlTextWriterPtr& xmlWriter,
 		for (INT32 varCountLC = 0; varCountLC < varCount; varCountLC++)
 		{
 			ProcessImage piObj;
-			piObj.Initialize();
+			//piObj.Initialize();
 			piObj = piCollObj[varCountLC];
 			/* Start an element named "Channel". Since thist is the first
 			 * element, this will be the root element of the document. */
@@ -11479,7 +11573,7 @@ char* GetNodeAssigmentBits(Node* nodeObj)
 	}
 	char* nodeAssignData = NULL;
 	ULONG tempValue;
-	nodeAssignData = new char[8 + STR_ALLOC_BUFFER];
+	nodeAssignData = new char[10 + STR_ALLOC_BUFFER];
 	tempValue = EPL_NODEASSIGN_VALID | EPL_NODEASSIGN_NODE_EXISTS
 			| EPL_NODEASSIGN_NODE_IS_CN | EPL_NODEASSIGN_START_CN;
 	switch (nodeObj->GetStationType())

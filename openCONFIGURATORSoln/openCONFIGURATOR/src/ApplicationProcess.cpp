@@ -120,7 +120,7 @@ void ApplicationProcess::AddParameter(Parameter objectParameter)
 {
 	INT32 itemPosition = ParameterCollection.Add();
 
-	objectParameter.paraIndex = itemPosition;
+	//objectParameter.paraIndex = itemPosition;
 	ParameterCollection[itemPosition] = objectParameter;
 }
 

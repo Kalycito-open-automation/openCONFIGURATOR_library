@@ -221,7 +221,11 @@ void SetUniquePIVarName()
 			bool nameMatched = false;
 
 			piObjTemp1 = &objNode->PICollection[iInLoopCount];
-
+			if( piObjTemp1 == NULL)
+			{
+				cout<<"PICollection Null object. Node ID:"<<objNode->GetNodeId()<<" iInLoopCount:"<<iInLoopCount<<endl;
+				continue;
+			}
 			//it is possible that the changed var name matching a previous entry
 			for (INT32 iInChkLoopCount = 0;
 					iInChkLoopCount < objNode->PICollection.Count();
@@ -234,46 +238,40 @@ void SetUniquePIVarName()
 				}
 
 				piObjTemp2 = &objNode->PICollection[iInChkLoopCount];
-
+				if( piObjTemp2 == NULL)
+				{
+					cout<<"PICollection Null object. Node ID:"<<objNode->GetNodeId()<<" InLC:"<<iInLoopCount<<" OutLC:"<<iInChkLoopCount<<endl;
+					continue;
+				}
 				//check module index, module name, directiontype and variable name
 				//if all are same then append count variable to variable name
-				if ((0
-						== strcmp(piObjTemp1->moduleIndex,
-								piObjTemp2->moduleIndex))
-						&& (0
-								== strcmp(piObjTemp1->moduleName,
-										piObjTemp2->moduleName))
-						&& (piObjTemp1->directionType
-								== piObjTemp2->directionType)
-						&& (0
-								== strcmp(piObjTemp1->varDeclName,
-										piObjTemp2->varDeclName)))
+				if ((0 == strcmp(piObjTemp1->moduleIndex, piObjTemp2->moduleIndex))
+						&& (0 == strcmp(piObjTemp1->moduleName, piObjTemp2->moduleName))
+						&& (piObjTemp1->directionType == piObjTemp2->directionType)
+						&& ((piObjTemp1->varDeclName != NULL) && (NULL != piObjTemp2->varDeclName)))
 				{
-					//change the name of VarName
-					uniqNameCnt++; //1 is reserved for first matched entry
-					if (NULL != piObjTemp2->varDeclName)
+					if((0 == strcmp(piObjTemp1->varDeclName, piObjTemp2->varDeclName)))
 					{
-						delete[] piObjTemp2->varDeclName;
+						//change the name of VarName
+						uniqNameCnt++; //1 is reserved for first matched entry
+						if (NULL != piObjTemp2->varDeclName)
+						{
+							delete[] piObjTemp2->varDeclName;
+						}
+						piObjTemp2->varDeclName = new char[strlen(piObjTemp1->varDeclName) + uniqNameLen + ALLOC_BUFFER];
+						sprintf(piObjTemp2->varDeclName, "%s%02d", piObjTemp1->varDeclName, uniqNameCnt);
+						nameMatched = true;
+
+						//change the name of Name
+						if (NULL != piObjTemp2->name)
+							delete[] piObjTemp2->name;
+
+						piObjTemp2->name = new char[strlen(piObjTemp2->varDeclName) + strlen(piObjTemp2->moduleName) + 6 + ALLOC_BUFFER];
+						strcpy(piObjTemp2->name, GetPIName(objNode->GetNodeId()));
+						strcat(piObjTemp2->name, piObjTemp2->moduleName);
+						strcat(piObjTemp2->name, ".");
+						strcat(piObjTemp2->name, piObjTemp2->varDeclName);
 					}
-					piObjTemp2->varDeclName = new char[strlen(
-							piObjTemp1->varDeclName) + uniqNameLen
-							+ ALLOC_BUFFER];
-					sprintf(piObjTemp2->varDeclName, "%s%02d",
-							piObjTemp1->varDeclName, uniqNameCnt);
-					nameMatched = true;
-
-					//change the name of Name
-					if (NULL != piObjTemp2->name)
-						delete[] piObjTemp2->name;
-
-					piObjTemp2->name =
-							new char[strlen(piObjTemp2->varDeclName)
-									+ strlen(piObjTemp2->moduleName) + 6
-									+ ALLOC_BUFFER];
-					strcpy(piObjTemp2->name, GetPIName(objNode->GetNodeId()));
-					strcat(piObjTemp2->name, piObjTemp2->moduleName);
-					strcat(piObjTemp2->name, ".");
-					strcat(piObjTemp2->name, piObjTemp2->varDeclName);
 
 				}
 			}
@@ -281,15 +279,13 @@ void SetUniquePIVarName()
 			if (true == nameMatched)
 			{
 				char* tempVarName = NULL;
-				tempVarName = new char[strlen(piObjTemp1->varDeclName)
-						+ ALLOC_BUFFER];
+				tempVarName = new char[strlen(piObjTemp1->varDeclName) + ALLOC_BUFFER];
 				strcpy(tempVarName, piObjTemp1->varDeclName);
 				if (NULL != piObjTemp1->varDeclName)
 				{
 					delete[] piObjTemp1->varDeclName;
 				}
-				piObjTemp1->varDeclName = new char[strlen(tempVarName)
-						+ uniqNameLen + ALLOC_BUFFER];
+				piObjTemp1->varDeclName = new char[strlen(tempVarName) + uniqNameLen + ALLOC_BUFFER];
 
 				sprintf(piObjTemp1->varDeclName, "%s%02d", tempVarName, 1);
 				delete[] tempVarName;
@@ -299,8 +295,7 @@ void SetUniquePIVarName()
 				{
 					delete[] piObjTemp1->name;
 				}
-				piObjTemp1->name = new char[strlen(piObjTemp1->varDeclName)
-						+ strlen(piObjTemp1->moduleName) + 6 + ALLOC_BUFFER];
+				piObjTemp1->name = new char[strlen(piObjTemp1->varDeclName) + strlen(piObjTemp1->moduleName) + 6 + ALLOC_BUFFER];
 
 				strcpy(piObjTemp1->name, GetPIName(objNode->GetNodeId()));
 				strcat(piObjTemp1->name, piObjTemp1->moduleName);
@@ -606,8 +601,11 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			strcat(tempName, "_");
 
 			strcat(tempName, moduleName);
-			strcat(tempName, "_");
-			strcat(tempName, piObj[loopCount].varDeclName);
+			if (piObj[loopCount].varDeclName != NULL)
+			{
+				strcat(tempName, "_");
+				strcat(tempName, piObj[loopCount].varDeclName);
+			}
 
 			strcat(mainBuffer, tempName);
 			strcat(mainBuffer, ":");
@@ -815,15 +813,17 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 		offsetVal += GetDatasizeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar);
 		strcat(mainBuffer, " ");
 		strcat(mainBuffer, objNetPiCol[loopCount].moduleName);
-		strcat(mainBuffer, "_");
-		strcat(mainBuffer, objNetPiCol[loopCount].name);
-		if (objNetPiCol[loopCount].count > 0)
+		if(objNetPiCol[loopCount].name != NULL)
 		{
-			strcat(mainBuffer, "_to_");
-			strcat(mainBuffer, objNetPiCol[loopCount].lastName);
+			strcat(mainBuffer, "_");
+			strcat(mainBuffer, objNetPiCol[loopCount].name);
+			if ((objNetPiCol[loopCount].count > 0) && (objNetPiCol[loopCount].lastName != NULL))
+			{
+				strcat(mainBuffer, "_to_");
+				strcat(mainBuffer, objNetPiCol[loopCount].lastName);
+			}
 		}
 		strcat(mainBuffer, ";\n");
-
 	}
 	delete[] objNetPiCol;
 	char* totalSize = new char[20];
