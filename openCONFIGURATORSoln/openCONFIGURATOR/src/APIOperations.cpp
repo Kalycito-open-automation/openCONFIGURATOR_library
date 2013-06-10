@@ -9441,7 +9441,7 @@ INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType)
 
 		}
 		/* if greater no change*/
-		if (size64OUTOffset.currOffset >= size8OUTOffset.currOffset)
+		if (size64OUTOffset.currOffset >= size32OUTOffset.currOffset)
 		{
 		}
 		else
@@ -9455,9 +9455,40 @@ INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType)
 		size64OUTOffset.prevOffset = size64OUTOffset.currOffset;
 		retOffset = size64OUTOffset.currOffset;
 		size64OUTOffset.currOffset = size64OUTOffset.currOffset + 8;
+		/* Set other DataType Offsets*/
+		/* if greater no change*/
+		if (size8OUTOffset.currOffset >= size64OUTOffset.currOffset)
+		{
+			//
+		}
+		else
+		{
+			size8OUTOffset.prevOffset = size8OUTOffset.currOffset;
+			size8OUTOffset.currOffset = size64OUTOffset.currOffset;
+		}
+
+		/* if greater no change*/
+		if (size16OUTOffset.currOffset >= size64OUTOffset.currOffset)
+		{
+		}
+		else
+		{
+			size16OUTOffset.prevOffset = size16OUTOffset.currOffset;
+			size16OUTOffset.currOffset = size64OUTOffset.currOffset;
+		}
+		/* if greater no change*/
+		if (size32OUTOffset.currOffset >= size64OUTOffset.currOffset)
+		{
+			//
+		}
+		else
+		{
+			size32OUTOffset.prevOffset = size32OUTOffset.currOffset;
+			size32OUTOffset.currOffset = size64OUTOffset.currOffset;
+		}
 		break;
 	default:
-		cout << "Undefined DataSize Encountered:" << __FUNCTION__ << endl;
+		cout << "Undefined DataSize Encountered:" << dataSize <<" in "<< __FUNCTION__ << endl;
 		break;
 	}
 	return retOffset;
@@ -9578,7 +9609,7 @@ INT32 ComputeINOffset(INT32 dataSize, PDOType pdoType)
 
 		}
 		/* if greater no change*/
-		if (size64INOffset.currOffset >= size8INOffset.currOffset)
+		if (size64INOffset.currOffset >= size32INOffset.currOffset)
 		{
 		}
 		else
@@ -9592,6 +9623,35 @@ INT32 ComputeINOffset(INT32 dataSize, PDOType pdoType)
 		size64INOffset.prevOffset = size64INOffset.currOffset;
 		retOffset = size64INOffset.currOffset;
 		size64INOffset.currOffset = size64INOffset.currOffset + 8;
+		/* Set other DataType Offsets*/
+		/* if greater no change*/
+		if (size8INOffset.currOffset >= size64INOffset.currOffset)
+		{
+		}
+		else
+		{
+			size8INOffset.prevOffset = size8INOffset.currOffset;
+			size8INOffset.currOffset = size64INOffset.currOffset;
+		}
+
+		/* if greater no change*/
+		if (size16INOffset.currOffset >= size64INOffset.currOffset)
+		{
+		}
+		else
+		{
+			size16INOffset.prevOffset = size16INOffset.currOffset;
+			size16INOffset.currOffset = size64INOffset.currOffset;
+		}
+		/* if greater no change*/
+		if (size32INOffset.currOffset >= size64INOffset.currOffset)
+		{
+		}
+		else
+		{
+			size32INOffset.prevOffset = size32INOffset.currOffset;
+			size32INOffset.currOffset = size64INOffset.currOffset;
+		}
 		break;
 	default:
 		cout << "Undefined DataSize Encountered:" << __FUNCTION__ << endl;

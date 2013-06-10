@@ -1273,24 +1273,14 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 			subIndex = (offsetVal / dataSizeBytes) + 1;
 			if (subIndex > 254)
 			{
+				subIndex--;
 				INT32 div = subIndex / 254;
-
-				#if defined DEBUG
-				cout << "subIndex: "<<subIndex<<" dataSizeBytes:"<<dataSizeBytes<<endl;
-				#endif
-
-				subIndex = subIndex + (div - 1);
-				INT32 mod = subIndex % 254;
-
-				#if defined DEBUG
-				cout << "subIndex: "<<subIndex<<" mod:"<<mod<<endl;
-				#endif
+				INT32 mod = (subIndex % 254) + 1;
 
 				INT32 addressVal;
 				addressVal = HexToInt(piIndexTable[idx].addressStr);
 				addressVal = addressVal + div;
-				stPIObject.indexId = IntToAscii(addressVal, stPIObject.indexId,
-						16);
+				stPIObject.indexId = IntToAscii(addressVal, stPIObject.indexId, 16);
 				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 
