@@ -646,8 +646,8 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 			bool idx18Present = false;
 
 			idxCommObjMN = idxCollObjMN->GetIndex(idxLC);
-			subStr1 = SubString((char*) idxCommObjMN->GetIndexValue(), 0, 2);
-			subStr2 = SubString((char*) idxCommObjMN->GetIndexValue(), 2, 2);
+			subStr1 = SubString(subStr1, idxCommObjMN->GetIndexValue(), 0, 2);
+			subStr2 = SubString(subStr2, idxCommObjMN->GetIndexValue(), 2, 2);
 #if defined DEBUG
 			cout<<"Entry Processing: "<<subStr1<<subStr2<<endl;
 #endif
@@ -660,16 +660,18 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 			{
 				idx18Present = true;
 			}
+			delete[] subStr1;
 
 			if ((idx14Present == true) || (idx18Present == true))
 			{
 				SubIndex *sidxObj = NULL;
-				char* sidxActValue = new char[SUBINDEX_LEN];
 				sidxObj = idxCommObjMN->GetSubIndexbyIndexValue((char*) "01");
+
 				if (NULL != sidxObj)
 				{
 					INT32 nodeIdTemp;
-					sidxActValue = (char*) sidxObj->GetActualValue(); //NULL
+					char* sidxActValue = new char[INDEX_LEN];
+					strcpy(sidxActValue, sidxObj->GetActualValue());
 					nodeIdTemp = GetDecimalValue(sidxActValue);
 
 					if (nodeId == nodeIdTemp)
@@ -713,14 +715,14 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 #endif
 						delete[] idxIdTxobjMN;
 					}
+					delete[] sidxActValue;
 				}
 				else
 				{
 					//00th subindex in the communication index is not present
 				}
-				//delete[] varActValue;
 			}
-			delete[] subStr1;
+
 			delete[] subStr2;
 		}
 	}
@@ -1232,9 +1234,9 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 					}
 				}
 				char *newIndexName = new char[50];
-				char indexSubStr[4];
-				strcpy(indexSubStr, SubString(indexId, 2, 4));
-				newIndexName = dictObj->GetIndexName((char*)indexSubStr,(char*) indexObj.GetName());
+				char indexSubStr[INDEX_LEN];
+				SubString((char*) indexSubStr, (const char*) indexId, 2, 4);
+				newIndexName = dictObj->GetIndexName((char*)indexSubStr, (char*) indexObj.GetName());
 				if( newIndexName != NULL)
 				{
 					indexObj.SetName(newIndexName);
@@ -1895,9 +1897,10 @@ ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal)
 			ULONG tempHighLimit;
 			if (true == CheckIfHex((char*) lowLimitVal))
 			{
-				tempLowLimit = HexToInt(
-						SubString((char*) lowLimitVal, 2,
-								strlen(lowLimitVal) - 2));
+				char *lowLimitTemp = new char[strlen(lowLimitVal)];
+				SubString(lowLimitTemp, (const char*) lowLimitVal, 2, (strlen(lowLimitVal) - 2));
+				tempLowLimit = HexToInt(lowLimitTemp);
+				delete[] lowLimitTemp;
 			}
 			else
 			{
@@ -1906,9 +1909,10 @@ ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal)
 
 			if (true == CheckIfHex((char*) highLimitVal))
 			{
-				tempHighLimit = HexToInt(
-						SubString((char*) highLimitVal, 2,
-								strlen(highLimitVal) - 2));
+				char *highLimitTemp = new char[strlen(lowLimitVal)];
+				SubString(highLimitTemp, (const char*) highLimitVal, 2, (strlen(highLimitVal) - 2));
+				tempHighLimit = HexToInt(highLimitTemp);
+				delete[] highLimitTemp;
 			}
 			else
 			{
@@ -1984,9 +1988,11 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 				INT32 noOfSubIndexes = 0; //= pobjIndex->getNumberofSubIndexes();
 				if (true == CheckIfHex((char*) sidxObj->GetActualValue()))
 				{
-					noOfSubIndexes = HexToInt(
-							SubString((char*) sidxObj->GetActualValue(), 2,
-									strlen(sidxObj->GetActualValue()) - 2));
+					INT32 sidxActLen = strlen(sidxObj->GetActualValue());
+					char *sidxActVal = new char[sidxActLen];
+					SubString(sidxActVal, sidxObj->GetActualValue(), 2, (sidxActLen - 2));
+					noOfSubIndexes = HexToInt(sidxActVal);
+					delete[] sidxActVal;
 				}
 				else
 				{
@@ -2919,9 +2925,6 @@ void UpdateCNVisibleNode(Node* nodeObj)
 	Index* commIndexObj = NULL;
 	SubIndex* sidxObj1 = NULL;
 	SubIndex* sidxObj2 = NULL;
-	char* indexId = NULL;
-	char* commIdxId = NULL;
-	char* mappedNodeId = NULL;
 	INT32 crossTxStnCnt = 0;
 
 	ResetAllSubIndexFlag(
@@ -2947,16 +2950,15 @@ void UpdateCNVisibleNode(Node* nodeObj)
 						&& !(CheckIfValueZero(
 								(char*) sidxObj1->GetActualValue())))
 				{
-					commIdxId = new char[INDEX_LEN];
-					indexId = SubString((char*) indexObj->GetIndexValue(), 2,
-							2);
+					char* commIdxId = NULL;
+					char* indexId = new char[SUBINDEX_LEN];
+					commIdxId = new char[INDEX_LEN + 1];
+					indexId = SubString(indexId, indexObj->GetIndexValue(), 2, 2);
 					strcpy(commIdxId, (char*) "14");
 					strcat(commIdxId, indexId);
-					//Delete may be issue bcoz of SubString function
 					delete[] indexId;
 
-					commIndexObj = pdoIndexCollObj->GetIndexbyIndexValue(
-							commIdxId);
+					commIndexObj = pdoIndexCollObj->GetIndexbyIndexValue(commIdxId);
 					delete[] commIdxId;
 
 					if (NULL != commIndexObj)
@@ -3000,20 +3002,17 @@ void UpdateCNVisibleNode(Node* nodeObj)
 									throw exceptionObj;
 								}
 
+								char* mappedNodeId = new char[SUBINDEX_LEN];
 								//copy the MN objects
-								if (CheckIfHex(
-										(char*) sidxObj2->GetActualValue()))
+								if (CheckIfHex((char*) sidxObj2->GetActualValue()))
 								{
-									mappedNodeId = SubString(
-											(char*) sidxObj2->GetActualValue(),
-											2, 2);
+									mappedNodeId = SubString(mappedNodeId, sidxObj2->GetActualValue(), 2, 2);
 								}
 								else
 								{
-									mappedNodeId = new char[SUBINDEX_LEN];
-									strcpy(mappedNodeId,
-											sidxObj2->GetActualValue());
+									strcpy(mappedNodeId, sidxObj2->GetActualValue());
 								}
+
 								mappedNodeId = PadLeft(mappedNodeId, '0', 2);
 
 								if (true == IsCNNodeAssignmentValid(nodeObj))
@@ -3184,7 +3183,7 @@ void ResetAllPdos(INT32 nodeId, NodeType nodeType)
 			totalNoOfSidx = indexObj->GetNumberofSubIndexes();
 
 			char* idxIdStr = new char[SUBINDEX_LEN];
-			idxIdStr = SubString((char*) indexObj->GetIndexValue(), 0, 2);
+			idxIdStr = SubString(idxIdStr, indexObj->GetIndexValue(), 0, 2);
 			if ((0 == strcmp(idxIdStr, "1A")) || (0 == strcmp(idxIdStr, "1a"))
 					|| (0 == strcmp(idxIdStr, "16")))
 			{
@@ -3360,9 +3359,11 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 			{
 				if (CheckIfHex((char*) sidxObj->GetActualValue()))
 				{
-					noOfSubIndexes = HexToInt(
-							SubString((char*) sidxObj->GetActualValue(), 2,
-									strlen(sidxObj->GetActualValue()) - 2));
+					INT32 sidxLen = strlen(sidxObj->GetActualValue());
+					char* sidxActVal = new char[sidxLen];
+					SubString(sidxActVal, sidxObj->GetActualValue(), 2, (sidxLen - 2));
+					noOfSubIndexes = HexToInt(sidxActVal);
+					delete[] sidxActVal;
 				}
 				else
 				{
@@ -3672,9 +3673,11 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 			{
 				if (CheckIfHex((char*) sidxObj->GetActualValue()))
 				{
-					noOfSubIndexes = HexToInt(
-							SubString((char*) sidxObj->GetActualValue(), 2,
-									strlen(sidxObj->GetActualValue()) - 2));
+					INT32 sidxActLen = strlen(sidxObj->GetActualValue());
+					char* sidxActVal = new char[sidxActLen];
+					SubString(sidxActVal, sidxObj->GetActualValue(), 2, (sidxActLen - 2));
+					noOfSubIndexes = HexToInt(sidxActVal);
+					delete[] sidxActVal;
 				}
 				else
 				{
@@ -3714,12 +3717,11 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 		for (INT32 sidxLC = 0; sidxLC < noOfTotalSubIndexes; sidxLC++)
 		{
 			bool includeAccess = false;
+			sidxObj = indexObj->GetSubIndex(sidxLC);
 #if defined DEBUG
 			cout << "Indexx:" << indexObj->GetIndexValue() << " SIdx:"
 			<< sidxObj->GetIndexValue() << endl;
 #endif
-			sidxObj = indexObj->GetSubIndex(sidxLC);
-
 			includeAccess = CheckAccessTypeForInclude(
 					(char*) sidxObj->GetAccessType());
 
@@ -5453,7 +5455,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 	ComplexDataType* cdtObj = NULL;
 	INT32 totalBytesMapped = 0;
 	INT32 iStartBitOffset =  0;
-	INT32 iOffset;
+	INT32 iOffset = 0;
 	bool bIsNewBitStringVar = false;
 	INT32 iDataSize = 0;
 	//cout<<"DecodeUniqiueIDRef"<<endl;
@@ -5505,7 +5507,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				//if (parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL)
 				if((parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataTypeUniqueIDRef, "") != 0))
 				{
-					cout<<"Inside CDT calculation"<<endl;
+					//cout<<"Inside CDT calculation"<<endl;
 					cdtObj = appProcessObj->GetCDTbyUniqueID(parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
 					if (cdtObj == NULL)
 					{
@@ -5907,23 +5909,11 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									throw exceptionObj;
 								}
 
-								char* moduleIndex = NULL;
-								moduleIndex = SubString((char*) actualVal,
-										iLength - 4, 4);
-								moduleIndex[5] = '\0';
-
-								/* Get the SubIndex*/
-								char* varSubIndex = NULL; // = new char[SUBINDEX_SIZE + ALLOC_BUFFER];
-								//varSubIndex = subString(reverseValue,2,2);
-								varSubIndex = SubString((char*) actualVal,
-										iLength - 6, 2);
-								varSubIndex[3] = '\0';
-
-#if defined DEBUG	
-								cout << "PImoduleIndex:" << moduleIndex << " PImoduleSubIndex:" << varSubIndex << endl;
-#endif
 								INT32 mappedOffset = 0;
-								mappedOffset = HexToInt(SubString((char*) actualVal, 6, 4));
+								char* mappingOffset = new char[INDEX_LEN];
+								SubString(mappingOffset, actualVal, 6, 4);
+								mappedOffset = HexToInt(mappingOffset);
+								delete[] mappingOffset;
 
 #if defined DEBUG
 								cout << "Validating offset(decimal): "<<"mappedOffset"<<mappedOffset<<" nodeMappedTotalBytes"<<nodeMappedTotalBytes<<" Sidx: "<< sidxObj->GetIndexValue()<<endl;
@@ -5940,10 +5930,22 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 								//Mapped length in bits
 								INT32 mappedLength = 0;
-								mappedLength = HexToInt(
-										SubString((char*) actualVal, 2, 4));
+								char* mappingLen = new char[INDEX_LEN];
+								SubString(mappingLen, actualVal, 2, 4);
+								mappedLength = HexToInt(mappingLen);
+								delete[] mappingLen;
 #if defined DEBUG
 								cout<<" PIMappedLength:"<<mappedLength<<endl;
+#endif
+								char* moduleIndex = new char[INDEX_LEN];
+								moduleIndex = SubString(moduleIndex, actualVal, iLength - 4, 4);
+
+								/* Get the SubIndex*/
+								char* varSubIndex = new char[SUBINDEX_LEN];
+								varSubIndex = SubString(varSubIndex, actualVal, iLength - 6, 2);
+
+#if defined DEBUG	
+								cout << "PImoduleIndex:" << moduleIndex << " PImoduleSubIndex:" << varSubIndex << endl;
 #endif
 
 								Index *moduleIndexObj = NULL;
@@ -5957,24 +5959,21 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								bool objMapped = false;
 								PDOType pdoType = indexObj.GetPDOType();
 
-								moduleIndexObj =
-										indexCollObj->GetIndexbyIndexValue(
-												moduleIndex);
+								moduleIndexObj = indexCollObj->GetIndexbyIndexValue(moduleIndex);
+
 								if (moduleIndexObj == NULL)
 								{
 									exceptionObj.OCFMException(
 											OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-									char acCustomError[200] =
-									{ 0 };
+									char acCustomError[200];
 									sprintf(acCustomError,
 											"In node id: %d, Index: %s which is mapped as a PDO module does not exist",
 											nodeObj->GetNodeId(), moduleIndex);
-									CopyCustomErrorString(
-											&(exceptionObj._ocfmRetCode),
-											acCustomError);
-
+									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+									delete[] moduleIndex;
 									throw exceptionObj;
 								}
+								delete[] moduleIndex;
 
 								if (moduleIndexObj->GetName() != NULL)
 								{
@@ -6045,7 +6044,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										sprintf(acCustomError,
 												"In node id: %d, Index: %s with SubIndex: %s which is mapped as a PDO module does not exist",
 												nodeObj->GetNodeId(),
-												moduleIndex, varSubIndex);
+												moduleIndexObj->GetIndexValue(), varSubIndex);
 										CopyCustomErrorString(
 												&(exceptionObj._ocfmRetCode),
 												acCustomError);
@@ -6110,6 +6109,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										}
 									}
 								}
+
+
+								delete[] varSubIndex;
 
 								if (uniqueidRefID != NULL)
 								{
@@ -6195,8 +6197,8 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									}
 
 									piObj.moduleIndex = new char[strlen(
-											moduleIndex) + STR_ALLOC_BUFFER];
-									strcpy(piObj.moduleIndex, moduleIndex);
+											moduleIndexObj->GetIndexValue()) + STR_ALLOC_BUFFER];
+									strcpy(piObj.moduleIndex, moduleIndexObj->GetIndexValue());
 
 									if (objMapped)
 									{
@@ -6292,6 +6294,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										throw exceptionObj;
 									}
 									/* Datatype in hex of the Process Image variable*/
+									//TODO: dtObj.dataTypeName may be NULL
 									piObj.dataInfo.dtName = new char[strlen(
 											dtObj.dataTypeName)
 											+ STR_ALLOC_BUFFER];
@@ -6543,9 +6546,9 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 					if (strncmp(indexObj.GetIndexValue(), "16", 2) == 0)
 					{
 						Index *commIndexObj = NULL;
-						char *indexId = SubString(
-								(char *) indexObj.GetIndexValue(), 2, 4);
-						char *commIdxId = new char[INDEX_LEN];
+						char *indexId = new char[SUBINDEX_LEN];
+						SubString(indexId, indexObj.GetIndexValue(), 2, 2);
+						char *commIdxId = new char[INDEX_LEN + 1];
 						strcpy(commIdxId, (char *) "14");
 						strcat(commIdxId, indexId);
 						commIndexObj = indexCollObj->GetIndexbyIndexValue(
@@ -6602,21 +6605,22 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 							&& ((MN_NODEID == rpdoMappedNodeId)
 							|| (BROADCAST_NODEID == rpdoMappedNodeId)))
 						{
-							char* modOffsetVal = new char[strlen(
-									actualValueStr) + 1];
-							strcpy(modOffsetVal, actualValueStr);
+							//char* modOffsetVal = new char[strlen(actualValueStr) + 1];
+							//strcpy(modOffsetVal, actualValueStr);
+							//delete[] modOffsetVal;
+
 							INT32 iLength = 0;
 							INT32 iOffset = 0;
 
-							char* lengthVal = NULL;
-							lengthVal = SubString((char *) actualValueStr,
-									2, 4);
+							char* lengthVal = new char[INDEX_LEN];
+							lengthVal = SubString(lengthVal, actualValueStr, 2, 4);
 							iLength = HexToInt(lengthVal);
+							delete[] lengthVal;
 
-							char* offsetVal = NULL;
-							offsetVal = SubString((char *) actualValueStr,
-									6, 4);
+							char* offsetVal = new char[INDEX_LEN];
+							offsetVal = SubString(offsetVal, actualValueStr, 6, 4);
 							iOffset = HexToInt(offsetVal);
+							delete[] offsetVal;
 
 							//	iNodeMappedTotalBytes = iOffset + iLength;
 
@@ -6629,34 +6633,27 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 								nodeObj->SetPReqActPayloadValue(
 										(iOffset + iLength) / 8);
 							}
-
-							delete[] modOffsetVal;
-							delete[] lengthVal;
-							delete[] offsetVal;
 						}
 						if (strncmp(indexObj.GetIndexValue(), "1A", 2) == 0)
 						{
-							char* modOffset = new char[strlen(
-									actualValueStr) + 1];
-							strcpy(modOffset, actualValueStr);
-							INT32 len = 0;
-							char* lengthStr = NULL;
-							lengthStr = SubString((char *) actualValueStr,
-									2, 4);
-							len = HexToInt(lengthStr);
+							//char* modOffset = new char[strlen(actualValueStr) + 1];
+							//strcpy(modOffset, actualValueStr);
+							//delete[] modOffset;
 
-							char* varOffset = NULL;
-							varOffset = SubString((char *) actualValueStr,
-									6, 4);
+							INT32 len = 0;
+							char* lengthStr = new char[INDEX_LEN];
+							lengthStr = SubString(lengthStr, actualValueStr, 2, 4);
+							len = HexToInt(lengthStr);
+							delete[] lengthStr;
+
 							INT32 offsetVal = 0;
+							char* varOffset = new char[INDEX_LEN];
+							varOffset = SubString(varOffset, actualValueStr, 6, 4);
 							offsetVal = HexToInt(varOffset);
+							delete[] varOffset;
 
 							nodeObj->SetPResActPayloadValue(
 									(offsetVal + len) / 8);
-
-							delete[] modOffset;
-							delete[] lengthStr;
-							delete[] varOffset;
 						}
 					}
 				}
@@ -8462,13 +8459,15 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 	}
 	/* Calculate the actual value of MN PDO */
 	char* actValue = new char[20];
-	strcpy(actValue, SubString(mnPdoVarObj.value, 0, 6));
+	SubString(actValue, (const char*) mnPdoVarObj.value, 0, 6);
 	char* offsetVal = new char[5];
 
 	offsetVal = IntToAscii(prevSize, offsetVal, 16);
 	offsetVal = PadLeft(offsetVal, '0', 4);
 	offsetVal = ConvertToUpper(offsetVal);
 	strcat(actValue, offsetVal);
+	delete[] offsetVal;
+
 	/* Add reserve byte*/
 	strcat(actValue, "00");
 
@@ -8479,10 +8478,10 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 #if defined DEBUG
 	cout<<"Actual Value"<<actValue<<endl;
 #endif
+	delete[] actValue;
+
 	AddPDOIndexsToMN(mnPdoVarObj.indexId, mnPdoVarObj.subIndexId,
 			mnPdoVarObj.pdoType);
-	delete[] offsetVal;
-	delete[] actValue;
 }
 
 void SetSIdxValue(char* indexId, char* sidxId, char* value,
@@ -10828,6 +10827,7 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 		cout << "UnHandled Datatype encountered:" << iecDataType << endl;
 		break;
 	}
+	//TODO: piObjectObj.indexId &/|| piObjectObj.sIdxId may be null
 #if defined DEBUG
 	cout << __FUNCTION__ << " Ind:" << piObjectObj.indexId << " SubInd:"
 	<< piObjectObj.sIdxId << endl;
@@ -11212,7 +11212,7 @@ void CopyPDODefToAct(INT32 nodeId, NodeType nodeType)
 		}
 	}
 }
-
+//TODO: unused function
 Index GetPDOIndexByOffset(Index* indexObj)
 {
 	if (NULL == indexObj)
@@ -11247,11 +11247,13 @@ Index GetPDOIndexByOffset(Index* indexObj)
 				const char* actualVal1 = sidxObj1->GetActualValue();
 
 				INT32 length1 = strlen(actualVal1);
-				char* offset1 = NULL;
 				INT32 offsetVal1 = 0;
+				char* offset1 = new char[INDEX_LEN];
 
-				offset1 = SubString((char*) actualVal1, length1 - 12, 4);
+				offset1 = SubString(offset1, actualVal1, length1 - 12, 4);
 				offsetVal1 = HexToInt(offset1);
+				delete[] offset1;
+
 				sidxObj2 = tempIndexObj.GetSubIndex(idxLC2 + 1);
 				if ((NULL != sidxObj2->GetActualValue())
 						&& (0 != strcmp(sidxObj2->GetActualValue(), ""))
@@ -11260,11 +11262,12 @@ Index GetPDOIndexByOffset(Index* indexObj)
 				{
 					const char* actualVal2 = sidxObj2->GetActualValue();
 					INT32 length2 = strlen(actualVal2);
-					char* offset2 = NULL;
+					char* offset2 = new char[INDEX_LEN];
 					INT32 offsetVal2 = 0;
 
-					offset2 = SubString((char*) actualVal2, length2 - 12, 4);
+					offset2 = SubString(offset2, actualVal2, length2 - 12, 4);
 					offsetVal2 = HexToInt(offset2);
+					delete[] offset2;
 
 					if (offsetVal1 > offsetVal2)
 					{
@@ -11477,14 +11480,11 @@ ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID,
 								|| strncmp(nodeObj->GetForcedCycleValue(), "0X",
 										2) == 0)
 						{
-							actualValue =
-									HexToInt(
-											SubString(
-													nodeObj->GetForcedCycleValue(),
-													2,
-													strlen(
-															nodeObj->GetForcedCycleValue())
-															- 2));
+							INT32 forcedLen = strlen(nodeObj->GetForcedCycleValue());
+							char* forcedVal = new char[forcedLen];
+							SubString(forcedVal, (const char*) nodeObj->GetForcedCycleValue(), 2, forcedLen - 2);
+							actualValue = HexToInt(forcedVal);
+							delete[] forcedVal;
 						}
 						else
 						{
@@ -11697,12 +11697,15 @@ void SetPresMNNodeAssigmentBits()
 			{
 				Index *commIndexObj = NULL;
 
-				char *indexId = SubString((char *) indexObj->GetIndexValue(), 2,
-						4);
-				char *commIdxId = new char[INDEX_LEN];
+				char *indexId = new char[SUBINDEX_LEN];
+				SubString(indexId, indexObj->GetIndexValue(), 2, 2);
+				char *commIdxId = new char[INDEX_LEN + 1];
 				strcpy(commIdxId, (char *) "18");
 				strcat(commIdxId, indexId);
 				commIndexObj = indexCollObj->GetIndexbyIndexValue(commIdxId);
+				delete[] indexId;
+				delete[] commIdxId;
+
 				if (NULL != commIndexObj)
 				{
 					SubIndex *sidxObj = NULL;
@@ -11724,8 +11727,6 @@ void SetPresMNNodeAssigmentBits()
 						}
 					}
 				}
-				delete[] commIdxId;
-				delete[] indexId;
 			}
 		}
 	}
@@ -11879,23 +11880,33 @@ ocfmRetCode RecalculateMultiplex()
 							INT32 mnMultiActualValue = 0;
 							if (strncmp(actValue, "0x", 2) == 0
 									|| strncmp(actValue, "0X", 2) == 0)
-								mnMultiActualValue = HexToInt(
-										SubString(actValue, 2,
-												strlen(actValue) - 2));
+							{
+								char *tempActVal = new char[strlen(actValue)];
+								SubString(tempActVal, (const char*) actValue, 2, strlen(actValue) - 2);
+								mnMultiActualValue = HexToInt(tempActVal);
+								delete[] tempActVal;
+							}
 							else
+							{
 								mnMultiActualValue = atoi(actValue);
+							}
 
 							char* forcedCycleValue = new char[50];
 							strcpy(forcedCycleValue,
 									nodeObj->GetForcedCycleValue());
 							INT32 cnActualValue = 0;
 							if (strncmp(forcedCycleValue, "0x", 2) == 0
-									|| strncmp(forcedCycleValue, "0X", 2) == 0)
-								cnActualValue = HexToInt(
-										SubString(forcedCycleValue, 2,
-												strlen(forcedCycleValue) - 2));
+								|| strncmp(forcedCycleValue, "0X", 2) == 0)
+							{
+								char *tempForcedVal = new char[strlen(forcedCycleValue)];
+								SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
+								cnActualValue = HexToInt(tempForcedVal);
+								delete[] tempForcedVal;
+							}
 							else
+							{
 								cnActualValue = atoi(forcedCycleValue);
+							}
 
 							if (mnMultiActualValue == 0)
 							{
@@ -12123,8 +12134,13 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 
 	INT32 tempCycleValue = 0;
 	if (strncmp(cycleValue, "0x", 2) == 0 || strncmp(cycleValue, "0X", 2) == 0)
-		tempCycleValue = HexToInt(
-				SubString(cycleValue, 2, strlen(cycleValue) - 2));
+	{
+		INT32 cycleValLen = strlen(cycleValue);
+		char* tempCycleStr = new char[cycleValLen];
+		SubString(tempCycleStr, (const char*) cycleValue, 2, cycleValLen - 2);
+		tempCycleValue = HexToInt(tempCycleStr);
+		delete[] tempCycleStr;
+	}
 	else
 		tempCycleValue = atoi(cycleValue);
 
@@ -12174,12 +12190,17 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 					strcpy(ForcedCycleValue, objNode->GetForcedCycleValue());
 					INT32 actualValueCN = 0;
 					if (strncmp(ForcedCycleValue, "0x", 2) == 0
-							|| strncmp(ForcedCycleValue, "0X", 2) == 0)
-						actualValueCN = HexToInt(
-								SubString(ForcedCycleValue, 2,
-										strlen(ForcedCycleValue) - 2));
+						|| strncmp(ForcedCycleValue, "0X", 2) == 0)
+					{
+						char *tempForcedVal = new char[strlen(ForcedCycleValue)];
+						SubString(tempForcedVal, (const char*) ForcedCycleValue, 2, strlen(ForcedCycleValue) - 2);
+						actualValueCN = HexToInt(tempForcedVal);
+						delete[] tempForcedVal;
+					}
 					else
+					{
 						actualValueCN = atoi(ForcedCycleValue);
+					}
 
 					delete[] ForcedCycleValue;
 					if (tempCycleValue == actualValueCN)
@@ -12216,12 +12237,17 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 				strcpy(forcedCycleValue, objNode->GetForcedCycleValue());
 				INT32 actualValueCN = 0;
 				if (strncmp(forcedCycleValue, "0x", 2) == 0
-						|| strncmp(forcedCycleValue, "0X", 2) == 0)
-					actualValueCN = HexToInt(
-							SubString(forcedCycleValue, 2,
-									strlen(forcedCycleValue) - 2));
+					|| strncmp(forcedCycleValue, "0X", 2) == 0)
+				{
+					char *tempForcedVal = new char[strlen(forcedCycleValue)];
+					SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
+					actualValueCN = HexToInt(tempForcedVal);
+					delete[] tempForcedVal;
+				}
 				else
+				{
 					actualValueCN = atoi(forcedCycleValue);
+				}
 
 				delete[] forcedCycleValue;
 				if (tempCycleValue >= actualValueCN || actualValueCN == 1)
@@ -12236,11 +12262,11 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 				cycleNumberGlobal = actualValueCN;
 
 				static char* tempActualValue = NULL;
-				if (tempActualValue != NULL)
-				{
-					delete[] tempActualValue;
-					tempActualValue = NULL;
-				}
+				//if (tempActualValue != NULL)
+				//{
+				//	delete[] tempActualValue;
+				//	tempActualValue = NULL;
+				//}
 				tempActualValue = new char[50];
 				tempActualValue = IntToAscii(actualValueCN, tempActualValue,
 						10);
@@ -12248,7 +12274,6 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 				objNode->SetForcedCycle(tempActualValue);
 
 				delete[] tempActualValue;
-				delete[] forcedCycleValue;
 			} //end of if loop
 		} //end of for loop
 		delete[] actValue;
@@ -12310,8 +12335,13 @@ ocfmRetCode CheckMutliplexAssigned()
 		strcpy(errCodeObj.errorString, "CN with nodeid ");
 		INT32 tempActualValue = 0;
 		if (strncmp(actValue, "0x", 2) == 0 || strncmp(actValue, "0X", 2) == 0)
-			tempActualValue = HexToInt(
-					SubString(actValue, 2, strlen(actValue) - 2));
+		{
+			INT32 actLen = strlen(actValue);
+			char *tempActStr = new char[actLen];
+			SubString(tempActStr, (const char*) actValue, 2, actLen - 2);
+			tempActualValue = HexToInt(tempActStr);
+			delete[] tempActStr;
+		}
 		else
 			tempActualValue = atoi(actValue);
 
@@ -12373,10 +12403,13 @@ ocfmRetCode CheckMutliplexAssigned()
 								nodeObj->GetForcedCycleValue());
 						INT32 actualValueCN = 0;
 						if (strncmp(forcedCycleValue, "0x", 2) == 0
-								|| strncmp(forcedCycleValue, "0X", 2) == 0)
-							actualValueCN = HexToInt(
-									SubString(forcedCycleValue, 2,
-											strlen(forcedCycleValue) - 2));
+							|| strncmp(forcedCycleValue, "0X", 2) == 0)
+						{
+							char *tempForcedVal = new char[strlen(forcedCycleValue)];
+							SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
+							actualValueCN = HexToInt(tempForcedVal);
+							delete[] tempForcedVal;
+						}
 						else
 							actualValueCN = atoi(forcedCycleValue);
 
@@ -12455,9 +12488,12 @@ UINT32 GetFreeCycleNumber(UINT32 parmCycleNumber)
 					UINT32 actualValueCN = 0;
 					if (strncmp(forcedCycleValue, "0x", 2) == 0
 							|| strncmp(forcedCycleValue, "0X", 2) == 0)
-						actualValueCN = HexToInt(
-								SubString(forcedCycleValue, 2,
-										strlen(forcedCycleValue) - 2));
+					{
+						char *tempForcedVal = new char[strlen(forcedCycleValue)];
+						SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
+						actualValueCN = HexToInt(tempForcedVal);
+						delete[] tempForcedVal;
+					}
 					else
 						actualValueCN = atoi(forcedCycleValue);
 
@@ -12520,12 +12556,17 @@ bool IsMultiplexCycleNumberContinuous(UINT32 parmCycleNumber)
 					strcpy(forcedCycleValue, nodeObj->GetForcedCycleValue());
 					UINT32 actualValueCN = 0;
 					if (strncmp(forcedCycleValue, "0x", 2) == 0
-							|| strncmp(forcedCycleValue, "0X", 2) == 0)
-						actualValueCN = HexToInt(
-								SubString(forcedCycleValue, 2,
-										strlen(forcedCycleValue) - 2));
+						|| strncmp(forcedCycleValue, "0X", 2) == 0)
+					{
+						char *tempForcedVal = new char[strlen(forcedCycleValue)];
+						SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
+						actualValueCN = HexToInt(tempForcedVal);
+						delete[] tempForcedVal;
+					}
 					else
+					{
 						actualValueCN = atoi(forcedCycleValue);
+					}
 
 					delete[] forcedCycleValue;
 					if (cycleNumberLC == actualValueCN)
@@ -12614,7 +12655,13 @@ void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType)
 	}
 
 	if (strncmp(tempValStr, "0x", 2) == 0 || strncmp(tempValStr, "0X", 2) == 0)
-		tempValue = HexToInt(SubString(tempValStr, 2, strlen(tempValStr) - 2));
+	{
+		INT32 templen = strlen(tempValStr);
+		char * tempSubStr = new char[templen];
+		SubString(tempSubStr, (const char*) tempValStr, 2, templen - 2);
+		tempValue = HexToInt(tempSubStr);
+		delete[] tempSubStr;
+	}
 	else
 		tempValue = atoi(tempValStr);
 
@@ -13207,7 +13254,7 @@ INT32* ArrangeNodeIDbyStation(void)
 
 	if (0 != iOtherStnCnt)
 	{
-		INT32 *piOtherStnColl = new INT32[iOtherStnCnt];
+		INT32 *piOtherStnColl = new INT32[iOtherStnCnt+1];
 		INT32 iOtherStnLoopCnt = 0;
 		for (loopCount = 0; loopCount < nodesCount; loopCount++)
 		{

@@ -161,22 +161,26 @@ char* PadLeft(char* str, char padChar, INT32 padLength)
 	return str;
 }
 
-//TODO: Another parameter to be added for substring to avoid new delete memory issues.
-char* SubString(char* str, INT32 startPos, INT32 len)
+char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len)
 {
-	if (NULL == str)
+	if ((NULL != srcStr) && (NULL != destStr))
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
-		throw objException;
-	}
-	char* strTemp = NULL;
+		if ((startPos + len) > strlen(srcStr))
+		{
+			cout<<"Error: "<< strlen(destStr) << " " << __FUNCTION__ <<" wrong inputs. startPos:"<<startPos<<" Len:"<<len <<" Total available:"<<strlen(srcStr)<<endl;
+		}
 
-	strTemp = new char[len + 1];
-	strncpy(strTemp, (const char*) (str + startPos), len);
-	strTemp[len] = '\0';
-	return strTemp;
+		strncpy(destStr, (const char*) (srcStr + startPos), len);
+		destStr[len] = '\0';
+		#if defined DEBUG
+			cout << "src:" << srcStr << " DestStr: "<< destStr << endl;
+		#endif
+	}
+	else
+	{
+		cout<<"Error: SubString Returning NULL"<<endl;
+	}
+	return destStr;
 }
 
 char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
@@ -407,7 +411,7 @@ char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding)
 
 	return hexTemp;
 }
-
+//TODO: change parameter as const char*
 bool CheckIfHex(char* srcStr)
 {
 	if (NULL == strchr(srcStr, 'x'))
@@ -554,7 +558,12 @@ char* GetLastAvailableCycleNumber()
 
 		UINT32 cycleValue;
 		if (0 == strncmp(actValue, "0x", 2) || 0 == strncmp(actValue, "0X", 2))
-			cycleValue = HexToInt(SubString(actValue, 2, strlen(actValue) - 2));
+		{
+			char *tempCycleVal = new char[strlen(actValue)];
+			SubString(tempCycleVal, (const char*)actValue, 2, strlen(actValue) - 2);
+			cycleValue = HexToInt(tempCycleVal);
+			delete[] tempCycleVal;
+		}
 		else
 			cycleValue = atoi(actValue);
 
@@ -623,7 +632,10 @@ bool CheckIfValueZero(char* srcStr)
 	INT32 srcValue = 0;
 	if (0 == strncmp(srcStr, "0x", 2) || 0 == strncmp(srcStr, "0X", 2))
 	{
-		srcValue = HexToInt(SubString(srcStr, 2, strlen(srcStr) - 2));
+		char* tempVal = new char[strlen(srcStr)];
+		SubString(tempVal, (const char*) srcStr, 2, strlen(srcStr) - 2);
+		srcValue = HexToInt(tempVal);
+		delete[] tempVal;
 	}
 	else
 	{
@@ -640,6 +652,7 @@ bool CheckIfValueZero(char* srcStr)
 	}
 }
 
+//TODO: Change as const char*
 INT32 GetDecimalValue(char* srcStr)
 {
 	if (NULL == srcStr || 0 == strcmp(srcStr, ""))
@@ -650,7 +663,10 @@ INT32 GetDecimalValue(char* srcStr)
 	INT32 srcValue = 0;
 	if (0 == strncmp(srcStr, "0x", 2) || 0 == strncmp(srcStr, "0X", 2))
 	{
-		srcValue = HexToInt(SubString(srcStr, 2, strlen(srcStr) - 2));
+		char* tempVal = new char[strlen(srcStr)];
+		SubString(tempVal, (const char*) srcStr, 2, strlen(srcStr) - 2);
+		srcValue = HexToInt(tempVal);
+		delete[] tempVal;
 	}
 	else
 	{

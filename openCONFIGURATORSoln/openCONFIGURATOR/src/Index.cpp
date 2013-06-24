@@ -177,7 +177,7 @@ SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 	objSidx = NULL;
 	return objSidx;
 }
-
+//TODO: unused function
 void Index::SwapSubObjects(INT32 fromPosition, INT32 toPosition)
 {
 	swap(subIndexCollection[fromPosition], subIndexCollection[toPosition]);

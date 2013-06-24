@@ -59,7 +59,7 @@
 #include <string.h>
 #include <libxml/xmlerror.h>
 #include "../Include/Exception.h"
-
+#include "../Include/Internal.h"
 //==========================================================================//
 // 				F U N C T I O N  D E C L A R A T I O N S 					//
 //==========================================================================//
@@ -231,7 +231,10 @@ void ocfmException::OCFMException(ConfiguratorErrors errCode)
 		strcpy(_ocfmRetCode.errorString, "XAP File Not Written");
 		break;
 	case OCFM_ERR_MAX_PI_SIZE:
-		strcpy(_ocfmRetCode.errorString, "MAX PI Size(4064 bytes) crossed");
+		//strcpy(_ocfmRetCode.errorString, "MAX PI Size(4064 bytes) crossed");
+		strcpy(_ocfmRetCode.errorString, "MAX PI Size (");
+		strcat(_ocfmRetCode.errorString, (char*) MAX_PI_SIZE);
+		strcat(_ocfmRetCode.errorString, " bytes)crossed");
 		break;
 	case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
 		strcpy(_ocfmRetCode.errorString, "Invalid upper and lower limits");

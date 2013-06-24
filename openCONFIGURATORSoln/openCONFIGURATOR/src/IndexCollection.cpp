@@ -91,8 +91,8 @@ IndexCollection::~IndexCollection(void)
 void IndexCollection::AddIndex(Index objIndex)
 {
 	INT32 itemPosition = indexCollection.Add();
-	char* subStr = NULL;
-	subStr = SubString((char*) objIndex.GetIndexValue(), 0, 2);
+	char* subStr = new char[SUBINDEX_LEN];
+	subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
 	if ((0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16")))
 	{
 		objIndex.SetPDOType(PDO_RPDO);
@@ -106,6 +106,7 @@ void IndexCollection::AddIndex(Index objIndex)
 	{
 		//Nothing to be added.
 	}
+	delete[] subStr;
 	indexCollection[itemPosition] = objIndex;
 	//cout << "iItemPosition" << iItemPosition << endl;
 	indexCount = indexCollection.Count();
@@ -132,7 +133,7 @@ void IndexCollection::DeletePDOs()
 	for (loopCount = 0; loopCount < indexCount; loopCount++)
 	{
 		objIndex = indexCollection[loopCount];
-		subStr = SubString((char*) objIndex.GetIndexValue(), 0, 2);
+		subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
 		if ((0 == strcmp(subStr, "1A")) || (0 == strcmp(subStr, "1a"))
 				|| (0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16"))
 				|| (0 == strcmp(subStr, "18")))
@@ -148,13 +149,13 @@ void IndexCollection::DeletePDOs()
 void IndexCollection::DeletePIObjects()
 {
 	INT32 iLoopCount = 0;
-	char* subStr = new char[2];
+	char* subStr = new char[1+1];
 
 	Index objIndex;
 	for (iLoopCount = 0; iLoopCount < indexCount; iLoopCount++)
 	{
 		objIndex = indexCollection[iLoopCount];
-		subStr = SubString((char*) objIndex.GetIndexValue(), 0, 1);
+		subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 1);
 		if ((0 == strcmp(subStr, "A")) || (0 == strcmp(subStr, "a")))
 		{
 			indexCollection.Remove(iLoopCount);

@@ -329,7 +329,7 @@ void BaseIndex::SetPDOMapping(char* pdoMappingStr)
 
 	strcpy(varStrBuff, pdoMappingStr);
 	varStrBuff = ConvertToUpper((char*) varStrBuff);
-	if (0 == strcmp(varStrBuff, "DEFAULT"))
+	if ((0 == strcmp(varStrBuff, "DEFAULT")) || 0 == strcmp(varStrBuff, "DEF"))
 	{
 		pdoMapping = DEFAULT;
 	}
@@ -337,7 +337,7 @@ void BaseIndex::SetPDOMapping(char* pdoMappingStr)
 	{
 		pdoMapping = NO;
 	}
-	else if (0 == strcmp(varStrBuff, "OPTIONAL"))
+	else if ((0 == strcmp(varStrBuff, "OPTIONAL")) || 0 == strcmp(varStrBuff, "OPT"))
 	{
 		pdoMapping = OPTIONAL;
 	}
@@ -466,7 +466,10 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 
 	if (CheckIfHex(hexValue))
 	{
-		value = HexToInt(SubString(hexValue, 2, (strlen(hexValue) - 2)));
+		char* subStr = new char[strlen(hexValue)];
+		SubString(subStr, (const char*) hexValue, 2, (strlen(hexValue) - 2));
+		value = HexToInt(subStr);
+		delete[] subStr;
 	}
 	else
 	{
@@ -480,8 +483,10 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 			ULONG lowlimitValue;
 			if (CheckIfHex((char*) this->lowLimit))
 			{
-				lowlimitValue = HexToInt(
-						SubString((char*) lowLimit, 2, strlen(lowLimit) - 2));
+				char* subStr = new char[strlen(lowLimit)];
+				SubString(subStr, lowLimit, 2, strlen(lowLimit) - 2);
+				lowlimitValue = HexToInt(subStr);
+				delete[] subStr;
 			}
 			else
 			{
@@ -515,9 +520,10 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 			ULONG ulHighLimit;
 			if (CheckIfHex((char*) this->highLimit))
 			{
-				ulHighLimit = HexToInt(
-						SubString((char*) highLimit, 2,
-								(strlen(highLimit) - 2)));
+				char* subStr = new char[strlen(highLimit)];
+				SubString(subStr, highLimit, 2, (strlen(highLimit) - 2));
+				ulHighLimit = HexToInt(subStr);
+				delete[] subStr;
 			}
 			else
 			{

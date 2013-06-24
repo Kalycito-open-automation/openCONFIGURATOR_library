@@ -468,6 +468,7 @@ class Node
 		INT32 preqActualPayload;
 		bool hasPdoObjects;
 		bool isForcedCycle;
+		//TODO: const char*
 		char* nodeName;
 		char* forcedCycle;
 		char* presTimeOut;

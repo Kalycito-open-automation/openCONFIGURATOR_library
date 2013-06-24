@@ -542,6 +542,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 {
 	char* mainBuffer = new char[HEADER_FILE_BUFFER];
 	char* tempBuffer = new char[200];
+	mainBuffer[0] = 0;
 
 	if (0 != noOfVars)
 	{
@@ -584,7 +585,8 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			//iNodeId = objProcessImage[iLoopCount].CNNodeID;
 
 			nodeId = IntToAscii(piObj[loopCount].nodeId, nodeId, 10);
-			strcpy(moduleNo, SubString(piObj[loopCount].moduleIndex, 2, 2));
+			SubString(moduleNo, (const char*) piObj[loopCount].moduleIndex, 2, 2);
+			//strcpy(moduleNo, SubString(piObj[loopCount].moduleIndex, 2, 2));
 			strcpy(moduleName, piObj[loopCount].moduleName);
 
 			strcat(mainBuffer, "\tunsigned");
@@ -830,6 +832,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	IntToAscii(totalSizeVal, totalSize, 10);
 	char* tempBuffer1 = new char[200];
 	char* tempBuffer2 = new char[500];
+	tempBuffer1[0] = 0;
+	tempBuffer2[0] = 0;
 
 	if (INPUT == dirType)
 	{
@@ -972,7 +976,8 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 			}
 
 			nodeIdStr = IntToAscii(piObject[noVarsLC].nodeId, nodeIdStr, 10);
-			strcpy(moduleNo, SubString(piObject[noVarsLC].moduleIndex, 2, 2));
+			SubString(moduleNo, (const char*) piObject[noVarsLC].moduleIndex, 2, 2);
+			//strcpy(moduleNo, SubString(piObject[noVarsLC].moduleIndex, 2, 2));
 			strcpy(moduleName, piObject[noVarsLC].moduleName);
 
 			char* varName = new char[100];

@@ -124,9 +124,13 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 	value = xmlTextReaderConstValue(reader);
 	try
 	{
-		if ((NULL == name) || (NULL == value))
+		if (NULL == name)
 		{
-			//cout << "Got NULL for name or value\n" << endl;
+			cout << "Got NULL for name" << endl;
+		}
+		if (NULL == value)
+		{
+			//cout << "Got NULL for value\n" << endl;
 		}
 
 		//If the NodeTYPE is ELEMENT
@@ -260,14 +264,17 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
 		char* idxId)
 {
 	sattrIdxSIdx stAttrIdx;
-	char* subIdx = new char[RANGE_INDEX];
 	char* idx = NULL;
 
 	idx = strchr(value, '-');
 	if (NULL != idx)
 	{
-		subIdx = SubString(value, 0, strlen(idx) - 1);
-		idx = SubString(value, strlen(subIdx) + 1, strlen(value));
+		char* subIdx = new char[RANGE_INDEX];
+		char* endIdx = new char[RANGE_INDEX];
+		//cout<<"1: "<< value <<" "<< "0 " << strlen(idx) - 1 << endl;
+		subIdx = SubString(subIdx, (const char*) value, 0, strlen(idx) - 1);
+		//cout << "2: "<< value << " " << strlen(subIdx) + 1 << " "<< strlen(subIdx) << endl;
+		endIdx = SubString(endIdx, (const char*) value, strlen(subIdx) + 1, strlen(subIdx));
 
 		stAttrIdx.objectType = objType;
 		stAttrIdx.Idx = new char[INDEX_LEN];
@@ -276,8 +283,10 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
 		{
 			stAttrIdx.startIndex = new char[INDEX_LEN];
 			stAttrIdx.endIndex = new char[INDEX_LEN];
-			strcpy(stAttrIdx.endIndex, SubString(idxId, 0, 4 - strlen(subIdx)));
-			strcat(stAttrIdx.endIndex, idx);
+			//cout<<"3: "<< idxId <<" 0 " << 4 - strlen(subIdx) << endl;
+			SubString(stAttrIdx.endIndex, (const char*) idxId, 0, (4 - strlen(subIdx)));
+			//strcpy(stAttrIdx.endIndex, SubString(idxId, 0, 4 - strlen(subIdx)));
+			strcat(stAttrIdx.endIndex, endIdx);
 			strcpy(stAttrIdx.startIndex, idxId);
 		}
 		else
@@ -285,13 +294,15 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
 			stAttrIdx.startIndex = new char[SUBINDEX_LEN];
 			stAttrIdx.endIndex = new char[SUBINDEX_LEN];
 			strcpy(stAttrIdx.startIndex, subIdx);
-			strcpy(stAttrIdx.endIndex, idx);
+			strcpy(stAttrIdx.endIndex, endIdx);
 		}
+		delete[] subIdx;
+		delete[] endIdx;
 
 		strcpy(stAttrIdx.Idx, idxId);
 		AddSameAttributesObjects(stAttrIdx);
 	}
-	delete[] subIdx;
+//cout<<__FUNCTION__<< " Ends"<<endl;
 }
 
 Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
@@ -447,6 +458,7 @@ INT32 ObjectDictionary::IfObjectDictSubIndexExists(char* idxId, char* sIdxId)
 
 char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 {
+//cout<<__FUNCTION__<< " Starts"<<endl;
 	char* tempObjName = NULL;
 
 	if (NULL == objectName)
@@ -459,23 +471,40 @@ char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 	{
 		INT32 len = 0;
 		len = 1;
-		if (0 == strcmp(SubString(tempObjName, 1, 1), "X"))
+		char* temp1 = new char[];
+		SubString(temp1, (const char*) tempObjName, 1, 1);
+		if (0 == strcmp(temp1, "X"))
 		{
 			len++;
 		}
+		delete[] temp1;
 
 		INT32 pos = strlen(tempObjName);
 		INT32 count = strlen(idxId) - len;
 		char* modifiedName = new char[strlen(objectName) + STR_ALLOC_BUFFER];
-		strcpy(modifiedName,
-				SubString(objectName, 0, strlen(objectName) - pos));
-		strcat(modifiedName, SubString(idxId, count, len));
-		strcat(modifiedName,
-				SubString(tempObjName, len, strlen(tempObjName) - len));
+		SubString(modifiedName, (const char*) objectName, 0, strlen(objectName) - pos);
+		//strcpy(modifiedName, SubString(objectName, 0, strlen(objectName) - pos));
+		//cout<<"1"<<endl;
+		char* tempIdxId = new char[len + 1];
+		SubString(tempIdxId, (const char*) idxId, count, len);
+		//cout<<"2"<<endl;
+		strcat(modifiedName, tempIdxId);
+		delete[] tempIdxId;
+		//strcat(modifiedName, SubString(idxId, count, len));
+
+		char* tempSubStr = new char[strlen(tempObjName) - len + 1];
+		SubString(tempSubStr, (const char*) tempObjName, len, strlen(tempObjName) - len);
+		//cout<<"3"<<endl;
+		strcat(modifiedName, tempSubStr);
+		//strcat(modifiedName, SubString(tempObjName, len, strlen(tempObjName) - len));
+
+		//TODO: mem leak - FIX
+		//cout<<__FUNCTION__<< " ends"<<endl;
 		return modifiedName;
 	}
 	else
 	{
+		//cout<<__FUNCTION__<< " ends2"<<endl;
 		return objectName;
 	}
 }

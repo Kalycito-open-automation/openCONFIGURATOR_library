@@ -93,7 +93,7 @@
 #define SUBINDEX_LEN 3
 #define RANGE_INDEX 3
 #define STR_ALLOC_BUFFER 1
-#define MAX_PI_SIZE 4064
+#define MAX_PI_SIZE 65536
 #define PROJECT_FILE_NAME 500
 #define LINUX_INSTALL_DIR "/usr/share/openCONFIGURATOR-"TOOL_VERSION
 #define LINUX_INSTALL_DIR_LEN 50
@@ -192,14 +192,15 @@ bool CheckIfNotPDO(char* indexId);
 /**
  \brief		This function shall be used to return a substring of the input parameter string from the given startPos for given len
 
- \param		str    			Character pointer to the string
+ \param		destStr			Character pointer to the sub string
+ \param		srcStr    		Character pointer to the source string
  \param		startPos    	Integer to hold the value of starting position of the sub string in the string
  \param		len     		Integer to hold the value of sub string length required
 
  \return	char*
  */
 /*****************************************************************************/
-char* SubString(char* str, INT32 startPos, INT32 len);
+char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the reversed version the input parameter string
