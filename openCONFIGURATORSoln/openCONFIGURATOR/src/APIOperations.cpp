@@ -1096,8 +1096,22 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 
 			sidxObj->SetName((char*) "NumberOfEntries");
 			sidxObj->SetObjectType((char*) "VAR");
-			char* dtName = new char[15];
 
+			if(0 == strcmp(indexObj->GetObjectType(), "ARRAY"))
+			{
+				sidxObj->SetAccessType((char*) "rw");
+			}
+			else
+			{
+				sidxObj->SetAccessType((char*) "const");
+			}
+			sidxObj->SetPDOMapping((char*) "NO");
+			sidxObj->SetDefaultValue((char*) "0x0");
+			sidxObj->SetActualValue((char*) "0x0");
+			sidxObj->SetHighLimit((char*) "0xFE");
+			sidxObj->SetLowLimit((char*) "0x0");
+
+			char* dtName = new char[15];
 			strcpy(dtName, (const char*) "UNSIGNED8");
 			if (true == (CheckIfDataTypeByNameExists(dtName, nodeId)))
 			{
@@ -1561,7 +1575,10 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		if ((ARRAY == indexObj->GetEObjectType())
 				|| (RECORD == indexObj->GetEObjectType()))
 		{
+			//delete the subobject 00 and then add and updates the number of entries
+			errCodeObj = DeleteSubIndex(nodeId, nodeType, indexId, (char*)"00");
 			errCodeObj = AddSubobject(nodeId, nodeType, indexId);
+			UpdateNumberOfEnteriesSIdx(indexObj, nodeType);
 		}
 
 		if (NULL != dataTypeName)
@@ -2132,7 +2149,7 @@ void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue)
 	{
 		if (NULL != cycleTimeValue)
 		{
-			strcpy(cycleTimeValue, ConvertToUpper(cycleTimeValue));
+			cycleTimeValue = ConvertToUpper(cycleTimeValue);
 			indexObj->SetActualValue(cycleTimeValue);
 		}
 		else
@@ -4059,7 +4076,7 @@ void WriteCNsData(char* fileName)
 					noOfEnteries, 16);
 			/*1 is not added for the size*/
 			noOfEnteries = PadLeft(noOfEnteries, '0', 8);
-			strcpy(noOfEnteries, ConvertToUpper(noOfEnteries));
+			noOfEnteries = ConvertToUpper(noOfEnteries);
 			strcpy(cdcBuffer3, noOfEnteries);
 			strcat(cdcBuffer3, "\n");
 			strcpy(cdcBuffer2, cdcBuffer3);
@@ -8481,7 +8498,7 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 
 	offsetVal = IntToAscii(prevSize, offsetVal, 16);
 	offsetVal = PadLeft(offsetVal, '0', 4);
-	strcpy(offsetVal, ConvertToUpper(offsetVal));
+	offsetVal = ConvertToUpper(offsetVal);
 	strcat(actValue, offsetVal);
 	/* Add reserve byte*/
 	strcat(actValue, "00");
@@ -8572,7 +8589,7 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 	//pobjIndex = pobjIdxCol->getIndexbyIndexValue(varIdx);
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
-	// to doStack wasnt booting up with sub index 00 for 1C09, 1F26
+	//TODO: Stack wasnt booting up with sub index 00 for 1C09, 1F26
 	if ((strcmp("1C09", indexId) == 0) || (strcmp("1F26", indexId) == 0)
 			|| (strcmp("1F8B", indexId) == 0) || (strcmp("1F8D", indexId) == 0)
 			|| (strcmp("1F27", indexId) == 0) || (strcmp("1F84", indexId) == 0))
@@ -8756,7 +8773,7 @@ ocfmRetCode AddOtherMNIndexes(INT32 nodeID)
 			configDateGlobal = GetConfigDate();
 			value = IntToAscii(configDateGlobal, value, 10);
 			//hexVal = padLeft(hexVal, '0' , 8);
-			strcpy(value, ConvertToUpper(value));
+			value = ConvertToUpper(value);
 			AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(), value,
 					false);
 
@@ -8780,7 +8797,7 @@ ocfmRetCode AddOtherMNIndexes(INT32 nodeID)
 			char* value = new char[50];
 			configTimeGlobal = GetConfigTime();
 			value = IntToAscii(configTimeGlobal, value, 10);
-			strcpy(value, ConvertToUpper(value));
+			value = ConvertToUpper(value);
 			AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(), value,
 					false);
 			delete[] value;
@@ -10853,7 +10870,7 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 	char* padStr = new char[5 + ALLOC_BUFFER];
 	padStr = IntToAscii(dataSize, padStr, 16);
 	padStr = PadLeft(padStr, '0', 4);
-	strcpy(padStr, ConvertToUpper(padStr));
+	padStr = ConvertToUpper(padStr);
 	strcpy(mnPDOobj.value, "0x");
 	strcat(mnPDOobj.value, padStr);
 	/* Set the Offset*/
@@ -10939,6 +10956,9 @@ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 //TODO: varNodetype is not used. To be removed.
 void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)
 {
+#if defined DEBUG
+	cout<< __FUNCTION__ ;
+#endif
 	if (NULL == indexObj)
 	{
 		ocfmException exceptionObj;
@@ -10951,18 +10971,37 @@ void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)
 	INT32 iTotalSIdxs = 0;
 
 	pobjSIdx = indexObj->GetSubIndexbyIndexValue((char*) "00");
-
+	#if defined DEBUG
+		cout<<" IndexObj: "<< indexObj->GetIndexValue();
+	#endif
 	/* subindexes excluding "00"*/
 	iTotalSIdxs = indexObj->GetNumberofSubIndexes() - 1;
 
 	if (pobjSIdx != NULL)
 	{
+		#if defined DEBUG
+			if( pobjSIdx->GetActualValue() != NULL)
+				cout<<" Previous Actual: "<<pobjSIdx->GetActualValue();
+			if( pobjSIdx->GetDefaultValue() != NULL)
+				cout<<" Default: "<<pobjSIdx->GetDefaultValue()<<endl;
+			cout<<" Updating with 0x"<< std::hex << iTotalSIdxs <<endl;
+		#endif
 		char tempStr[10];
 		char* buffer = new char[10];
 		strcpy(buffer, "0x");
 		strcat(buffer, IntToAscii(iTotalSIdxs, tempStr, 16));
+		if(CheckIfManufactureSpecificObject((char*) indexObj->GetIndexValue()))
+		{
+			pobjSIdx->SetDefaultValue(buffer);
+		}
 		pobjSIdx->SetActualValue(buffer);
 		delete[] buffer;
+	}
+	else
+	{
+		#if defined DEBUG
+			cout<<"0x00 Subindex Does Not Exist."<<endl;
+		#endif
 	}
 }
 
@@ -11060,7 +11099,7 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 		INT32 ilConfigDate;
 		ilConfigDate = GetConfigDate();
 		val = IntToAscii(ilConfigDate, val, 10);
-		strcpy(val, ConvertToUpper(val));
+		val = ConvertToUpper(val);
 		AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(), val, false);
 		delete[] val;
 
@@ -11082,7 +11121,7 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 		INT32 ilConfigTime;
 		ilConfigTime = GetConfigTime();
 		val = IntToAscii(ilConfigTime, val, 10);
-		strcpy(val, ConvertToUpper(val));
+		val = ConvertToUpper(val);
 
 		AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(), val, false);
 		delete[] val;

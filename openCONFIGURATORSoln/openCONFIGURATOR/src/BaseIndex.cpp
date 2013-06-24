@@ -269,8 +269,9 @@ void BaseIndex::SetObjectType(char* objTypeStr)
 	char* tempObjtype = new char[strlen(objTypeStr) + STR_ALLOC_BUFFER];
 
 	strcpy(tempObjtype, objTypeStr);
+	tempObjtype = ConvertToUpper(tempObjtype);
 	if ((0 == strcmp(tempObjtype, "5"))
-			|| (0 == strcmp(ConvertToUpper(tempObjtype), "DEFTYPE")))
+			|| (0 == strcmp(tempObjtype, "DEFTYPE")))
 	{
 		objectType = DEFTYPE;
 	}
@@ -326,24 +327,25 @@ void BaseIndex::SetPDOMapping(char* pdoMappingStr)
 {
 	char* varStrBuff = new char[strlen(pdoMappingStr) + STR_ALLOC_BUFFER];
 
-	strcpy(varStrBuff, ConvertToUpper((char*) pdoMappingStr));
-	if (0 == strcmp(ConvertToUpper(varStrBuff), "DEFAULT"))
+	strcpy(varStrBuff, pdoMappingStr);
+	varStrBuff = ConvertToUpper((char*) varStrBuff);
+	if (0 == strcmp(varStrBuff, "DEFAULT"))
 	{
 		pdoMapping = DEFAULT;
 	}
-	else if (0 == strcmp(ConvertToUpper(varStrBuff), "NO"))
+	else if (0 == strcmp(varStrBuff, "NO"))
 	{
 		pdoMapping = NO;
 	}
-	else if (0 == strcmp(ConvertToUpper(varStrBuff), "OPTIONAL"))
+	else if (0 == strcmp(varStrBuff, "OPTIONAL"))
 	{
 		pdoMapping = OPTIONAL;
 	}
-	else if (0 == strcmp(ConvertToUpper(varStrBuff), "RPDO"))
+	else if (0 == strcmp(varStrBuff, "RPDO"))
 	{
 		pdoMapping = RPDO;
 	}
-	else if (0 == strcmp(ConvertToUpper(varStrBuff), "TPDO"))
+	else if (0 == strcmp(varStrBuff, "TPDO"))
 	{
 		pdoMapping = TPDO;
 	}
