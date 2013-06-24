@@ -5789,72 +5789,13 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							throw exceptionObj;
 						}
 
-						//set the correponding 14xx/01 to f0
-						if ((true == isBuild)
-								&& (strncmp(indexObj.GetIndexValue(), "16", 2)
-										== 0))
+						bool pdoResult = false;
+						pdoResult = CheckPdoCommParam(indexObj.GetPDOType(), isBuild, &indexObj, indexCollObj, nodeObj);
+						if (pdoResult == false)
 						{
-							Index *commIndexObj = NULL;
-
-							char *varIdx = SubString(
-									(char *) indexObj.GetIndexValue(), 2, 4);
-							char *varCommIdx = new char[INDEX_LEN];
-							strcpy(varCommIdx, (char *) "14");
-							strcat(varCommIdx, varIdx);
-							commIndexObj = indexCollObj->GetIndexbyIndexValue(
-									varCommIdx);
-							if (NULL != commIndexObj)
-							{
-								SubIndex *subIndexObj = NULL;
-								subIndexObj =
-										commIndexObj->GetSubIndexbyIndexValue(
-												(char *) "01");
-								if (NULL != subIndexObj)
-								{
-									if ((NULL != subIndexObj->GetActualValue())
-											&& (0
-													!= strcmp(
-															subIndexObj->GetActualValue(),
-															"")))
-									{
-										rpdoMappedNodeID =
-												GetDecimalValue(
-														(char *) subIndexObj->GetActualValue());
-										if ((CHAINED == stnType)
-												&& (BROADCAST_NODEID
-														== rpdoMappedNodeID))
-										{
-											subIndexObj->SetActualValue(
-													(char *) "0xF0");
-											//  bChangeOffset = true;
-										}
-
-										if ((CHAINED != stnType)
-												&& (MN_NODEID
-														== rpdoMappedNodeID))
-										{
-											subIndexObj->SetActualValue(
-													(char *) "0x0");
-											//  bChangeOffset = true;
-										}
-										rpdoMappedNodeID =
-												GetDecimalValue(
-														(char *) subIndexObj->GetActualValue());
-										if ((BROADCAST_NODEID
-												!= rpdoMappedNodeID))
-										{
-											if ((MN_NODEID != rpdoMappedNodeID))
-											{
-												continue;
-											}
-										}
-									}
-								}
-							}
-							delete[] varCommIdx;
-							delete[] varIdx;
+							//Incorrect Target node id for a PDO(may be a cross Tx). So do not process.
+							continue;
 						}
-						//CN's cannot have 18xx & 1Axx other than 1800 & 1A00 mapped for MN
 
 						while (sidxCount <= sidxTotalCount)
 						{
@@ -5875,6 +5816,19 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								const char* actualVal =
 										sidxObj->GetActualValue();
 								INT32 iLength = strlen(actualVal);
+#if defined DEBUG
+								cout<<"Length of the value: "<<iLength<<" Actual Value: "<<actualVal<<endl;
+#endif
+								//Actual pdo mapping value includes 16bit of original payload mapping and two for "0x"
+								if (iLength != (16 + 2))
+								{
+									exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+									char customError[200] = { 0 };
+									sprintf(customError, "The node '%s id: %d' has invalid mapping value for a PDO object %s / %s", nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue() );
+									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									throw exceptionObj;
+								}
+
 								char* moduleIndex = NULL;
 								moduleIndex = SubString((char*) actualVal,
 										iLength - 4, 4);
@@ -6409,6 +6363,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									delete[] modOffset;
 									delete[] tempLenStr;
 									delete[] offsetStr;
+								}
+							}
+							else
+							{
+								if (NULL != sidxObj)
+								{
+									exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+									char customError[200] = { 0 };
+									sprintf(customError, "In node '%s' id:%d, Empty actual value configured for the PDO object %s / %s", nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									throw exceptionObj;
 								}
 							}
 							sidxCount++;

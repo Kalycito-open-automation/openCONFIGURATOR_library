@@ -424,3 +424,194 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 	}
 	return retVal;
 }
+
+bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj)
+{
+	ocfmException exceptionObj;
+	char *varIdx = NULL;
+	char *varCommIdx = new char[INDEX_LEN];
+	char customError[200] = { 0 };
+
+	varIdx = SubString((char *) indexObj->GetIndexValue(), 2, 4);
+	if (pdoTypeVar == PDO_TPDO)
+	{
+		strcpy(varCommIdx, (char *) "18");
+		strcat(varCommIdx, varIdx);
+		//If varIdx != "00" throw error as only the 1st object 1A00 shall be implemented on a CN
+		if (0 != strcmp(varIdx, "00"))
+		{
+			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXID);
+			sprintf(customError, "The TPDO object is not valid for CN with Node name: '%s', Node ID: '%d' \nReason: Only the TPDO object pair 1800 and 1A00 shall be implemented for a CN", nodeObj->GetNodeName(), nodeObj->GetNodeId());
+			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			throw exceptionObj;
+		}
+	}
+	else if (pdoTypeVar == PDO_RPDO)
+	{
+		strcpy(varCommIdx, (char *) "14");
+		strcat(varCommIdx, varIdx);
+	}
+	else
+	{
+		delete[] varCommIdx;
+		delete[] varIdx;
+		return false;
+	}
+
+	Index *commIndexObj = NULL;
+	commIndexObj = indexCollObj->GetIndexbyIndexValue(varCommIdx);
+	if (NULL == commIndexObj)
+	{
+		//throw exception as matching communication index not found for a CN
+		exceptionObj.OCFMException(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+		sprintf(customError, "Communication Param object 0x%s not found in the node %s( %d )", varCommIdx, nodeObj->GetNodeName(), nodeObj->GetNodeId());
+		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		throw exceptionObj;
+	}
+
+	SubIndex *subIndexObj = NULL;
+	subIndexObj = commIndexObj->GetSubIndexbyIndexValue((char *) "01");
+	if (NULL == subIndexObj)
+	{
+		//Throw exception as Target node id sidx not found in a CN TPDO comm param object
+		exceptionObj.OCFMException(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
+		sprintf(customError, " In CN: %d. SubObject PDO_Target_Node_Id(0x01) in Object 0x%s not found.", nodeObj->GetNodeId(), varCommIdx);
+		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		throw exceptionObj;
+	}
+
+	if (NULL != subIndexObj->GetActualValue())
+	{
+		if (0 == strlen(subIndexObj->GetActualValue()))
+		{
+			//Throw exception as wrong Target node id for TPDO CN
+			exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+			sprintf(customError, " In CN: %d. Invalid PDO_Target_Node_Id value configured in Object %s/01", nodeObj->GetNodeId(), varCommIdx);
+			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			throw exceptionObj;
+		}
+		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetActualValue());
+
+		if (pdoTypeVar == PDO_TPDO)
+		{
+			if ((BROADCAST_NODEID != mappedNodeId))
+			{
+				//Throw exception as wrong Target node id for TPDO CN
+				exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+				sprintf(customError, " In CN: %d. Invalid PDO_Target_Node_Id value configured in Object %s/01. It Should be always 0 for a CN's TPDO", nodeObj->GetNodeId(), varCommIdx);
+				CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+				throw exceptionObj;
+			}
+			else
+			{
+				//Correct Target node id for a CN TPDO
+			}
+		}
+		else if (pdoTypeVar == PDO_RPDO)
+		{
+			if (isBuild == true)
+			{
+				StationType stnType = nodeObj->GetStationType();
+				if ((CHAINED == stnType)
+					&& (BROADCAST_NODEID == mappedNodeId))
+				{
+					subIndexObj->SetActualValue((char *) "0xF0");
+				}
+
+				if ((CHAINED != stnType)
+					&& (MN_NODEID == mappedNodeId))
+				{
+					subIndexObj->SetActualValue((char *) "0x0");
+				}
+
+				if ((BROADCAST_NODEID != mappedNodeId))
+				{
+					if ((MN_NODEID != mappedNodeId))
+					{
+						delete[] varCommIdx;
+						delete[] varIdx;
+						return false;
+					}
+				}
+			}
+		}
+		else
+		{
+			delete[] varCommIdx;
+			delete[] varIdx;
+			return false;
+		}
+	}
+	else if (NULL != subIndexObj->GetDefaultValue())
+	{
+		//Actual value not configured. So checking default value
+		if (0 == strlen(subIndexObj->GetDefaultValue()))
+		{
+			exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+			sprintf(customError, " In CN: %d. Invalid default PDO_Target_Node_Id value configured in Object %s/01", nodeObj->GetNodeId(), varCommIdx);
+			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			throw exceptionObj;
+		}
+		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetDefaultValue());
+		if (pdoTypeVar == PDO_TPDO)
+		{
+			if ((BROADCAST_NODEID != mappedNodeId))
+			{
+				//Throw exception as wrong Target node id for TPDO CN
+				exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+				sprintf(customError, " In CN: %d. Invalid default PDO_Target_Node_Id value configured in Object %s/01. It Should be always 0 for a CN's TPDO", nodeObj->GetNodeId(), varCommIdx);
+				CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+				throw exceptionObj;
+			}
+			else
+			{
+				//Correct Target node id for a CN TPDO
+			}
+		}
+		else if (pdoTypeVar == PDO_RPDO)
+		{
+			if (isBuild == true)
+			{
+				StationType stnType = nodeObj->GetStationType();
+				if ((CHAINED == stnType)
+					&& (BROADCAST_NODEID == mappedNodeId))
+				{
+					subIndexObj->SetActualValue((char *) "0xF0");
+				}
+
+				if ((CHAINED != stnType)
+					&& (MN_NODEID == mappedNodeId))
+				{
+					subIndexObj->SetActualValue((char *) "0x0");
+				}
+
+				if ((BROADCAST_NODEID != mappedNodeId))
+				{
+					if ((MN_NODEID != mappedNodeId))
+					{
+						delete[] varCommIdx;
+						delete[] varIdx;
+						return false;
+					}
+				}
+			}
+		}
+		else
+		{
+			delete[] varCommIdx;
+			delete[] varIdx;
+			return false;
+		}
+	}
+	else
+	{
+		//Throw exception as Both default & Actual Target node id  value is not configured
+		exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+		sprintf(customError, " In CN: %d. PDO_Target_Node_Id value not configured in Object %s/01", nodeObj->GetNodeId(), varCommIdx);
+		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		throw exceptionObj;
+	}
+	delete[] varCommIdx;
+	delete[] varIdx;
+	return true;
+}

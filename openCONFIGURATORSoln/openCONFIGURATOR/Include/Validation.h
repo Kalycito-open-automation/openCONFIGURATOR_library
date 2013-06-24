@@ -119,4 +119,6 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
 /*****************************************************************************/
 bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
+bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj);
+
 #endif // Validation_h
