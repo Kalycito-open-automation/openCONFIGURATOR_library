@@ -172,18 +172,35 @@ Index* IndexCollection::GetIndex(INT32 indexPosition)
 
 Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
 {
-	INT32 loopCount;
 	Index objIndex;
-	for (loopCount = 0; loopCount < indexCount; loopCount++)
+	if(NULL != indexId)
 	{
-		objIndex = indexCollection[loopCount];
-		//NULL check values 
-		if (0
-				== strcmp(StringToUpper((char*) objIndex.GetIndexValue()),
-						StringToUpper(indexId)))
+		char *idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
+		strcpy(idxIdUpper, indexId);
+		idxIdUpper = ConvertToUpper(idxIdUpper);
+
+		for (INT32 loopCount = 0; loopCount < indexCount; loopCount++)
 		{
-			return &indexCollection[loopCount];
+			objIndex = indexCollection[loopCount];
+			//NULL check values 
+			if(objIndex.GetIndexValue() != NULL)
+			{
+				char *objIdxIdUpper = new char[strlen(objIndex.GetIndexValue()) + STR_ALLOC_BUFFER];
+				strcpy(objIdxIdUpper, objIndex.GetIndexValue());
+				objIdxIdUpper = ConvertToUpper(objIdxIdUpper);
+				if (0 == strcmp(objIdxIdUpper, idxIdUpper))
+				{
+					delete[] idxIdUpper;
+					delete[] objIdxIdUpper;
+					return &indexCollection[loopCount];
+				}
+				else
+				{
+					delete[] objIdxIdUpper;
+				}
+			}
 		}
+		delete[] idxIdUpper;
 	}
 	return NULL;
 }

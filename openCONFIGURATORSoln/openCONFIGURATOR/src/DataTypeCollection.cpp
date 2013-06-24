@@ -132,16 +132,28 @@ DataType* DataTypeCollection::GetDataTypeByName(char* dataTypeValue)
 {
 	DataType* objDataType = NULL;
 
-	for (INT32 loopCount = 0; loopCount < this->GetNumberOfDataTypes();
-			loopCount++)
+	if (NULL != dataTypeValue)
 	{
-		objDataType = this->GetDataTypeElement(loopCount);
-
-		if (0
-				== strcmp(StringToUpper(objDataType->GetName()),
-						StringToUpper(dataTypeValue)))
+		for (INT32 loopCount = 0; loopCount < this->GetNumberOfDataTypes(); loopCount++)
 		{
-			return objDataType;
+			objDataType = this->GetDataTypeElement(loopCount);
+
+			char *objDtNameUpper = new char[strlen(objDataType->GetName()) + STR_ALLOC_BUFFER];
+			char *dtValUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
+
+			strcpy(objDtNameUpper, objDataType->GetName());
+			objDtNameUpper = ConvertToUpper(objDtNameUpper);
+			strcpy(dtValUpper, dataTypeValue);
+			dtValUpper = ConvertToUpper(dtValUpper);
+
+			if (0 == strcmp(objDtNameUpper, dtValUpper))
+			{
+				delete[] objDtNameUpper;
+				delete[] dtValUpper;
+				return objDataType;
+			}
+			delete[] objDtNameUpper;
+			delete[] dtValUpper;
 		}
 	}
 	objDataType = NULL;

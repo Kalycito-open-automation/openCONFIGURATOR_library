@@ -2191,101 +2191,137 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 
 INT32 GetDataSize(char* dataTypeVal)
 {
-	if (strcmp(StringToUpper(dataTypeVal), "UNSIGNED8") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "BOOLEAN") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "INTEGER8") == 0)
+	INT32 retSize = 1; //by default to handle err case = 1 byte
+	if(NULL != dataTypeVal)
 	{
-		return 1;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "UNSIGNED16") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "INTEGER16") == 0)
-	{
-		return 2;
-	}
+		char *dataTypeUpper = new char[strlen(dataTypeVal) + STR_ALLOC_BUFFER];
+		strcpy(dataTypeUpper, dataTypeVal);
+		dataTypeUpper = ConvertToUpper(dataTypeUpper);
 
-	else if (strcmp(StringToUpper(dataTypeVal), "INTEGER24") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "UNSIGNED24") == 0)
-	{
-		return 3;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "UNSIGNED32") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "INTEGER32") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "REAL32") == 0)
-	{
-		return 4;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "INTEGER40") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "UNSIGNED40") == 0)
-	{
-		return 5;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "INTEGER48") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "UNSIGNED48") == 0)
-	{
-		return 6;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "INTEGER56") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "UNSIGNED56") == 0)
-	{
-		return 7;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "UNSIGNED64") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "INTEGER64") == 0
-			|| strcmp(StringToUpper(dataTypeVal), "REAL64") == 0)
-	{
-		return 8;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "MAC_ADDRESS") == 0)
-	{
-		return 6;
-	}
-	else if (strcmp(StringToUpper(dataTypeVal), "IP_ADDRESS") == 0)
-	{
-		return 4;
-	}
-	/* NETTIME is composed as follows:
-	 STRUCT OF
-	 UNSIGNED32 seconds
-	 UNSIGNED32 nanoseconds */
-	else if (strcmp(StringToUpper(dataTypeVal), "NETTIME") == 0)
-	{
-		return 8;
-	}
-	/*STRUCT OF
-	 UNSIGNED28 ms,
-	 VOID4 reserved,
-	 UNSIGNED16 days
-	 TIME_DIFFERENCE*/
-	else if (strcmp(StringToUpper(dataTypeVal), "TIME_DIFF") == 0)
-	{
-		return 6;
-	}
-	/*STRUCT OF
-	 UNSIGNED28 ms,
-	 VOID4 reserved,
-	 UNSIGNED16 days
-	 TIME_DIFFERENCE*/
-	else if (strcmp(StringToUpper(dataTypeVal), "TIME_OF_DAY") == 0)
-	{
-		return 6;
+		if (strcmp(dataTypeUpper, "UNSIGNED8") == 0
+				|| strcmp(dataTypeUpper, "BOOLEAN") == 0
+				|| strcmp(dataTypeUpper, "INTEGER8") == 0)
+		{
+			retSize = 1;
+		}
+		else if (strcmp(dataTypeUpper, "UNSIGNED16") == 0
+				|| strcmp(dataTypeUpper, "INTEGER16") == 0)
+		{
+			retSize = 2;
+		}
+
+		else if (strcmp(dataTypeUpper, "INTEGER24") == 0
+				|| strcmp(dataTypeUpper, "UNSIGNED24") == 0)
+		{
+			retSize = 3;
+		}
+		else if (strcmp(dataTypeUpper, "UNSIGNED32") == 0
+				|| strcmp(dataTypeUpper, "INTEGER32") == 0
+				|| strcmp(dataTypeUpper, "REAL32") == 0)
+		{
+			retSize = 4;
+		}
+		else if (strcmp(dataTypeUpper, "INTEGER40") == 0
+				|| strcmp(dataTypeUpper, "UNSIGNED40") == 0)
+		{
+			retSize = 5;
+		}
+		else if (strcmp(dataTypeUpper, "INTEGER48") == 0
+				|| strcmp(dataTypeUpper, "UNSIGNED48") == 0)
+		{
+			retSize = 6;
+		}
+		else if (strcmp(dataTypeUpper, "INTEGER56") == 0
+				|| strcmp(dataTypeUpper, "UNSIGNED56") == 0)
+		{
+			retSize = 7;
+		}
+		else if (strcmp(dataTypeUpper, "UNSIGNED64") == 0
+				|| strcmp(dataTypeUpper, "INTEGER64") == 0
+				|| strcmp(dataTypeUpper, "REAL64") == 0)
+		{
+			retSize = 8;
+		}
+		else if (strcmp(dataTypeUpper, "MAC_ADDRESS") == 0)
+		{
+			retSize = 6;
+		}
+		else if (strcmp(dataTypeUpper, "IP_ADDRESS") == 0)
+		{
+			retSize = 4;
+		}
+		/* NETTIME is composed as follows:
+		 STRUCT OF
+		 UNSIGNED32 seconds
+		 UNSIGNED32 nanoseconds */
+		else if (strcmp(dataTypeUpper, "NETTIME") == 0)
+		{
+			retSize = 8;
+		}
+		/*STRUCT OF
+		 UNSIGNED28 ms,
+		 VOID4 reserved,
+		 UNSIGNED16 days
+		 TIME_DIFFERENCE*/
+		else if (strcmp(dataTypeUpper, "TIME_DIFF") == 0)
+		{
+			retSize = 6;
+		}
+		/*STRUCT OF
+		 UNSIGNED28 ms,
+		 VOID4 reserved,
+		 UNSIGNED16 days
+		 TIME_DIFFERENCE*/
+		else if (strcmp(dataTypeUpper, "TIME_OF_DAY") == 0)
+		{
+			retSize = 6;
+		}
+		else
+		{
+			#if defined DEBUG
+				cout << __FUNCTION__ << " Unhandled datatype:" << dataTypeUpper << endl;
+			#endif
+		}
+		delete[] dataTypeUpper;
 	}
 	else
 	{
-#if defined DEBUG
-		cout << __FUNCTION__ << " Unhandled datatype:" << dataTypeVal << endl;
-#endif
+		#if defined DEBUG
+			cout << __FUNCTION__ << " Could no fetch input datatype:" << endl;
+		#endif
 	}
-	return 1; //by default
+	return retSize;
 }
 
 bool CheckIfStringDatatypes(char* dataTypeValue)
 {
-	if (strcmp(StringToUpper(dataTypeValue), "VISIBLE_STRING") == 0
-			|| strcmp(StringToUpper(dataTypeValue), "OCTET_STRING") == 0
-			|| strcmp(StringToUpper(dataTypeValue), "UNICODE_STRING") == 0)
-		return true;
+	bool retVal = false;
+	if (NULL != dataTypeValue)
+	{
+		char *dataTypeUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
+		strcpy(dataTypeUpper, dataTypeValue);
+
+		dataTypeUpper = ConvertToUpper(dataTypeUpper);
+
+		if ((strcmp(dataTypeUpper, "VISIBLE_STRING") == 0)
+				|| (strcmp(dataTypeUpper, "OCTET_STRING") == 0)
+				|| (strcmp(dataTypeUpper, "UNICODE_STRING") == 0))
+		{
+			retVal = true;
+		}
+		else
+		{
+			retVal = false;
+		}
+		delete[] dataTypeUpper;
+	}
 	else
-		return false;
+	{
+		#if defined DEBUG
+			cout << __FUNCTION__ << " Could no fetch input datatype:" << endl;
+		#endif
+	}
+	return retVal;
 }
 
 void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)

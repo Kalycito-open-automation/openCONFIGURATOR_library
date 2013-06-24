@@ -11740,7 +11740,7 @@ void SetPresMNNodeAssigmentBits()
 		{
 			char* nodeAssignData = NULL;
 			ULONG tempValue;
-			nodeAssignData = new char[8 + STR_ALLOC_BUFFER];
+			nodeAssignData = new char[10 + STR_ALLOC_BUFFER];
 			tempValue = EPL_NODEASSIGN_VALID | EPL_NODEASSIGN_NODE_EXISTS
 					| EPL_NODEASSIGN_MN_PRES;
 			strcpy(nodeAssignData, (char *) "0x");

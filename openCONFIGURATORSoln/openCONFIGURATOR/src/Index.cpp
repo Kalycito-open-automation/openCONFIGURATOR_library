@@ -138,23 +138,40 @@ SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
 
 SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 {
-	INT32 loopCount = 0;
 	SubIndex* objSidx = NULL;
 
-	for (loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
+	if( NULL != subIndexId)
 	{
-		objSidx = &subIndexCollection[loopCount];
-		//Check for null , alignment changes
-		if (0
-				== strcmp(StringToUpper((char*) objSidx->GetIndexValue()),
-						StringToUpper(subIndexId)))
+		char *sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
+		strcpy(sidxIdUpper, subIndexId);
+		sidxIdUpper = ConvertToUpper(sidxIdUpper);
+
+		for (INT32 loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
 		{
-			return objSidx;
+			objSidx = &subIndexCollection[loopCount];
+			//Check for null , alignment changes
+			if (NULL != objSidx)
+			{
+				if (objSidx->GetIndexValue() != NULL)
+				{
+					char *objSidxIdUpper = new char[strlen(objSidx->GetIndexValue()) + STR_ALLOC_BUFFER];
+					strcpy(objSidxIdUpper, objSidx->GetIndexValue());
+					objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
+					if (0 == strcmp(objSidxIdUpper, sidxIdUpper))
+					{
+						delete[] objSidxIdUpper;
+						delete[] sidxIdUpper;
+						return objSidx;
+					}
+					else
+					{
+						delete[] objSidxIdUpper;
+						objSidx = NULL;
+					}
+				}
+			}
 		}
-		else
-		{
-			objSidx = NULL;
-		}
+		delete[] sidxIdUpper;
 	}
 
 	objSidx = NULL;

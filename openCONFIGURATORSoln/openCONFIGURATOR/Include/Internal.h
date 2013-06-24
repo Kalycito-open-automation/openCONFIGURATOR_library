@@ -661,12 +661,12 @@ INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen);
 /**
  \brief		This function shall be used to return the input parameter string in upper case format
 
- \param		srcStr		Character pointer to the string
+ \param		str		Character pointer to the source string
 
  \return	char*
  */
 /*****************************************************************************/
-char* StringToUpper(char* srcStr);
+char* StringToUpper(char* str);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to set the flag to enable inclusion in CDC generation for the required CN indices

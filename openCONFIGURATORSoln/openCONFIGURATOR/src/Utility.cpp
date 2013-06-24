@@ -500,22 +500,35 @@ INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen)
 
 bool CheckAllowedDTForMapping(char* dataTypeName)
 {
-	if (0 == strcmp(StringToUpper(dataTypeName), "INTEGER8")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER16")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER32")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "INTEGER64")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED8")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED16")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED32")
-			|| 0 == strcmp(StringToUpper(dataTypeName), "UNSIGNED64"))
+	bool retVal = false;
+	if( NULL != dataTypeName)
 	{
-		return true;
+		char *dtNameUpper = new char[strlen(dataTypeName) + STR_ALLOC_BUFFER];
+		strcpy(dtNameUpper, dataTypeName);
+		dtNameUpper = ConvertToUpper(dtNameUpper);
 
+		if (0 == strcmp(dtNameUpper, "INTEGER8")
+			|| 0 == strcmp(dtNameUpper, "INTEGER16")
+			|| 0 == strcmp(dtNameUpper, "INTEGER32")
+			|| 0 == strcmp(dtNameUpper, "INTEGER64")
+			|| 0 == strcmp(dtNameUpper, "UNSIGNED8")
+			|| 0 == strcmp(dtNameUpper, "UNSIGNED16")
+			|| 0 == strcmp(dtNameUpper, "UNSIGNED32")
+			|| 0 == strcmp(dtNameUpper, "UNSIGNED64"))
+		{
+			retVal = true;
+		}
+		else
+		{
+			retVal = false;
+		}
+		delete[] dtNameUpper;
 	}
 	else
 	{
-		return false;
+		retVal = false;
 	}
+	return retVal;
 }
 
 //TODO: Add a parameter to return the value to avoid new delete memory issues
@@ -652,13 +665,16 @@ bool CheckAccessTypeForInclude(char* accessType)
 	bool retInclude;
 	if (NULL == accessType)
 	{
+		//TODO: To check with the functionality. Return true or false?
 		retInclude = true;
 	}
 	else
 	{
-		char* tempAccesstype = StringToUpper(accessType);
+		char* tempAccesstype = new char[strlen(accessType) + STR_ALLOC_BUFFER];
+		strcpy(tempAccesstype, accessType);
+		tempAccesstype = ConvertToUpper(tempAccesstype);
 		if ((0 == strcmp(tempAccesstype, "CONST"))
-				|| (0 == strcmp(tempAccesstype, "RO")))
+			|| (0 == strcmp(tempAccesstype, "RO")))
 		{
 			retInclude = false;
 		}
@@ -666,7 +682,6 @@ bool CheckAccessTypeForInclude(char* accessType)
 		{
 			retInclude = true;
 		}
-		//UpperAccesstype should not be deleted if StringToUpper function parameters changed
 		delete[] tempAccesstype;
 	}
 	return retInclude;

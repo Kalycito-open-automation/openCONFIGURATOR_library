@@ -171,34 +171,36 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 					idxLC++)
 			{
 				Index *idxObj = NULL;
-				char *tempIndexId = NULL;
-
 				idxObj = idxCollObj->GetIndex(idxLC);
-				tempIndexId = new char[strlen((char*) idxObj->GetIndexValue())
-						+ STR_ALLOC_BUFFER];
-				strcpy(tempIndexId, (char*) idxObj->GetIndexValue());
 
-				if (0
-						== strcmp(StringToUpper(tempIndexId),
-								StringToUpper(indexId)))
+				char *objIdxIdUpper = new char[strlen(idxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
+				char *idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
+				strcpy(objIdxIdUpper, idxObj->GetIndexValue());
+				objIdxIdUpper = ConvertToUpper(objIdxIdUpper);
+				strcpy(idxIdUpper, indexId);
+				idxIdUpper = ConvertToUpper(idxIdUpper);
+
+				if (0 == strcmp(objIdxIdUpper, idxIdUpper))
 				{
-					//Index *objIndexPtr = NULL;
-
-					//objIndexPtr = idxCollObj->GetIndex(idxLC);
 					*idxPos = idxLC;
 					errCodeObj.code = OCFM_ERR_SUCCESS;
+					delete[] objIdxIdUpper;
+					delete[] idxIdUpper;
 					return errCodeObj;
 				}
 				else if (idxLC == (idxCollObj->GetNumberofIndexes() - 1))
 				{
 					// Index Doesn't Exist
 					errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
+					delete[] objIdxIdUpper;
+					delete[] idxIdUpper;
 					return errCodeObj;
 				}
 				else
 				{
 				}
-				delete[] tempIndexId;
+				delete[] objIdxIdUpper;
+				delete[] idxIdUpper;
 			}
 		}
 		else
@@ -257,25 +259,37 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 					sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
-
 				sidxObj = idxObj->GetSubIndex(sidxLC);
-				if ((strcmp(StringToUpper((char*) sidxObj->GetIndexValue()),
-						StringToUpper(sidxId)) == 0))
+
+				char *objSidxIdUpper = new char[strlen(sidxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
+				char *sidxIdUpper = new char[strlen(sidxId) + STR_ALLOC_BUFFER];
+				strcpy(objSidxIdUpper, sidxObj->GetIndexValue());
+				strcpy(sidxIdUpper, sidxId);
+				objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
+				sidxIdUpper = ConvertToUpper(sidxIdUpper);
+
+				if ((strcmp(objSidxIdUpper, sidxIdUpper) == 0))
 				{
 					errCodeObj.code = OCFM_ERR_SUCCESS;
 					*sidxPos = sidxLC;
+					delete[] objSidxIdUpper;
+					delete[] sidxIdUpper;
 					return errCodeObj;
 				}
 				else if (sidxLC == (idxObj->GetNumberofSubIndexes() - 1))
 				{
 					// SubIndex Doesn't Exist
 					errCodeObj.code = OCFM_ERR_SUBINDEXID_NOT_FOUND;
+					delete[] objSidxIdUpper;
+					delete[] sidxIdUpper;
 					return errCodeObj;
 				}
 				else
 				{
 					//TODO: operation to be added
 				}
+				delete[] objSidxIdUpper;
+				delete[] sidxIdUpper;
 			}
 		}
 		else
@@ -343,7 +357,11 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
 	idxCollObj = nodeObj.GetIndexCollection();
 	idxObj = idxCollObj->GetIndexbyIndexValue(indexID);
 
-	if ((0 == idxObj->GetNumberofSubIndexes()))
+	if (NULL == idxObj)
+	{
+		return false;
+	}
+	else if ((0 == idxObj->GetNumberofSubIndexes()))
 	{
 		return false;
 	}
@@ -356,20 +374,29 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
 			SubIndex* objSubIndexPtr;
 			objSubIndexPtr = idxObj->GetSubIndex(sidxLC);
 
-			if ((0
-					== strcmp(
-							StringToUpper(
-									(char*) objSubIndexPtr->GetIndexValue()),
-							StringToUpper(subIndexId))))
+			char *objSidxIdUpper = new char[strlen(objSubIndexPtr->GetIndexValue()) + STR_ALLOC_BUFFER];
+			char *sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
+			strcpy(objSidxIdUpper, objSubIndexPtr->GetIndexValue());
+			strcpy(sidxIdUpper, subIndexId);
+			objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
+			sidxIdUpper = ConvertToUpper(sidxIdUpper);
+
+			if ((0 == strcmp(objSidxIdUpper, sidxIdUpper)))
 			{
+				delete[] sidxIdUpper;
+				delete[] objSidxIdUpper;
 				return true;
 			}
 			else if (sidxLC == (idxObj->GetNumberofSubIndexes() - 1))
 			{
+				delete[] sidxIdUpper;
+				delete[] objSidxIdUpper;
 				return false;
 			}
 			else
 			{
+				delete[] sidxIdUpper;
+				delete[] objSidxIdUpper;
 				//TODO: Nothing to be added. Continue to run the loop
 			}
 		}
