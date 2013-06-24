@@ -787,18 +787,18 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
 void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 		PIDirectionType dirType, FILE* netHeader)
 {
-
 	char* mainBuffer = new char[HEADER_FILE_BUFFER];
 	mainBuffer[0] = 0;
-	char* tempBuffer1 = new char[200];
-	char* tempBuffer2 = new char[500];
+
 	char offsetStr[10];
-	INT32 offsetVal = 0;
+	UINT32 offsetVal = 0;
 	NETProcessImage *objNetPiCol = NULL;
 	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType,
 			netHeader);
+	NodeCollection* objNodeCol = NULL;
+	objNodeCol = NodeCollection::GetNodeColObjectPointer();
 
-	objNetPiCol = new NETProcessImage[PI_VAR_COUNT];
+	objNetPiCol = new NETProcessImage[(objNodeCol->GetCNNodesCount() * PI_VAR_COUNT)];
 	INT32 netPIVarsCount = GroupNETPIVariables(dirType, objNetPiCol);
 	for (INT32 loopCount = 0; loopCount < netPIVarsCount; loopCount++)
 	{
@@ -828,6 +828,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	delete[] objNetPiCol;
 	char* totalSize = new char[20];
 	IntToAscii(totalSizeVal, totalSize, 10);
+	char* tempBuffer1 = new char[200];
+	char* tempBuffer2 = new char[500];
 
 	if (INPUT == dirType)
 	{

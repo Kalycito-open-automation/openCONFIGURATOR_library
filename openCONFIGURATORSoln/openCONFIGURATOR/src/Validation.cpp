@@ -736,17 +736,23 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidx
 bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* accessType)
 {
 	bool retVal = false;
-	accessType = StringToUpper(accessType);
-	pdoMappingVal = StringToUpper(pdoMappingVal);
+	char* accessTypeUpper = new char[strlen(accessType) + STR_ALLOC_BUFFER];
+	char* pdoMappingUpper = new char[strlen(pdoMappingVal) + STR_ALLOC_BUFFER];
+
+	strcpy(accessTypeUpper, accessType);
+	strcpy(pdoMappingUpper, pdoMappingVal);
+	accessTypeUpper = ConvertToUpper(accessTypeUpper);
+	pdoMappingUpper = ConvertToUpper(pdoMappingUpper);
+	
 	switch(pdoTypeVal)
 	{
 	case PDO_RPDO:
 		#if defined DEBUG
-			cout<<"Checking for AccesType: "<<accessType<<" with PDOmapping: "<<pdoMappingVal<<" in an RPDO";
+			cout<<"Checking for AccesType: "<<accessTypeUpper<<" with PDOmapping: "<<pdoMappingUpper<<" in an RPDO";
 		#endif
-			if ((strcmp(pdoMappingVal, "DEFAULT") == 0) || (strcmp(pdoMappingVal, "OPTIONAL") == 0))
+			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
-				if((strcmp(accessType, "WO") == 0) || (strcmp(accessType, "WRITE") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEOUTPUT") == 0))
+				if((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
 				{
 					retVal = true;
 				}
@@ -755,9 +761,9 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* acce
 					retVal = false;
 				}
 			}
-			else if ((strcmp(pdoMappingVal, "RPDO") == 0))
+			else if ((strcmp(pdoMappingUpper, "RPDO") == 0))
 			{
-				if((strcmp(accessType, "WO") == 0) || (strcmp(accessType, "WRITE") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEOUTPUT") == 0))
+				if((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
 				{
 					retVal = true;
 				}
@@ -773,11 +779,11 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* acce
 			break;
 	case PDO_TPDO:
 		#if defined DEBUG
-			cout<<"Checking for AccesType: "<<accessType<<" with PDOmapping: "<<pdoMappingVal<<" in an TPDO";
+			cout<<"Checking for AccesType: "<<accessTypeUpper<<" with PDOmapping: "<<pdoMappingUpper<<" in an TPDO";
 		#endif
-			if ((strcmp(pdoMappingVal, "DEFAULT") == 0) || (strcmp(pdoMappingVal, "OPTIONAL") == 0))
+			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
-				if((strcmp(accessType, "RO") == 0) || (strcmp(accessType, "READ") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEINPUT") == 0))
+				if((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
 				{
 					retVal = true;
 				}
@@ -786,9 +792,9 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* acce
 					retVal = false;
 				}
 			}
-			else if ((strcmp(pdoMappingVal, "TPDO") == 0))
+			else if ((strcmp(pdoMappingUpper, "TPDO") == 0))
 			{
-				if((strcmp(accessType, "RO") == 0) || (strcmp(accessType, "READ") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEINPUT") == 0))
+				if((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
 				{
 					retVal = true;
 				}
@@ -806,6 +812,8 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* acce
 		retVal = false;
 	}
 
+	delete[] pdoMappingUpper;
+	delete[] accessTypeUpper;
 	#if defined DEBUG
 		cout<<" : Returning: "<<retVal<<endl;
 	#endif

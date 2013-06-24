@@ -4477,7 +4477,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 	char *Buffer1 = NULL;
 	char *tempFileName = NULL;
 	char *tempOutputFileName = NULL;
-	UINT32 len;
+
 	ocfmRetCode errCodeObj;
 	ocfmRetCode errCodeObj1;
 	ocfmRetCode errCodeObj2;
@@ -4660,6 +4660,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 		noOfEntries = PadLeft(noOfEntries, '0', 8);
 		strcpy(Buffer1, noOfEntries);
 		strcat(Buffer1, "\n");
+		UINT32 len;
 		len = strlen(Buffer1);
 		delete[] noOfEntries;
 
@@ -4715,10 +4716,11 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 		objNodeCollection = NodeCollection::GetNodeColObjectPointer();
 		nodeObjMN = objNodeCollection->GetMNNode();
 		indexCollObj = nodeObjMN.GetIndexCollection();
+cout<<"Write MN CDC"<<endl;
 
 		//Get all the MN's Default Data in Buffer1
-		Buffer1 = new char[CDC_MN_BUFFER];
-		memset(Buffer1, 0, CDC_MN_BUFFER * sizeof(char));
+		Buffer1 = new char[(CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())];
+		memset(Buffer1, 0, (((CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())) * sizeof(char)));
 		FormatCdc(indexCollObj, Buffer1, fileptr, MN);
 
 		len = strlen(Buffer1);
@@ -4730,7 +4732,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 		}
 		delete[] Buffer1;
 		fclose(fileptr);
-
+cout<<"Completed writing MN CDC. Starting CN CDC part"<<endl;
 		/*************************Write CN's Data in Buffer2***************************************************/
 		WriteCNsData((char*) tempFileName);
 		//INT32 ret;
@@ -5435,11 +5437,11 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 }
 
 //INT32 DecodeUniqueIDRef(char* uniqueidRefID, Node* nodeObj, PDOType pdoType, char* moduleName, char* moduleIndex)
-INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIndex* sidxObj, Index* moduleIndexObj, SubIndex* moduleSidxObj)
+INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubIndex* sidxObj, Index* moduleIndexObj, SubIndex* moduleSidxObj)
 {
 	ocfmException exceptionObj;
 //moduleSidxObj can be null for Var object types
-	if ((NULL == uniquedIdref) || (NULL == nodeObj) || (NULL == sidxObj) || (NULL == moduleIndexObj))
+	if ((NULL == uniqueidRefId) || (NULL == nodeObj) || (NULL == sidxObj) || (NULL == moduleIndexObj))
 	{
 		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
@@ -5454,7 +5456,6 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 	INT32 iOffset;
 	bool bIsNewBitStringVar = false;
 	INT32 iDataSize = 0;
-	PDOType pdoType = indexObj.GetPDOType();
 	//cout<<"DecodeUniqiueIDRef"<<endl;
 	try
 	{
@@ -5463,21 +5464,13 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 			appProcessObj = nodeObj->GetApplicationProcess();
 			if (appProcessObj->ParameterCollection.Count() != 0)
 			{
-				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniquedIdref);
+				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniqueidRefId);
 				if (parameterObj == NULL)
 				{
 					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
 					char customError[200] = { 0 };
-					sprintf(customError, "In node id: %d object %s with unique id: %s  reference not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniquedIdref);
+					sprintf(customError, "In node id: %d object %s with unique id: %s  reference not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniqueidRefId);
 					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
-					throw exceptionObj;
-				}
-				cout<<"Parameter Found"<<" Uid: "<<uniquedIdref<<endl;
-				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(
-						uniquedIdref);
-				if (parameterObj == NULL)
-				{
-					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
 					throw exceptionObj;
 				}
 				if (parameterObj->accessStr == NULL)
@@ -5518,12 +5511,13 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 					{
 						exceptionObj.OCFMException(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 						char customError[200] = { 0 };
-						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniquedIdref, parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
+						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniqueidRefId, parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
 						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
 						throw exceptionObj;
 					}
-					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, pdoType, (char*)moduleIndexObj->GetName(), (char*)moduleIndexObj->GetIndexValue());
-					lastVarIndexGlobal = -1;
+					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj,
+						nodeObj, parameterObj, indexObj.GetPDOType(), (char*)moduleIndexObj->GetName(),
+						(char*) moduleIndexObj->GetIndexValue());					lastVarIndexGlobal = -1;
 					cdtCompletedGlobal = false;
 				}
 				else if ((parameterObj->nameIdDtAttr.dataType != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataType, "") != 0))
@@ -5539,21 +5533,21 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 						strcpy(objProcessImage.direction, GetParameterAccess(parameterObj->accessStr));
 					}
 					cout<<"Access:"<<objProcessImage.direction<<endl;
-					if(pdoType == PDO_TPDO)
+					if(indexObj.GetPDOType() == PDO_TPDO)
 					{
 						objProcessImage.directionType = INPUT;
 					}
-					else if(pdoType == PDO_RPDO)
+					else if(indexObj.GetPDOType() == PDO_RPDO)
 					{
 						objProcessImage.directionType = OUTPUT;
 					}
 					objProcessImage.nodeId = nodeObj->GetNodeId();
 
-					objProcessImage.name = new char[strlen(uniquedIdref) + strlen(moduleIndexObj->GetName()) + 6 + ALLOC_BUFFER];
+					objProcessImage.name = new char[strlen(uniqueidRefId) + strlen(moduleIndexObj->GetName()) + 6 + ALLOC_BUFFER];
 					strcpy(objProcessImage.name, GetPIName(nodeObj->GetNodeId()));
 					strcat(objProcessImage.name, moduleIndexObj->GetName());
 					strcat(objProcessImage.name, ".");
-					strcat(objProcessImage.name, uniquedIdref);
+					strcat(objProcessImage.name, uniqueidRefId);
 					
 					objProcessImage.moduleName = new char[strlen(moduleIndexObj->GetName()) + ALLOC_BUFFER];
 					strcpy(objProcessImage.moduleName, moduleIndexObj->GetName());
@@ -5561,8 +5555,8 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 					objProcessImage.moduleIndex = new char[strlen(moduleIndexObj->GetIndexValue()) + ALLOC_BUFFER];
 					strcpy(objProcessImage.moduleIndex, moduleIndexObj->GetIndexValue());
 
-					//objProcessImage.varDeclName = (char*)malloc(strlen(uniquedIdref) + ALLOC_BUFFER);
-					//strcpy(objProcessImage.varDeclName, uniquedIdref);
+					//objProcessImage.varDeclName = (char*)malloc(strlen(uniqueidRefId) + ALLOC_BUFFER);
+					//strcpy(objProcessImage.varDeclName, uniqueidRefId);
 					cout<<"Name: "<<objProcessImage.name<<endl;
 
 					objProcessImage.dataInfo = *(GetIECDT(parameterObj->nameIdDtAttr.dataType, parameterObj->size));
@@ -5583,13 +5577,13 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 							iDataSize =  objProcessImage.dataInfo.dataSize;
 						//}
 
-						if(pdoType == PDO_RPDO)
+						if(indexObj.GetPDOType() == PDO_RPDO)
 						{
-							iOffset =  ComputeOUTOffset(iDataSize, pdoType);
+							iOffset =  ComputeOUTOffset(iDataSize, indexObj.GetPDOType());
 						}
-						else if(pdoType == PDO_TPDO)
+						else if(indexObj.GetPDOType() == PDO_TPDO)
 						{
-							iOffset =  ComputeINOffset(iDataSize, pdoType);
+							iOffset =  ComputeINOffset(iDataSize, indexObj.GetPDOType());
 						}
 					}
 					
@@ -5598,7 +5592,7 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIn
 
 					 totalBytesMapped = totalBytesMapped + (iDataSize / 8);
 					cout<<"Create MN pdo Var"<<" iOffset:"<<iOffset<<" iDataSize:"<<iDataSize<<endl;
-					CreateMNPDOVar(iOffset, iDataSize, objProcessImage.dataInfo.iecDtVar, pdoType, nodeObj);
+					CreateMNPDOVar(iOffset, iDataSize, objProcessImage.dataInfo.iecDtVar, indexObj.GetPDOType(), nodeObj);
 					if((objProcessImage.dataInfo.dataSize >= 8) && (iStartBitOffset!= 0 ) && (objProcessImage.dataInfo.iecDtVar != BITSTRING))
 					{
 						iStartBitOffset = 0;
@@ -5757,9 +5751,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 					else
 					{
 #if defined DEBUG
-						cout << "index:"
-						<< (char*) indexObjB4Sort->GetIndexValue()
-						<< endl;
+						cout << "Processing PDO index:" << (char*) indexObjB4Sort->GetIndexValue() << endl;
 #endif
 					}
 					nodeMappedTotalBytes = 0;
@@ -5783,6 +5775,11 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								(char *) "00");
 						if (NULL == sidxObjB4Sort)
 						{
+							#if defined DEBUG
+							cout<<"00 sidx doesnot exist:: Not Processing - CN " << nodeObj->GetNodeId() << " Index - " << indexObj.GetIndexValue() << endl;
+							#endif
+
+							//TODO: Throw error
 							continue;
 						}
 						// Actual value checked for Null, Empty, non-zero
@@ -5815,6 +5812,10 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							{
 								// PDO channel is deactivated
 								// Zero is not set here,as it is intialised to Zero previously
+								#if defined DEBUG
+								cout<<"CheckIfValueZero default:: Not Processing - CN " << nodeObj->GetNodeId() << " Index - " << indexObj.GetIndexValue() << endl;
+								#endif
+
 								continue;
 							}
 							else // If the Actual values is Null or Empty, Default value is set for Total SIdx for mapping
@@ -5849,9 +5850,12 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 						if (pdoResult == false)
 						{
 							//Incorrect Target node id for a PDO(may be a cross Tx). So do not process.
+							#if defined DEBUG
+							cout<<"CheckPdoCommParam:: Not Processing - CN " << nodeObj->GetNodeId() << " Index - " << indexObj.GetIndexValue() << endl;
+							#endif
+
 							continue;
 						}
-						//CN's cannot have 18xx & 1Axx other than 1800 & 1A00 mapped for MN
 
 						while (sidxCount <= sidxTotalCount)
 						{
@@ -7031,8 +7035,8 @@ ocfmRetCode GenerateXAP(char* xapFilePath)
 		xmlTextWriterPtr xmlWriter = NULL;
 		xmlDocPtr xmlDocObj = NULL;
 
-		piInCollObj = new ProcessImage[PI_VAR_COUNT];
-		piOutCollObj = new ProcessImage[PI_VAR_COUNT];
+		piInCollObj = new ProcessImage[(nodeCollObj->GetCNNodesCount() * PI_VAR_COUNT)];
+		piOutCollObj = new ProcessImage[(nodeCollObj->GetCNNodesCount() * PI_VAR_COUNT)];
 		GroupInOutPIVariables(piInCollObj, piOutCollObj);
 
 		StartXAPxml(xmlWriter, xmlDocObj);
@@ -7080,8 +7084,8 @@ ocfmRetCode GenerateNET(char* netFilePath)
 			throw exceptionObj;
 		}
 
-		piInCollObj = new ProcessImage[PI_VAR_COUNT];
-		piOutCollObj = new ProcessImage[PI_VAR_COUNT];
+		piInCollObj = new ProcessImage[(nodeCollObj->GetCNNodesCount() * PI_VAR_COUNT)];
+		piOutCollObj = new ProcessImage[(nodeCollObj->GetCNNodesCount() * PI_VAR_COUNT)];
 		GroupInOutPIVariables(piInCollObj, piOutCollObj);
 		/*Generate Dot NET Header file */
 		GenerateNETHeaderFile(netFilePath, piInCollObj, piOutCollObj,
