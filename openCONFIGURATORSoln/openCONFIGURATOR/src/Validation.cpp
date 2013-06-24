@@ -615,3 +615,172 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	delete[] varIdx;
 	return true;
 }
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj)
+{
+
+	bool retVal = false;
+	if (strcmp(indexObj->GetPDOMapping(), "NO") == 0)
+	{
+		retVal = false;
+	}
+	else if ((strcmp(indexObj->GetPDOMapping(), "OPTIONAL") == 0) || (strcmp(indexObj->GetPDOMapping(), "DEFAULT") == 0))
+	{
+		retVal = true;
+	}
+	else
+	{
+		switch(pdoTypeVal)
+		{
+			case PDO_TPDO:
+					if( (strcmp(indexObj->GetPDOMapping(), "TPDO") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						//default pdo mapping ?
+					}
+					break;
+			case PDO_RPDO:
+					if( (strcmp(indexObj->GetPDOMapping(), "RPDO") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						//default pdo mapping ?
+					}
+					break;
+			default:
+					retVal = false;
+		}
+	}
+#if defined DEBUG
+	cout<<indexObj->GetPDOMapping()<<"PDO Mapping in Index:"<<indexObj->GetIndexValue()<<endl;
+#endif
+	return retVal;
+}
+//TODO: Remove indexObj - unused
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidxObj)
+{
+	bool retVal = false;
+	if (strcmp(sidxObj->GetPDOMapping(), "NO") == 0)
+	{
+		retVal = false;
+	}
+	else if ((strcmp(sidxObj->GetPDOMapping(), "OPTIONAL") == 0) || (strcmp(sidxObj->GetPDOMapping(), "DEFAULT") == 0))
+	{
+		retVal = true;
+	}
+	else
+	{
+		switch(pdoTypeVal)
+		{
+			case PDO_TPDO:
+					if( (strcmp(sidxObj->GetPDOMapping(), "TPDO") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						//default pdo mapping ?
+					}
+					break;
+			case PDO_RPDO:
+					if( (strcmp(sidxObj->GetPDOMapping(), "RPDO") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						//default pdo mapping ?
+					}
+					break;
+			default:
+					retVal = false;
+		}
+	}
+#if defined DEBUG
+	cout<<sidxObj->GetPDOMapping()<<" PDO Mapping in "<<indexObj->GetIndexValue()<<"/"<<sidxObj->GetIndexValue()<<endl;
+#endif
+	return retVal;
+}
+
+bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* accessType)
+{
+	bool retVal = false;
+	accessType = StringToUpper(accessType);
+	pdoMappingVal = StringToUpper(pdoMappingVal);
+	switch(pdoTypeVal)
+	{
+	case PDO_RPDO:
+		#if defined DEBUG
+			cout<<"Checking for AccesType: "<<accessType<<" with PDOmapping: "<<pdoMappingVal<<" in an RPDO";
+		#endif
+			if ((strcmp(pdoMappingVal, "DEFAULT") == 0) || (strcmp(pdoMappingVal, "OPTIONAL") == 0))
+			{
+				if((strcmp(accessType, "WO") == 0) || (strcmp(accessType, "WRITE") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEOUTPUT") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					retVal = false;
+				}
+			}
+			else if ((strcmp(pdoMappingVal, "RPDO") == 0))
+			{
+				if((strcmp(accessType, "WO") == 0) || (strcmp(accessType, "WRITE") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEOUTPUT") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					retVal = false;
+				}
+			}
+			else
+			{
+				retVal = false;
+			}
+			break;
+	case PDO_TPDO:
+		#if defined DEBUG
+			cout<<"Checking for AccesType: "<<accessType<<" with PDOmapping: "<<pdoMappingVal<<" in an TPDO";
+		#endif
+			if ((strcmp(pdoMappingVal, "DEFAULT") == 0) || (strcmp(pdoMappingVal, "OPTIONAL") == 0))
+			{
+				if((strcmp(accessType, "RO") == 0) || (strcmp(accessType, "READ") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEINPUT") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					retVal = false;
+				}
+			}
+			else if ((strcmp(pdoMappingVal, "TPDO") == 0))
+			{
+				if((strcmp(accessType, "RO") == 0) || (strcmp(accessType, "READ") == 0) || (strcmp(accessType, "RW") == 0) || (strcmp(accessType, "READWRITE") == 0) || (strcmp(accessType, "READWRITEINPUT") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					retVal = false;
+				}
+			}
+			else
+			{
+				retVal = false;
+			}
+			break;
+	default:
+		retVal = false;
+	}
+
+	#if defined DEBUG
+		cout<<" : Returning: "<<retVal<<endl;
+	#endif
+	return retVal;
+}

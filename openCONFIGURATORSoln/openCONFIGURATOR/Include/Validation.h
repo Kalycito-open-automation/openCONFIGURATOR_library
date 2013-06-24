@@ -121,4 +121,33 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
 bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj);
 
+/**
+ \brief		Checks if the SubObject has the property to be mapped as a PDO or not
+
+ \param[in]		pdoTypeVal		Enum variable of PDOType to hold the PDO type to which the object is mapped
+ \param[in]		indexObj		Class pointer of Index to get its properties
+ \param[in]		sidxObj			Class pointer of SubIndex to get its properties
+ \return		bool			Returns true if the pdoMapping property of the Object is valid
+ */
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidxObj);
+
+/**
+ \brief		Checks if the Object has the property to be mapped as a PDO or not
+
+ \param[in]		pdoTypeVal	Enum variable of PDOType to hold the PDO type to which the object is mapped
+ \param[in]		indexObj	Class pointer of Index to get its properties
+ \return		bool		Returns true if the pdoMapping property of the subObject is valid
+ */
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj);
+
+/**
+ \brief		Validates the accesstype for the given pdomapping for the mapped pdoType
+
+ \param[in]		pdoTypeVal		Enum variable of PDOType to hold the PDO type to which the object is mapped
+ \param[in]		pdoMappingVal	Character pointer to the value of pdoMapping property of the object
+ \param[in]		accessType		Character pointer to the value of accessType property of the object
+ \return		bool			Returns true if the accessType is valid
+ */
+bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* accessType);
+
 #endif // Validation_h

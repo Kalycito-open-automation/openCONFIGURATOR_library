@@ -5434,17 +5434,16 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 	return totalBytesMapped;
 }
 
-INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
-		char* moduleName, char* moduleIndex)
+//INT32 DecodeUniqueIDRef(char* uniqueidRefID, Node* nodeObj, PDOType pdoType, char* moduleName, char* moduleIndex)
+INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, Index indexObj, SubIndex* sidxObj, Index* moduleIndexObj, SubIndex* moduleSidxObj)
 {
 	ocfmException exceptionObj;
-
-	if ((NULL == uniquedIdref) || (NULL == nodeObj) || (NULL == moduleName)
-			|| (NULL == moduleIndex))
+//moduleSidxObj can be null for Var object types
+	if ((NULL == uniquedIdref) || (NULL == nodeObj) || (NULL == sidxObj) || (NULL == moduleIndexObj))
 	{
 		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-		throw exceptionObj;
+		return 0;
 	}
 
 	Parameter* parameterObj = NULL;
@@ -5455,6 +5454,7 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 	INT32 iOffset;
 	bool bIsNewBitStringVar = false;
 	INT32 iDataSize = 0;
+	PDOType pdoType = indexObj.GetPDOType();
 	//cout<<"DecodeUniqiueIDRef"<<endl;
 	try
 	{
@@ -5468,11 +5468,46 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 				{
 					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
 					char customError[200] = { 0 };
-					sprintf(customError, "In node id: %d object %s with unique id: %s  reference not found", nodeObj->GetNodeId(), moduleName, uniquedIdref);
+					sprintf(customError, "In node id: %d object %s with unique id: %s  reference not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniquedIdref);
 					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
 					throw exceptionObj;
 				}
 				cout<<"Parameter Found"<<" Uid: "<<uniquedIdref<<endl;
+				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(
+						uniquedIdref);
+				if (parameterObj == NULL)
+				{
+					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
+					throw exceptionObj;
+				}
+				if (parameterObj->accessStr == NULL)
+				{
+					exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
+					//TODO: Clear message as AccessType is not present
+					throw exceptionObj;
+				}
+				if(moduleSidxObj != NULL)
+				{
+					if(!IsValidAccessTypeForPdo(indexObj.GetPDOType(), (char*) moduleSidxObj->GetPDOMapping(), parameterObj->accessStr))
+					{
+						char customError[200] = { 0 };
+						sprintf(customError, "In CN %s, the SubObject '%s / %s' with invalid access type mapped as a PDO object in %s / %s", nodeObj->GetNodeName(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetIndexValue(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+						exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+						throw exceptionObj;
+					}
+				}
+				else
+				{
+					if(!IsValidAccessTypeForPdo(indexObj.GetPDOType(), (char*) moduleIndexObj->GetPDOMapping(), parameterObj->accessStr))
+					{
+						char customError[200] = { 0 };
+						sprintf(customError, "In CN %s, the Object '%s' with invalid access type mapped as a PDO object in %s / %s", nodeObj->GetNodeName(), moduleIndexObj->GetIndexValue(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+						exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+						throw exceptionObj;
+					}
+				}
 				// Check if DataTypeUniqueIDref exists
 				//if (parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL)
 				if((parameterObj->nameIdDtAttr.dataTypeUniqueIDRef != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataTypeUniqueIDRef, "") != 0))
@@ -5483,17 +5518,17 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 					{
 						exceptionObj.OCFMException(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 						char customError[200] = { 0 };
-						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleName, uniquedIdref, parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
+						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniquedIdref, parameterObj->nameIdDtAttr.dataTypeUniqueIDRef);
 						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
 						throw exceptionObj;
 					}
-					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, pdoType, moduleName, moduleIndex);
+					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, pdoType, (char*)moduleIndexObj->GetName(), (char*)moduleIndexObj->GetIndexValue());
 					lastVarIndexGlobal = -1;
 					cdtCompletedGlobal = false;
 				}
 				else if ((parameterObj->nameIdDtAttr.dataType != NULL) && (strcmp(parameterObj->nameIdDtAttr.dataType, "") != 0))
 				{
-					cout<<"Dt: "<<parameterObj->nameIdDtAttr.dataType<<" ModName:"<<moduleName<<" moduleIndex:"<<moduleIndex<<endl;
+					cout<<"Dt: "<<parameterObj->nameIdDtAttr.dataType<<" ModName:"<<moduleIndexObj->GetName()<<" moduleIndex:"<<moduleIndexObj->GetIndexValue()<<endl;
 					//pobjAppProc, nodeObj, parameterObj, pdoType, moduleName, moduleIndex
 					ProcessImage objProcessImage;
 					objProcessImage.Initialize();
@@ -5514,17 +5549,17 @@ INT32 DecodeUniqueIDRef(char* uniquedIdref, Node* nodeObj, PDOType pdoType,
 					}
 					objProcessImage.nodeId = nodeObj->GetNodeId();
 
-					objProcessImage.name = new char[strlen(uniquedIdref) + strlen(moduleName) + 6 + ALLOC_BUFFER];
+					objProcessImage.name = new char[strlen(uniquedIdref) + strlen(moduleIndexObj->GetName()) + 6 + ALLOC_BUFFER];
 					strcpy(objProcessImage.name, GetPIName(nodeObj->GetNodeId()));
-					strcat(objProcessImage.name, moduleName);
+					strcat(objProcessImage.name, moduleIndexObj->GetName());
 					strcat(objProcessImage.name, ".");
 					strcat(objProcessImage.name, uniquedIdref);
 					
-					objProcessImage.moduleName = new char[strlen(moduleName) + ALLOC_BUFFER];
-					strcpy(objProcessImage.moduleName, moduleName);
+					objProcessImage.moduleName = new char[strlen(moduleIndexObj->GetName()) + ALLOC_BUFFER];
+					strcpy(objProcessImage.moduleName, moduleIndexObj->GetName());
 					
-					objProcessImage.moduleIndex = new char[strlen(moduleIndex) + ALLOC_BUFFER];
-					strcpy(objProcessImage.moduleIndex, moduleIndex);
+					objProcessImage.moduleIndex = new char[strlen(moduleIndexObj->GetIndexValue()) + ALLOC_BUFFER];
+					strcpy(objProcessImage.moduleIndex, moduleIndexObj->GetIndexValue());
 
 					//objProcessImage.varDeclName = (char*)malloc(strlen(uniquedIdref) + ALLOC_BUFFER);
 					//strcpy(objProcessImage.varDeclName, uniquedIdref);
@@ -5881,7 +5916,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								varSubIndex[3] = '\0';
 
 #if defined DEBUG	
-								cout << "varModuleIndex:" << moduleIndex << "varSubIndex:" << varSubIndex << endl;
+								cout << "PImoduleIndex:" << moduleIndex << " PImoduleSubIndex:" << varSubIndex << endl;
 #endif
 								INT32 mappedOffset = 0;
 								mappedOffset = HexToInt(SubString((char*) actualVal, 6, 4));
@@ -5904,7 +5939,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								mappedLength = HexToInt(
 										SubString((char*) actualVal, 2, 4));
 #if defined DEBUG
-								cout<<" IntMapLength:"<<mappedLength<<endl;
+								cout<<" PIMappedLength:"<<mappedLength<<endl;
 #endif
 
 								Index *moduleIndexObj = NULL;
@@ -5916,6 +5951,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								DataType dtObj;
 								dtObj.dataTypeName = NULL;
 								bool objMapped = false;
+								PDOType pdoType = indexObj.GetPDOType();
 
 								moduleIndexObj =
 										indexCollObj->GetIndexbyIndexValue(
@@ -5949,6 +5985,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										&& (strcmp(varSubIndex, "00") == 0))
 								{
 									objMapped = true;
+
+									//Check if the object has correct PDOmapping attribute
+									if(!CheckForValidPDOMapping(pdoType, moduleIndexObj))
+									{
+										char customError[200] = { 0 };
+										sprintf(customError, "%s has invalid object mapped in %s / %s. \n The object %s  has pdo mapping set to %s.", nodeObj->GetNodeName(), indexObj.GetIndexValue(), sidxObj->GetIndexValue(), moduleIndexObj->GetIndexValue(), moduleIndexObj->GetPDOMapping());
+										exceptionObj.OCFMException(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+										throw exceptionObj;
+									}
+
 									if (moduleIndexObj->GetUniqueIDRef() != NULL)
 									{
 										uniqueidRefID =
@@ -5962,17 +6009,23 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									{
 										if (moduleIndexObj->GetAccessType() != NULL)
 										{
-											accessStr =
-													new char[strlen(
-															moduleIndexObj->GetAccessType())
-															+ ALLOC_BUFFER];
-											strcpy(accessStr,
-													moduleIndexObj->GetAccessType());
-
+											accessStr = new char[strlen(moduleIndexObj->GetAccessType()) + ALLOC_BUFFER];
+											strcpy(accessStr, moduleIndexObj->GetAccessType());
+											if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleIndexObj->GetPDOMapping(), accessStr))
+											{
+												char customError[200] = { 0 };
+												sprintf(customError, "In CN %s, the Object '%s' with invalid access type mapped as a PDO object in %s / %s", nodeObj->GetNodeName(), moduleIndexObj->GetIndexValue(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+												exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+												CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+												throw exceptionObj;
+											}
+										}
+										else
+										{
+											//Error: Invalid Access Type for the object %s in Node name:%s id:%d
 										}
 										dtObj = moduleIndexObj->GetDataType();
 									}
-
 								}
 								else
 								{
@@ -6000,6 +6053,16 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									}
 									else
 									{
+										//Check if the subobject has correct PDOmapping attribute
+										if(!CheckForValidPDOMapping(pdoType, moduleIndexObj, moduleSidxObj))
+										{
+											char customError[200] = { 0 };
+											sprintf(customError, "%s has invalid object mapped in %s / %s. \n The object %s / %s has pdo mapping set to %s.", nodeObj->GetNodeName(), indexObj.GetIndexValue(), sidxObj->GetIndexValue(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetIndexValue(), moduleSidxObj->GetPDOMapping());
+											exceptionObj.OCFMException(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+											CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+											throw exceptionObj;
+										}
+
 										if (moduleSidxObj->GetUniqueIDRef() != NULL)
 										{
 											uniqueidRefID =
@@ -6013,144 +6076,45 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										{
 											if (moduleSidxObj->GetName() != NULL)
 											{
-												sidxName =
-														new char[strlen(
-																moduleSidxObj->GetName())
-																+ ALLOC_BUFFER];
-												strcpy(sidxName,
-														moduleSidxObj->GetName());
-
-												if (moduleSidxObj->GetAccessType() != NULL)
-												{
-													accessStr =
-															new char[strlen(
-																	moduleSidxObj->GetAccessType())
-																	+ ALLOC_BUFFER];
-													strcpy(accessStr,
-															moduleSidxObj->GetAccessType());
-												}
-												dtObj =
-														moduleSidxObj->GetDataType();
+												sidxName = new char[strlen(moduleSidxObj->GetName()) + ALLOC_BUFFER];
+												strcpy(sidxName, moduleSidxObj->GetName());
 											}
+											else
+											{
+												//Error: Name not configured for the SubObject %s/%s in Node name:%s id:%d
+											}
+
+											if (moduleSidxObj->GetAccessType() != NULL)
+											{
+												accessStr = new char[strlen(moduleSidxObj->GetAccessType()) + ALLOC_BUFFER];
+												strcpy(accessStr, moduleSidxObj->GetAccessType());
+
+												if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleSidxObj->GetPDOMapping(), accessStr))
+												{
+													char customError[200] = { 0 };
+													sprintf(customError, "In CN %s, the SubObject '%s / %s' with invalid access type mapped as a PDO object in %s / %s", nodeObj->GetNodeName(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetIndexValue(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+													exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+													CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+													throw exceptionObj;
+												}
+											}
+											else
+											{
+												//Error: Invalid Access Type for the SubObject %s/%s in Node name:%s id:%d
+											}
+											dtObj = moduleSidxObj->GetDataType();
 										}
 									}
-
 								}
 
-								PDOType pdoType = indexObj.GetPDOType();
-								if ((NULL == moduleSidxObj->GetPDOMapping())
-										|| (0
-												== strcmp(
-														moduleSidxObj->GetPDOMapping(),
-														"")))
-								{
-									exceptionObj.OCFMException(
-											OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-									char acCustomError[200] =
-									{ 0 };
-									sprintf(acCustomError,
-											"Node: %d has invalid object mapped in %s / %s. \n The object %s / %s has no pdo mapping set",
-											nodeObj->GetNodeId(),
-											indexObj.GetIndexValue(),
-											sidxObj->GetIndexValue(),
-											moduleIndex, varSubIndex);
-									CopyCustomErrorString(
-											&(exceptionObj._ocfmRetCode),
-											acCustomError);
-									throw exceptionObj;
-								}
-								char* pdoMappingType = new char[strlen(
-										moduleSidxObj->GetPDOMapping())
-										+ STR_ALLOC_BUFFER];
-								pdoMappingType = strcpy(pdoMappingType,
-										moduleSidxObj->GetPDOMapping());
-
-#if defined DEBUG
-								cout<<"Mapping:"<<pdoMappingType<<" pdoType:"<<pdoType<<endl;
-#endif
-
-								if ((0
-										== strcmp(
-												ConvertToUpper(
-														(char*) pdoMappingType),
-												"TPDO"))
-										&& (pdoType == PDO_TPDO))
-								{
-								}
-								else if ((0
-										== strcmp(
-												ConvertToUpper(
-														(char*) pdoMappingType),
-												"RPDO"))
-										&& (pdoType == PDO_RPDO))
-								{
-								}
-								else
-								{
-									char* tempStr = new char[20
-											+ STR_ALLOC_BUFFER];
-									if (0
-											== strcmp(
-													ConvertToUpper(
-															(char*) pdoMappingType),
-													"TPDO"))
-									{
-										tempStr = strcpy(tempStr, "RPDO");
-									}
-									else if (0
-											== strcmp(
-													ConvertToUpper(
-															(char*) pdoMappingType),
-													"RPDO"))
-									{
-										tempStr = strcpy(tempStr, "TPDO");
-									}
-									else
-									{
-										if (pdoType == PDO_TPDO)
-										{
-											tempStr = strcpy(tempStr, "TPDO");
-										}
-										else
-										{
-											tempStr = strcpy(tempStr, "RPDO");
-										}
-										//nothing to do
-									}
-
-									exceptionObj.OCFMException(
-											OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-									char acCustomError[200] =
-									{ 0 };
-									//Sample: In Node: 123  invalid object mapped in 1A00 / 01. The object 6000 / 00 has pdo mapping set to OPTIONAL. use an object which has pdo mapping TPDO.
-									sprintf(acCustomError,
-											"Node: %d has invalid object mapped in %s / %s. \n The object %s / %s has pdo mapping set to %s. Use an object which has pdo mapping %s.",
-											nodeObj->GetNodeId(),
-											indexObj.GetIndexValue(),
-											sidxObj->GetIndexValue(),
-											moduleIndex, varSubIndex,
-											pdoMappingType, tempStr);
-
-									CopyCustomErrorString(
-											&(exceptionObj._ocfmRetCode),
-											acCustomError);
-									delete[] tempStr;
-									delete[] pdoMappingType;
-									throw exceptionObj;
-								}
-								delete[] pdoMappingType;
 								if (uniqueidRefID != NULL)
 								{
-									INT32 totalBytesMapped = 0;
-									totalBytesMapped =
-											DecodeUniqueIDRef(uniqueidRefID,
-													nodeObj, pdoType,
-													(char*) moduleIndexObj->GetName(),
-													(char*) moduleIndexObj->GetIndexValue());
+									INT32 actualMappedBytes = 0;
+									actualMappedBytes = DecodeUniqueIDRef(uniqueidRefID, nodeObj, indexObj, sidxObj, moduleIndexObj, moduleSidxObj);
 #if defined DEBUG
-									cout<<"iMappedLength:"<<mappedLength<<" totalBytesMapped:"<<totalBytesMapped<<endl;
+									cout<<"iMappedLength:"<<mappedLength<<" actualMappedBytes:"<<actualMappedBytes<<endl;
 #endif
-									if (mappedLength != (totalBytesMapped * 8))
+									if (mappedLength != (actualMappedBytes * 8))
 									{
 										exceptionObj.OCFMException(
 												OCFM_ERR_INVALID_SIZE_MAPPED);
@@ -6186,6 +6150,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 												OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
 										throw exceptionObj;
 									}
+
 									piObj.nodeId = nodeObj->GetNodeId();
 									/* Name of the Process Image variable*/
 									piObj.name = (char*) malloc(
@@ -7652,7 +7617,7 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 
 }
 
-//TODO: iMnNodeId not used. to be removed in header also
+//TODO: nodeId not used. to be removed in header also
 ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount)
 {
 
@@ -9332,7 +9297,7 @@ void CheckIfOffsetUsed(INT32& iOffset, PDOType varPdoType)
 
 }
 
-//TODO: No need of varPdotype for size calculation. to be removed in header
+//TODO: No need of pdoType for size calculation. to be removed in header
 INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType)
 {
 	INT32 retOffset = 0;
@@ -9500,7 +9465,7 @@ INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType)
 	return retOffset;
 }
 
-//TODO: No need of varPdotype for size calculation. to be removed in header
+//TODO: No need of pdoType for size calculation. to be removed in header
 INT32 ComputeINOffset(INT32 dataSize, PDOType pdoType)
 {
 	INT32 retOffset = 0;
@@ -10953,7 +10918,7 @@ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 	return errCodeObj;
 }
 
-//TODO: varNodetype is not used. To be removed.
+//TODO: nodeType is not used. To be removed.
 void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)
 {
 #if defined DEBUG
@@ -12765,7 +12730,7 @@ void RecalculateCNPresTimeout(char* sidxId)
 
 }
 
-//TODO: CNsCount is not used to be removed.
+//TODO: cnCount is not used to be removed.
 void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 		bool allowMNSubindex)
 {

@@ -88,7 +88,7 @@ BaseIndex::BaseIndex(void)
 	dataTypeValue = NULL;
 	nodeId = 0;
 	//objectType = 0; //TODO: Review initialisation
-	//pdoMapping = 0;
+	pdoMapping = NO;
 	parameterIndex = -1;
 	includeInCDC = FALSE;
 }

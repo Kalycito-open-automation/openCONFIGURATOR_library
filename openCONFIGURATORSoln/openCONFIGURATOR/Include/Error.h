@@ -123,7 +123,8 @@ typedef enum
 	OCFM_ERR_INVALID_PARAMETER, /*54*/
 	OCFM_ERR_INVALID_SIZE_MAPPED, /*55*/
 	OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO, /*56*/
-	OCFM_ERR_INVALID_PDO_OFFSET /*57*/
+	OCFM_ERR_INVALID_PDO_OFFSET, /*57*/
+	OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO /*58*/
 } ConfiguratorErrors;
 
 /************************************************************************************************/

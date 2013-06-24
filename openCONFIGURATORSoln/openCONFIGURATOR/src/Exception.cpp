@@ -271,7 +271,11 @@ void ocfmException::OCFMException(ConfiguratorErrors errCode)
 		break;
 	case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
 		strcpy(_ocfmRetCode.errorString,
-				"Invalid mapping type for the PDO. Check the pdo mapping for the mapped PI object");
+				"Invalid mapping type for the PDO. Check the pdo mapping for the mapped object");
+		break;
+	case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
+		strcpy(_ocfmRetCode.errorString,
+				"Invalid access type for the PDO. Check the access type for the mapped object");
 		break;
 	case OCFM_ERR_INVALID_PDO_OFFSET:
 		strcpy(_ocfmRetCode.errorString,
