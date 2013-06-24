@@ -122,7 +122,8 @@ typedef enum
 	OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND, /*53*/
 	OCFM_ERR_INVALID_PARAMETER, /*54*/
 	OCFM_ERR_INVALID_SIZE_MAPPED, /*55*/
-	OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO /*56*/
+	OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO, /*56*/
+	OCFM_ERR_INVALID_PDO_OFFSET /*57*/
 } ConfiguratorErrors;
 
 /************************************************************************************************/

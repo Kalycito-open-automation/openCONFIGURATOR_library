@@ -273,6 +273,10 @@ void ocfmException::OCFMException(ConfiguratorErrors errCode)
 		strcpy(_ocfmRetCode.errorString,
 				"Invalid mapping type for the PDO. Check the pdo mapping for the mapped PI object");
 		break;
+	case OCFM_ERR_INVALID_PDO_OFFSET:
+		strcpy(_ocfmRetCode.errorString,
+				"Invalid offset in the PDO object. Check the offset value in the mapping");
+		break;
 	default:
 		strcpy(_ocfmRetCode.errorString, "Unhandled Error");
 		break;

@@ -5593,7 +5593,6 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 	//CNode *pobjMNNode = NULL;
 	INT32 totalBytesMapped = 0;
 	INT32 totalChainedBytesMapped = 0;
-	INT32 nodeMappedTotalBytes = 0;
 	INT32 rpdoMappedNodeID = 0;
 
 	IndexCollection *pdoIndexCollObj = NULL;
@@ -5688,6 +5687,8 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 				nodeObj->SetPReqActPayloadValue(0);
 				nodeObj->SetPResActPayloadValue(0);
 
+				INT32 nodeMappedTotalBytes = 0;
+
 				for (INT32 indexLC = 0;
 						indexLC < pdoIndexCollObj->GetNumberofIndexes();
 						indexLC++)
@@ -5714,10 +5715,12 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 					if (indexObjB4Sort->GetNumberofSubIndexes() > 0)
 					{
-
+/*
+	Commented the function call to sort the subindex objects with respect to offset. It is redundant while fetching subindex by order (00-FE) and 00th sidx gives the number of valid subindex
+*/
 						/* Sort the pdo collection */
-						indexObj = GetPDOIndexByOffset(indexObjB4Sort);
-
+						//indexObj = GetPDOIndexByOffset(indexObjB4Sort);
+						indexObj = *indexObjB4Sort;
 						INT32 sidxCount = 1;
 
 						// Initialised to Zero and the value will be taken from the Actual value or the default value in priority
@@ -5796,12 +5799,31 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							//Incorrect Target node id for a PDO(may be a cross Tx). So do not process.
 							continue;
 						}
+						//CN's cannot have 18xx & 1Axx other than 1800 & 1A00 mapped for MN
 
 						while (sidxCount <= sidxTotalCount)
 						{
 							SubIndex *sidxObj = NULL;
-							sidxObj = indexObj.GetSubIndex(sidxCount);
-#if defined DEBUG	
+							char *sidxId = new char[SUBINDEX_LEN];
+							sidxId = IntToAscii(sidxCount, sidxId, 16);
+							sidxId = PadLeft(sidxId, '0', 2);
+#if defined DEBUG
+							cout << " Position: "<< sidxCount <<" SidxId: "<<sidxId<<endl;
+#endif
+							//sidxObj = indexObj.GetSubIndex(sidxCount);
+							sidxObj = indexObj.GetSubIndexbyIndexValue(sidxId);
+
+							if (sidxObj == NULL)
+							{
+								exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
+								char customError[200] = { 0 };
+								sprintf(customError, "SubObjects should be continuous start from 00 to FE. SubIndex with id %s is missing under the object %s in node %s", sidxId, indexObj.GetIndexValue(), nodeObj->GetNodeName());
+								CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+								delete [] sidxId;
+								throw exceptionObj;
+							}
+							delete [] sidxId;
+#if defined DEBUG
 							cout << "\n pobjSubIdx->getIndexValue():"
 							<< sidxObj->GetIndexValue() << endl;
 							cout << "\n pobjSubIdx->getName():"
@@ -5844,6 +5866,21 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 #if defined DEBUG	
 								cout << "varModuleIndex:" << moduleIndex << "varSubIndex:" << varSubIndex << endl;
 #endif
+								INT32 mappedOffset = 0;
+								mappedOffset = HexToInt(SubString((char*) actualVal, 6, 4));
+
+#if defined DEBUG
+								cout << "Validating offset(decimal): "<<"mappedOffset"<<mappedOffset<<" nodeMappedTotalBytes"<<nodeMappedTotalBytes<<" Sidx: "<< sidxObj->GetIndexValue()<<endl;
+#endif
+
+								if (mappedOffset != nodeMappedTotalBytes)
+								{
+									exceptionObj.OCFMException(OCFM_ERR_INVALID_PDO_OFFSET);
+									char customError[200] = { 0 };
+									sprintf(customError, "Incorrect offset configured for the PDO\nIn the node %s, the offset value in the Object: %s/%s is invalid", nodeObj->GetNodeName(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
+									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									throw exceptionObj;
+								}
 
 								//Mapped length in bits
 								INT32 mappedLength = 0;
@@ -6308,62 +6345,38 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 												|| (BROADCAST_NODEID
 														== rpdoMappedNodeID)))
 								{
-									char* modOffset = new char[strlen(actualVal)
-											+ 1];
+									char* modOffset = new char[strlen(actualVal) + 1];
 									strcpy(modOffset, actualVal);
-									INT32 len = 0;
-									char* tempLenStr = NULL;
-									//extract the length mapped 1AXX
-									tempLenStr = SubString((char *) actualVal,
-											2, 4);
-									len = HexToInt(tempLenStr);
-
 									char* offsetStr = new char[5];
 									memset(offsetStr, 0, 5 * sizeof(char));
 									if (CHAINED == stnType)
 									{
-										offsetStr = IntToAscii(
-												totalChainedBytesMapped,
-												&(offsetStr[0]), 16);
+										offsetStr = IntToAscii(totalChainedBytesMapped, &(offsetStr[0]), 16);
 									}
 									else
 									{
-										offsetStr = IntToAscii(
-												nodeMappedTotalBytes,
-												&(offsetStr[0]), 16);
+										offsetStr = IntToAscii(nodeMappedTotalBytes, &(offsetStr[0]), 16);
 									}
-									offsetStr = PadLeft(&(offsetStr[0]), '0',
-											4);
-									INT32 offsetCopyCount;
-									for (offsetCopyCount = 0;
-											offsetCopyCount <= 3;
-											offsetCopyCount++)
+									offsetStr = PadLeft(&(offsetStr[0]), '0', 4);
+
+									for (INT32 offsetCopyCount = 0; offsetCopyCount <= 3; offsetCopyCount++)
 									{
-										modOffset[offsetCopyCount + 2 + 4] =
-												offsetStr[offsetCopyCount];
+										modOffset[offsetCopyCount + 2 + 4] = offsetStr[offsetCopyCount];
 									}
-									strcpy(modOffset,
-											ConvertToUpper(modOffset));
 
 									indexCollObj->GetIndexbyIndexValue(
 											(char *) indexObjB4Sort->GetIndexValue())->GetSubIndexbyIndexValue(
 											(char *) sidxObj->GetIndexValue())->SetActualValue(
 											modOffset);
-
-									nodeMappedTotalBytes = nodeMappedTotalBytes
-											+ len;
-
 									if (CHAINED == stnType)
 									{
-										totalChainedBytesMapped =
-												totalChainedBytesMapped + len;
-
+										totalChainedBytesMapped = totalChainedBytesMapped + mappedLength;
 									}
 
 									delete[] modOffset;
-									delete[] tempLenStr;
 									delete[] offsetStr;
 								}
+								nodeMappedTotalBytes = nodeMappedTotalBytes + mappedLength;
 							}
 							else
 							{
@@ -6443,210 +6456,221 @@ void CalculatePayload()
 			pdoIdxCollObj = nodeObj->getPDOIndexCollection(&rpdoCount,
 					&tpdoCount);
 
-			if (pdoIdxCollObj != NULL)
+			if (pdoIdxCollObj == NULL)
 			{
-				IndexCollection* indexCollObj = NULL;
-				indexCollObj = nodeObj->GetIndexCollection();
+				continue;
+			}
 
-				nodeObj->SetPReqActPayloadValue(0);
-				nodeObj->SetPResActPayloadValue(0);
+			IndexCollection* indexCollObj = NULL;
+			indexCollObj = nodeObj->GetIndexCollection();
 
-				for (INT32 idxLC = 0;
-						idxLC < pdoIdxCollObj->GetNumberofIndexes(); idxLC++)
+			nodeObj->SetPReqActPayloadValue(0);
+			nodeObj->SetPResActPayloadValue(0);
+
+			for (INT32 idxLC = 0;
+					idxLC < pdoIdxCollObj->GetNumberofIndexes(); idxLC++)
+			{
+				Index* indexObjB4Sort;
+				Index indexObj;
+				indexObjB4Sort = pdoIdxCollObj->GetIndex(idxLC);
+				if (!(CheckIfMappingPDO(
+						(char*) indexObjB4Sort->GetIndexValue())))
 				{
-					Index* indexObjB4Sort;
-					Index indexObj;
-					indexObjB4Sort = pdoIdxCollObj->GetIndex(idxLC);
-					if (!(CheckIfMappingPDO(
-							(char*) indexObjB4Sort->GetIndexValue())))
+					continue;
+				}
+				//	iNodeMappedTotalBytes = 0;
+
+				if (indexObjB4Sort->GetNumberofSubIndexes() > 0)
+				{
+/*
+Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also the offset from 0000 for the subindex "0x01"
+*/
+					/* Sort the pdo collection */
+					//indexObj = GetPDOIndexByOffset(indexObjB4Sort);
+					indexObj = *indexObjB4Sort;
+					INT32 sidxCount = 1; /* SubIndex processing should not include 00th subindex*/
+					INT32 sidxTot = 0;
+
+					SubIndex *sidxObj;
+					sidxObj = indexObjB4Sort->GetSubIndexbyIndexValue(
+							(char *) "00");
+					if (NULL == sidxObj)
 					{
 						continue;
 					}
-					//	iNodeMappedTotalBytes = 0;
 
-					if (indexObjB4Sort->GetNumberofSubIndexes() > 0)
+					if ((sidxObj->GetActualValue() != NULL) // Actual value checked for Null
+							&& (0
+									!= strcmp(sidxObj->GetActualValue(),
+											"")) // Actual value checked for Empty
+							&& !(CheckIfValueZero(
+									(char*) sidxObj->GetActualValue()))) // Actual value checked for non-zero
 					{
-						/* Sort the pdo collection */
-						indexObj = GetPDOIndexByOffset(indexObjB4Sort);
-						INT32 sidxCount = 1;
-						INT32 sidxTot = 0;
-
-						SubIndex *sidxObj;
-						sidxObj = indexObjB4Sort->GetSubIndexbyIndexValue(
-								(char *) "00");
-						if (NULL != sidxObj)
-						{
-							if ((sidxObj->GetActualValue() != NULL) // Actual value checked for Null
-									&& (0
-											!= strcmp(sidxObj->GetActualValue(),
-													"")) // Actual value checked for Empty
-									&& !(CheckIfValueZero(
-											(char*) sidxObj->GetActualValue()))) // Actual value checked for non-zero
-							{
-								//value is not zero the channel is activated
-								sidxTot = GetDecimalValue(
-										(char*) sidxObj->GetActualValue());
+						//value is not zero the channel is activated
+						sidxTot = GetDecimalValue(
+								(char*) sidxObj->GetActualValue());
 #if defined DEBUG	
-								cout << "iSiTotal:" << sidxTot << endl;
+						cout << "iSiTotal:" << sidxTot << endl;
 #endif
-							}
-							else
-							{
-								if (0 == strcmp(sidxObj->GetActualValue(), ""))
-								{
-									//pdo channel is deactivated. Empty act value
-									continue;
-								}
-								if (CheckIfValueZero(
-										(char*) sidxObj->GetActualValue()))
-								{
-									// PDO channel is deactivated
-									// Zero is not set here,as it is intialised to Zero previously
-									continue;
-								}
-								else // If the Actual values is Null or Empty, Default value is set for Total SIdx for mapping
-								{
-									//No need to check for value null or empty. GetDecimalValue returns zero or particular value.
-									sidxTot = GetDecimalValue(
-											(char*) sidxObj->GetDefaultValue());
-								}
-							}
-
-						}
-						else
+					}
+					else
+					{
+						if (0 == strcmp(sidxObj->GetActualValue(), ""))
 						{
-							//no of entries index does not exist
+							//pdo channel is deactivated. Empty act value
 							continue;
 						}
-						//Check isiTotal value is valid
-						if (sidxTot
-								>= (indexObjB4Sort->GetNumberofSubIndexes()))
+						if (CheckIfValueZero(
+								(char*) sidxObj->GetActualValue()))
 						{
-							exceptionObj.OCFMException(
-									OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-							char acCustomError[200] =
-							{ 0 };
-							sprintf(acCustomError,
-									"Mapping objects not found in index: %s in node: %d",
-									(char*) indexObjB4Sort->GetIndexValue(),
-									nodeObj->GetNodeId());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode),
-									acCustomError);
+							// PDO channel is deactivated
+							// Zero is not set here,as it is intialised to Zero previously
+							continue;
+						}
+						else // If the Actual values is Null or Empty, Default value is set for Total SIdx for mapping
+						{
+							//No need to check for value null or empty. GetDecimalValue returns zero or particular value.
+							sidxTot = GetDecimalValue(
+									(char*) sidxObj->GetDefaultValue());
+						}
+					}
 
-							throw exceptionObj;
+					//Check isiTotal value is valid
+					if (sidxTot
+							>= (indexObjB4Sort->GetNumberofSubIndexes()))
+					{
+						exceptionObj.OCFMException(
+								OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+						char acCustomError[200] =
+						{ 0 };
+						sprintf(acCustomError,
+								"Mapping objects not found in index: %s in node: %d",
+								(char*) indexObjB4Sort->GetIndexValue(),
+								nodeObj->GetNodeId());
+						CopyCustomErrorString(&(exceptionObj._ocfmRetCode),
+								acCustomError);
+
+						throw exceptionObj;
+					}
+
+					INT32 rpdoMappedNodeId = -1;
+					if (strncmp(indexObj.GetIndexValue(), "16", 2) == 0)
+					{
+						Index *commIndexObj = NULL;
+						char *indexId = SubString(
+								(char *) indexObj.GetIndexValue(), 2, 4);
+						char *commIdxId = new char[INDEX_LEN];
+						strcpy(commIdxId, (char *) "14");
+						strcat(commIdxId, indexId);
+						commIndexObj = indexCollObj->GetIndexbyIndexValue(
+								commIdxId);
+						if (NULL != commIndexObj)
+						{
+							SubIndex *subIndexObj = NULL;
+							subIndexObj =
+									commIndexObj->GetSubIndexbyIndexValue(
+											(char *) "01");
+							if (NULL != subIndexObj)
+							{
+								rpdoMappedNodeId =
+										GetDecimalValue(
+												(char*) subIndexObj->GetActualValue());
+							}
+						}
+						delete[] commIdxId;
+						delete[] indexId;
+					}
+
+					while (sidxCount <= sidxTot)
+					{
+
+						SubIndex* subIndexObj = NULL;
+						char *sidxId = new char[SUBINDEX_LEN];
+						sidxId = IntToAscii(sidxCount, sidxId, 16);
+						sidxId = PadLeft(sidxId, '0', 2);
+						#if defined DEBUG
+								cout << " Position: "<< sidxCount <<" SidxId: "<<sidxId<<endl;
+						#endif
+						//subIndexObj = indexObj.GetSubIndex(sidxCount);
+						subIndexObj = indexObj.GetSubIndexbyIndexValue(sidxId);
+
+						if (subIndexObj == NULL)
+						{
+							delete [] sidxId;
+							continue;
+						}
+						delete [] sidxId;
+
+						sidxCount++;
+
+						if ((subIndexObj->GetActualValue() == NULL)
+							|| (0 == strcmp(subIndexObj->GetActualValue(), ""))
+							|| (CheckIfValueZero((char*) subIndexObj->GetActualValue())))
+						{
+							continue;
 						}
 
-						INT32 rpdoMappedNodeId = -1;
-						if (strncmp(indexObj.GetIndexValue(), "16", 2) == 0)
+						const char* actualValueStr = subIndexObj->GetActualValue();
+
+						if ((strncmp(indexObj.GetIndexValue(), "16", 2) == 0)
+							&& ((MN_NODEID == rpdoMappedNodeId)
+							|| (BROADCAST_NODEID == rpdoMappedNodeId)))
 						{
-							Index *commIndexObj = NULL;
-							char *indexId = SubString(
-									(char *) indexObj.GetIndexValue(), 2, 4);
-							char *commIdxId = new char[INDEX_LEN];
-							strcpy(commIdxId, (char *) "14");
-							strcat(commIdxId, indexId);
-							commIndexObj = indexCollObj->GetIndexbyIndexValue(
-									commIdxId);
-							if (NULL != commIndexObj)
+							char* modOffsetVal = new char[strlen(
+									actualValueStr) + 1];
+							strcpy(modOffsetVal, actualValueStr);
+							INT32 iLength = 0;
+							INT32 iOffset = 0;
+
+							char* lengthVal = NULL;
+							lengthVal = SubString((char *) actualValueStr,
+									2, 4);
+							iLength = HexToInt(lengthVal);
+
+							char* offsetVal = NULL;
+							offsetVal = SubString((char *) actualValueStr,
+									6, 4);
+							iOffset = HexToInt(offsetVal);
+
+							//	iNodeMappedTotalBytes = iOffset + iLength;
+
+							if (CHAINED == nodeStn)
 							{
-								SubIndex *subIndexObj = NULL;
-								subIndexObj =
-										commIndexObj->GetSubIndexbyIndexValue(
-												(char *) "01");
-								if (NULL != subIndexObj)
-								{
-									rpdoMappedNodeId =
-											GetDecimalValue(
-													(char*) subIndexObj->GetActualValue());
-								}
+								totalChainedBytesMapped = iOffset + iLength;
 							}
-							delete[] commIdxId;
-							delete[] indexId;
+							if (BROADCAST_NODEID == rpdoMappedNodeId)
+							{
+								nodeObj->SetPReqActPayloadValue(
+										(iOffset + iLength) / 8);
+							}
+
+							delete[] modOffsetVal;
+							delete[] lengthVal;
+							delete[] offsetVal;
 						}
-
-						while (sidxCount <= sidxTot)
+						if (strncmp(indexObj.GetIndexValue(), "1A", 2) == 0)
 						{
+							char* modOffset = new char[strlen(
+									actualValueStr) + 1];
+							strcpy(modOffset, actualValueStr);
+							INT32 len = 0;
+							char* lengthStr = NULL;
+							lengthStr = SubString((char *) actualValueStr,
+									2, 4);
+							len = HexToInt(lengthStr);
 
-							SubIndex* subIndexObj;
-							subIndexObj = indexObj.GetSubIndex(sidxCount);
+							char* varOffset = NULL;
+							varOffset = SubString((char *) actualValueStr,
+									6, 4);
+							INT32 offsetVal = 0;
+							offsetVal = HexToInt(varOffset);
 
-							sidxCount++;
+							nodeObj->SetPResActPayloadValue(
+									(offsetVal + len) / 8);
 
-							if ((subIndexObj->GetActualValue() == NULL)
-									|| (0
-											== strcmp(
-													subIndexObj->GetActualValue(),
-													""))
-									|| (CheckIfValueZero(
-											(char*) subIndexObj->GetActualValue())))
-							{
-								continue;
-							}
-
-							const char* actualValueStr =
-									subIndexObj->GetActualValue();
-
-							if ((strncmp(indexObj.GetIndexValue(), "16", 2) == 0)
-									&& ((MN_NODEID == rpdoMappedNodeId)
-											|| (BROADCAST_NODEID
-													== rpdoMappedNodeId)))
-							{
-								char* modOffsetVal = new char[strlen(
-										actualValueStr) + 1];
-								strcpy(modOffsetVal, actualValueStr);
-								INT32 iLength = 0;
-								INT32 iOffset = 0;
-
-								char* lengthVal = NULL;
-								lengthVal = SubString((char *) actualValueStr,
-										2, 4);
-								iLength = HexToInt(lengthVal);
-
-								char* offsetVal = NULL;
-								offsetVal = SubString((char *) actualValueStr,
-										6, 4);
-								iOffset = HexToInt(offsetVal);
-
-								//	iNodeMappedTotalBytes = iOffset + iLength;
-
-								if (CHAINED == nodeStn)
-								{
-									totalChainedBytesMapped = iOffset + iLength;
-								}
-								if (BROADCAST_NODEID == rpdoMappedNodeId)
-								{
-									nodeObj->SetPReqActPayloadValue(
-											(iOffset + iLength) / 8);
-								}
-
-								delete[] modOffsetVal;
-								delete[] lengthVal;
-								delete[] offsetVal;
-							}
-							if (strncmp(indexObj.GetIndexValue(), "1A", 2) == 0)
-							{
-								char* modOffset = new char[strlen(
-										actualValueStr) + 1];
-								strcpy(modOffset, actualValueStr);
-								INT32 len = 0;
-								char* lengthStr = NULL;
-								lengthStr = SubString((char *) actualValueStr,
-										2, 4);
-								len = HexToInt(lengthStr);
-
-								char* varOffset = NULL;
-								varOffset = SubString((char *) actualValueStr,
-										6, 4);
-								INT32 offsetVal = 0;
-								offsetVal = HexToInt(varOffset);
-
-								nodeObj->SetPResActPayloadValue(
-										(offsetVal + len) / 8);
-
-								delete[] modOffset;
-								delete[] lengthStr;
-								delete[] varOffset;
-							}
+							delete[] modOffset;
+							delete[] lengthStr;
+							delete[] varOffset;
 						}
 					}
 				}
