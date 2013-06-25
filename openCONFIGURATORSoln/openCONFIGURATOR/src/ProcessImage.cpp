@@ -331,6 +331,7 @@ PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
 		}
 		else if (!strcmp(iecDataType, "WORD"))
 		{
+			//TODO: verify spec
 			stDataInfo->dataSize = dataSize;
 			stDataInfo->iecDtVar = BYTE;
 		}
@@ -401,6 +402,7 @@ PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
 		}
 		else if (!strcmp(iecDataType, "WSTRING"))
 		{
+			//TODO: verify spec
 			stDataInfo->dataSize = dataSize;
 			stDataInfo->iecDtVar = WSTRING;
 		}

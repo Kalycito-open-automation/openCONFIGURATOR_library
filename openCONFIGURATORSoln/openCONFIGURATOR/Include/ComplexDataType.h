@@ -74,12 +74,12 @@ class ComplexDataType
 		ComplexDataType(void);
 		~ComplexDataType(void);
 
-		INT32 cDtObjPosition;
-		char* prevUniqueId;
-		AppProcessCommon *nameIdAttr;
+		INT32 cDtObjPosition;			/**< Usage to be documented */
+		char* prevUniqueId;				/**< Usage to be documented */
+		AppProcessCommon *nameIdAttr;	/**< Usage to be documented */
 
-		TCollection<varDeclaration> varDeclarationCollection;
-
+		TCollection<varDeclaration> varDeclarationCollection;	/**< Variable collection */
+	
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to add an object of varDeclaration to a collection list and update the count
@@ -92,7 +92,7 @@ class ComplexDataType
 		void AddVarDeclaration(varDeclaration varDeclarationObject);
 
 	private:
-		INT32 varDeclarationCollCount;
+		INT32 varDeclarationCollCount;	/**< Total number of variables under varCollection tag */
 
 };
 #endif // complexdatatype_h

@@ -391,20 +391,20 @@ class BaseIndex
 		void SetFlagIfIncludedCdc(Flag flagVal);
 
 	protected:
-		const char* name;
-		const char* indexId;
-		const char* lowLimit;
-		const char* highLimit;
-		const char* accessType;
-		const char* defaultValue;
-		char* uniqueIdRef;
-		char* actualValue;
-		char* dataTypeValue; /* Only used for ObjectDictionary*/
-		ObjectType objectType;
-		DataType dataType;
-		PDOMapping pdoMapping;
-		INT32 nodeId;
-		INT32 parameterIndex;
-		Flag includeInCDC;
+		const char* name;				/**< Name of the object */
+		const char* indexId;			/**< IndexId of the object */
+		const char* lowLimit;			/**< Low limit for the value of the object */
+		const char* highLimit;			/**< High limit for the value of the object */
+		const char* accessType;			/**< AccessType of the object */
+		const char* defaultValue;		/**< Default value of the object */
+		char* uniqueIdRef;				/**< UniqueIdreference of the object */
+		char* actualValue;				/**< Actual value of the object */
+		char* dataTypeValue;			/**< DataType of the object */
+		ObjectType objectType;			/**< ObjectType of the object */
+		DataType dataType;				/**< DataType of the object */
+		PDOMapping pdoMapping;			/**< Pdomapping of the object */
+		INT32 nodeId;					/**< Usage to be documented */
+		INT32 parameterIndex;			/**< Usage to be documented */
+		Flag includeInCDC;				/**< Include in CDC flag */
 };
 #endif //BaseIndex_h

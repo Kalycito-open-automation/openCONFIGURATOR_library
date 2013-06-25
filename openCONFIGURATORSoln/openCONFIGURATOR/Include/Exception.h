@@ -71,7 +71,7 @@ class ocfmException: public std::exception
 		ocfmException(void);
 		~ocfmException(void) throw ();
 	public:
-		ocfmRetCode _ocfmRetCode;
+		ocfmRetCode _ocfmRetCode;		/**< Usage to be documented */
 	public:
 		/*****************************************************************************/
 		/**

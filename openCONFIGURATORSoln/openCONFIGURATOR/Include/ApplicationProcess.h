@@ -76,10 +76,10 @@ class ApplicationProcess
 		ApplicationProcess(void);
 		~ApplicationProcess(void);
 
-		char *xddFileName;
-		char *projectPath;
-		TCollection<ComplexDataType> CDTCollection;
-		TCollection<Parameter> ParameterCollection;
+		char *xddFileName;			/**< Usage to be documented */
+		char *projectPath;			/**< Usage to be documented */
+		TCollection<ComplexDataType> CDTCollection;		/**< Usage to be documented */
+		TCollection<Parameter> ParameterCollection;		/**< Usage to be documented */
 
 		/*****************************************************************************/
 		/**

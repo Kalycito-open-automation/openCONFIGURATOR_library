@@ -129,7 +129,7 @@ class DataTypeCollection
 		DataType* GetDataTypeByName(char* dataTypeValue);
 
 	private:
-		INT32 dataTypeCollectionCount;
-		TCollection<DataType> dataTypeCollectionObj;
+		INT32 dataTypeCollectionCount;					/**< Usage to be documented */
+		TCollection<DataType> dataTypeCollectionObj;	/**< Usage to be documented */
 };
 #endif // DataTypeCollection_h

@@ -58,6 +58,7 @@
 /* Defines */
 
 #define DLLEXPORT
+/** The debug prints to the standard output. */ 
 //#define DEBUG
 
 /* Windows Platform */
