@@ -471,7 +471,7 @@ char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 	{
 		INT32 len = 0;
 		len = 1;
-		char* temp1 = new char[];
+		char* temp1 = new char[2];
 		SubString(temp1, (const char*) tempObjName, 1, 1);
 		if (0 == strcmp(temp1, "X"))
 		{
