@@ -126,7 +126,9 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 	{
 		if (NULL == name)
 		{
+#if defined DEBUG
 			cout << "Got NULL for name" << endl;
+#endif
 		}
 		if (NULL == value)
 		{

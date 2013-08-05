@@ -256,7 +256,6 @@ public:
 	\param[in]	tempDataTypeName	Character pointer to the dataType to be set
 	\return		void
 	*/
-	//TODO: Review. setName not called
 	void SetName(char* tempDataTypeName)
 	{
 

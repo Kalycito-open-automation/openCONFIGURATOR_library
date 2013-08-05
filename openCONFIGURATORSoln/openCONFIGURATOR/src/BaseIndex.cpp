@@ -384,7 +384,6 @@ void BaseIndex::SetDataType(char* dataTypeName)
 	}
 }
 
-//TODO: unused function
 void BaseIndex::SetDataTypeName(char* dataTypeName, INT32 nodeIdVal)
 {
 	DataType* objDataType = NULL;

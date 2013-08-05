@@ -73,7 +73,9 @@ char* ConvertToUpper(char* str)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	UINT32 loopCount = 0;
@@ -115,7 +117,9 @@ char* Reverse(char* str)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	char* charLeft = str;
@@ -178,7 +182,9 @@ char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len)
 	}
 	else
 	{
+#if defined DEBUG
 		cout<<"Error: SubString Returning NULL"<<endl;
+#endif
 	}
 	return destStr;
 }
@@ -367,7 +373,9 @@ char* ConvertStringToHex(char* srcStr)
 
 	if (NULL == srcStr)
 	{
+#if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		return NULL;
 	}
 	srcStrLen = strlen(srcStr);
@@ -707,19 +715,19 @@ bool CheckToolVersion(char* currentToolVersion)
 {
 	char* tempToolVersion = ConvertToUpper(currentToolVersion);
 	if ((0 == strcmp(tempToolVersion, TOOL_VERSION))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_1))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_2))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_3))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
-		|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_7))
-		|| (0 == strcmp(tempToolVersion, LAST_TOOL_VERSION))
-		|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
-		|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))
-		|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_3))
-		|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_4))
-		|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_5)))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_1))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_2))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_3))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
+			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_7))
+			|| (0 == strcmp(tempToolVersion, LAST_TOOL_VERSION))
+			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
+			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))
+			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_3))
+			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_4))
+			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_5)))
 	{
 		return true;
 	}

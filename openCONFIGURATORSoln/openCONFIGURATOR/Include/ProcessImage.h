@@ -225,7 +225,6 @@ public:
 		indexId = NULL;
 		sIdxId = NULL;
 	}
-
 };
 
 /** 

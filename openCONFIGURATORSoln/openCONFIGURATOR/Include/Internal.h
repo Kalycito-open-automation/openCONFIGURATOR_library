@@ -266,16 +266,6 @@ bool CheckIfManufactureSpecificObject(char* indexId);
  */
 /*****************************************************************************/
 bool IsAscii(char argVar);
-/*****************************************************************************************/
-/**
- \brief		This function shall return the total size of data in the buffer
-
- \param		cdcBuffer		Character pointer to hold the buffer data
-
- \return	INT32
- */
-/******************************************************************************************/
-INT32 LenOfCNBuffer(char* cdcBuffer);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to pad the left side portion of the string with the given padChar and for the given padLength
@@ -332,8 +322,6 @@ bool CheckAllowedCNIndexes(char* indexId);
  */
 /*****************************************************************************/
 bool CheckBlockedMNIndexes(char* indexId);
-//TODO: To be removed. Convert cdc to binary
-INT32 ConvertCdcToBinary(char* fileName, char* tempFile);
 /*****************************************************************************/
 /**
  \brief		This function shall get the parameter access code by providing the access type
@@ -715,16 +703,6 @@ void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType);
 bool CheckIfStringDatatypes(char* dataTypeValue);
 /*****************************************************************************/
 /**
- \brief		This function shall create other required MN indices
-
- \param		nodeID			Integer variable to hold the node id
-
- \return	ocfmRetCode		ConfiguratorErrors
- */
-/*****************************************************************************/
-ocfmRetCode AddOtherMNIndexes(INT32 nodeID);
-/*****************************************************************************/
-/**
  \brief		This function auto generates the values in the other required MN indices
 
  \param		nodeObj	Class pointer of the class Node
@@ -1008,16 +986,6 @@ bool CheckIfValueZero(char* srcStr);
  */
 /*****************************************************************************/
 INT32 GetDecimalValue(char* srcStr);
-/*****************************************************************************************/
-/**
- \brief		This function shall update the 'Actual Value' attribute of sub index of the NMT_NodeAssignment object (0x1F81) of the CN with reference to corresponding entry in MN OBD
-
- \param		nodeObj		Class pointer of Node for a CN node
-
- \return	void
- */
-/******************************************************************************************/
-void UpdateCNNodeAssignment(Node* nodeObj);
 /*****************************************************************************/
 /**
  \brief		This function shall reset the Multiplexed CN's forced cycle value
@@ -1072,15 +1040,6 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj);
 /*****************************************************************************/
 void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 		bool allowMNSubindex);
-/*****************************************************************************/
-/**
- \brief			This function shall recalculate the the CN PRes Timeout value
-
- \param			sidxId
- \return		void
- */
-/*****************************************************************************/
-void RecalculateCNPresTimeout(char* sidxId);
 /*****************************************************************************/
 /**
  \brief		This function shall validate CN's PRes Timeout value with the PRes default timeout value

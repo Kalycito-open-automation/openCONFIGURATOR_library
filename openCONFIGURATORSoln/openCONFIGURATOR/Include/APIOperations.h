@@ -157,17 +157,6 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 		char *value, bool setDefaultValue);
 /*****************************************************************************/
 /**
- \brief		This function shall check whether the offset is used or not
-
- \param		iOffset			Integer to hold the offset value
- \param		varPdoType		Enum of type PDOType to hold PDO type
-
- \return	void
- */
-/*****************************************************************************/
-void CheckIfOffsetUsed(INT32& iOffset, PDOType varPdoType);
-
-/**
  \brief		This function returns the node id assignment/reAssignment to be written in the CDC
 
  \param[out]	Buffer				Character pointer to update the nodeid assignment contents

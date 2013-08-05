@@ -79,13 +79,17 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 		if (NULL == nodePos)
 		{
 			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 			throw &exceptionObj;
 		}
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
+#if defined DEBUG
 			cout << "IfNodeExists: pobjNodeCollection is NULL!" << endl;
+#endif
 			errCodeObj.code = OCFM_ERR_UNKNOWN;
 			return errCodeObj;
 		}
@@ -137,7 +141,9 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 		if ((NULL == indexId) || (NULL == idxPos))
 		{
 			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 			throw exceptionObj;
 		}
 
@@ -226,7 +232,9 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 				|| (NULL == sidxPos))
 		{
 			objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 			throw objException;
 		}
 		Node nodeObj;
@@ -283,10 +291,6 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 					delete[] objSidxIdUpper;
 					delete[] sidxIdUpper;
 					return errCodeObj;
-				}
-				else
-				{
-					//TODO: operation to be added
 				}
 				delete[] objSidxIdUpper;
 				delete[] sidxIdUpper;
@@ -451,8 +455,9 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 	}
 	else
 	{
-		cout << "Error! IfVersionNumberMatches function can't find VERSION"
-				<< endl;
+#if defined DEBUG
+		cout << "Error! IfVersionNumberMatches function can't find VERSION" << endl;
+#endif
 		retVal = false;
 	}
 	return retVal;

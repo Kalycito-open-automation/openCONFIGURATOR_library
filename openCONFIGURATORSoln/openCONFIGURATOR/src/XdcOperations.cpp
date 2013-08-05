@@ -140,7 +140,9 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -234,16 +236,8 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 		{
 			indexObj->SetFlagIfIncludedCdc(true);
 		}
-		else
-		{
-			//Nothing to be added.
 		}
 	}
-	else
-	{
-		//TODO: Else added. Operation to be specified.
-	}
-}
 
 void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 {
@@ -253,7 +247,9 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -315,11 +311,7 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 		{
 			sidxObj->SetFlagIfIncludedCdc(true);
 		}
-		else
-		{
-			//Nothing will be executed.
 		}
-	}
 	else
 	{
 #ifdef DEBUG
@@ -435,8 +427,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 		else
 		{
 #ifdef DEBUG
-			cout << __FUNCTION__ << " unhandled datatype: " << dtObj->dataTypeName
-			     << endl;
+			cout << __FUNCTION__ << " unhandled datatype: " << dtObj->dataTypeName << endl;
 #endif
 		}
 	}
@@ -450,7 +441,9 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -471,10 +464,6 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 		parameterObj->accessStr = new char[strlen((const char*) xcValue) + 1];
 		strcpy(parameterObj->accessStr, (const char*) xcValue);
 	}
-	else
-	{
-		//TODO: Else added. operation to be added
-	}
 
 	/* TO DO: DATATYPE..There is no tag for it..need to check after how many reads datatype is define </label>
 	 <USINT/>*/
@@ -489,7 +478,9 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	if (NULL == parameterObj)
 	{
 		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw exceptionObj;
 	}
 	iRetVal = xmlTextReaderRead(reader);
@@ -553,7 +544,9 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -570,11 +563,7 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 		CheckAndCorrectName((char*) value);
 		cdtObj->nameIdAttr->SetName((char*) value);
 	}
-	else
-	{
-		//TODO: else addded. Operation to be added.
 	}
-}
 
 bool CheckifSimpleDT(char *datatypeName, char *dataSize)
 {
@@ -613,10 +602,6 @@ void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl)
 	{
 		CheckAndCorrectName((char*) value);
 		vdecl.namIdDtAttr->SetName((char*) value);
-	}
-	else
-	{
-		//TODO: Else added. Operation to be added.
 	}
 
 	if (!strcmp(ConvertToUpper((char*) name), "SIZE"))
@@ -669,7 +654,9 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	if (NULL == cdtObj)
 	{
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 
@@ -1499,10 +1486,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 							throw objException;
 						}
 					}
-					else
-					{
-						//TODO: Else added. Operation to be added.
-					}
 
 					// End varDeclaration Tag
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
@@ -1858,10 +1841,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "CDCFlag", BAD_CAST "TRUE");
 			}
-			else
-			{
-				//Nothing to do.
-			}
 
 			xmlTextWriterSetIndent(xtwWriter, 1);
 
@@ -1988,10 +1967,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					{
 						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						               BAD_CAST "CDCFlag", BAD_CAST "TRUE");
-					}
-					else
-					{
-						//Nothing to do.
 					}
 					// End SubObject Tag
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
@@ -2172,10 +2147,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			//End CN Features Tag
 			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		}
-		else
-		{
-			//Nothing other than MN & CN
-		}
 
 		xmlTextWriterSetIndent(xtwWriter, 1);
 		//End Network Management Tag
@@ -2330,12 +2301,8 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 				}
 			}
 		}
-		else
-		{
-			//Nothing to be added.
 		}
 	}
-}
 
 //TODO: unused function
 ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)

@@ -113,7 +113,9 @@ void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset,
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 	if (1 == piObj->dataInfo.dataSize)
@@ -165,13 +167,9 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 				piOutCol[outVarsGlobal] = objNode->PICollection[piLoopCount];
 				outVarsGlobal++;
 			}
-			else
-			{
-				//Nothing other than INPUT & OUTPUT
 			}
 		}
 	}
-}
 
 INT32 GroupNETPIVariables(PIDirectionType directionType,
 		NETProcessImage netPIObj[])
@@ -223,7 +221,9 @@ void SetUniquePIVarName()
 			piObjTemp1 = &objNode->PICollection[iInLoopCount];
 			if( piObjTemp1 == NULL)
 			{
+#if defined DEBUG
 				cout<<"PICollection Null object. Node ID:"<<objNode->GetNodeId()<<" iInLoopCount:"<<iInLoopCount<<endl;
+#endif
 				continue;
 			}
 			//it is possible that the changed var name matching a previous entry
@@ -406,11 +406,7 @@ PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
 			stDataInfo->dataSize = dataSize;
 			stDataInfo->iecDtVar = WSTRING;
 		}
-		else
-		{
-			//TODO: else added. operation to be specified
 		}
-	}
 	return stDataInfo;
 }
 
@@ -660,10 +656,6 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			strcat(mainBuffer, " PI_IN;");
 			strcat(mainBuffer, "\n");
 		}
-		else
-		{
-			//Nothing to do
-		}
 
 		char* strSize = new char[50];
 
@@ -866,10 +858,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 		strcpy(tempBuffer2, "\t}\n");
 	}
-	else
-	{
-		//TODO: Else added. Nothing to do
-	}
+
 	delete[] totalSize;
 
 	ocfmException ex;
@@ -1048,11 +1037,7 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 							strcpy(objNode->NETPIColl[pos].dataInfo.dtName,
 									"UInt32");
 						}
-						else
-						{
-							//TODO: else added. Operation to be specified
 						}
-					}
 					else
 					{
 						piPos = pos + 1;
@@ -1121,7 +1106,9 @@ void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId)
 	{
 		ocfmException objException;
 		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		throw objException;
 	}
 
@@ -1180,7 +1167,9 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			}
 			else
 			{
+#if defined DEBUG
 				cout << "enumPdoType is not TPDO or RPDO _1\n" << endl;
+#endif
 			}
 			/* Add subindex 00 */
 			stRetCode = AddSubIndex(MN_NODEID, MN, indexId, (char*) "00");
@@ -1234,7 +1223,9 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			}
 			else
 			{
+#if defined DEBUG
 				cout << "enumPdoType is not TPDO or RPDO _2\n" << endl;
+#endif
 			}
 			delete[] pdoMap;
 		}
@@ -1330,10 +1321,6 @@ char* GetPIDataTypeName(char* indexId)
 							static_cast<PDODataType>(-1);
 			break;
 		}
-		else
-		{
-			//TODO: else added. operation to be specified
-		}
 	}
 	switch (tempDataType)
 	{
@@ -1406,10 +1393,6 @@ char* GetPIName(char* indexId)
 							piIndexTable[iLoopCount - 1].dtObj :
 							static_cast<PDODataType>(-1);
 			break;
-		}
-		else
-		{
-			//TOOD: else added, operation to be specified
 		}
 	}
 	switch (tempDataType)

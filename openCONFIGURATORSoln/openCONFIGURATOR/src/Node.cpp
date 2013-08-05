@@ -219,10 +219,6 @@ void Node::AddMNPDOvar(MNPdoVariable pdoVarObj, PDOType pdotype)
 		INT32 iItemPosition = MNPDOINVarCollection.Add();
 		MNPDOINVarCollection[iItemPosition] = pdoVarObj;
 	}
-	else
-	{
-		//Nothing to be added.
-	}
 }
 
 void Node::CreateApplicationProcess()
