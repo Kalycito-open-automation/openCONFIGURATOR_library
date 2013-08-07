@@ -214,16 +214,6 @@ char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len);
 char* Reverse(char* str);
 /*****************************************************************************************/
 /**
- \brief		ProcessPDONodes
-
- This API shall process the PDO nodes of the Controlled node
-
- \return	ocfmRetCode			ConfiguratorErrors
- */
-/******************************************************************************************/
-ocfmRetCode ProcessPDONodes();
-/*****************************************************************************************/
-/**
  \brief		This function shall process the PDO Nodes of the CNs and generate a PDO collection that is used to create the MN PDO's & the process image variables
 
  \param		isBuild		Boolean flag to hold the value true if it is Build process
@@ -231,7 +221,7 @@ ocfmRetCode ProcessPDONodes();
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /******************************************************************************************/
-ocfmRetCode ProcessPDONodes(bool isBuild);
+ocfmRetCode ProcessPDONodes(bool isBuild = false);
 /*****************************************************************************/
 /**
  \brief		This function shall auto generate the MN's object dictionary
@@ -710,7 +700,7 @@ bool CheckIfStringDatatypes(char* dataTypeValue);
  \return	void
  */
 /*****************************************************************************/
-void AuotgenerateOtherIndexs(Node* nodeObj);
+void AutogenerateOtherIndexs(Node* nodeObj);
 /*****************************************************************************/
 /**
  \brief		This function shall update the CN's Date or Time in the corresponding Sub Index of the MN

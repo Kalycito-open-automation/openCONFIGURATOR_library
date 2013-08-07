@@ -58,6 +58,9 @@
 #include "../Include/Node.h"
 #include "../Include/Internal.h"
 
+#include <sstream>
+using namespace std;
+
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
@@ -375,67 +378,52 @@ char* Node::GetForcedCycleValue()
 ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 {
 	//add or update 1f9b
-	ocfmRetCode errReslt1;
-	ocfmRetCode errReslt2;
-	ocfmRetCode errReslt3;
+	ocfmRetCode exObj;
+	ocfmRetCode indexNodeExObj;
+	ocfmRetCode indexMNstoreExObj;
+
 	INT32 idxPos = 0;
 	INT32 sIdxPos = 0;
 
-	char customErr1[200];
-	char customErr2[100];
-	char customErr3[100];
-	customErr1[0] = 0;
-	customErr2[0] = 0;
-	customErr3[0] = 0;
+	ostringstream errorString;
 
 	char* sidxId = new char[SUBINDEX_LEN];
 	char indexId[] = MULTIPL_CYCLE_ASSIGN_OBJECT;
 
-	errReslt1.code = OCFM_ERR_SUCCESS;
+	exObj.setErrorCode(OCFM_ERR_SUCCESS);
 
 	sidxId = IntToAscii(this->GetNodeId(), sidxId, 16);
 	sidxId = PadLeft(sidxId, '0', 2);
 
-	errReslt2 = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sIdxPos,
+	indexMNstoreExObj = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sIdxPos,
 			&idxPos);
-	errReslt3 = IfSubIndexExists(this->GetNodeId(), CN, indexId, sidxId,
+	indexNodeExObj = IfSubIndexExists(this->GetNodeId(), CN, indexId, sidxId,
 			&sIdxPos, &idxPos);
-	if ((OCFM_ERR_SUCCESS == errReslt2.code)
-			&& (OCFM_ERR_SUCCESS == errReslt3.code))
+	if ((OCFM_ERR_SUCCESS != indexMNstoreExObj.getErrorCode())
+		&& (OCFM_ERR_SUCCESS != indexNodeExObj.getErrorCode()))
 	{
-		// both the index and subindex are present continue
-	}
-	else
-	{
-		if (OCFM_ERR_INDEXID_NOT_FOUND == errReslt2.code)
+		if (OCFM_ERR_INDEXID_NOT_FOUND == indexMNstoreExObj.getErrorCode())
 		{
-			strcpy((char*) customErr2, "The Index 1F9B does not exist in MN. ");
+			errorString<<"The Index 1F9B does not exist in MN.\n";
 		}
-		if (OCFM_ERR_INDEXID_NOT_FOUND == errReslt3.code)
+		if (OCFM_ERR_INDEXID_NOT_FOUND == indexNodeExObj.getErrorCode())
 		{
-			sprintf((char*) customErr3,
-					"The Index 1F9B does not exist in CN node id:%d. ",
-					this->GetNodeId());
+			errorString<<"The Index 1F9B does not exist in CN node id:"<<this->GetNodeId()<<".\n";
 		}
-		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt2.code)
+		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == indexMNstoreExObj.getErrorCode())
 		{
-			sprintf(customErr2,
-					"The Subindex %s in Index 1F9B does not exist in MN. ",
-					sidxId);
+			errorString<<"The Subindex "<<sidxId<<" in Index 1F9B does not exist in MN.\n";
 		}
-		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == errReslt3.code)
+		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == indexNodeExObj.getErrorCode())
 		{
-			sprintf(customErr3,
-					"The Subindex %s in Index 1F9B does not exist in CN node id:%d. ",
-					sidxId, this->GetNodeId());
+			errorString<<"The Subindex "<<sidxId<<" in Index 1F9B does not exist in CN node id:"<<this->GetNodeId()<<".\n";
 		}
-		strcpy(customErr1, customErr2);
-		strcat(customErr1, customErr3);
-		strcat(customErr1, "Unable to assign the multiplexing cycle");
+		errorString<<"Unable to assign the multiplexing cycle.\n";
 
-		errReslt1.code = OCFM_ERR_MULTIPLEX_ASSIGN_ERROR;
-		CopyCustomErrorString(&errReslt1, (char*) &customErr1);
-		return errReslt1;
+		exObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
+		exObj.setErrorString(errorString.str());
+
+		return exObj;
 	}
 
 	char* sidxName = new char[50];
@@ -480,7 +468,7 @@ ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
 	strcpy((char*) forcedCycle, tempForcedCycleVal);
 
 	delete[] sidxName;
-	return errReslt1;
+	return exObj;
 }
 
 void Node::ResetForcedCycleValue()
@@ -524,7 +512,7 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 
 	stErrorInfo = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sidxPos,
 			&idxPos);
-	if (OCFM_ERR_SUCCESS != stErrorInfo.code)
+	if (OCFM_ERR_SUCCESS != stErrorInfo.getErrorCode())
 	{
 		return;
 	}

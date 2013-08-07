@@ -71,8 +71,8 @@ char* ConvertToUpper(char* str)
 {
 	if (NULL == str)
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode objException;
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -92,9 +92,11 @@ char* StringToUpper(char* srcStr)
 {
 	if (NULL == srcStr)
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
+		ocfmRetCode objException;
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+#ifdef DEBUG
+		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;  
+#endif 
 		throw objException;
 	}
 	UINT32 uiLoopCount;
@@ -115,8 +117,8 @@ char* Reverse(char* str)
 {
 	if (NULL == str)
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode objException;
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -139,9 +141,11 @@ char* PadLeft(char* str, char padChar, INT32 padLength)
 {
 	if (NULL == str)
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
+		ocfmRetCode objException;
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+#ifdef DEBUG
+		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;  
+#endif
 		throw objException;
 	}
 
@@ -387,8 +391,8 @@ char* ConvertStringToHex(char* srcStr)
 		cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ocfmRetCode ex;
+		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 		throw ex;
 	}
 	strcpy(tempSrcStr, (char*) srcStr);
@@ -552,7 +556,7 @@ char* GetLastAvailableCycleNumber()
 	INT32 subIndexPos;
 	retCode = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07",
 			&subIndexPos, &indexPos);
-	if (OCFM_ERR_SUCCESS != retCode.code)
+	if (OCFM_ERR_SUCCESS != retCode.getErrorCode())
 	{
 		strcpy(retForcedCycleValue, "");
 		return retForcedCycleValue;
@@ -561,7 +565,7 @@ char* GetLastAvailableCycleNumber()
 	retCode = GetSubIndexAttributes(240, MN, (char*) "1F98", (char*) "07",
 			ACTUALVALUE, actValue);
 	UINT32 tempCycleNumber = cycleNumberGlobal;
-	if (OCFM_ERR_SUCCESS != retCode.code)
+	if (OCFM_ERR_SUCCESS != retCode.getErrorCode())
 	{
 
 		UINT32 cycleValue;

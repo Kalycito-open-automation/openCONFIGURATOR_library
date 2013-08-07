@@ -58,9 +58,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sstream>
 #include "../Include/Validation.h"
 #include "../Include/Exception.h"
 
+using namespace std;
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
@@ -70,15 +72,14 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	try
 	{
 
 		if (NULL == nodePos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -90,8 +91,8 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 #if defined DEBUG
 			cout << "IfNodeExists: pobjNodeCollection is NULL!" << endl;
 #endif
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			return exceptionObj;
 		}
 
 		if (nodeCollObj->GetNumberOfNodes() > 0)
@@ -106,56 +107,50 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 					if (nodeObj.GetNodeId() == nodeId)
 					{
 						*nodePos = nodeLC;
-						errCodeObj.code = OCFM_ERR_SUCCESS;
+						exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 						nodeExist = true;
 
-						return errCodeObj;
+						return exceptionObj;
 					}
 				}
 			}
-			exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
-			throw &exceptionObj;
+			exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
+			throw exceptionObj;
 		}
 		else
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw &exceptionObj;
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw exceptionObj;
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	//return stErrStruct;
 }
 
 ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 		INT32 *idxPos)
 {
-	ocfmRetCode errCodeObj;
 	INT32 nodePos;
 	bool bFlag = false;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == idxPos))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
 			throw exceptionObj;
 		}
 
-		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, bFlag);
+		exceptionObj = IfNodeExists(nodeId, nodeType, &nodePos, bFlag);
 
-		if ((true == bFlag) && (OCFM_ERR_SUCCESS == errCodeObj.code))
+		if ((true != bFlag) && (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode()))
 		{
-			//continue with process
-		}
-		else
-		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 			throw exceptionObj;
 		}
 		Node nodeObj;
@@ -168,7 +163,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 		if (0 == idxCollObj->GetNumberofIndexes())
 		{
 			*idxPos = 0;
-			errCodeObj.code = OCFM_ERR_NO_INDEX_FOUND;
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		}
 		else if (idxCollObj->GetNumberofIndexes() > 0)
 		{
@@ -189,21 +184,18 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 				if (0 == strcmp(objIdxIdUpper, idxIdUpper))
 				{
 					*idxPos = idxLC;
-					errCodeObj.code = OCFM_ERR_SUCCESS;
+					exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 					delete[] objIdxIdUpper;
 					delete[] idxIdUpper;
-					return errCodeObj;
+					return exceptionObj;
 				}
 				else if (idxLC == (idxCollObj->GetNumberofIndexes() - 1))
 				{
 					// Index Doesn't Exist
-					errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
+					exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 					delete[] objIdxIdUpper;
 					delete[] idxIdUpper;
-					return errCodeObj;
-				}
-				else
-				{
+					return exceptionObj;
 				}
 				delete[] objIdxIdUpper;
 				delete[] idxIdUpper;
@@ -212,26 +204,25 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 		else
 		{
 			// Indexes Doesn't Exist
-			errCodeObj.code = OCFM_ERR_NO_INDEX_FOUND;
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 		char* sidxId, INT32* sidxPos, INT32* idxPos)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException objException;
+	ocfmRetCode objException;
 	try
 	{
 		if ((NULL == idxId) || (NULL == sidxId) || (NULL == idxPos)
 				|| (NULL == sidxPos))
 		{
-			objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -242,13 +233,13 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 		IndexCollection *idxCollObj = NULL;
 		Index *idxObj = NULL;
 
-		errCodeObj = IfIndexExists(nodeId, nodeType, idxId, idxPos);
+		objException = IfIndexExists(nodeId, nodeType, idxId, idxPos);
 
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != objException.getErrorCode())
 		{
 			// Node Doesn't Exist
-			errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
-			return errCodeObj;
+			objException.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			return objException;
 		}
 
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -258,7 +249,7 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 		idxObj = idxCollObj->GetIndex(*idxPos);
 		if (idxObj->GetNumberofSubIndexes() == 0)
 		{
-			errCodeObj.code = OCFM_ERR_NO_SUBINDEXS_FOUND;
+			objException.setErrorCode(OCFM_ERR_NO_SUBINDEXS_FOUND);
 		}
 		else if (idxObj->GetNumberofSubIndexes() > 0)
 		{
@@ -278,19 +269,19 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 
 				if ((strcmp(objSidxIdUpper, sidxIdUpper) == 0))
 				{
-					errCodeObj.code = OCFM_ERR_SUCCESS;
+					objException.setErrorCode(OCFM_ERR_SUCCESS);
 					*sidxPos = sidxLC;
 					delete[] objSidxIdUpper;
 					delete[] sidxIdUpper;
-					return errCodeObj;
+					return objException;
 				}
 				else if (sidxLC == (idxObj->GetNumberofSubIndexes() - 1))
 				{
 					// SubIndex Doesn't Exist
-					errCodeObj.code = OCFM_ERR_SUBINDEXID_NOT_FOUND;
+					objException.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 					delete[] objSidxIdUpper;
 					delete[] sidxIdUpper;
-					return errCodeObj;
+					return objException;
 				}
 				delete[] objSidxIdUpper;
 				delete[] sidxIdUpper;
@@ -298,13 +289,13 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 		}
 		else
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
+			objException.setErrorCode(OCFM_ERR_UNKNOWN);
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return objException;
 }
 
 bool CheckIfDataTypeExists(char* dataValue, INT32 nodeId)
@@ -465,9 +456,10 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 
 bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	char *varCommIdx = new char[INDEX_LEN];
 	char customError[200] = { 0 };
+	ostringstream errorString;
 
 	if (pdoTypeVar == PDO_TPDO)
 	{
@@ -478,9 +470,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		//If varIdx != "00" throw error as only the 1st object 1A00 shall be implemented on a CN
 		if (0 != strcmp(varIdx, "00"))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXID);
-			sprintf(customError, "The TPDO object is not valid for CN with Node name: '%s', Node ID: '%d' \nReason: Only the TPDO object pair 1800 and 1A00 shall be implemented for a CN", nodeObj->GetNodeName(), nodeObj->GetNodeId());
-			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
+			errorString<<"The TPDO object is not valid for CN with Node name: '"<<nodeObj->GetNodeName()<<"', Node ID: '"<<nodeObj->GetNodeId()<<"' \nReason: Only the TPDO object pair 1800 and 1A00 shall be implemented for a CN";
+			exceptionObj.setErrorString(errorString.str());
 			delete[] varIdx;
 			delete[] varCommIdx;
 			throw exceptionObj;
@@ -506,9 +498,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	if (NULL == commIndexObj)
 	{
 		//throw exception as matching communication index not found for a CN
-		exceptionObj.OCFMException(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-		sprintf(customError, "Communication Param object 0x%s not found in the node %s( %d )", varCommIdx, nodeObj->GetNodeName(), nodeObj->GetNodeId());
-		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+		errorString<<"Communication Param object 0x"<<varCommIdx<<" not found in the node "<<nodeObj->GetNodeName()<<"( "<<nodeObj->GetNodeId()<<" )";
+		exceptionObj.setErrorString(errorString.str());
 		delete[] varCommIdx;
 		throw exceptionObj;
 	}
@@ -519,9 +511,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	if (NULL == subIndexObj)
 	{
 		//Throw exception as Target node id sidx not found in a CN TPDO comm param object
-		exceptionObj.OCFMException(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-		sprintf(customError, " In CN: %d. SubObject PDO_Target_Node_Id(0x01) in Object 0x%s not found.", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
+		errorString<<"In CN: "<<nodeObj->GetNodeId()<<". SubObject PDO_Target_Node_Id(0x01) in Object 0x"<<commIndexObj->GetIndexValue()<<" not found.";
+		
 		throw exceptionObj;
 	}
 
@@ -530,9 +522,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		if (0 == strlen(subIndexObj->GetActualValue()))
 		{
 			//Throw exception as wrong Target node id for TPDO CN
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-			sprintf(customError, " In CN: %d. Invalid PDO_Target_Node_Id value configured in Object %s/01", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+			errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+			exceptionObj.setErrorString(errorString.str());
 			throw exceptionObj;
 		}
 		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetActualValue());
@@ -542,9 +534,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 			if ((BROADCAST_NODEID != mappedNodeId))
 			{
 				//Throw exception as wrong Target node id for TPDO CN
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-				sprintf(customError, " In CN: %d. Invalid PDO_Target_Node_Id value configured in Object %s/01. It Should be always 0 for a CN's TPDO", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-				CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+				errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01. It Should be always 0 for a CN's TPDO";
+				exceptionObj.setErrorString(errorString.str());
 				throw exceptionObj;
 			}
 			else
@@ -588,9 +580,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		//Actual value not configured. So checking default value
 		if (0 == strlen(subIndexObj->GetDefaultValue()))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-			sprintf(customError, " In CN: %d. Invalid default PDO_Target_Node_Id value configured in Object %s/01", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-			CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+			errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid default PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+			exceptionObj.setErrorString(errorString.str());
 			throw exceptionObj;
 		}
 		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetDefaultValue());
@@ -599,9 +591,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 			if ((BROADCAST_NODEID != mappedNodeId))
 			{
 				//Throw exception as wrong Target node id for TPDO CN
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-				sprintf(customError, " In CN: %d. Invalid default PDO_Target_Node_Id value configured in Object %s/01. It Should be always 0 for a CN's TPDO", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-				CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+				errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid default PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01. It Should be always 0 for a CN's TPDO";
+				exceptionObj.setErrorString(errorString.str());
 				throw exceptionObj;
 			}
 			else
@@ -643,9 +635,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	else
 	{
 		//Throw exception as Both default & Actual Target node id  value is not configured
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-		sprintf(customError, " In CN: %d. PDO_Target_Node_Id value not configured in Object %s/01", nodeObj->GetNodeId(), commIndexObj->GetIndexValue());
-		CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+		errorString<<"In CN: "<<nodeObj->GetNodeId()<<". PDO_Target_Node_Id value not configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+		exceptionObj.setErrorString(errorString.str());
 		throw exceptionObj;
 	}
 

@@ -105,41 +105,6 @@ ModuleCol moduleColl[TOTAL_MODULES];
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-//TODO: Unused function
-void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset,
-		INT32& startBitOffset)
-{
-	if (NULL == piObj)
-	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
-		throw objException;
-	}
-	if (1 == piObj->dataInfo.dataSize)
-	{
-		if (-1 == startBitOffset)
-		{
-			piObj->byteOffset = startByteOffset;
-		}
-		startBitOffset = startBitOffset + 1;
-		piObj->bitOffset = startBitOffset;
-		piObj->byteOffset = startByteOffset;
-
-		if (7 == startBitOffset)
-		{
-			startByteOffset = startByteOffset + 1;
-		}
-	}
-	else
-	{
-		piObj->byteOffset = startByteOffset;
-		startByteOffset = startByteOffset + (piObj->dataInfo.dataSize) / 8;
-	}
-}
-
 void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 {
 
@@ -430,14 +395,15 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 {
 	char* xapFileName = new char[strlen(fileName) + ALLOC_BUFFER];
 	FILE* xapFile = new FILE();
+	ocfmRetCode ex;
 
 	strcpy(xapFileName, fileName);
 	strcat(xapFileName, ".h");
 
 	if (NULL == (xapFile = fopen(xapFileName, "w+ ")))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+
+		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -452,8 +418,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 	UINT32 uiStrLength = strlen(varComment);
 	if ((uiStrLength != fwrite(varComment, sizeof(char), uiStrLength, xapFile)))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] varComment;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -468,9 +433,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 #if defined DEBUG
 		cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
-
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 		delete[] xapFileName;
 		fclose(xapFile);
 		throw ex;
@@ -484,8 +447,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 	if ((uiStrLength
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] xapHeaderIncludeGuard;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -504,8 +466,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 	/* write Output structure */
 	if (NULL == (xapFile = fopen(xapFileName, "a+")))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -524,8 +485,7 @@ void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
 	if ((uiStrLength
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] xapHeaderIncludeGuard;
 		fclose(xapFile);
 		throw ex;
@@ -541,6 +501,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	char* mainBuffer = new char[HEADER_FILE_BUFFER];
 	char* tempBuffer = new char[200];
 	mainBuffer[0] = 0;
+	ocfmRetCode ex;
 
 	if (0 != noOfVars)
 	{
@@ -675,8 +636,8 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBufferLen
 			!= fwrite(tempBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] mainBuffer;
 		delete[] tempBuffer;
 		throw ex;
@@ -688,8 +649,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBufferLen
 			!= fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] mainBuffer;
 		throw ex;
 	}
@@ -701,15 +661,14 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
 {
 	char* netFileName = new char[strlen(fileName) + ALLOC_BUFFER];
 	FILE* netFile = new FILE();
-	ocfmException ex;
+	ocfmRetCode ex;
 
 	strcpy(netFileName, fileName);
 	strcat(netFileName, ".cs");
 	/* write Input structure */
 	if (NULL == (netFile = fopen(netFileName, "w+")))
 	{
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 		delete[] netFileName;
 		throw ex;
 	}
@@ -745,7 +704,7 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
 
 		if ((mainBufLen != fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
 		{
-			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 			fclose(netFile);
 			delete[] mainBuffer;
 			throw ex;
@@ -770,7 +729,7 @@ void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
 
 		if ((tempBufLen != fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
 		{
-			ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 			fclose(netFile);
 			delete[] tempBuffer;
 			throw ex;
@@ -861,13 +820,13 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 	delete[] totalSize;
 
-	ocfmException ex;
+	ocfmRetCode ex;
 	UINT32 tempBuf1Len = strlen(tempBuffer1);
 
 	if ((tempBuf1Len
 			!= fwrite(tempBuffer1, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] mainBuffer;
 		delete[] tempBuffer1;
 		delete[] tempBuffer2;
@@ -879,7 +838,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 	if ((tempBuf1Len != fwrite(mainBuffer, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] tempBuffer2;
 		delete[] mainBuffer;
 		throw ex;
@@ -891,7 +850,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBuf1Len
 			!= fwrite(tempBuffer2, sizeof(char), tempBuf1Len, netHeader)))
 	{
-		ex.OCFMException(OCFM_ERR_FILE_CANNOT_OPEN);
+		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		delete[] tempBuffer2;
 		throw ex;
 	}
@@ -1104,8 +1063,8 @@ void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId)
 {
 	if ((NULL == objDataType) || (NULL == idxId) || (NULL == sIdxId))
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode objException;
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -1147,7 +1106,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 	if (NULL != objIdxCol)
 	{
 		objIndex = objIdxCol->GetIndexbyIndexValue(indexId);
-		if ((OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.code)
+		if ((OCFM_ERR_INDEX_ALREADY_EXISTS != stRetCode.getErrorCode())
 				&& (NULL != objIndex))
 		{
 			char objName[14 + ALLOC_BUFFER];
@@ -1173,22 +1132,20 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			}
 			/* Add subindex 00 */
 			stRetCode = AddSubIndex(MN_NODEID, MN, indexId, (char*) "00");
-			if (OCFM_ERR_SUCCESS != stRetCode.code)
+			if (OCFM_ERR_SUCCESS != stRetCode.getErrorCode())
 			{
-				ocfmException objException;
-				objException.OCFMException(stRetCode.code);
-				throw objException;
+				throw stRetCode;
 			}
 		}
 	}
 
 	stRetCode = AddSubIndex(MN_NODEID, MN, indexId, sIdxId);
-	if (OCFM_ERR_SUCCESS != stRetCode.code)
+	if (OCFM_ERR_SUCCESS != stRetCode.getErrorCode())
 	{
-		cout << __LINE__ << " AddSubIndex error in line" << endl;
-		ocfmException objException;
-		objException.OCFMException(stRetCode.code);
-		throw objException;
+#ifdef DEBUG
+		cout << __LINE__ << " AddSubIndex error in line" << endl;  
+#endif 
+		throw stRetCode;
 	}
 
 	if (NULL != objIndex)

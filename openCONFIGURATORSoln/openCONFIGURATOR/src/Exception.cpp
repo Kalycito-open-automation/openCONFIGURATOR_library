@@ -1,10 +1,7 @@
-/**
- ******************************************************************************
+/******************************************************************************
  \file		Exception.cpp
-
  \brief		This file contains the class member definitions that are used to throw exception to the GUI when an error occurs
- ******************************************************************************
- */
+ ******************************************************************************/
 
 /*
  © Kalycito Infotech Private Limited
@@ -51,266 +48,266 @@
 
  ****************************************************************************/
 
-/****************************************************************************************************/
-/* Includes */
-
 #include <iostream>
+#include <sstream>
 #include <exception>
-#include <string.h>
+#include <string>
 #include <libxml/xmlerror.h>
 #include "../Include/Exception.h"
 #include "../Include/Internal.h"
+
 //==========================================================================//
 // 				F U N C T I O N  D E C L A R A T I O N S 					//
 //==========================================================================//
 
-/*************************************************************************/
-/* Constructor */
-
-/**
- 
-
- */
-
-ocfmException::ocfmException(void)
+ocfmRetCode::ocfmRetCode(void)
 {
-	_ocfmRetCode.code = OCFM_ERR_SUCCESS;
+	this->setErrorCode(OCFM_ERR_SUCCESS);
 }
 
-/*************************************************************************/
-/* Destructor */
+ocfmRetCode::ocfmRetCode(ConfiguratorError errorCode)
+{
+	this->setErrorCode(errorCode);
+}
 
-/**
- 
+ocfmRetCode::ocfmRetCode(const ocfmRetCode& origin)
+{
+	this->code = origin.code;
+	this->errorString = origin.getErrorString();
+}
 
- */
-
-ocfmException::~ocfmException(void) throw ()
+ocfmRetCode::~ocfmRetCode(void) throw ()
 {
 
 }
 
-void ocfmException::OCFMException(ConfiguratorErrors errCode)
+void ocfmRetCode::setErrorCode(ConfiguratorError error)
 {
-	_ocfmRetCode.code = errCode;
-	_ocfmRetCode.errorString = new char[ERR_STRING_LEN];
-
-	switch (errCode)
+	this->code = error;
+	switch (error)
 	{
-	case OCFM_ERR_FILE_NOT_PRESENT:
-		strcpy(_ocfmRetCode.errorString, "File not present");
-		break;
-	case OCFM_ERR_FILE_CANNOT_OPEN:
-		strcpy(_ocfmRetCode.errorString, "File cannot open");
-		break;
-	case OCFM_ERR_INVALID_NODEID:
-		strcpy(_ocfmRetCode.errorString, "Invalid Node ID");
-		break;
-	case OCFM_ERR_INVALID_NODEPOS:
-		strcpy(_ocfmRetCode.errorString, "Invalid Node position");
-		break;
-	case OCFM_ERR_INVALID_NODETYPE:
-		strcpy(_ocfmRetCode.errorString, "Invalid Node type");
-		break;
-	case OCFM_ERR_DATATYPE_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString,
-				"DataType Not Found in the DataTypeList of XDC");
-		break;
-	case OCFM_ERR_INVALID_INDEXID:
-		strcpy(_ocfmRetCode.errorString, "Invalid Index ID");
-		break;
-	case OCFM_ERR_INVALID_INDEXPOS:
-		strcpy(_ocfmRetCode.errorString, "Invalid Index position");
-		break;
-	case OCFM_ERR_INVALID_SUBINDEXID:
-		strcpy(_ocfmRetCode.errorString, "Invalid SubIndex ID");
-		break;
-	case OCFM_ERR_INVALID_SUBINDEXPOS:
-		strcpy(_ocfmRetCode.errorString, "Invalid SubIndex position");
-		break;
-	case OCFM_ERR_INVALID_ATTRIBUTETYPE:
-		strcpy(_ocfmRetCode.errorString, "Invalid Attribute type");
-		break;
-	case OCFM_ERR_NO_NODES_FOUND:
-		strcpy(_ocfmRetCode.errorString, "No Nodes found");
-		break;
-	case OCFM_ERR_NO_INDEX_FOUND:
-		strcpy(_ocfmRetCode.errorString, "No Indexes found");
-		break;
-	case OCFM_ERR_NO_SUBINDEXS_FOUND:
-		strcpy(_ocfmRetCode.errorString, "No SubIndexes found");
-		break;
-	case OCFM_ERR_NODEID_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "Node ID not found");
-		break;
-	case OCFM_ERR_INDEXID_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "Index ID not found");
-		break;
-	case OCFM_ERR_SUBINDEXID_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "SubIndex ID not found");
-		break;
-	case OCFM_ERR_NODE_ALREADY_EXISTS:
-		strcpy(_ocfmRetCode.errorString, "Node Already Exists");
-		break;
-	case OCFM_ERR_INDEX_ALREADY_EXISTS:
-		strcpy(_ocfmRetCode.errorString, "Index Already Exists");
-		break;
-	case OCFM_ERR_SUBINDEX_ALREADY_EXISTS:
-		strcpy(_ocfmRetCode.errorString, "SubIndex Already Exists");
-		break;
-	case OCFM_ERR_INVALID_VALUE:
-		strcpy(_ocfmRetCode.errorString, "Invalid value");
-		break;
-	case OCFM_ERR_INVALID_NAME:
-		strcpy(_ocfmRetCode.errorString, "Invalid name");
-		break;
-	case OCFM_ERR_XML_FILE_CORRUPTED:
-		strcpy(_ocfmRetCode.errorString, "XML file corrupted");
-		break;
-	case OCFM_ERR_CANNOT_OPEN_FILE:
-		strcpy(_ocfmRetCode.errorString, "Cannot open file");
-		break;
-	case OCFM_ERR_PARSE_XML:
-		strcpy(_ocfmRetCode.errorString, "Cannot parse XML");
-		break;
-	case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "PDO Mapped Module Index Not Found");
-		break;
-	case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString,
-				"PDO Mapped Module SubIndex Not Found");
-		break;
-	case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "Unique ID reference not found");
-		break;
-	case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "Struct Datatype not found");
-		break;
-	case OCFM_ERR_NO_CN_NODES_FOUND:
-		strcpy(_ocfmRetCode.errorString, "NO CN Nodes are found");
-		break;
-	case OCFM_ERR_UNKNOWN:
-		strcpy(_ocfmRetCode.errorString, "Unknown error");
-		break;
-	case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
-		strcpy(_ocfmRetCode.errorString, "Value out of range");
-		break;
-	case OCFM_ERR_MN_NODE_DOESNT_EXIST:
-		strcpy(_ocfmRetCode.errorString, "MN Node doesnt exist");
-		break;
-	case OCFM_ERR_CREATE_XML_WRITER_FAILED:
-		strcpy(_ocfmRetCode.errorString, "Error creating the xml writer");
-		break;
-	case OCFM_ERR_XML_WRITER_START_ELT_FAILED:
-		strcpy(_ocfmRetCode.errorString, "Error at xmlTextWriterStartElement");
-		break;
-	case OCFM_ERR_XML_WRITER_END_ELT_FAILED:
-		strcpy(_ocfmRetCode.errorString, "Error at xmlTextWriterEndElement");
-		break;
-	case OCFM_ERR_XML_START_DOC_FAILED:
-		strcpy(_ocfmRetCode.errorString, "Error at xmlTextWriterStartDocument");
-		break;
-	case OCFM_ERR_XML_END_DOC_FAILED:
-		strcpy(_ocfmRetCode.errorString, "Error at xmlTextWriterEndDocument");
-		break;
-	case OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH:
-		strcpy(_ocfmRetCode.errorString,
-				"Cannot open project: Tool-Project version mismatch");
-		break;
-	case OCFM_ERR_INVALID_PJTXML:
-		strcpy(_ocfmRetCode.errorString,
-				"Cannot open project: Invalid Project XML");
-		break;
-	case OCFM_ERR_PROJECT_SETTINGS:
-		strcpy(_ocfmRetCode.errorString, "Project Settings are NULL");
-		break;
-	case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
-		strcpy(_ocfmRetCode.errorString, "Invalid Datatype for Mapped Object");
-		break;
-	case OCFM_ERR_XAP_FILE_NOT_WRITTEN:
-		strcpy(_ocfmRetCode.errorString, "XAP File Not Written");
-		break;
-	case OCFM_ERR_MAX_PI_SIZE:
-		strcpy(_ocfmRetCode.errorString, "MAX PI Size(65536 bytes) crossed");
-		break;
-	case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
-		strcpy(_ocfmRetCode.errorString, "Invalid upper and lower limits");
-		break;
-	case OCFM_ERR_LOW_CNPRESTIMEOUT:
-		strcpy(_ocfmRetCode.errorString,
-				"Value is less than minimum value of CN PResTimeout");
-		break;
-	case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
-		strcpy(_ocfmRetCode.errorString, "CN Exceeds Cross Traffic Station");
-		break;
-	case OCFM_ERR_EXCESS_CHANNEL:
-		strcpy(_ocfmRetCode.errorString,
-				"The number of Channels has exceeded than the defined value for the MN");
-		break;
-	case OCFM_ERR_INVALID_TXT_FOR_CDC:
-		strcpy(_ocfmRetCode.errorString,
-				"The text file as the input for cdc, is incorrectly formatted");
-		break;
-	case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
-		strcpy(_ocfmRetCode.errorString,
-				"Memory allocation failed. Try restarting the application");
-		break;
-	case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
-		strcpy(_ocfmRetCode.errorString, "Number of TPDO channels exceeded");
-		break;
-	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString, "NoOfEntries SubIndex not present");
-		break;
-	case OCFM_ERR_INVALID_PARAMETER:
-		strcpy(_ocfmRetCode.errorString,
-				"Invalid parameter: Internal Error. Try restarting the Application");
-		break;
-	case OCFM_ERR_INVALID_SIZE_MAPPED:
-		strcpy(_ocfmRetCode.errorString,
-				"Invalid Size mapped for the PDO. Check the length for the according datatype");
-		break;
-	case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
-		strcpy(_ocfmRetCode.errorString,
-				"Invalid mapping type for the PDO. Check the PDOmapping property for the mapped object");
-		break;
-	case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
-		strcpy(_ocfmRetCode.errorString,
-				"Invalid access type for the PDO. Check the access type for the mapped object");
-		break;
-	case OCFM_ERR_INVALID_PDO_OFFSET:
-		strcpy(_ocfmRetCode.errorString,
-				"Invalid offset in the PDO object. Check the offset value in the mapping");
-		break;
-	case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
-		strcpy(_ocfmRetCode.errorString, "It seems you have opened the project created with pre 1.3.0 version.\nErrors with respect to 'PDOMapping' and 'AccessType' can be expected during build process.");
-		break;
-	case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
-		strcpy(_ocfmRetCode.errorString,
-				"XDD schema validation failed");
-		break;
-	case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
-		strcpy(_ocfmRetCode.errorString,
-			"XDD schema file not found");
-		break;
-	case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
-		strcpy(_ocfmRetCode.errorString,
-			"XDD schema itself is not valid");
-		break;
-	case OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR:
-		strcpy(_ocfmRetCode.errorString,
-			"XDD schema parser context creation failed");
-		break;
-	case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
-		strcpy(_ocfmRetCode.errorString,
-			"XDD schema validation context creation failed");
-		break;
-	case OCFM_ERR_XML_PARSING_ERROR:
-		strcpy(_ocfmRetCode.errorString,
-			"XDD parsing failed due to wrong XML syntax");
-		break;
-	default:
-		strcpy(_ocfmRetCode.errorString, "Unhandled Error");
-		break;
+		case OCFM_ERR_SUCCESS:
+			this->errorString = "Success";
+			break;
+		case OCFM_ERR_FILE_NOT_PRESENT:
+			this->errorString = "File not present";
+			break;
+		case OCFM_ERR_FILE_CANNOT_OPEN:
+			this->errorString = "File cannot open";
+			break;
+		case OCFM_ERR_INVALID_NODEID:
+			this->errorString = "Invalid Node ID";
+			break;
+		case OCFM_ERR_INVALID_NODEPOS:
+			this->errorString = "Invalid Node position";
+			break;
+		case OCFM_ERR_INVALID_NODETYPE:
+			this->errorString = "Invalid Node type";
+			break;
+		case OCFM_ERR_DATATYPE_NOT_FOUND:
+			this->errorString = "DataType Not Found in the DataTypeList of XDC";
+			break;
+		case OCFM_ERR_INVALID_INDEXID:
+			this->errorString = "Invalid Index ID";
+			break;
+		case OCFM_ERR_INVALID_INDEXPOS:
+			this->errorString = "Invalid Index position";
+			break;
+		case OCFM_ERR_INVALID_SUBINDEXID:
+			this->errorString = "Invalid SubIndex ID";
+			break;
+		case OCFM_ERR_INVALID_SUBINDEXPOS:
+			this->errorString = "Invalid SubIndex position";
+			break;
+		case OCFM_ERR_INVALID_ATTRIBUTETYPE:
+			this->errorString = "Invalid Attribute type";
+			break;
+		case OCFM_ERR_NO_NODES_FOUND:
+			this->errorString = "No Nodes found";
+			break;
+		case OCFM_ERR_NO_INDEX_FOUND:
+			this->errorString = "No Indexes found";
+			break;
+		case OCFM_ERR_NO_SUBINDEXS_FOUND:
+			this->errorString = "No SubIndexes found";
+			break;
+		case OCFM_ERR_NODEID_NOT_FOUND:
+			this->errorString = "Node ID not found";
+			break;
+		case OCFM_ERR_INDEXID_NOT_FOUND:
+			this->errorString = "Index ID not found";
+			break;
+		case OCFM_ERR_SUBINDEXID_NOT_FOUND:
+			this->errorString = "SubIndex ID not found";
+			break;
+		case OCFM_ERR_NODE_ALREADY_EXISTS:
+			this->errorString = "Node Already Exists";
+			break;
+		case OCFM_ERR_INDEX_ALREADY_EXISTS:
+			this->errorString = "Index Already Exists";
+			break;
+		case OCFM_ERR_SUBINDEX_ALREADY_EXISTS:
+			this->errorString = "SubIndex Already Exists";
+			break;
+		case OCFM_ERR_INVALID_VALUE:
+			this->errorString = "Invalid value";
+			break;
+		case OCFM_ERR_INVALID_NAME:
+			this->errorString = "Invalid name";
+			break;
+		case OCFM_ERR_XML_FILE_CORRUPTED:
+			this->errorString = "XML file corrupted";
+			break;
+		case OCFM_ERR_CANNOT_OPEN_FILE:
+			this->errorString = "Cannot open file";
+			break;
+		case OCFM_ERR_PARSE_XML:
+			this->errorString = "Cannot parse XML";
+			break;
+		case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
+			this->errorString = "PDO Mapped Module Index Not Found";
+			break;
+		case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
+			this->errorString = "PDO Mapped Module SubIndex Not Found";
+			break;
+		case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
+			this->errorString = "Unique ID reference not found";
+			break;
+		case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
+			this->errorString = "Struct Datatype not found";
+			break;
+		case OCFM_ERR_NO_CN_NODES_FOUND:
+			this->errorString = "NO CN Nodes are found";
+			break;
+		case OCFM_ERR_UNKNOWN:
+			this->errorString = "Unknown error";
+			break;
+		case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
+			this->errorString = "Value out of range";
+			break;
+		case OCFM_ERR_MN_NODE_DOESNT_EXIST:
+			this->errorString = "MN Node doesnt exist";
+			break;
+		case OCFM_ERR_CREATE_XML_WRITER_FAILED:
+			this->errorString = "Error creating the xml writer";
+			break;
+		case OCFM_ERR_XML_WRITER_START_ELT_FAILED:
+			this->errorString = "Error at xmlTextWriterStartElement";
+			break;
+		case OCFM_ERR_XML_WRITER_END_ELT_FAILED:
+			this->errorString = "Error at xmlTextWriterEndElement";
+			break;
+		case OCFM_ERR_XML_START_DOC_FAILED:
+			this->errorString = "Error at xmlTextWriterStartDocument";
+			break;
+		case OCFM_ERR_XML_END_DOC_FAILED:
+			this->errorString = "Error at xmlTextWriterEndDocument";
+			break;
+		case OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH:
+			this->errorString = "Cannot open project: Tool-Project version mismatch";
+			break;
+		case OCFM_ERR_INVALID_PJTXML:
+			this->errorString = "Cannot open project: Invalid Project XML";
+			break;
+		case OCFM_ERR_PROJECT_SETTINGS:
+			this->errorString = "Project Settings are NULL";
+			break;
+		case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
+			this->errorString = "Invalid Datatype for Mapped Object";
+			break;
+		case OCFM_ERR_XAP_FILE_NOT_WRITTEN:
+			this->errorString = "XAP File Not Written";
+			break;
+		case OCFM_ERR_MAX_PI_SIZE:
+		{
+			ostringstream buffer;
+			buffer << "MAX PI Size (" << MAX_PI_SIZE << " bytes) exceeded";
+			this->errorString = buffer.str();
+			break;
+		}
+		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
+			this->errorString = "Invalid upper and lower limits";
+			break;
+		case OCFM_ERR_LOW_CNPRESTIMEOUT:
+			this->errorString = "Value is less than minimum value of CN PresTimeout";
+			break;
+		case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
+			this->errorString = "CN Exceeds Cross Traffic Station";
+			break;
+		case OCFM_ERR_EXCESS_CHANNEL:
+			this->errorString = "The number of Channels has exceeded than the defined value for the MN";
+			break;
+		case OCFM_ERR_INVALID_TXT_FOR_CDC:
+			this->errorString = "The text file as the input for cdc, is incorrectly formatted";
+			break;
+		case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
+			this->errorString = "Memory allocation failed. Try restarting the application";
+			break;
+		case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
+			this->errorString = "Number of TPDO channels exceeded";
+			break;
+		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
+			this->errorString = "NoOfEntries SubIndex not present";
+			break;
+		case OCFM_ERR_INVALID_PARAMETER:
+			this->errorString = "Invalid parameter: Internal Error. Try restarting the Application";
+			break;
+		case OCFM_ERR_INVALID_SIZE_MAPPED:
+			this->errorString = "Invalid Size mapped for the PDO. Check the length for the according datatype";
+			break;
+		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
+			this->errorString = "Invalid mapping type for the PDO. Check the pdo mapping for the mapped object";
+			break;
+		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
+			this->errorString = "Invalid access type for the PDO. Check the access type for the mapped object";
+			break;
+		case OCFM_ERR_INVALID_PDO_OFFSET:
+			this->errorString = "Invalid offset in the PDO object. Check the offset value in the mapping";
+			break;
+		case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
+			this->errorString = "It seems you have opened the project created with pre 1.3.0 version.\nErrors with respect to 'PDOMapping' and 'AccessType' can be expected during build process.";
+			break;
+		case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
+			this->errorString = "XDD schema validation failed";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
+			this->errorString = "XDD schema file not found";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
+			this->errorString = "XDD schema itself is not valid";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR:
+			this->errorString = "XDD schema parser context creation failed";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
+			this->errorString = "XDD schema validation context creation failed";
+			break;
+		case OCFM_ERR_XML_PARSING_ERROR:
+			this->errorString = "XDD parsing failed due to wrong XML syntax";
+			break;
+		case OCFM_ERR_CANNOT_CREATE_DIR:
+			this->errorString = "Can not create project directory";
+			break;
+		default:
+			this->errorString = "No error string specified";
+			break;
 	}
 }
+
+ConfiguratorError ocfmRetCode::getErrorCode(void) const
+{
+	return this->code;
+}
+
+void ocfmRetCode::setErrorString(const string& errorString)
+{
+	this->errorString = errorString;
+}
+
+const string& ocfmRetCode::getErrorString(void) const
+{
+	return this->errorString;
+}
+
+
 

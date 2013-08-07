@@ -63,9 +63,9 @@
 %{
 /* Simply include the header definitions for the SWIG */
 #include "../openCONFIGURATOR/Include/Exports.h"
-#include "../openCONFIGURATOR/Include/Error.h"
 #include "../openCONFIGURATOR/Include/Declarations.h"
-#include "../openCONFIGURATOR/Include/Exports.h"
+#include "../openCONFIGURATOR/Include/Exception.h"
+#include "../openCONFIGURATOR/Include/Enums.h"
 %}
 
 /* Include all the required SWIG interfaces */
@@ -74,6 +74,7 @@
 %include typemaps.i
 %include exception.i
 %include std_except.i
+%include std_string.i
 
 /* Conversions for pointer output to handled in TCL */
 %pointer_functions(char, charp)
@@ -94,9 +95,9 @@
 
 
 %include "../openCONFIGURATOR/Include/Declarations.h"
-%include "../openCONFIGURATOR/Include/Error.h"
 %include "../openCONFIGURATOR/Include/Exports.h"
 %include "../openCONFIGURATOR/Include/Enums.h"
+%include "../openCONFIGURATOR/Include/Exception.h"
 
 using namespace std; 
 

@@ -286,15 +286,6 @@ INT32 ComputeINOffset(INT32 dataSize, PDOType pdoType);
  */
 INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType);
 
-/**
- \brief		This function shall be used to set the start bit and byte offsets in the given ProcessImage object
- 
- \param		piObj				Class pointer of ProcessImage type
- \param		startByteOffset		Integer pointer to the value of startbyteoffset
- \param		startBitOffset		Integer pointer to the value of startbitoffset
- \return	void
- */
-void SetPIOffsets(ProcessImage* piObj, INT32& startByteOffset, INT32& startBitOffset);
 
 /**
  \brief		This function shall be used to generate the XAP header file

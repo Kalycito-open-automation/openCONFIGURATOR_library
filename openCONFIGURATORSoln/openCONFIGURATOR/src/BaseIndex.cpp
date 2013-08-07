@@ -60,7 +60,9 @@
 #include "../Include/Declarations.h"
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
+#include <sstream>
 
+using namespace std;
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
@@ -460,6 +462,8 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 {
 	ULONG value;
 	bool retFlag = true;
+	ostringstream errorString;
+	ocfmRetCode objException;
 
 	if (0 == strcmp(hexValue, ""))
 	{
@@ -500,14 +504,10 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 			}
 			else
 			{
-				ocfmException objException;
-				objException._ocfmRetCode.code =
-						OCFM_ERR_VALUE_NOT_WITHIN_RANGE;
-				objException._ocfmRetCode.errorString = new char[150];
-				objException._ocfmRetCode.errorString[0] = 0;
-				sprintf(objException._ocfmRetCode.errorString,
-						"The entered value(%s) is less than the lower limit(%s)",
-						hexValue, this->lowLimit);
+
+				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+				errorString << "The entered value("<<hexValue<<") is less than the lower limit("<<this->lowLimit<<")";
+				objException.setErrorString(errorString.str());
 				throw objException;
 				//bFlag = false;
 				//return bFlag;
@@ -537,14 +537,9 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 			}
 			else
 			{
-				ocfmException objException;
-				objException._ocfmRetCode.code =
-						OCFM_ERR_VALUE_NOT_WITHIN_RANGE;
-				objException._ocfmRetCode.errorString = new char[150];
-				objException._ocfmRetCode.errorString[0] = 0;
-				sprintf(objException._ocfmRetCode.errorString,
-						"The entered value(%s) is greater than the upper limit(%s)",
-						hexValue, this->highLimit);
+				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+				errorString<<"The entered value("<<hexValue<<") is greater than the upper limit("<<this->highLimit<<")";
+				objException.setErrorString(errorString.str());
 				throw objException;
 				//bFlag = false;
 			}

@@ -243,12 +243,8 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 				}
 				idxObj->AddSubIndex(sidxObj);
 			}
-			else
-			{
-				//TODO: Else added. Operation to be specified
-			}
 		}
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
 		throw ex;
 	}

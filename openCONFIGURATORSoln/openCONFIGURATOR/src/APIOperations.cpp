@@ -57,6 +57,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <libxml/xmlreader.h>
 #include <errno.h>
@@ -83,7 +84,7 @@
 /****************************************************************************/
 /* Defines */
 
-#define MY_ENCODING "UTF-8"
+#define ENCODING "UTF-8"
 #define CDC_BUFFER 5000
 #define CDC_MN_BUFFER 200000
 #define MAX_FILE_PATH_SIZE 500
@@ -376,17 +377,13 @@ static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
 ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException objException;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 #if defined DEBUG
 		cout << __FUNCTION__ << ": " << nodeType << endl;
 #endif
-
 		if (MN == nodeType)
 		{
 			if (!objectDictLoadedGlobal)
@@ -411,11 +408,11 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 			bool nodeExistFlag = false;
 			errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos,
 					nodeExistFlag);
-			if ((errCodeObj.code == OCFM_ERR_SUCCESS)
+			if ((errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
 					&& (nodeExistFlag == true))
 			{
-				objException.OCFMException(OCFM_ERR_NODE_ALREADY_EXISTS);
-				throw objException;
+				errCodeObj.setErrorCode(OCFM_ERR_NODE_ALREADY_EXISTS);
+				throw errCodeObj;
 			}
 			else
 			{
@@ -423,10 +420,6 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 				cout << "Node id:" << nodeId << " not found. ErrCode: " << OCFM_ERR_NODEID_NOT_FOUND << endl;
 #endif
 			}
-		}
-		else
-		{
-			//Nothing other than MN & CN
 		}
 		Node nodeObj;
 		nodeObj.SetNodeId(nodeId);
@@ -437,8 +430,8 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 			cout << "Err_setting_node_name" << endl;
 			nodeObj.SetNodeName((char*) "ERR_NAME");
 #endif
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			return (errCodeObj);
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		else
 		{
@@ -454,26 +447,25 @@ ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			objException.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw objException;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 		nodeCollObj->AddNode(nodeObj);
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		errCodeObj = ex->_ocfmRetCode;
-		return (errCodeObj);
+		return ex;
 	}
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return (errCodeObj);
+
+	errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return errCodeObj;
 }
 
 ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName,
 		char* importXmlFile)
 {
 	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
@@ -483,36 +475,35 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName,
 #if defined DEBUG
 			cout << "varNodeName Null" << endl;
 #endif
-			return (errCodeObj);
+			throw errCodeObj;
 		}
 		errCodeObj = CreateNode(nodeId, nodeType, nodeName);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			return (errCodeObj);
+			throw errCodeObj;
 		}
 		//Import the xdd/xdc for the Node created
-		errCodeObj.code = OCFM_ERR_UNKNOWN;
 		if (NULL == importXmlFile)
 		{
 #if defined DEBUG
 			cout << "varImportXmlFile Null" << endl;
 #endif
-			return (errCodeObj);
+			throw errCodeObj;
 		}
 		errCodeObj = ImportXML(importXmlFile, nodeId, nodeType);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			return (errCodeObj);
+			throw errCodeObj;
 		}
 
-		errCodeObj.code = OCFM_ERR_UNKNOWN;
+		errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 		if (MN == nodeType)
 		{
 			//set the loss of SoC tolerance to 50 ms
 			INT32 idxPos = 0;
 			errCodeObj = IfIndexExists(nodeId, nodeType, (char *) "1C14",
 					&idxPos);
-			if (OCFM_ERR_SUCCESS == errCodeObj.code)
+			if (OCFM_ERR_SUCCESS == errCodeObj.getErrorCode())
 			{
 				Index* idxObj = NULL;
 
@@ -532,20 +523,19 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName,
 			}
 		}
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		errCodeObj = ex->_ocfmRetCode;
-		return (errCodeObj);
+		return ex;
 	}
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return (errCodeObj);
+	errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return errCodeObj;
 }
 
 ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 {
 	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	INT32 nodePos = 0;
 	bool nodeExist = false;
 
@@ -554,13 +544,9 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 	if (nodeExist != true)
 	{
 		/* Function didnt throw any exception but Node doesnt exist */
-		if (errCodeObj.code == OCFM_ERR_SUCCESS)
+		if (errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
 		{
-			errCodeObj.code = OCFM_ERR_NODEID_NOT_FOUND;
-		}
-		else
-		{ /* Function threw exception*/
-			// Node Doesn't Exist
+			errCodeObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		}
 		return errCodeObj;
 	}
@@ -570,7 +556,7 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	if (NULL == nodeCollObj)
 	{
-		errCodeObj.code = OCFM_ERR_NO_NODES_FOUND;
+		errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 		return errCodeObj;
 	}
 	nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodePos);
@@ -579,8 +565,7 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 	{
 		INT32 indexPos = 0;
 		INT32 subIndexPos = 0;
-		errCodeObj.code = OCFM_ERR_UNKNOWN;
-		errCodeObj.errorString = NULL;
+		errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 		if (MULTIPLEXED == nodeObj.GetStationType())
 		{
@@ -607,12 +592,12 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 		errCodeObj = IfSubIndexExists(MN_NODEID, MN,
 				(char*) MULTIPL_CYCLE_ASSIGN_OBJECT, sidxStr, &subIndexPos,
 				&indexPos);
-		if (errCodeObj.code == OCFM_ERR_SUCCESS)
+		if (errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
 		{
 			errCodeObj = SetSubIndexAttribute(MN_NODEID, MN,
 					(char*) MULTIPL_CYCLE_ASSIGN_OBJECT, sidxStr, ACTUALVALUE,
 					(char*) "");
-			if (errCodeObj.code != OCFM_ERR_SUCCESS)
+			if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
 			{
 #if defined DEBUG
 				cout << "1F9B SetSubIndexAttribute Failed" << endl;
@@ -626,12 +611,12 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 		errCodeObj = IfSubIndexExists(MN_NODEID, MN,
 				(char*) MNCN_POLLRESPONSE_TIMEOUT_OBJECT, sidxStr, &subIndexPos,
 				&indexPos);
-		if (errCodeObj.code == OCFM_ERR_SUCCESS)
+		if (errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
 		{
 			errCodeObj = SetSubIndexAttribute(MN_NODEID, MN,
 					(char*) MNCN_POLLRESPONSE_TIMEOUT_OBJECT, sidxStr,
 					ACTUALVALUE, (char*) "");
-			if (errCodeObj.code != OCFM_ERR_SUCCESS)
+			if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
 			{
 #if defined DEBUG
 				cout << "1F92 SetSubIndexAttribute Failed" << endl;
@@ -722,7 +707,7 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 							idxTxObjMN->DeleteSubIndexCollection();
 							errCodeObj = AddSubIndex(MN_NODEID, MN,
 									idxIdTxobjMN, (char*) "00");
-							if (errCodeObj.code != OCFM_ERR_SUCCESS)
+							if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
 							{
 #if defined DEBUG
 								cout << "00th subindex cannot be added" << endl;
@@ -753,27 +738,23 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 	cout << "Deleted " << nodeType << ". NodeID:" << nodeId << endl;
 #endif
 
-	//stErrorInfo.code = OCFM_ERR_SUCCESS;
 	return errCodeObj;
 }
 
 ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		INT32 idxPos = 0;
 
 		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &idxPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		NodeCollection* nodeCollObj = NULL;
@@ -783,9 +764,8 @@ ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		//objNode = pobjNodeCollection->getNode(varNodeType, iNodeID);
 		//pobjIndexCollection = objNode.getIndexCollection();
@@ -793,17 +773,15 @@ ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 		nodeObj = nodeCollObj->GetNodePtr(nodeType, nodeId);
 		if (NULL == nodeObj)
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 
 		indexCollObj = nodeObj->GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 
 		indexCollObj->DeleteIndex(idxPos);
@@ -812,11 +790,11 @@ ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 		<< ". IndexID:" << indexId << endl;
 #endif
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -827,25 +805,21 @@ ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 	INT32 sidxPos = 0;
 	INT32 idxPos = 0;
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == subIndexID))
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, subIndexID,
 				&sidxPos, &idxPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		NodeCollection* nodeCollObj = NULL;
@@ -857,23 +831,23 @@ ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
 
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(idxPos);
 		if (NULL == indexObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		subIndexObj = indexObj->GetSubIndex(sidxPos);
@@ -883,16 +857,16 @@ ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 			indexObj->DeleteSubIndex(sidxPos);
 
 			UpdateNumberOfEnteriesSIdx(indexObj, nodeType);
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
 		else
 		{
-			errCodeObj.code = OCFM_ERR_SUBINDEXID_NOT_FOUND;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 		}
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -903,32 +877,29 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 	INT32 sidxPos = 0;
 	INT32 idxPos = 0;
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == subIndexId))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			errCodeObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
-			throw exceptionObj;
+			throw errCodeObj;
 		}
 
 		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, subIndexId,
 				&sidxPos, &idxPos);
-		if (OCFM_ERR_SUCCESS == errCodeObj.code)
+		if (OCFM_ERR_SUCCESS == errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEX_ALREADY_EXISTS);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEX_ALREADY_EXISTS);
+			throw errCodeObj;
 		}
 
-		if ((OCFM_ERR_NO_SUBINDEXS_FOUND == errCodeObj.code)
-				|| (OCFM_ERR_SUBINDEXID_NOT_FOUND == errCodeObj.code))
+		if ((OCFM_ERR_NO_SUBINDEXS_FOUND == errCodeObj.getErrorCode())
+				|| (OCFM_ERR_SUBINDEXID_NOT_FOUND == errCodeObj.getErrorCode()))
 		{
 			NodeCollection* nodeCollObj = NULL;
 			//Node objNode;
@@ -941,8 +912,8 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 			if (NULL == nodeCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+				throw errCodeObj;
 			}
 
 			//objNode = pobjNodeCollection->getNode(varNodeType, iNodeID);
@@ -952,15 +923,15 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 			idxCollObj = nodeObj->GetIndexCollection();
 			if (NULL == idxCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+				throw errCodeObj;
 			}
 
 			pobjIndex = idxCollObj->GetIndex(idxPos);
 			if (NULL == pobjIndex)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+				throw errCodeObj;
 			}
 
 			/* Get the SubIndex from ObjectDictionary*/
@@ -968,9 +939,8 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 			dictCollObj = ObjectDictionary::GetObjDictPtr();
 			if (NULL == dictCollObj)
 			{
-				errCodeObj.code = OCFM_ERR_UNKNOWN;
-				exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+				throw errCodeObj;
 			}
 
 			SubIndex* sidxObj = NULL;
@@ -1028,8 +998,8 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 			}
 			else
 			{
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+				throw errCodeObj;
 			}
 			/* Update subindex "00"*/
 			if ((NULL != sidxObj) && (NULL != sidxObj->GetIndexValue()))
@@ -1042,11 +1012,11 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 
 			//SetDefaultSubIndexAttributes(varSubIndexID, &pobjSubIndex);
 
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1054,23 +1024,20 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if (NULL == indexId)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 #if defined DEBUG
 		cout<<"Adding 00 subindex. IndexId: "<<indexId<<endl;
 #endif
 		errCodeObj = AddSubIndex(nodeId, nodeType, indexId, (char*) "00");
-		if ((OCFM_ERR_SUCCESS == errCodeObj.code)
+		if ((OCFM_ERR_SUCCESS == errCodeObj.getErrorCode())
 				&& (true == CheckIfManufactureSpecificObject(indexId)))
 		{
 			NodeCollection* nodeCollObj = NULL;
@@ -1085,17 +1052,17 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 
 			errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId,
 					(char*) "00", &sidxPos, &indexPos);
-			if (OCFM_ERR_SUCCESS != errCodeObj.code)
+			if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 			{
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+				throw errCodeObj;
 			}
 
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 			if (NULL == nodeCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+				throw errCodeObj;
 			}
 
 			nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1103,22 +1070,22 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 			indexCollObj = nodeObj.GetIndexCollection();
 			if (NULL == indexCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+				throw errCodeObj;
 			}
 
 			indexObj = indexCollObj->GetIndex(indexPos);
 			if (NULL == indexObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+				throw errCodeObj;
 			}
 
 			sidxObj = indexObj->GetSubIndex(sidxPos);
 			if (NULL == sidxObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+				throw errCodeObj;
 			}
 
 			sidxObj->SetName((char*) "NumberOfEntries");
@@ -1147,15 +1114,15 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 			else
 			{
 				delete[] dtName;
-				exceptionObj.OCFMException(OCFM_ERR_DATATYPE_NOT_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
+				throw errCodeObj;
 			}
 			delete[] dtName;
 		}
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException& ex)
+		errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1164,28 +1131,25 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 {
 	ocfmRetCode errCodeObj;
 	INT32 indexPos = 0;
-	ocfmException exceptionObj;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 
 	try
 	{
 		if (NULL == indexId)
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (OCFM_ERR_SUCCESS == errCodeObj.code)
+		if (OCFM_ERR_SUCCESS == errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEX_ALREADY_EXISTS);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEX_ALREADY_EXISTS);
+			throw errCodeObj;
 		}
 
-		if ((OCFM_ERR_NO_INDEX_FOUND == errCodeObj.code)
-				|| (OCFM_ERR_INDEXID_NOT_FOUND == errCodeObj.code))
+		if ((OCFM_ERR_NO_INDEX_FOUND == errCodeObj.getErrorCode())
+			|| (OCFM_ERR_INDEXID_NOT_FOUND == errCodeObj.getErrorCode()))
 		{
 			NodeCollection* nodeCollObj = NULL;
 			Node nodeObj;
@@ -1196,24 +1160,23 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 			if (NULL == nodeCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+				throw errCodeObj;
 			}
 			nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
 			indexCollObj = nodeObj.GetIndexCollection();
 			if (NULL == indexCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+				throw errCodeObj;
 			}
 
 			/* Get the Index from ObjectDictionary*/
 			dictObj = ObjectDictionary::GetObjDictPtr();
 			if (NULL == dictObj)
 			{
-				errCodeObj.code = OCFM_ERR_UNKNOWN;
-				exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+				throw errCodeObj;
 			}
 			//Validate for TPDO channels for a CN
 			if ((CN == nodeObj.GetNodeType())
@@ -1229,16 +1192,12 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 				//Allowed to add TPDO only if the node has 0 TPDO's(1Axx)
 				if (tpdoCount > 0)
 				{
-					exceptionObj.OCFMException(
-							OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
-					char customErrStr[200] =
-					{ 0 };
-					sprintf(customErrStr,
-							"Node id: %d (CN) cannot have more than one TPDO Channel",
-							nodeObj.GetNodeId());
-					CopyCustomErrorString(&(exceptionObj._ocfmRetCode),
-							customErrStr);
-					throw exceptionObj;
+					errCodeObj.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+					ostringstream errorString;
+					errorString << "Node id: " << nodeObj.GetNodeId() << " (CN) cannot have more than one TPDO Channel";
+					errCodeObj.setErrorString(errorString.str());
+
+					throw errCodeObj;
 				}
 			}
 			dictIndexObj = dictObj->GetObjectDictIndex(indexId);
@@ -1289,21 +1248,21 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 			}
 			else
 			{
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXID);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
+				throw errCodeObj;
 			}
 
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
 		else
 		{
 			// This Part of code is never expected to happen
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXID);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
+			throw errCodeObj;
 		}
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1312,24 +1271,21 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 		char* indexId, char* indexValue, char* indexName, bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == indexValue) || (NULL == indexName))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		INT32 indexPos = 0;
 		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		NodeCollection* nodeCollObj = NULL;
@@ -1341,9 +1297,8 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_NO_NODES_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1351,17 +1306,15 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_NO_INDEX_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(indexPos);
 		if (NULL == indexObj)
 		{
-			errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj->SetName(indexName);
@@ -1372,18 +1325,18 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 			if (true == indexObj->IsIndexValueValid(indexValue))
 			{
 				indexObj->SetActualValue(indexValue);
-				errCodeObj.code = OCFM_ERR_SUCCESS;
+				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 			}
 			else
 			{
-				exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+				throw errCodeObj;
 			}
 		}
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1393,29 +1346,25 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == sidxId) || (NULL == indexValue)
 				|| (NULL == indexName))
 		{
-			errCodeObj.code = OCFM_ERR_UNKNOWN;
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 
 		INT32 indexPos = 0;
 		INT32 subIndexPos = 0;
 		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, sidxId,
 				&subIndexPos, &indexPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+			throw errCodeObj;
 		}
 
 		if ((MN_NODEID == nodeId) && (MN == nodeType)
@@ -1424,8 +1373,8 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		{
 			if (false == ValidateCNPresTimeout(sidxId, indexValue))
 			{
-				exceptionObj.OCFMException(OCFM_ERR_LOW_CNPRESTIMEOUT);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_LOW_CNPRESTIMEOUT);
+				throw errCodeObj;
 			}
 		}
 
@@ -1438,8 +1387,8 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1447,22 +1396,22 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(indexPos);
 		if (NULL == indexObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		sidxObj = indexObj->GetSubIndex(subIndexPos);
 		if (NULL == sidxObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		sidxObj->SetName(indexName);
@@ -1471,12 +1420,12 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		if (sidxObj->IsIndexValueValid(indexValue))
 		{
 			sidxObj->SetActualValue(indexValue);
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
 		else
 		{
-			exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			throw errCodeObj;
 		}
 
 		if ((MN_NODEID == nodeId) && (MN == nodeType)
@@ -1485,9 +1434,9 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		{
 			errCodeObj = RecalculateMultiplex();
 		}
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1499,23 +1448,22 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
 
 	try
 	{
 		// || (NULL == varActualValue) || (NULL == varIndexName) || (NULL == varAccess) || (NULL == varDataTypeName) || (NULL == pdoMappingVal) || (NULL == vardefaultValue) || (NULL == varhighLimit) || (NULL == varlowLimit) || (NULL == varobjType)
 		if ((NULL == indexId))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 
 		INT32 indexPos;
 		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		NodeCollection* nodeCollObj = NULL;
@@ -1526,9 +1474,8 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_NO_NODES_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1536,17 +1483,15 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			errCodeObj.code = OCFM_ERR_NO_INDEX_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(indexPos);
 		if (NULL == indexObj)
 		{
-			errCodeObj.code = OCFM_ERR_INDEXID_NOT_FOUND;
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		/* Check if the value is valid*/
@@ -1577,12 +1522,12 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		}
 
 		ocfmRetCode errorLimitInfo;
-		errorLimitInfo.code = OCFM_ERR_INVALID_UPPERLOWER_LIMITS;
+		errorLimitInfo.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
 		if ((NULL != highLimitVal) && (NULL != lowLimitVal))
 		{
 			errorLimitInfo = CheckUpperAndLowerLimits(lowLimitVal,
 					highLimitVal);
-			if (OCFM_ERR_SUCCESS == errorLimitInfo.code)
+			if (OCFM_ERR_SUCCESS == errorLimitInfo.getErrorCode())
 			{
 				indexObj->SetHighLimit(highLimitVal);
 				indexObj->SetLowLimit(lowLimitVal);
@@ -1630,8 +1575,8 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 				}
 				else
 				{
-					exceptionObj.OCFMException(OCFM_ERR_DATATYPE_NOT_FOUND);
-					throw exceptionObj;
+					errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
+					throw errCodeObj;
 				}
 			}
 		}
@@ -1640,18 +1585,18 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 			if (indexObj->IsIndexValueValid(actualValue))
 			{
 				indexObj->SetActualValue(actualValue);
-				errCodeObj.code = OCFM_ERR_SUCCESS;
+				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 			}
 			else
 			{
-				exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+				throw errCodeObj;
 			}
 		}
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1663,27 +1608,24 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		char* objectType, bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == sidxId))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 
 		INT32 indexPos = 0;
 		INT32 sidxPos = 0;
 		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, sidxId,
 				&sidxPos, &indexPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+			throw errCodeObj;
 		}
 
 		NodeCollection* nodeCollObj = NULL;
@@ -1695,8 +1637,8 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1704,21 +1646,21 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(indexPos);
 		if (NULL == indexObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 		subIndexObj = indexObj->GetSubIndex(sidxPos);
 		if (NULL == subIndexObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		if (NULL != indexName)
@@ -1746,11 +1688,11 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		}
 
 		ocfmRetCode errLimitInfo;
-		errLimitInfo.code = OCFM_ERR_INVALID_UPPERLOWER_LIMITS;
+		errLimitInfo.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
 		if ((NULL != highLimitVal) && (NULL != lowLimitVal))
 		{
 			errLimitInfo = CheckUpperAndLowerLimits(lowLimitVal, highLimitVal);
-			if (OCFM_ERR_SUCCESS == errLimitInfo.code)
+			if (OCFM_ERR_SUCCESS == errLimitInfo.getErrorCode())
 			{
 				subIndexObj->SetHighLimit(highLimitVal);
 				subIndexObj->SetLowLimit(lowLimitVal);
@@ -1773,12 +1715,12 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 			if (subIndexObj->IsIndexValueValid(actualValue))
 			{
 				subIndexObj->SetActualValue(actualValue);
-				errCodeObj.code = OCFM_ERR_SUCCESS;
+				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 			}
 			else
 			{
-				exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				throw exceptionObj;
+				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+				throw errCodeObj;
 			}
 		}
 		if (NULL != dataTypeName)
@@ -1793,15 +1735,15 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 				}
 				else
 				{
-					exceptionObj.OCFMException(OCFM_ERR_DATATYPE_NOT_FOUND);
-					throw exceptionObj;
+					errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
+					throw errCodeObj;
 				}
 			}
 		}
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1810,23 +1752,20 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
 		char* sidxId, AttributeType attributeType, char* attributeValue)
 {
 	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if ((NULL == indexId) || (NULL == sidxId))
 		{
-			exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
+			throw errCodeObj;
 		}
 		INT32 sidxPos = 0;
 		INT32 iIndexPos = 0;
 		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, sidxId,
 				&sidxPos, &iIndexPos);
-		if (OCFM_ERR_SUCCESS != errCodeObj.code)
+		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
 			return errCodeObj;
 		}
@@ -1840,8 +1779,8 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			throw errCodeObj;
 		}
 
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -1849,22 +1788,22 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
 		indexCollObj = nodeObj.GetIndexCollection();
 		if (NULL == indexCollObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			throw errCodeObj;
 		}
 
 		indexObj = indexCollObj->GetIndex(iIndexPos);
 		if (NULL == indexObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		sidxObj = indexObj->GetSubIndex(sidxPos);
 		if (NULL == sidxObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+			throw errCodeObj;
 		}
 
 		switch (attributeType)
@@ -1906,14 +1845,14 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
 			// No Operation
 			break;
 		default:
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-			throw exceptionObj;
+			errCodeObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+			throw errCodeObj;
 		}
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
 	return errCodeObj;
 }
@@ -1921,7 +1860,7 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
 ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal)
 {
 	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_SUCCESS;
+	errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 
 	if ((NULL != lowLimitVal) && (NULL != highLimitVal))
 	{
@@ -1959,23 +1898,10 @@ ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal)
 			}
 			else
 			{
-				errCodeObj.code = OCFM_ERR_INVALID_UPPERLOWER_LIMITS;
-				errCodeObj.errorString = new char[150];
-				INT32 iErrSprintf = 0;
-				errCodeObj.errorString[0] = 0;
-				iErrSprintf = sprintf(errCodeObj.errorString,
-						"The lower limit(%s) is greater than upperlimit(%s)",
-						lowLimitVal, highLimitVal);
-				if (iErrSprintf < 0)
-				{
-#if defined DEBUG
-					cout << "Sprintf Error:" << __FUNCTION__ << endl;
-#endif
-				}
-				else
-				{
-					//sprintf Success
-				}
+				errCodeObj.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
+				ostringstream errorString;
+				errorString << "The lower limit(" << lowLimitVal <<") is greater than upperlimit(" << highLimitVal <<")";
+				errCodeObj.setErrorString(errorString.str());
 				return errCodeObj;
 			}
 		}
@@ -1986,24 +1912,24 @@ ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal)
 void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 		char* cdcBuffer, bool enablePDO)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	//Get the Index Value
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
 	if (NULL == indexObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
 	if (NULL == cdcBuffer)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
+		exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 		throw exceptionObj;
 	}
 
@@ -2158,8 +2084,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 		}
 		else
 		{
-			exceptionObj.OCFMException(
-					OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND);
 #if defined DEBUG
 			cout << "No.Of Entries subindex Not found:: Index: " << indexObj->GetIndexValue() << endl;
 #endif
@@ -2177,12 +2102,12 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 
 void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	Index* indexObj = NULL;
 
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2213,12 +2138,12 @@ void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue)
 void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
 		char* socToleranceValue)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	Index* indexObj = NULL;
 
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2248,12 +2173,12 @@ void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
 
 void UpdateCNAsyncMTUsize(IndexCollection* indexCollObj, char* asyncMTUsize)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	Index* indexObj = NULL;
 
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2294,12 +2219,12 @@ void UpdateCNAsyncMTUsize(IndexCollection* indexCollObj, char* asyncMTUsize)
 
 void UpdateCNMultiPrescal(IndexCollection* indexCollObj, char* multiPrescalVal)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	Index* indexObj = NULL;
 
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2339,11 +2264,9 @@ void UpdateCNMultiPrescal(IndexCollection* indexCollObj, char* multiPrescalVal)
 
 bool IsCNNodeAssignmentValid(Node* nodeObj)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 	INT32 indexPos = 0;
 	INT32 sidxPos = 0;
 	INT32 nodeId = 0;
@@ -2352,24 +2275,24 @@ bool IsCNNodeAssignmentValid(Node* nodeObj)
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
 	nodeId = nodeObj->GetNodeId();
 	nodeType = nodeObj->GetNodeType();
 
-	errCodeObj = IfIndexExists(nodeId, nodeType, (char*) "1F9B", &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(nodeId, nodeType, (char*) "1F9B", &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
-		errCodeObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
+		exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
 				(char*) "07", &sidxPos, &indexPos);
-		if (OCFM_ERR_SUCCESS == errCodeObj.code)
+		if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 		{
 			char* multipleCycleCnt = new char[20];
-			errCodeObj = GetSubIndexAttributes(nodeId, nodeType, (char*) "1F98",
+			exceptionObj = GetSubIndexAttributes(nodeId, nodeType, (char*) "1F98",
 					(char*) "07", ACTUALVALUE, multipleCycleCnt);
-			if (OCFM_ERR_SUCCESS == errCodeObj.code)
+			if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 			{
 				if ((NULL != multipleCycleCnt)
 						&& (0 != strcmp(multipleCycleCnt, ""))
@@ -2400,8 +2323,8 @@ bool IsCNNodeAssignmentValid(Node* nodeObj)
 #endif
 	}
 
-	errCodeObj = IfIndexExists(nodeId, nodeType, (char*) "1016", &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(nodeId, nodeType, (char*) "1016", &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		copyNodeAssignmentVal = true;
 	}
@@ -2412,8 +2335,8 @@ bool IsCNNodeAssignmentValid(Node* nodeObj)
 #endif
 	}
 
-	errCodeObj = IfIndexExists(nodeId, nodeType, (char*) "1F8D", &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(nodeId, nodeType, (char*) "1F8D", &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		copyNodeAssignmentVal = true;
 	}
@@ -2428,7 +2351,7 @@ bool IsCNNodeAssignmentValid(Node* nodeObj)
 
 void UpdateCNMultipleCycleAssign(Node* nodeObj)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	IndexCollection* indexCollObjCN = NULL;
 	Index* indexObjCN = NULL;
 	Index* indexObjMN = NULL;
@@ -2437,7 +2360,7 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj)
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2445,7 +2368,7 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj)
 
 	if (NULL == indexCollObjCN)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2493,11 +2416,8 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj)
 
 void UpdateCNPresMNActLoad(Node* nodeObj)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	INT32 indexPos = 0;
 	INT32 subIndexPos = 0;
@@ -2510,22 +2430,22 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	if (NULL == nodeCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 		throw exceptionObj;
 	}
 
 	nodeId = nodeObj->GetNodeId();
 	nodeType = nodeObj->GetNodeType();
-	errCodeObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F8D",
+	exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F8D",
 			(char*) "F0", &subIndexPos, &indexPos);
-	if (OCFM_ERR_SUCCESS != errCodeObj.code)
+	if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 	{
 #if defined DEBUG
 		cout << "UpdateCNPresMNActLoad failed. 1F8D/F0 does not exist" << endl;
@@ -2539,14 +2459,14 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 	indexCollObj = nodeObj->GetIndexCollection();
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
 	indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1F8D");
 	if (NULL == indexObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 		throw exceptionObj;
 	}
 	else
@@ -2555,7 +2475,7 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 		sidxObj = indexObj->GetSubIndexbyIndexValue(subIndexId);
 		if (NULL == sidxObj)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 			throw exceptionObj;
 		}
 		else
@@ -2598,11 +2518,8 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 
 void UpdatePreqActLoad(Node* nodeObj)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	IndexCollection* indexCollObj = NULL;
 	Index* indexObj = NULL;
@@ -2614,15 +2531,15 @@ void UpdatePreqActLoad(Node* nodeObj)
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
 	nodeId = nodeObj->GetNodeId();
 	nodeType = nodeObj->GetNodeType();
-	errCodeObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
+	exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
 			(char*) "04", &subIndexPos, &indexPos);
-	if (OCFM_ERR_SUCCESS != errCodeObj.code)
+	if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 	{
 #if defined DEBUG
 		cout << "UpdatePReqActLoad failed. 1F98/04 does not exist" << endl;
@@ -2633,7 +2550,7 @@ void UpdatePreqActLoad(Node* nodeObj)
 	indexCollObj = nodeObj->GetIndexCollection();
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2675,9 +2592,9 @@ void UpdatePreqActLoad(Node* nodeObj)
 				IntToAscii(nodeObj->GetNodeId(), subIndexId, 16);
 				subIndexId = PadLeft(subIndexId, '0', 2);
 
-				errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F8B",
+				exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F8B",
 						subIndexId, &subIndexPos, &indexPos);
-				if (OCFM_ERR_SUCCESS != errCodeObj.code)
+				if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 				{
 					return;
 				}
@@ -2711,8 +2628,8 @@ void UpdatePreqActLoad(Node* nodeObj)
 
 void UpdatePresActLoad(Node* nodeObj)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	Index* indexObj = NULL;
 	IndexCollection* indexCollObj = NULL;
@@ -2724,12 +2641,9 @@ void UpdatePresActLoad(Node* nodeObj)
 	char* subIndexId = NULL;
 	NodeType nodeType;
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
-
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2740,9 +2654,9 @@ void UpdatePresActLoad(Node* nodeObj)
 	subIndexId = new char[SUBINDEX_LEN];
 	strcpy(subIndexId, (char*) "05");
 
-	errCodeObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98", subIndexId,
+	exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98", subIndexId,
 			&subIndexPos, &indexPos);
-	if (OCFM_ERR_SUCCESS != errCodeObj.code)
+	if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 	{
 #if defined DEBUG
 		cout << "UpdatePresActLoad failed. 1F98/05 does not exist" << endl;
@@ -2753,7 +2667,7 @@ void UpdatePresActLoad(Node* nodeObj)
 	indexCollObj = nodeObj->GetIndexCollection();
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 	indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1F98");
@@ -2785,9 +2699,9 @@ void UpdatePresActLoad(Node* nodeObj)
 				IntToAscii(nodeObj->GetNodeId(), subIndexId, 16);
 				subIndexId = PadLeft(subIndexId, '0', 2);
 
-				errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F8D",
+				exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F8D",
 						subIndexId, &subIndexPos, &indexPos);
-				if (OCFM_ERR_SUCCESS != errCodeObj.code)
+				if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 				{
 #if defined DEBUG
 					cout << "UpdatePresActLoad failed. MN 1F8D/" << subIndexId
@@ -2848,11 +2762,11 @@ void UpdatePresActLoad(Node* nodeObj)
 
 void UpdateCNVisibleNode(Node* nodeObj)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
@@ -2926,29 +2840,10 @@ void UpdateCNVisibleNode(Node* nodeObj)
 								crossTxStnCnt++;
 								if (MAX_CN_CROSS_TRAFFIC_STN < crossTxStnCnt)
 								{
-									exceptionObj._ocfmRetCode.code =
-											OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN;
-									char acCustomError[200];
-									INT32 status = 0;
-									status =
-											sprintf(acCustomError,
-													"The CN node id: %d has been configured with more than the permissible number of cross traffic stations. The maximum permitted is %d",
-													nodeObj->GetNodeId(),
-													MAX_CN_CROSS_TRAFFIC_STN);
-									if (status < 0)
-									{
-#if defined DEBUG
-										cout << "Error in sprintf" << __LINE__
-												<< endl;
-#endif
-									}
-									else
-									{
-										//sprintf success
-									}
-									CopyCustomErrorString(
-											&(exceptionObj._ocfmRetCode),
-											acCustomError);
+									exceptionObj.setErrorCode(OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN);
+									ostringstream errorString;
+									errorString << "The CN node id: " << nodeObj->GetNodeId() << "has been configured with more than the permissible number of cross traffic stations. The maximum permitted is " << MAX_CN_CROSS_TRAFFIC_STN;
+									exceptionObj.setErrorString(errorString.str());
 									throw exceptionObj;
 								}
 
@@ -2983,20 +2878,17 @@ void UpdateCNVisibleNode(Node* nodeObj)
 										{
 #if defined DEBUG
 											cout
-													<< "CopyMNSubindexToCN 1F8D Fails:"
-													<< __FUNCTION__ << endl;
+													<< "CopyMNSubindexToCN 1F8D Fails:"<< __FUNCTION__ << endl;
 #endif
 										}
 									}
 									else
 									{
 #if defined DEBUG
-										cout << "CopyMNSubindexToCN 1F81 Fails:"
-												<< __FUNCTION__ << endl;
+										cout << "CopyMNSubindexToCN 1F81 Fails:"<< __FUNCTION__ << endl;
 #endif
 									}
 								}
-
 								delete[] mappedNodeId;
 							}
 						}
@@ -3013,21 +2905,21 @@ void UpdateCNVisibleNode(Node* nodeObj)
 bool CopyMNSubindexToCN(Node* nodeObj, char* indexId, char* subIndexId)
 {
 	bool sidxCopied = false;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	IndexCollection* indexCollObj = NULL;
 	Index* indexObjMN = NULL;
 	Index* indexObjCN = NULL;
 
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NODEID_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
 		throw exceptionObj;
 	}
 
 	indexCollObj = nodeObj->GetIndexCollection();
 	if (NULL == indexCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 		throw exceptionObj;
 	}
 
@@ -3036,7 +2928,7 @@ bool CopyMNSubindexToCN(Node* nodeObj, char* indexId, char* subIndexId)
 #if defined DEBUG
 		cout << "CopyMNSubindexToCN failed: Invalid Parameters" << endl;
 #endif
-		exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
+		exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 		throw exceptionObj;
 	}
 	indexObjCN = indexCollObj->GetIndexbyIndexValue(indexId);
@@ -3196,8 +3088,8 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 #if defined DEBUG
 		cout << "GetIndexData failed: Invalid Parameters" << endl;
 #endif
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 		throw exceptionObj;
 	}
 
@@ -3512,8 +3404,8 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 #if defined DEBUG
 		cout << "BRSpecificGetIndexData failed: Invalid Parameters" << endl;
 #endif
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 		throw exceptionObj;
 	}
 
@@ -3843,13 +3735,13 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 
 void WriteCNsData(char* fileName)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	NodeCollection* nodeCollObj = NULL;
 
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	if (NULL == nodeCollObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 		throw exceptionObj;
 	}
 
@@ -3876,7 +3768,7 @@ void WriteCNsData(char* fileName)
 			indexCollObj = nodeObj.GetIndexCollection();
 			if (NULL == indexCollObj)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+				exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 				delete fileptr;
 				throw exceptionObj;
 			}
@@ -4431,19 +4323,12 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 	char *tempFileName = NULL;
 	char *tempOutputFileName = NULL;
 
-	ocfmRetCode errCodeObj;
-	ocfmRetCode errCodeObj1;
-	ocfmRetCode errCodeObj2;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	ocfmRetCode storeExceptionObj;
 	INT32 sidxPos = 0;
 	INT32 indexPos = 0;
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj2.code = OCFM_ERR_UNKNOWN;
-	errCodeObj1.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
-	errCodeObj2.errorString = NULL;
-	errCodeObj1.errorString = NULL;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
@@ -4456,17 +4341,17 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 		nodeObjMN = objNodeCollection->GetMNNode();
 		if (objNodeCollection->GetNumberOfNodes() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		if (nodeObjMN.IsNull())
 		{
-			exceptionObj.OCFMException(OCFM_ERR_MN_NODE_DOESNT_EXIST);
+			exceptionObj.setErrorCode(OCFM_ERR_MN_NODE_DOESNT_EXIST);
 			throw exceptionObj;
 		}
 		if (objNodeCollection->GetCNNodesCount() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_CN_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -4477,26 +4362,23 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 
 		if (pjtSettingsObj->GetGenerateAttr() == YES_AG)
 		{
-			errCodeObj = CheckMutliplexAssigned();
-			if (errCodeObj.code != OCFM_ERR_SUCCESS)
+			exceptionObj = CheckMutliplexAssigned();
+			if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 			{
-				return errCodeObj;
+				return exceptionObj;
 			}
 			/*Generate MNOBD for Auto Generate On*/
-			errCodeObj = GenerateMNOBD(true);
-			if (OCFM_ERR_EXCESS_CHANNEL == errCodeObj.code)
+			exceptionObj = GenerateMNOBD(true);
+			if (OCFM_ERR_EXCESS_CHANNEL == exceptionObj.getErrorCode())
 			{
 				//Do not throw exception here as we need the process to complete
-				errCodeObj2 = errCodeObj;
+				storeExceptionObj.setErrorCode(exceptionObj.getErrorCode());
 			}
-			else if (OCFM_ERR_SUCCESS != errCodeObj.code)
+			else if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 			{
-				return errCodeObj;
+				return exceptionObj;
 			}
-			else
-			{
 			}
-		}
 
 
 		if (YES_AG == pjtSettingsObj->GetGenerateAttr())
@@ -4516,9 +4398,9 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 					char* nodeAssignmentBitsStr = GetNodeAssigmentBits(&nodeObjCN);
 					char* tempStr2 = new char[strlen(nodeAssignmentBitsStr) + ALLOC_BUFFER + 2];
 					sprintf(tempStr2, "0x%s", nodeAssignmentBitsStr);
-					errCodeObj1 = IfSubIndexExists(MN_NODEID, MN, (char*) "1F81",
+					exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F81",
 						tempStr, &sidxPos, &indexPos);
-					if (OCFM_ERR_SUCCESS != errCodeObj1.code)
+					if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 					{
 						continue;
 					}
@@ -4561,7 +4443,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 
 		if ((fileptr = fopen(tempFileName, "w+")) == NULL)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+			exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 			throw exceptionObj;
 		}
 
@@ -4605,7 +4487,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 
 		if ((fileptr = fopen(tempFileName, "a+")) == NULL)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+			exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 			throw exceptionObj;
 		}
 		objNodeCollection = NodeCollection::GetNodeColObjectPointer();
@@ -4637,7 +4519,7 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 		{
 			if ((fileptr = fopen(tempFileName, "a+")) == NULL)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+				exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 				throw exceptionObj;
 			}
 
@@ -4679,24 +4561,23 @@ ocfmRetCode GenerateCDC(char* cdcPath)
 
 		if (OCFM_ERR_SUCCESS == returnFromTxt2Cdc)
 		{
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
 		else
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_TXT_FOR_CDC);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_TXT_FOR_CDC);
 			throw exceptionObj;
 		}
-		if (OCFM_ERR_EXCESS_CHANNEL == errCodeObj2.code)
+		if (OCFM_ERR_EXCESS_CHANNEL == storeExceptionObj.getErrorCode())
 		{
-			exceptionObj.OCFMException(errCodeObj2.code);
-			throw exceptionObj;
+			throw storeExceptionObj;
 		}
 
-	} catch (ocfmException & ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 //TODO: only buffer is used not the fileptr. Should be removed in header & related functions
@@ -4705,8 +4586,8 @@ void FormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 {
 	if ((NULL == objIndexCollection) || (NULL == Buffer1))
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -4843,10 +4724,10 @@ void FormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 		FILE* fileptr, NodeType eNodeType, INT32 iNodeId)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	if ((NULL == objIndexCollection) || (NULL == Buffer1))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -4869,7 +4750,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 			<< endl;
 #endif
 
-			exceptionObj.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+			exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 			throw exceptionObj;
 		}
 		if (indexObj->GetFlagIfIncludedCdc() == true)
@@ -4887,8 +4768,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 					<< endl;
 #endif
 
-					exceptionObj.OCFMException(
-							OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+					exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 					throw exceptionObj;
 				}
 				if (!CheckIfValueZero((char*) sidxObj->GetActualValue()))
@@ -5000,7 +4880,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 			<< endl;
 #endif
 
-			exceptionObj.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+			exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 			throw exceptionObj;
 		}
 		if (indexObj->GetFlagIfIncludedCdc() == true)
@@ -5017,8 +4897,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
 					<< __LINE__ << endl;
 #endif
 
-					exceptionObj.OCFMException(
-							OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+					exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 					throw exceptionObj;
 				}
 				if (!CheckIfValueZero((char*) sidxObj->GetActualValue()))
@@ -5039,16 +4918,16 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 		Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
 		char* moduleName, char* moduleIndexId)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	if (cdtObj == NULL)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
+		exceptionObj.setErrorCode(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 		throw exceptionObj;
 	}
 	if ((NULL == appProcessObj) || (NULL == nodeObj) || (NULL == parameterObj)
 			|| (NULL == moduleName) || (NULL == moduleIndexId))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -5221,9 +5100,9 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 #endif
 				if (totalBytesMapped > MAX_PI_SIZE)
 				{
-					ocfmException objex;
-					objex.OCFMException(OCFM_ERR_MAX_PI_SIZE);
-					throw objex;
+					ocfmRetCode exceptionObj;
+					exceptionObj.setErrorCode(OCFM_ERR_MAX_PI_SIZE);
+					throw exceptionObj;
 				}
 				CreateMNPDOVar(offsetVal, dataSize, piObj.dataInfo.iecDtVar,
 						pdoType, nodeObj);
@@ -5291,12 +5170,15 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 //INT32 DecodeUniqueIDRef(char* uniqueidRefID, Node* nodeObj, PDOType pdoType, char* moduleName, char* moduleIndex)
 INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubIndex* sidxObj, Index* moduleIndexObj, SubIndex* moduleSidxObj)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	ostringstream errorString;
 //moduleSidxObj can be null for Var object types
 	if ((NULL == uniqueidRefId) || (NULL == nodeObj) || (NULL == sidxObj) || (NULL == moduleIndexObj))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+#if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
+#endif
 		return 0;
 	}
 
@@ -5319,18 +5201,16 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniqueidRefId);
 				if (parameterObj == NULL)
 				{
-					exceptionObj.OCFMException(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
-					char customError[300] = { 0 };
-					sprintf(customError, "Parameter with UniqueIdRef=%s not found\n In %s(%d) which is mapped via the module %s(0x%s)", uniqueidRefId, nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue());
-					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+					exceptionObj.setErrorCode(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
+					errorString << "Parameter with UniqueIdRef=" << uniqueidRefId <<" not found\n In " << nodeObj->GetNodeName() <<"("<<nodeObj->GetNodeId()<<") which is mapped via the module "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")";
+					exceptionObj.setErrorString(errorString.str());
 					throw exceptionObj;
 				}
 				if (parameterObj->accessStr == NULL)
 				{
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-					char customError[300] = { 0 };
-					sprintf(customError, "AccessType not found for the parameter with uniqueIdRef: %s\n In %s(%d) which is mapped via the module %s(%s)", uniqueidRefId, nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetName());
-					CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+					errorString << "AccessType not found for the parameter with uniqueIdRef: "<< uniqueidRefId << "\n In " << nodeObj->GetNodeName() <<"("<< nodeObj->GetNodeId() <<") which is mapped via the module "<< moduleIndexObj->GetName() <<"("<< moduleIndexObj->GetName() <<")";
+					exceptionObj.setErrorString(errorString.str());
 					throw exceptionObj;
 				}
 
@@ -5341,10 +5221,9 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				{
 					if(!IsValidAccessTypeForPdo(indexObj.GetPDOType(), (char*) moduleSidxObj->GetPDOMapping(), parameterObj->accessStr))
 					{
-						char customError[300] = { 0 };
-						sprintf(customError, "Parameter with accessType=%s cannot be mapped to PDO\n In %s(%d), %s/%s mapped via the module %s(0x%s)/%s(0x%s)", parameterObj->accessStr, nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetName(), moduleSidxObj->GetIndexValue());
-						exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+						exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+						errorString <<"Parameter with accessType="<<parameterObj->accessStr<<" cannot be mapped to PDO\n In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue()<<" mapped via the module "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")/"<<moduleSidxObj->GetName()<<"(0x"<<moduleSidxObj->GetIndexValue()<<")";
+						exceptionObj.setErrorString(errorString.str());
 						throw exceptionObj;
 					}
 				}
@@ -5352,10 +5231,9 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				{
 					if(!IsValidAccessTypeForPdo(indexObj.GetPDOType(), (char*) moduleIndexObj->GetPDOMapping(), parameterObj->accessStr))
 					{
-						char customError[300] = { 0 };
-						sprintf(customError, "Parameter with accessType=%s cannot be mapped to PDO\n In %s(%d), %s/%s mapped via the module %s(0x%s)", parameterObj->accessStr, nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue());
-						exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+						exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+						errorString << "Parameter with accessType="<<parameterObj->accessStr<<" cannot be mapped to PDO\n In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue()<<" mapped via the module "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")";
+						exceptionObj.setErrorString(errorString.str());
 						throw exceptionObj;
 					}
 				}
@@ -5366,10 +5244,9 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 					cdtObj = appProcessObj->GetCDTbyUniqueID(parameterObj->nameIdDtAttr->GetDtUniqueRefId());
 					if (cdtObj == NULL)
 					{
-						exceptionObj.OCFMException(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
-						char customError[200] = { 0 };
-						sprintf(customError, "In node id: %d object %s with unique id: %s, reference to dataTypeUniqueIDRef: %s not found", nodeObj->GetNodeId(), moduleIndexObj->GetName(), uniqueidRefId, parameterObj->nameIdDtAttr->GetDtUniqueRefId());
-						CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+						exceptionObj.setErrorCode(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
+						errorString << "In node id: "<<nodeObj->GetNodeId()<<" object "<<moduleIndexObj->GetName()<<" with unique id: "<<uniqueidRefId<<", reference to dataTypeUniqueIDRef: "<<parameterObj->nameIdDtAttr->GetDtUniqueRefId()<<" not found";
+						exceptionObj.setErrorString(errorString.str());
 						throw exceptionObj;
 					}
 					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, indexObj.GetPDOType(), (char*)moduleIndexObj->GetName(), (char*) moduleIndexObj->GetIndexValue());
@@ -5471,22 +5348,20 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 			}
 		}
 
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
 		throw ex;
 	}
 	return totalBytesMapped;
 }
 
-ocfmRetCode ProcessPDONodes()
-{
-	return (ProcessPDONodes(false));
-}
-
 ocfmRetCode ProcessPDONodes(bool isBuild)
 {
 	NodeCollection *nodeCollObj = NULL;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+	ostringstream errorString;
+
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	Node *nodeObj = NULL;
 	//CNode *pobjMNNode = NULL;
@@ -5498,9 +5373,6 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 	IndexCollection *indexCollObj = NULL;
 	/* Check RPDO Mapped objects*/
 	INT32 nodesCount = 0;
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 	// bool bChangeOffset = false;
 
 	nodesCount = nodeCollObj->GetCNNodesCount();
@@ -5514,7 +5386,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 		if (nodesCount == 0)
 		{
 			//exit(0);
-			exceptionObj.OCFMException(OCFM_ERR_NO_CN_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -5571,15 +5443,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 				//Validate the number of TPDO's for a CN
 				if (countTPDO > 1)
 				{
-					exceptionObj.OCFMException(
-							OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
-					char acCustomError[200] =
-					{ 0 };
-					sprintf(acCustomError,
-							"CN Node-Id: %d cannot have more than one TPDO Channel",
-							nodeObj->GetNodeId());
-					CopyCustomErrorString(&(exceptionObj._ocfmRetCode),
-							acCustomError);
+					exceptionObj.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+					errorString <<"CN Node-Id: "<<nodeObj->GetNodeId()<<" cannot have more than one TPDO Channel";
+					exceptionObj.setErrorString(errorString.str());
 					throw exceptionObj;
 				}
 
@@ -5632,10 +5498,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							#if defined DEBUG
 							cout<<"00 sidx doesnot exist:: Not Processing - CN " << nodeObj->GetNodeId() << " Index - " << indexObj.GetIndexValue() << endl;
 							#endif
-							exceptionObj.OCFMException(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-							char acCustomError[200] = { 0 };
-							sprintf(acCustomError, "NumberOfEntries(0x00) subindex not found.\n In %s(0x%s), %s(%d)", indexObjB4Sort->GetName(), indexObjB4Sort->GetIndexValue(), nodeObj->GetNodeName(), nodeObj->GetNodeId());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+							exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
+							errorString << "NumberOfEntries(0x00) subindex not found.\n In "<<indexObjB4Sort->GetName()<<"(0x"<<indexObjB4Sort->GetIndexValue()<<"), "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<")";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 
 							//continue;
@@ -5689,11 +5554,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 						if (sidxTotalCount
 								>= (indexObjB4Sort->GetNumberofSubIndexes()))
 						{
-							exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-							char acCustomError[200] = { 0 };
-							sprintf(acCustomError, "Number of subindexes configured exceeds the available subindexes. \n In %s(0x%s), %s(%d)", indexObjB4Sort->GetName(), indexObjB4Sort->GetIndexValue(), nodeObj->GetNodeName(), nodeObj->GetNodeId());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
-
+							exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+							errorString<<"Number of subindexes configured exceeds the available subindexes. \n In "<<indexObjB4Sort->GetName()<<"(0x"<<indexObjB4Sort->GetIndexValue()<<"), "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<")";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 						}
 
@@ -5723,10 +5586,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 							if (sidxObj == NULL)
 							{
-								exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
-								char customError[200] = { 0 };
-								sprintf(customError, "SubIndex with id 0x%s is missing.\n In  %s(%d), %s(0x%s).\n SubIndex should be continuous start from 00 to FE.", sidxId, nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetName(), indexObj.GetIndexValue());
-								CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+								exceptionObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
+								errorString <<"SubIndex with id 0x"<<sidxId<<" is missing.\n In  "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<indexObj.GetName()<<"(0x"<<indexObj.GetIndexValue()<<").\n SubIndex should be continuous start from 00 to FE."; 
+								exceptionObj.setErrorString(errorString.str());
 								delete [] sidxId;
 								throw exceptionObj;
 							}
@@ -5752,10 +5614,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								//Actual pdo mapping value includes 16bit of original payload mapping and two for "0x"
 								if (iLength != (16 + 2))
 								{
-									exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-									char customError[200] = { 0 };
-									sprintf(customError, "Invalid actual value in the subindex(0x%s) for the %s(0x%s), %s(%d)", sidxObj->GetIndexValue(), indexObj.GetName(), indexObj.GetIndexValue(), nodeObj->GetNodeName(), nodeObj->GetNodeId());
-									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+									errorString<<"Invalid actual value in the subindex(0x"<<sidxObj->GetIndexValue()<<") for the "<<indexObj.GetName()<<"(0x"<<indexObj.GetIndexValue()<<"), "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<")";
+									exceptionObj.setErrorString(errorString.str());
 									throw exceptionObj;
 								}
 
@@ -5794,13 +5655,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 								if (moduleIndexObj == NULL)
 								{
-									exceptionObj.OCFMException(
-											OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-									char acCustomError[200];
-									sprintf(acCustomError,
-											"In node id: %d, Index: %s which is mapped as a PDO module does not exist",
-											nodeObj->GetNodeId(), moduleIndex);
-									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+									exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+									errorString<<"In node id: "<<nodeObj->GetNodeId()<<", Index: "<<moduleIndex<<" which is mapped as a PDO module does not exist";
+									exceptionObj.setErrorString(errorString.str());
 									delete[] moduleIndex;
 									throw exceptionObj;
 								}
@@ -5823,21 +5680,18 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									//Check if the object has correct PDOmapping attribute
 									if(!CheckForValidPDOMapping(pdoType, moduleIndexObj))
 									{
-										char customError[300] = { 0 };
-										sprintf(customError, "In %s(%d), %s(0x%s) with PDOmapping=%s cannot be mapped to a ", nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue(), moduleIndexObj->GetPDOMapping());
+										errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") with pdoMapping="<<moduleIndexObj->GetPDOMapping()<<" cannot be mapped to a ";
 										if(pdoType == PDO_TPDO)
 										{
-											strcat((char*) customError, (char*) "TPDO ");
+											errorString<<"TPDO ";
 										}
 										else
 										{
-											strcat((char*) customError, (char*) "RPDO ");
+											errorString<<"RPDO ";
 										}
-										strcat((char*) customError, indexObj.GetIndexValue());
-										strcat((char*) customError, (char*) "/");
-										strcat((char*) customError, sidxObj->GetIndexValue());
-										exceptionObj.OCFMException(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+										errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+										exceptionObj.setErrorString(errorString.str());
 										//Blocked thowing exception for objects with UniqueIdRef because the TCL/TK GUI has no support for UniqueIdRef.
 										if (moduleIndexObj->GetUniqueIDRef() == NULL)
 										{
@@ -5863,21 +5717,18 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 											strcpy(accessStr, moduleIndexObj->GetAccessType());
 											if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleIndexObj->GetPDOMapping(), accessStr))
 											{
-												char customError[300] = { 0 };
-												sprintf(customError, "In %s(%d), %s(0x%s) with AccessType='%s' cannot be mapped to a ", nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue(), moduleIndexObj->GetAccessType());
+												errorString<<"In "<<nodeObj->GetNodeName()<<""<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") with accessType='"<<moduleIndexObj->GetAccessType()<<"' cannot be mapped to a ";
 												if(pdoType == PDO_TPDO)
 												{
-													strcat((char*) customError, (char*) "TPDO ");
+													errorString<<"TPDO ";
 												}
 												else
 												{
-													strcat((char*) customError, (char*) "RPDO ");
+													 errorString<<"RPDO ";
 												}
-												strcat((char*) customError, indexObj.GetIndexValue());
-												strcat((char*) customError, (char*) "/");
-												strcat((char*) customError, sidxObj->GetIndexValue());
-												exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-												CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+												errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+												exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+												exceptionObj.setErrorString(errorString.str());
 												throw exceptionObj;
 											}
 										}
@@ -5898,17 +5749,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 													varSubIndex);
 									if (moduleSidxObj == NULL)
 									{
-										exceptionObj.OCFMException(
-												OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-										char acCustomError[200] =
-										{ 0 };
-										sprintf(acCustomError,
-												"In node id: %d, Index: %s with SubIndex: %s which is mapped as a PDO module does not exist",
-												nodeObj->GetNodeId(),
-												moduleIndexObj->GetIndexValue(), varSubIndex);
-										CopyCustomErrorString(
-												&(exceptionObj._ocfmRetCode),
-												acCustomError);
+										exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
+										errorString<<"In node id: "<<nodeObj->GetNodeId()<<", Index: "<<moduleIndexObj->GetIndexValue()<<" with SubIndex: "<<varSubIndex<<" which is mapped as a PDO module does not exist";
+										exceptionObj.setErrorString(errorString.str());
 										if (moduleName != NULL)
 										{
 											delete[] moduleName;
@@ -5920,21 +5763,18 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										//Check if the subobject has correct PDOmapping attribute
 										if(!CheckForValidPDOMapping(pdoType, moduleIndexObj, moduleSidxObj))
 										{
-											char customError[300] = { 0 };
-											sprintf(customError, "In %s(%d), %s(0x%s)/%s(0x%s) with PDOmapping=%s cannot be mapped to a ", nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetName(), moduleSidxObj->GetIndexValue(), moduleSidxObj->GetPDOMapping());
+											errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")/"<<moduleSidxObj->GetName()<<"(0x"<<moduleSidxObj->GetIndexValue()<<") with pdoMapping="<<moduleSidxObj->GetPDOMapping()<<" cannot be mapped to a ";
 											if(pdoType == PDO_TPDO)
 											{
-												strcat((char*) customError, (char*) "TPDO ");
+												errorString<<"TPDO ";
 											}
 											else
 											{
-												strcat((char*) customError, (char*) "RPDO ");
+												errorString<<"RPDO ";
 											}
-											strcat((char*) customError, indexObj.GetIndexValue());
-											strcat((char*) customError, (char*) "/");
-											strcat((char*) customError, sidxObj->GetIndexValue());
-											exceptionObj.OCFMException(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-											CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+											errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+											exceptionObj.setErrorCode(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
+											exceptionObj.setErrorString(errorString.str());
 											//Blocked thowing exception for objects with UniqueIdRef because the TCL/TK GUI has no support for UniqueIdRef.
 											if (moduleSidxObj->GetUniqueIDRef() == NULL)
 											{
@@ -5970,21 +5810,18 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 												if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleSidxObj->GetPDOMapping(), accessStr))
 												{
-													char customError[300] = { 0 };
-													sprintf(customError, "In %s(%d), %s(0x%s) / %s(0x%s) with AccessType='%s' cannot be mapped to a ", nodeObj->GetNodeName(), nodeObj->GetNodeId(), moduleIndexObj->GetName(), moduleIndexObj->GetIndexValue(), moduleSidxObj->GetName(), moduleSidxObj->GetIndexValue() ,moduleSidxObj->GetAccessType());
+													errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") / "<<moduleSidxObj->GetName()<<"(0x"<<moduleSidxObj->GetIndexValue()<<") with accessType='"<<moduleSidxObj->GetAccessType()<<"' cannot be mapped to a ";
 													if(pdoType == PDO_TPDO)
 													{
-														strcat((char*) customError, (char*) "TPDO ");
+														errorString<<"TPDO ";
 													}
 													else
 													{
-														strcat((char*) customError, (char*) "RPDO ");
+														errorString<<"RPDO ";
 													}
-													strcat((char*) customError, indexObj.GetIndexValue());
-													strcat((char*) customError, (char*) "/");
-													strcat((char*) customError, sidxObj->GetIndexValue());
-													exceptionObj.OCFMException(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-													CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+													errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+													exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
+													exceptionObj.setErrorString(errorString.str());
 													delete[] sidxName;
 													throw exceptionObj;
 												}
@@ -6013,14 +5850,10 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 #endif
 									if (mappedLength != (actualMappedBytes * 8))
 									{
-										exceptionObj.OCFMException(OCFM_ERR_INVALID_SIZE_MAPPED);
-										char acCustomError[200] = { 0 };
-										sprintf(acCustomError,
-											"In %s(%d), Index:0x%s / 0x%s has invalid length mapped\n Mapped length: %d Expected: %d", 
-											nodeObj->GetNodeName(), nodeObj->GetNodeId(), (char*) indexObj.GetIndexValue(),
-											(char*) sidxObj->GetIndexValue(),  mappedLength, (actualMappedBytes * 8));
-										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_SIZE_MAPPED);
 
+										errorString<<"Invalid Length for the mapping object. Index: "<<indexObj.GetIndexValue()<<" SubIndex: "<<sidxObj->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
+										exceptionObj.setErrorString(errorString.str());
 										throw exceptionObj;
 									}
 								}
@@ -6030,15 +5863,13 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									piObj.Initialize();
 									if (dtObj.GetName() == NULL)
 									{
-										exceptionObj.OCFMException(
-												OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
 										throw exceptionObj;
 									}
 									else if (!CheckAllowedDTForMapping(
 											dtObj.GetName()))
 									{
-										exceptionObj.OCFMException(
-												OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
 										throw exceptionObj;
 									}
 
@@ -6145,13 +5976,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 #endif
 									if ((dtObj.dataSize * 8) != mappedLength)
 									{
-										exceptionObj.OCFMException(OCFM_ERR_INVALID_SIZE_MAPPED);
-										char acCustomError[200] = { 0 };
-										sprintf(acCustomError,
-											"In %s(%d), Index:0x%s / 0x%s has invalid length mapped\n Mapped length: %d Expected: %d", 
-											nodeObj->GetNodeName(), nodeObj->GetNodeId(), (char*) indexObj.GetIndexValue(),
-											(char*) sidxObj->GetIndexValue(),  mappedLength, (dtObj.dataSize * 8));
-										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), acCustomError);
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_SIZE_MAPPED);
+										errorString<<"Invalid Length for the mapping object. Index: "<<indexObj.GetIndexValue()<<" SubIndex: "<<sidxObj->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
+										exceptionObj.setErrorString(errorString.str());
 										delete[] sidxName;
 										delete[] moduleName;
 										delete[] accessStr;
@@ -6166,8 +5993,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 											+ dtObj.dataSize;
 									if (totalBytesMapped > MAX_PI_SIZE)
 									{
-										exceptionObj.OCFMException(
-												OCFM_ERR_MAX_PI_SIZE);
+										exceptionObj.setErrorCode(OCFM_ERR_MAX_PI_SIZE);
 										delete[] sidxName;
 										delete[] accessStr;
 										delete[] moduleName;
@@ -6212,10 +6038,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								#endif
 								if ((nodeMappedTotalBytes + mappedLength) > (atoi((const char*)abC_DLL_ISOCHR_MAX_PAYL) * 8))
 								{
-									exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-									char customError[200] = { 0 };
-									sprintf(customError, "Maximum payload limit exceeded for the Channel %s in CN %d. ", indexObj.GetIndexValue(), nodeObj->GetNodeId());
-									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+									errorString<<"Maximum payload limit exceeded for the Channel "<<indexObj.GetIndexValue()<<" in CN "<<nodeObj->GetNodeId()<<".";
+									exceptionObj.setErrorString(errorString.str());
 									throw exceptionObj;
 								}
 
@@ -6251,10 +6076,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										totalChainedBytesMapped = totalChainedBytesMapped + mappedLength;
 										if ((totalChainedBytesMapped) > (atoi((const char*)abC_DLL_ISOCHR_MAX_PAYL) * 8))
 										{
-											exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-											char customError[200] = { 0 };
-											sprintf(customError, "The total payload for the chained stations exceeds the maximum PRes payload limit(1490 bytes) ");
-											CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+											exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+											errorString<<"The total payload for the chained stations exceeds the maximum Pres payload limit(1490 bytes) ";
+											exceptionObj.setErrorString(errorString.str());
 											delete[] modOffset;
 											throw exceptionObj;
 										}
@@ -6281,10 +6105,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 									if (mappedOffset != nodeMappedTotalBytes)
 									{
-										exceptionObj.OCFMException(OCFM_ERR_INVALID_PDO_OFFSET);
-										char customError[200] = { 0 };
-										sprintf(customError, "Incorrect offset configured for the PDO\nIn the node %s(%d), Index: %s(0x%s) subIndex: %s(0x%s)", nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetName(), indexObj.GetIndexValue(), sidxObj->GetName(), sidxObj->GetIndexValue());
-										CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_PDO_OFFSET);
+										errorString<<"Incorrect offset configured for the PDO\nIn the node "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), Index: "<<indexObj.GetName()<<"(0x"<<indexObj.GetIndexValue()<<") subIndex: "<<sidxObj->GetName()<<"(0x"<<sidxObj->GetIndexValue()<<")";
+										exceptionObj.setErrorString(errorString.str());
 										throw exceptionObj;
 									}
 								}
@@ -6300,10 +6123,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							{
 								if (NULL != sidxObj)
 								{
-									exceptionObj.OCFMException(OCFM_ERR_INVALID_VALUE);
-									char customError[200] = { 0 };
-									sprintf(customError, "In node '%s' id:%d, Empty actual value configured for the PDO object %s / %s", nodeObj->GetNodeName(), nodeObj->GetNodeId(), indexObj.GetIndexValue(), sidxObj->GetIndexValue());
-									CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+									exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+									errorString<<"In node '"<<nodeObj->GetNodeName()<<"' id:"<<nodeObj->GetNodeId()<<", Empty actual value configured for the PDO object "<<indexObj.GetIndexValue()<<" / "<<sidxObj->GetIndexValue();
+									exceptionObj.setErrorString(errorString.str());
 									throw exceptionObj;
 								}
 							}
@@ -6324,19 +6146,19 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 		//find the time of build
 		SetBuildTime();
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException& ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 void CalculatePayload()
 {
 
 	NodeCollection *nodeCollObj = NULL;
-
+	ostringstream errorString;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
 	/*Check RPDO Mapped objects*/
@@ -6345,7 +6167,7 @@ void CalculatePayload()
 	{
 		exit(0);
 	}
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	Node *nodeObj = NULL;
 	Node *nodeObjMN = NULL;
 	INT32 totalChainedBytesMapped = 0;
@@ -6457,17 +6279,9 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 					if (sidxTot
 							>= (indexObjB4Sort->GetNumberofSubIndexes()))
 					{
-						exceptionObj.OCFMException(
-								OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-						char acCustomError[200] =
-						{ 0 };
-						sprintf(acCustomError,
-								"Mapping objects not found in index: %s in node: %d",
-								(char*) indexObjB4Sort->GetIndexValue(),
-								nodeObj->GetNodeId());
-						CopyCustomErrorString(&(exceptionObj._ocfmRetCode),
-								acCustomError);
-
+						exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+						errorString<<"Mapping objects not found in index: "<<indexObjB4Sort->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
+						exceptionObj.setErrorString(errorString.str());
 						throw exceptionObj;
 					}
 
@@ -6601,14 +6415,14 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 
 INT32 GetCNDataLen(char* cdcBuffer)
 {
-	ocfmException errCodeObj;
+	ocfmRetCode errCodeObj;
 	INT32 count = 0;
 	INT32 noOfChars = 0;
 	INT32 position = 0;
  
 	if (NULL == cdcBuffer)
 	{
-		errCodeObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		errCodeObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -6841,7 +6655,7 @@ void StartXAPxml(xmlTextWriterPtr& xmlWriter, xmlDocPtr& xmlDocObj)
 	/* Start the document with the xml default for the version,
 	 * encoding UTF-8 and the default for the standalone
 	 * declaration. */
-	bytesWritten = xmlTextWriterStartDocument(xmlWriter, NULL, MY_ENCODING,
+	bytesWritten = xmlTextWriterStartDocument(xmlWriter, NULL, ENCODING,
 			NULL);
 	if (bytesWritten < 0)
 	{
@@ -6894,7 +6708,7 @@ void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName,
 ocfmRetCode GenerateXAP(char* xapFilePath)
 {
 	NodeCollection* nodeCollObj = NULL;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
 	char* xapFileName = new char[strlen(xapFilePath) + 4 + ALLOC_BUFFER];
@@ -6904,12 +6718,12 @@ ocfmRetCode GenerateXAP(char* xapFilePath)
 	{
 		if (nodeCollObj->GetNumberOfNodes() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		if (nodeCollObj->GetCNNodesCount() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_CN_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -6936,19 +6750,19 @@ ocfmRetCode GenerateXAP(char* xapFilePath)
 				inVarsGlobal, outVarsGlobal);
 		delete[] piInCollObj;
 		delete[] piOutCollObj;
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
 		delete[] xapFileName;
-		return ex._ocfmRetCode;
+		return ex;
 	}
 	delete[] xapFileName;
-	return exceptionObj._ocfmRetCode;
+	return exceptionObj;
 }
 
 ocfmRetCode GenerateNET(char* netFilePath)
 {
 	NodeCollection* nodeCollObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	ProcessImage* piInCollObj = NULL;
 	ProcessImage* piOutCollObj = NULL;
@@ -6956,12 +6770,12 @@ ocfmRetCode GenerateNET(char* netFilePath)
 	{
 		if (nodeCollObj->GetNumberOfNodes() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		if (nodeCollObj->GetCNNodesCount() == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_CN_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -6973,29 +6787,27 @@ ocfmRetCode GenerateNET(char* netFilePath)
 				inVarsGlobal, outVarsGlobal);
 		delete[] piInCollObj;
 		delete[] piOutCollObj;
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex._ocfmRetCode;
+		return ex;
 	}
-	return exceptionObj._ocfmRetCode;
+	return exceptionObj;
 }
 
 ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId,
 		AttributeType attributeType, char* outAttributeValue)
 {
 	INT32 indexPos;
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
-		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		exceptionObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 			throw exceptionObj;
 		}
 		Node nodeObj;
@@ -7081,22 +6893,21 @@ ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId,
 				strcpy(outAttributeValue, "0");
 			break;
 		default:
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_ATTRIBUTETYPE);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_ATTRIBUTETYPE);
 			throw exceptionObj;
 		}
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		AttributeType attributeType, char* outAttributeValue)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	try
 	{
@@ -7111,12 +6922,12 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 nodeCount = nodeCollObj->GetNumberOfNodes();
 		if (nodePos >= nodeCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEPOS);
 			throw exceptionObj;
 		}
 		else if (nodeCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -7126,12 +6937,12 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 indexCount = indexCollObj->GetNumberofIndexes();
 		if (indexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw exceptionObj;
 		}
 		else if (indexPos >= indexCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -7209,35 +7020,33 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 				strcpy(outAttributeValue, "0");
 			break;
 		default:
-			errCodeObj.code = OCFM_ERR_INVALID_ATTRIBUTETYPE;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_ATTRIBUTETYPE);
+			return exceptionObj;
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return errCodeObj;
+	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return exceptionObj;
 }
 
 ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		char* indexId, char* sidxId, AttributeType attributeType,
 		char* outAttributeValue)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 	try
 	{
 		INT32 sidxPos = -1;
 		INT32 indexPos = -1;
-		errCodeObj = IfSubIndexExists(nodeId, nodeType, indexId, sidxId,
+		exceptionObj = IfSubIndexExists(nodeId, nodeType, indexId, sidxId,
 				&sidxPos, &indexPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
 			throw exceptionObj;
 		}
 
@@ -7330,23 +7139,22 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 				strcpy(outAttributeValue, "0");
 			break;
 		default:
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXID);
 			throw exceptionObj;
 		}
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue)
 {
-	ocfmRetCode errCodeObj;
-
+	ocfmRetCode exceptionObj;
 	try
 	{
 		// Check for the Existance of the Node in the iNodePos
@@ -7354,19 +7162,19 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		NodeCollection *nodeCollObj = NULL;
 		IndexCollection *indexCollObj = NULL;
 		Index* indexObj = NULL;
-		ocfmException exceptionObj;
+
 
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
 		INT32 nodeCount = nodeCollObj->GetNumberOfNodes();
 		if (nodePos >= nodeCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEPOS);
 			throw exceptionObj;
 		}
 		else if (nodeCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -7376,12 +7184,12 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 indexCount = indexCollObj->GetNumberofIndexes();
 		if (indexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw exceptionObj;
 		}
 		else if (indexPos >= indexCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -7391,12 +7199,12 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 
 		if (subIndexPos >= subIndexCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXPOS);
 			throw exceptionObj;
 		}
 		else if (subIndexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_SUBINDEXS_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_SUBINDEXS_FOUND);
 			throw exceptionObj;
 		}
 
@@ -7477,33 +7285,30 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 			break;
 
 		default:
-			errCodeObj.code = OCFM_ERR_INVALID_ATTRIBUTETYPE;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_ATTRIBUTETYPE);
+			return exceptionObj;
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return errCodeObj;
+	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return exceptionObj;
 
 }
 
 //TODO: nodeId not used. to be removed in header also
 ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount)
 {
-
-	ocfmRetCode errCodeObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
 	NodeCollection *nodeCollObj = NULL;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		if (NULL == outNodeCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
@@ -7514,18 +7319,18 @@ ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount)
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (nodeCollObj->GetNumberOfNodes() < 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 
 		*outNodeCount = nodeCollObj->GetNumberOfNodes();
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 //TODO: change the returning char* to delete varNodeIdStr
@@ -7549,8 +7354,8 @@ char* GetParameterAccess(char* accessStr)
 {
 	if (NULL == accessStr)
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -7568,11 +7373,11 @@ char* GetParameterAccess(char* accessStr)
 
 ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	if (NULL == outIndexCount)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -7580,8 +7385,8 @@ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 	}
 
 	ocfmRetCode stErrorInfo;
-	stErrorInfo.code = OCFM_ERR_UNKNOWN;
-	stErrorInfo.errorString = NULL;
+	stErrorInfo.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	try
 	{
 		Node nodeObj;
@@ -7591,13 +7396,9 @@ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 
 		INT32 nodePos;
 		stErrorInfo = IfNodeExists(nodeId, nodeType, &nodePos, nodeExist);
-		if (stErrorInfo.code == 0 && nodeExist == true)
+		if (stErrorInfo.getErrorCode() != 0 && nodeExist != true)
 		{
-			//continue with process
-		}
-		else
-		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 			throw exceptionObj;
 		}
 
@@ -7607,10 +7408,10 @@ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 
 		*outIndexCount = indexCollObj->GetNumberofIndexes();
 
-		stErrorInfo.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		stErrorInfo.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
 	return stErrorInfo;
 }
@@ -7618,28 +7419,24 @@ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId,
 		INT32* outSubIndexCount)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	if ((NULL == indexId) || (NULL == outSubIndexCount))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
 		throw exceptionObj;
 	}
 
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
-
 	try
 	{
 		INT32 indexPos;
-		errCodeObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		exceptionObj = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 			throw exceptionObj;
 		}
 
@@ -7658,13 +7455,13 @@ ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId,
 
 		*outSubIndexCount = indexObj->GetNumberofSubIndexes();
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 void LoadObjectDictionary(char* xmlFilePath)
@@ -7715,35 +7512,32 @@ ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId,
 		char* outNodeName, StationType* outStationType, char* outForcedCycle,
 		bool* outIsForcedCycle)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	if ((NULL == outNodeId) || (NULL == outNodeName) || (NULL == outStationType)
 			|| (NULL == outForcedCycle) || (NULL == outIsForcedCycle))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
 		throw exceptionObj;
 	}
 
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 	INT32 nodeCount;
 	try
 	{
 		// We do not have support for multiple MNs in this version.
-		errCodeObj = GetNodeCount(MN_NODEID, &nodeCount);
+		exceptionObj = GetNodeCount(MN_NODEID, &nodeCount);
 
 		if (nodePos > nodeCount)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEPOS);
 			throw exceptionObj;
 		}
 		else if (nodeCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 
@@ -7778,22 +7572,21 @@ ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId,
 		*outStationType = nodeObj.GetStationType();
 		*outIsForcedCycle = nodeObj.GetForceCycleFlag();
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType,
 		INT32 indexPos, char* outIndexId)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	Node nodeObj;
 	NodeCollection *nodeCollObj;
 	IndexCollection *indexCollObj;
@@ -7803,15 +7596,11 @@ ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType,
 	try
 	{
 		bool existFlag = false;
-		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
-		if (errCodeObj.code == 0 && existFlag == true)
-		{
-			//continue with process
-		}
-		else
+		exceptionObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
+		if (exceptionObj.getErrorCode() != 0 && existFlag != true)
 		{
 			// Node Doesn't Exist
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 			throw exceptionObj;
 		}
 
@@ -7823,12 +7612,12 @@ ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType,
 
 		if (indexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw exceptionObj;
 		}
 		else if (indexCount < indexPos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -7837,21 +7626,20 @@ ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType,
 		if (indexObj->GetIndexValue() != NULL)
 			strcpy(outIndexId, (char *) indexObj->GetIndexValue());
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 		char* outIndexID)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	Node nodeObj;
 	NodeCollection *nodeCollObj;
 	IndexCollection *indexCollObj;
@@ -7865,12 +7653,12 @@ ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 
 		if (nodeCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		else if (nodeCount < nodePos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEPOS);
 			throw exceptionObj;
 		}
 
@@ -7881,12 +7669,12 @@ ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 
 		if (indexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw exceptionObj;
 		}
 		else if (indexCount < indexPos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -7895,12 +7683,12 @@ ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 		if (indexObj->GetIndexValue() != NULL)
 			strcpy(outIndexID, (char *) indexObj->GetIndexValue());
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 
 }
 
@@ -7913,18 +7701,15 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType,
 	//Index objIndex;
 	Index* indexObj;
 	ocfmRetCode stErrorInfo;
-	ocfmException exceptionObj;
-	stErrorInfo.code = OCFM_ERR_UNKNOWN;
-	stErrorInfo.errorString = NULL;
 
 	try
 	{
 		INT32 indexPos;
 		stErrorInfo = IfIndexExists(nodeId, nodeType, indexId, &indexPos);
-		if (stErrorInfo.code != OCFM_ERR_SUCCESS)
+		if (stErrorInfo.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INDEXID_NOT_FOUND);
-			throw exceptionObj;
+			stErrorInfo.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+			throw stErrorInfo;
 		}
 
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -7936,13 +7721,13 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType,
 		INT32 subIndexCount = indexObj->GetNumberofSubIndexes();
 		if (subIndexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_SUBINDEXS_FOUND);
-			throw exceptionObj;
+			stErrorInfo.setErrorCode(OCFM_ERR_NO_SUBINDEXS_FOUND);
+			throw stErrorInfo;
 		}
 		else if (subIndexCount < subIndexPos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXPOS);
-			throw exceptionObj;
+			stErrorInfo.setErrorCode(OCFM_ERR_INVALID_SUBINDEXPOS);
+			throw stErrorInfo;
 		}
 
 		SubIndex *sidxObj = NULL;
@@ -7951,11 +7736,11 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType,
 		if (sidxObj->GetIndexValue() != NULL)
 			strcpy(outSubIndexID, (char *) sidxObj->GetIndexValue());
 
-		stErrorInfo.code = OCFM_ERR_SUCCESS;
+		stErrorInfo.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
 	return stErrorInfo;
 }
@@ -7968,11 +7753,9 @@ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 	IndexCollection *indexCollObj = NULL;
 	//CIndex objIndex;
 	Index* indexObj = NULL;
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
 	try
 	{
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -7981,12 +7764,12 @@ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 
 		if (nodeCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		else if (nodeCount < nodePos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEPOS);
 			throw exceptionObj;
 		}
 
@@ -7996,12 +7779,12 @@ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 iTempIndexCount = indexCollObj->GetNumberofIndexes();
 		if (iTempIndexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_INDEX_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw exceptionObj;
 		}
 		else if (iTempIndexCount < indexPos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_INDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -8010,12 +7793,12 @@ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 		INT32 subIndexCount = indexObj->GetNumberofSubIndexes();
 		if (subIndexCount == 0)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_NO_SUBINDEXS_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_SUBINDEXS_FOUND);
 			throw exceptionObj;
 		}
 		else if (subIndexCount < subIndexPos)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_SUBINDEXPOS);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_SUBINDEXPOS);
 			throw exceptionObj;
 		}
 
@@ -8025,33 +7808,29 @@ ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 		if (sidxObj->GetIndexValue() != NULL)
 			strcpy(outSubIndexID, (char *) sidxObj->GetIndexValue());
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType)
 {
-	ocfmRetCode errCodeObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
 	INT32 nodePos;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
-		ocfmException exceptionObj;
+		
 		bool existFlag = false;
-		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
+		exceptionObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
 
-		if (errCodeObj.code == 0 && existFlag == true)
+		if (exceptionObj.getErrorCode() != 0 && existFlag != true)
 		{
-		}
-		else
-		{
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 			throw exceptionObj;
 		}
 		//CNode objNode;
@@ -8071,7 +7850,7 @@ ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType)
 			cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
-			exceptionObj.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+			exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 			throw exceptionObj;
 		}
 		nodeObj = nodeCollObj->GetNodePtr(nodeType, nodeId);
@@ -8090,7 +7869,7 @@ ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType)
 			cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
 
-			exceptionObj.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+			exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 			throw exceptionObj;
 		}
 		// Delete IndexCollection
@@ -8115,22 +7894,20 @@ ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType)
 		//Delete ComplexDataTypeCollection
 		appProcessObj->DeleteParameterCollection();
 		appProcessObj->DeleteComplexDataTypeCollection();
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* exCatch)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& exCatch)
 	{
-		return exCatch->_ocfmRetCode;
+		return exCatch;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode SaveProject(char* projectPath, char* projectName)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	int retVal;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
 	char* tempPath;
 	tempPath = new char[(strlen(projectPath)) + (strlen(projectName))
 			+ strlen("cdc_xap") + ALLOC_BUFFER];
@@ -8185,8 +7962,7 @@ ocfmRetCode SaveProject(char* projectPath, char* projectName)
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (nodeCollObj == NULL)
 		{
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
 		if (nodeCollObj->GetNumberOfNodes() > 0)
@@ -8243,31 +8019,30 @@ ocfmRetCode SaveProject(char* projectPath, char* projectName)
 				delete[] fullFileName;
 
 			}
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
 		else
 		{
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_NO_NODES_FOUND);
+			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
 			throw exceptionObj;
 		}
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
 		delete[] tempPath;
-		return ex->_ocfmRetCode;
+		return ex;
 	}
 	delete[] tempPath;
-	return errCodeObj;
+	return exceptionObj;
 }
 
 void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 		Index* indexObj, char* indexId, INT32 prevSize)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	if ((NULL == indexObj) || (NULL == indexId))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -8297,7 +8072,7 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 	delete[] tempIndexId;
 	if (NULL == subIndexObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_UNKNOWN);
+		exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 #if defined DEBUG
 		cout << "pobjSubIndex NULL:" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -8338,8 +8113,8 @@ void SetSIdxValue(char* indexId, char* sidxId, char* value,
 	//TODO: varValue (3rd parameter) to be null checked. Empty value sent in generateotherMNindexes function
 	if ((NULL == indexId) || (NULL == sidxId) || (NULL == indexCollObj))
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -8401,8 +8176,8 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 	char *sidxId = new char[3];
 	char *indexNo = new char[3];
 	char *hexIndexNo = new char[5];
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 	//pobjIndex = pobjIdxCol->getIndexbyIndexValue(varIdx);
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
@@ -8412,7 +8187,7 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 			|| (strcmp("1F27", indexId) == 0) || (strcmp("1F84", indexId) == 0))
 	{
 		strcpy(sidxId, "00");
-		errCodeObj = DeleteSubIndex(nodeId, MN, indexId, sidxId);
+		exceptionObj = DeleteSubIndex(nodeId, MN, indexId, sidxId);
 	}
 	else
 	{
@@ -8480,7 +8255,7 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 	delete[] indexNo;
 	delete[] sidxId;
 }
-
+//TODO REVIEW 
 ocfmRetCode GenerateMNOBD()
 {
 	return (GenerateMNOBD(false));
@@ -8492,14 +8267,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 	Node *nodeObjMN = NULL;
 	NodeCollection *nodeCollObj = NULL;
 	IndexCollection *indexCollObj = NULL;
+	ostringstream errorString;
 
 	char* indexIdMN = new char[INDEX_LEN];
 	char* sidxId = new char[SUBINDEX_LEN];
 	char* mappingSidxId = new char[SUBINDEX_LEN];
 
-	ocfmRetCode errCodeObj;
-
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	INT32 prevSubIndex = 0;
 	INT32 outPrevSize = 0;
 	INT32 chainOutPrevSubIndex = 0;
@@ -8517,19 +8291,19 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		nodeObjMN = nodeCollObj->GetNodePtr(MN, MN_NODEID);
 		if (nodeObjMN == NULL)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_MN_NODE_DOESNT_EXIST);
+			exceptionObj.setErrorCode(OCFM_ERR_MN_NODE_DOESNT_EXIST);
 			throw exceptionObj;
 		}
 		else
 		{
 			/*Process PDO Nodes*/
-			errCodeObj = ProcessPDONodes(IsBuild);
+			exceptionObj = ProcessPDONodes(IsBuild);
 #if defined DEBUG
 			cout << "PDO's in CN Nodes Processed" << endl;
 #endif
-			if (errCodeObj.code != OCFM_ERR_SUCCESS)
+			if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 			{
-				return errCodeObj;
+				return exceptionObj;
 			}
 
 			//CNode objMNNode;
@@ -8562,7 +8336,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			cout << "Deleted PI objects (Axxx indexes) in MN" << endl;
 #endif
 			// Autogenertate other indexs 
-			AuotgenerateOtherIndexs(nodeObjMN);
+			AutogenerateOtherIndexs(nodeObjMN);
 			/* Add other Indexes than PDO*/
 #if defined DEBUG
 			cout << "Autogenerated Other Indexs in MN" << endl;
@@ -8629,13 +8403,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						sidxId = PadLeft(sidxId, '0', 2);
 						indexIdMN = strcat(indexIdMN, sidxId);
-						errCodeObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
-						if (errCodeObj.code != OCFM_ERR_SUCCESS)
+						exceptionObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
+						if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 						{
 #if defined DEBUG
 							cout<<"AddIndex: "<<indexIdMN<<__LINE__<<endl;
 #endif
-							errCodeObj = AddIndex(MN_NODEID, MN, indexIdMN);
+							exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
 						}
 
 						//to write cn node id in 18XX/01
@@ -8646,13 +8420,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						//1800 is used of PRes chained station
 						strcpy(indexIdMN, (char *) "1800");
 						strcpy(sidxId, (char *) "00");
-						errCodeObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
-						if (errCodeObj.code != OCFM_ERR_SUCCESS)
+						exceptionObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
+						if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 						{
 #if defined DEBUG
 							cout<<"AddIndex: "<<indexIdMN<<__LINE__<<endl;
 #endif
-							errCodeObj = AddIndex(MN_NODEID, MN, indexIdMN);
+							exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
 						}
 
 						//to write 0 in 18XX/01 to indicate PRes MN
@@ -8661,9 +8435,8 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					/* set bFlag to true for 1800*/
 					indexObj = indexCollObj->GetIndexbyIndexValue(indexIdMN);
 
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
-						exceptionObj.OCFMException(errCodeObj.code);
 						//delete[] arrangedNodeIDbyStation;
 						throw exceptionObj;
 					}
@@ -8685,20 +8458,19 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					strcat(indexIdMN, sidxId);
 					/* Set the MN's PDO Index*/
 					indexPos = 0;
-					errCodeObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					exceptionObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
 #if defined DEBUG
 						cout<<"AddIndex: "<<indexIdMN<<__LINE__<<endl;
 #endif
-						errCodeObj = AddIndex(MN_NODEID, MN, indexIdMN);
+						exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
 					}
 
 					indexObj->SetFlagIfIncludedCdc(true);
 
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
-						exceptionObj.OCFMException(errCodeObj.code);
 						//delete[] arrangedNodeIDbyStation;
 						throw exceptionObj;
 					}
@@ -8713,10 +8485,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						#endif
 						if(prevSubIndex >= 254)
 						{
-							exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							char customError[200];
-							sprintf(customError, "Maximum limit for the payload frame exceeded while mapping to MN's %s channel. Check in CN %d's, RPDO channel's mapped number of subobjects ", indexObj->GetIndexValue(), nodeObj.GetNodeId());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+							errorString<<"Maximum limit for the payload frame exceeded while mapping to MN's "<<indexObj->GetIndexValue()<<" channel. Check in CN "<<nodeObj.GetNodeId()<<"'s, RPDO channel's mapped number of subobjects ";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 						}
 	
@@ -8726,10 +8497,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						#endif
 						if((outPrevSize + mnPDOObj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{
-							exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							char customError[200];
-							sprintf(customError, "Maximum payload limit exceeded for the TPDO Channel %s in MN ", indexObj->GetIndexValue());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+							errorString<<"Maximum payload limit exceeded for the TPDO Channel "<<indexObj->GetIndexValue()<<" in MN ";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 						}
 
@@ -8770,13 +8540,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 					sidxId = PadLeft(sidxId, '0', 2);
 					indexIdMN = strcat(indexIdMN, sidxId);
-					errCodeObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					exceptionObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
 #if defined DEBUG
 						cout<<"AddIndex: "<<indexIdMN<<__LINE__<<endl;
 #endif
-						errCodeObj = AddIndex(MN_NODEID, MN, indexIdMN);
+						exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
 						/* set bFlag to true for 1800*/
 					}
 					indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
@@ -8785,9 +8555,8 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 					inPrevSubIndex = 0;
 					inPrevSize = 0;
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
-						exceptionObj.OCFMException(errCodeObj.code);
 						//delete[] arrangedNodeIDbyStation;
 						throw exceptionObj;
 					}
@@ -8809,16 +8578,15 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					strcpy(indexIdMN, "16");
 					strcat(indexIdMN, sidxId);
 					/* Set the MN's PDO Index*/
-					errCodeObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
-					if (errCodeObj.code != OCFM_ERR_SUCCESS)
+					exceptionObj = IfIndexExists(MN_NODEID, MN, indexIdMN, &indexPos);
+					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
 #if defined DEBUG
 						cout << "AddIndex: " << indexIdMN << __LINE__ << endl;
 #endif
-						errCodeObj = AddIndex(MN_NODEID, MN, indexIdMN);
-						if (errCodeObj.code != OCFM_ERR_SUCCESS)
+						exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
+						if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 						{
-							exceptionObj.OCFMException(errCodeObj.code);
 							//delete[] arrangedNodeIDbyStation;
 							throw exceptionObj;
 						}
@@ -8839,10 +8607,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						if(inPrevSubIndex >= 254)
 						{
-							exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							char customError[200];
-							sprintf(customError, "Maximum limit for the payload frame exceeded while mapping to MN's %s channel. Check in CN %d's, TPDO channel's mapped number of subobjects ", indexObjTemp->GetIndexValue(), nodeObj.GetNodeId());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+							errorString<<"Maximum limit for the payload frame exceeded while mapping to MN's "<<indexObjTemp->GetIndexValue()<<" channel. Check in CN "<<nodeObj.GetNodeId()<<"'s, TPDO channel's mapped number of subobjects ";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 						}
 
@@ -8853,10 +8620,9 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						if((inPrevSize + mnPDOobj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{
-							exceptionObj.OCFMException(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							char customError[200];
-							sprintf(customError, "Maximum payload limit exceeded for the RPDO Channel %s in MN ", indexObjTemp->GetIndexValue());
-							CopyCustomErrorString(&(exceptionObj._ocfmRetCode), customError);
+							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+							errorString<<"Maximum payload limit exceeded for the RPDO Channel "<<indexObjTemp->GetIndexValue()<<" in MN ";
+							exceptionObj.setErrorString(errorString.str());
 							throw exceptionObj;
 						}
 
@@ -8887,21 +8653,21 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		SetFlagForRequiredMNIndexes(MN_NODEID);
 	}
 
-	catch (ocfmException& exObj)
+	catch (ocfmRetCode& exObj)
 	{
-		return exObj._ocfmRetCode;
+		return exObj;
 	}
 
 	if (txChannelCount > maxNoOfChannels)
 	{
-		errCodeObj.code = OCFM_ERR_EXCESS_CHANNEL;
+		exceptionObj.setErrorCode(OCFM_ERR_EXCESS_CHANNEL);
 	}
 	else
 	{
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 	}
 	delete[] indexIdMN;
-	return errCodeObj;
+	return exceptionObj;
 }
 
 //TODO: No need of pdoType for size calculation. to be removed in header
@@ -9287,9 +9053,9 @@ ocfmRetCode FreeProjectMemory()
 		nodeCollObj->DeleteNode(i);
 	}
 	delete nodeCollObj;
-	ocfmRetCode stErrorInfo;
-	stErrorInfo.code = OCFM_ERR_SUCCESS;
-	return stErrorInfo;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return exceptionObj;
 }
 
 ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
@@ -9319,7 +9085,7 @@ ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
 	xmlReader = xmlReaderForFile(tempFileName, NULL, 0);
 	delete[] tempFileName;
 
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	try
 	{
@@ -9337,7 +9103,7 @@ ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
 #if defined DEBUG 
 				cout << "\nOCFM_ERR_PARSE_XML\n" << endl;
 #endif
-				exceptionObj.OCFMException(OCFM_ERR_PARSE_XML);
+				exceptionObj.setErrorCode(OCFM_ERR_PARSE_XML);
 				throw exceptionObj;
 			}
 		}
@@ -9346,7 +9112,7 @@ ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
 #if defined DEBUG 
 			cout << "\nOCFM_ERR_CANNOT_OPEN_FILE\n" << endl;
 #endif
-			exceptionObj.OCFMException(OCFM_ERR_CANNOT_OPEN_FILE);
+			exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 			throw exceptionObj;
 		}
 
@@ -9391,39 +9157,28 @@ ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
 		}
 		delete[] presTimeoutVal;
 	}
-	catch (ocfmException& objocfmException)
+	catch (ocfmRetCode& ex)
 	{
-		return objocfmException._ocfmRetCode;
+		return ex;
 	}
 
-	try
+	PjtSettings* pjtSettingsObj;
+	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
+	//A compatibility workaround for the pdo mapping and accesstype errors.
+	if(1 == strcmp("1.3.0", pjtSettingsObj->GetPjtVersion()))
 	{
-		PjtSettings* pjtSettingsObj;
-		pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
-		//A compatibility workaround for the pdo mapping and accesstype errors.
-		if(1 == strcmp("1.3.0", pjtSettingsObj->GetPjtVersion()))
-		{
-			exceptionObj.OCFMException(COMPATIBILITY_INFO_PRE_130_PDOMAPPING);
-			throw exceptionObj;
-		}
-		else
-		{
-			//No errors for this project version
-		}
-	} catch (ocfmException& objocfmException)
-	{
-		return objocfmException._ocfmRetCode;
+		exceptionObj.setErrorCode(COMPATIBILITY_INFO_PRE_130_PDOMAPPING);
+		return exceptionObj;
 	}
 
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return errCodeObj;
+	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return exceptionObj;
 }
 
 ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 {
 	const xmlChar *xmlName;
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	xmlName = xmlTextReaderConstName(xmlReader);
 	if (xmlName == NULL)
@@ -9453,8 +9208,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 #if defined DEBUG
 							cout << "openCONFIGURATOR Tag present\n" << endl;
 #endif
-							exceptionObj.OCFMException(
-									OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH);
+							exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH);
 							throw exceptionObj;
 						}
 					}
@@ -9471,7 +9225,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 					cout << "Cannot open project: Invalid Project XML\n"
 					<< endl;
 #endif
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 					throw exceptionObj;
 				}
 			}
@@ -9488,7 +9242,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 						cout << "Cannot open project: Invalid Project XML\n"
 						<< endl;
 #endif
-						exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+						exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 						throw exceptionObj;
 					}
 				}
@@ -9498,7 +9252,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 					cout << "Cannot open project: Invalid Project XML\n"
 					<< endl;
 #endif
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 					throw exceptionObj;
 				}
 			}
@@ -9515,7 +9269,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 						cout << "Cannot open project: Invalid Project XML\n"
 						<< endl;
 #endif
-						exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+						exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 						throw exceptionObj;
 					}
 				}
@@ -9525,7 +9279,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 					cout << "Cannot open project: Invalid Project XML\n"
 					<< endl;
 #endif
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 					throw exceptionObj;
 				}
 			}
@@ -9540,7 +9294,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 					cout << "Cannot open project: Invalid Project XML\n"
 					<< endl;
 #endif
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 					throw exceptionObj;
 				}
 			}
@@ -9554,7 +9308,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 						cout << "Cannot open project: Invalid Project XML\n"
 						<< endl;
 #endif
-						exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+						exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 						throw exceptionObj;
 					}
 					else
@@ -9570,20 +9324,19 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
 					cout << "Cannot open project: Invalid Project XML\n"
 					<< endl;
 #endif
-					exceptionObj.OCFMException(OCFM_ERR_INVALID_PJTXML);
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_PJTXML);
 					throw exceptionObj;
 				}
 			}
 		}
 
-	} catch (ocfmException* exObj)
+	} catch (ocfmRetCode& exObj)
 	{
-		return exObj->_ocfmRetCode;
+		return exObj;
 	}
 
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	return errCodeObj;
+	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	return exceptionObj;
 }
 
 bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader)
@@ -9733,11 +9486,10 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
 	NodeType nodeType; //can't be initialised. and if it is not present false is returned.
 	bool forceCycleFlag = false;
 	StationType stationType;
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	stationType = NORMAL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
@@ -9898,14 +9650,14 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
 	//varNodeName 
 	if (nodeType == 1)
 	{
-		errCodeObj = CreateNode(nodeId, CN, nodeName);
+		exceptionObj = CreateNode(nodeId, CN, nodeName);
 	}
 	else if (nodeType == 0)
 	{
-		errCodeObj = CreateNode(nodeId, MN, nodeName);
+		exceptionObj = CreateNode(nodeId, MN, nodeName);
 	}
 
-	if (errCodeObj.code != OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		return false;
 	}
@@ -9917,7 +9669,7 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
 	nodeObj->SetForceCycleFlag(forceCycleFlag);
 
 #if defined DEBUG
-	cout << "\nCreateNode - stErrorInfo.code:" << errCodeObj.code << endl;
+	cout << "\nCreateNode - stErrorInfo.code:" << exceptionObj.getErrorCode() << endl;
 #endif
 
 	fileName = new char[(strlen(projectPath) + strlen(octFilePath) + 5)];
@@ -9925,14 +9677,14 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
 	delete[] octFilePath;
 	if (nodeType == 1)
 	{
-		errCodeObj = ParseFile(fileName, nodeId, CN);
+		exceptionObj = ParseFile(fileName, nodeId, CN);
 	}
 	else if (nodeType == 0)
 	{
-		errCodeObj = ParseFile(fileName, nodeId, MN);
+		exceptionObj = ParseFile(fileName, nodeId, MN);
 	}
 
-	if (errCodeObj.code != OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		return false;
 	}
@@ -9954,7 +9706,7 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 {
 	PjtSettings* pjtSettingsObj;
 	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 
 	xmlTextWriterPtr xmlWriter;
 	xmlDocPtr xmlDocObj;
@@ -9965,19 +9717,23 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	xmlWriter = xmlNewTextWriterDoc(&xmlDocObj, 0);
 	if (xmlWriter == NULL)
 	{
-		printf("testXmlwriterDoc: Error creating the xml pxtwWriter\n");
-		exceptionObj.OCFMException(OCFM_ERR_CREATE_XML_WRITER_FAILED);
+#if defined DEBUG
+		cout<<"testXmlwriterDoc: Error creating the xml pxtwWriter\n";
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_CREATE_XML_WRITER_FAILED);
 		throw exceptionObj;
 	}
 	/* Start the document with the xml default for the version,
 	 * encoding UTF-8 and the default for the standalone
 	 * declaration. */
-	bytesWritten = xmlTextWriterStartDocument(xmlWriter, NULL, MY_ENCODING,
+	bytesWritten = xmlTextWriterStartDocument(xmlWriter, NULL, ENCODING,
 			NULL);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterStartDocument\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_START_DOC_FAILED);
+#if defined DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterStartDocument\n";
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_START_DOC_FAILED);
 		throw exceptionObj;
 	}
 	bytesWritten = xmlTextWriterWriteComment(xmlWriter,
@@ -9988,8 +9744,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 			BAD_CAST "openCONFIGURATOR");
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#if defined DEBUG
+		cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 		throw exceptionObj;
 	}
 	bytesWritten = xmlTextWriterWriteAttribute(xmlWriter, BAD_CAST "Version",
@@ -10000,8 +9758,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterStartElement(xmlWriter, BAD_CAST "profile");
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10010,8 +9770,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterStartElement(xmlWriter, BAD_CAST "Auto");
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
+#endif 
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10062,8 +9824,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterEndElement(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10073,8 +9837,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 			BAD_CAST "Communication");
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 		throw exceptionObj;
 	}
 	bytesWritten = xmlTextWriterWriteAttribute(xmlWriter, BAD_CAST "IP",
@@ -10084,8 +9850,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterEndElement(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif 
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10093,8 +9861,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterEndElement(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif 
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 		throw exceptionObj;
 	}
 	xmlTextWriterSetIndent(xmlWriter, 1);
@@ -10103,8 +9873,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 			BAD_CAST "NodeCollection");
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 		throw exceptionObj;
 	}
 	//Node nodeObj;
@@ -10127,8 +9899,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 
 		if (bytesWritten < 0)
 		{
-			printf("testXmlwriterMemory: Error at xmlTextWriterStartElement\n");
-			exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+#ifdef DEBUG
+			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
+#endif
+			exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw exceptionObj;
 		}
 
@@ -10200,8 +9974,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 		bytesWritten = xmlTextWriterEndElement(xmlWriter);
 		if (bytesWritten < 0)
 		{
-			printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-			exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif
+			exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			delete[] tempNodeName;
 			delete[] tempNodeID;
 			delete[] tempOctName;
@@ -10217,8 +9993,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterEndElement(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10226,16 +10004,20 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 	bytesWritten = xmlTextWriterEndElement(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndElement\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
+#endif 
+		exceptionObj.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 		throw exceptionObj;
 	}
 
 	bytesWritten = xmlTextWriterEndDocument(xmlWriter);
 	if (bytesWritten < 0)
 	{
-		printf("testXmlwriterDoc: Error at xmlTextWriterEndDocument\n");
-		exceptionObj.OCFMException(OCFM_ERR_XML_END_DOC_FAILED);
+#ifdef DEBUG
+		cout<<"testXmlwriterDoc: Error at xmlTextWriterEndDocument\n";  
+#endif 
+		exceptionObj.setErrorCode(OCFM_ERR_XML_END_DOC_FAILED);
 		throw exceptionObj;
 	}
 
@@ -10253,7 +10035,7 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 		sprintf(fileName, "%s/%s/%s.oct", projectPath, projectName, projectName);
 	}
 #endif
-	xmlSaveFileEnc(fileName, xmlDocObj, MY_ENCODING);
+	xmlSaveFileEnc(fileName, xmlDocObj, ENCODING);
 
 	xmlFreeDoc(xmlDocObj);
 
@@ -10264,10 +10046,10 @@ bool SaveProjectXML(char* projectPath, char* projectName)
 void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 		PDOType pdoType, Node *nodeObj)
 {
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	if (NULL == nodeObj)
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -10463,19 +10245,16 @@ ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
 		bool* isExpertViewAlreadySet)
 {
 
-	ocfmException exceptionObj;
+	ocfmRetCode exceptionObj;
 	if ((NULL == autoGenStatus) || (NULL == autoSaveStatus)
 			|| (NULL == viewMode) || (NULL == isExpertViewAlreadySet))
 	{
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
 		throw exceptionObj;
 	}
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
 	PjtSettings* pjtSettingsObj = NULL;
 	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
 
@@ -10483,7 +10262,7 @@ ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
 	{
 		if (pjtSettingsObj == NULL)
 		{
-			exceptionObj.OCFMException(OCFM_ERR_PROJECT_SETTINGS);
+			exceptionObj.setErrorCode(OCFM_ERR_PROJECT_SETTINGS);
 			throw exceptionObj;
 		}
 
@@ -10492,21 +10271,20 @@ ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
 		*viewMode = pjtSettingsObj->GetViewMode();
 		*isExpertViewAlreadySet = pjtSettingsObj->GetExpertViewSelectedFlag();
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException& objocfmException)
+	} catch (ocfmRetCode& ex)
 	{
-		return objocfmException._ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 		AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet)
 {
-	ocfmRetCode errCodeObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 	PjtSettings* pjtSettingsObj;
 	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
 
@@ -10514,8 +10292,7 @@ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 	{
 		if (pjtSettingsObj == NULL)
 		{
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_PROJECT_SETTINGS);
+			exceptionObj.setErrorCode(OCFM_ERR_PROJECT_SETTINGS);
 			throw exceptionObj;
 		}
 
@@ -10523,24 +10300,24 @@ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 		pjtSettingsObj->SetSaveAttr(autoSaveStatus);
 		pjtSettingsObj->SetViewMode(viewMode);
 		pjtSettingsObj->SetExpertViewSelectedFlag(isExpertViewAlreadySet);
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException& exObj)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& exObj)
 	{
-		return exObj._ocfmRetCode;
+		return exObj;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 //TODO: nodeType is not used. To be removed.
 void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)
 {
+	ocfmRetCode exceptionObj;
 #if defined DEBUG
 	cout<< __FUNCTION__ ;
 #endif
 	if (NULL == indexObj)
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -10585,20 +10362,19 @@ void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)
 	}
 }
 
-void AuotgenerateOtherIndexs(Node* nodeObj)
+void AutogenerateOtherIndexs(Node* nodeObj)
 {
-
+	ocfmRetCode exceptionObj;
 	if (NULL == nodeObj)
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
 		throw exceptionObj;
 	}
 
-	ocfmRetCode errCodeObj;
 	char* indexId = new char[INDEX_LEN + ALLOC_BUFFER];
 	char* sidxId = new char[SUBINDEX_LEN + ALLOC_BUFFER];
 	Index* indexObj;
@@ -10609,16 +10385,16 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 	indexCollObj = nodeObj->GetIndexCollection();
 	/* 1006*/
 	strcpy(indexId, "1006");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
 #if defined DEBUG	
-	cout << "retcode" << errCodeObj.code << endl;
+	cout << "retcode" << exceptionObj.getErrorCode() << endl;
 	cout << "1006 added" << endl;
 #endif
 
 	/*  1300*/
 	strcpy(indexId, "1300");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		SetBasicIndexAttributes(MN_NODEID, MN, indexId, (char*) "5000",
 				(char*) "SDO_SequLayerTimeout_U32", true);
@@ -10626,8 +10402,8 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 
 	/* 1C02*/
 	strcpy(indexId, "1C02");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		/* $:set Flag to true*/
@@ -10656,8 +10432,8 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 
 	/*  1C09*/
 	strcpy(indexId, "1C09");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		/* $:set Flag to true*/
@@ -10670,8 +10446,8 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 
 	/*  1F26*/
 	strcpy(indexId, "1F26");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		/* $:set Flag to true*/
@@ -10692,8 +10468,8 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 #endif
 	/*  1F27*/
 	strcpy(indexId, "1F27");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		/* $:set Flag to true*/
@@ -10711,8 +10487,8 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 
 	/* 1F84*/
 	strcpy(indexId, "1F84");
-	errCodeObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		/* $:set Flag to true*/
@@ -10729,10 +10505,10 @@ void AuotgenerateOtherIndexs(Node* nodeObj)
 
 void UpdatedCNDateORTime(Index* indexObj, INT32 nodeId, DateTime dateOrTime)
 {
+	ocfmRetCode objException;
 	if (NULL == indexObj)
 	{
-		ocfmException objException;
-		objException.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -10759,7 +10535,7 @@ void UpdatedCNDateORTime(Index* indexObj, INT32 nodeId, DateTime dateOrTime)
 	strcpy(indexId, "1020");
 
 	if (OCFM_ERR_SUCCESS
-			!= (IfIndexExists(nodeObj->GetNodeId(), CN, indexId, &indexPos)).code)
+			!= (IfIndexExists(nodeObj->GetNodeId(), CN, indexId, &indexPos)).getErrorCode())
 	{
 		return;
 	}
@@ -10828,8 +10604,8 @@ Index GetPDOIndexByOffset(Index* indexObj)
 {
 	if (NULL == indexObj)
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -10898,24 +10674,18 @@ Index GetPDOIndexByOffset(Index* indexObj)
 ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType,
 		FeatureType featureType, char* featureName, char* outFeatureValue)
 {
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 
 	try
 	{
 		bool existFlag = false;
 		INT32 nodePos;
-		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
-		if (errCodeObj.code == 0 && existFlag == true)
-		{
-			//continue with process
-		}
-		else
+		exceptionObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
+		if (exceptionObj.getErrorCode() != 0 && existFlag != true)
 		{
 			// Node Doesn't Exist
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 			throw exceptionObj;
 		}
 
@@ -10930,22 +10700,19 @@ ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType,
 		strcpy(outFeatureValue,
 				nmtObj->GetNwMgmtFeatureValue(featureType, featureName));
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID,
 		NodeType nodeType, char* nodeName, StationType stationType,
 		char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal)
 {
-	ocfmRetCode errCodeObj;
-	ocfmException exceptionObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
+	ocfmRetCode exceptionObj;
 	INT32 nodePos;
 	try
 	{
@@ -10953,24 +10720,20 @@ ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID,
 
 		if (newNodeID == currentNodeId)
 		{
-			errCodeObj = IfNodeExists(newNodeID, nodeType, &nodePos, bFlag);
-			if (errCodeObj.code == 0 && bFlag == true)
+			exceptionObj = IfNodeExists(newNodeID, nodeType, &nodePos, bFlag);
+			if (exceptionObj.getErrorCode() != 0 && bFlag != true)
 			{
-
-			}
-			else
-			{
-				exceptionObj.OCFMException(OCFM_ERR_INVALID_NODEID);
+				exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
 				throw exceptionObj;
 			}
 
 		}
 		else if (newNodeID != currentNodeId)
 		{
-			errCodeObj = IfNodeExists(newNodeID, nodeType, &nodePos, bFlag);
-			if (errCodeObj.code == OCFM_ERR_SUCCESS && bFlag == true)
+			exceptionObj = IfNodeExists(newNodeID, nodeType, &nodePos, bFlag);
+			if (exceptionObj.getErrorCode() == OCFM_ERR_SUCCESS && bFlag == true)
 			{
-				exceptionObj.OCFMException(OCFM_ERR_NODE_ALREADY_EXISTS);
+				exceptionObj.setErrorCode(OCFM_ERR_NODE_ALREADY_EXISTS);
 				throw exceptionObj;
 			}
 			else
@@ -11089,47 +10852,42 @@ ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID,
 
 				if (setForceCycle == true)
 				{
-					errCodeObj = nodeObj->SetForcedCycle(forcedCycleVal);
+					exceptionObj = nodeObj->SetForcedCycle(forcedCycleVal);
 				}
 
-				if (OCFM_ERR_SUCCESS != errCodeObj.code)
+				if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 				{
-					return errCodeObj;
+					return exceptionObj;
 				}
 
 				nodeObj->SetForceCycleFlag(isForcedCycle);
 			}
 		}
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 
-	} catch (ocfmException* ex)
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType,
 		char* outDataTypes)
 {
-	ocfmRetCode errCodeObj;
-	errCodeObj.errorString = NULL;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	INT32 nodePos;
 	try
 	{
 		bool existFlag = false;
-		errCodeObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
-		if (errCodeObj.code == 0 && existFlag == true)
-		{
-
-		}
-		else
+		exceptionObj = IfNodeExists(nodeId, nodeType, &nodePos, existFlag);
+		if (exceptionObj.getErrorCode() != 0 && existFlag != true)
 		{
 			// Node Doesn't Exist
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_NODE_ALREADY_EXISTS);
+			exceptionObj.setErrorCode(OCFM_ERR_NODE_ALREADY_EXISTS);
 			throw exceptionObj;
 		}
 
@@ -11164,12 +10922,12 @@ ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType,
 			delete[] dtName;
 		}
 
-		errCodeObj.code = OCFM_ERR_SUCCESS;
-	} catch (ocfmException* ex)
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+	} catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
@@ -11303,10 +11061,11 @@ void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
 
 char* GetNodeAssigmentBits(Node* nodeObj)
 {
+	ocfmRetCode exceptionObj;
 	if (NULL == nodeObj)
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -11345,11 +11104,11 @@ void SetPresMNNodeAssigmentBits()
 {
 	INT32 indexPos;
 	INT32 subIndexPos;
-	ocfmRetCode errCodeObj;
-	errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char *) "1F81", (char *) "F0",
+	ocfmRetCode exceptionObj;
+	exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char *) "1F81", (char *) "F0",
 			&subIndexPos, &indexPos);
 
-	if (OCFM_ERR_SUCCESS != errCodeObj.code)
+	if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 	{
 		return;
 	}
@@ -11435,19 +11194,14 @@ void SetPresMNNodeAssigmentBits()
 			sidxObj->SetFlagIfIncludedCdc(true);
 			delete[] nodeAssignData;
 		}
-		else
-		{
-			// no operation
 		}
 	}
 
-}
-
 ocfmRetCode RecalculateMultiplex()
 {
-	ocfmRetCode errCodeObj;
-	errCodeObj.code = OCFM_ERR_UNKNOWN;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
+
 	NodeCollection *nodeCollObj = NULL;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
@@ -11455,29 +11209,27 @@ ocfmRetCode RecalculateMultiplex()
 	{
 		if (false == CheckIfMultiplexedCNExist())
 		{
-			errCodeObj.code = OCFM_ERR_SUCCESS;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+			return exceptionObj;
 		}
 		INT32 indexPos = 0;
 		INT32 subIndexPos = 0;
-		errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F98",
+		exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F98",
 				(char*) "07", &subIndexPos, &indexPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
 			//reset automatically assigned cn force cycle
 			ResetMultiplexedCNForceCycle();
-			errCodeObj.code = OCFM_ERR_SUCCESS;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
+			return exceptionObj;
 		}
 
 		char* actValue = new char[50];
 		actValue[0] = 0;
-		errCodeObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
+		exceptionObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
 				(char*) "07", ACTUALVALUE, actValue);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(errCodeObj.code);
 			delete[] actValue;
 			throw exceptionObj;
 		}
@@ -11489,7 +11241,6 @@ ocfmRetCode RecalculateMultiplex()
 			nodeObj = nodeCollObj->GetNodebyColIndex(nodeLC);
 			if (nodeObj->GetNodeType() == CN)
 			{
-				ocfmRetCode errCodeObj1;
 				static char* value = NULL;
 				if (value != NULL)
 				{
@@ -11504,17 +11255,14 @@ ocfmRetCode RecalculateMultiplex()
 				sIdxActValue[0] = 0;
 				try
 				{
-					errCodeObj1 = GetSubIndexAttributes(MN_NODEID, MN, indexId,
+					exceptionObj = GetSubIndexAttributes(MN_NODEID, MN, indexId,
 							value, ACTUALVALUE, sIdxActValue);
 				} catch (...)
 				{
 					delete[] sIdxActValue;
 					continue;
 				}
-				if (errCodeObj1.code == OCFM_ERR_SUCCESS)
-				{
-				}
-				else
+				if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 				{
 					continue;
 				}
@@ -11548,7 +11296,7 @@ ocfmRetCode RecalculateMultiplex()
 					}
 					else
 					{
-						if (errCodeObj1.code == OCFM_ERR_SUCCESS)
+						if (exceptionObj.getErrorCode() == OCFM_ERR_SUCCESS)
 						{
 							INT32 mnMultiActualValue = 0;
 							if (strncmp(actValue, "0x", 2) == 0
@@ -11647,11 +11395,11 @@ ocfmRetCode RecalculateMultiplex()
 		} //end of for loop
 		delete[] actValue;
 	} //end of try
-	catch (ocfmException* ex)
+	catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 void ResetMultiplexedCNForceCycle()
@@ -11665,7 +11413,7 @@ void ResetMultiplexedCNForceCycle()
 		nodeObj = nodeCollObj->GetNodebyColIndex(nodeLC);
 		if (nodeObj->GetNodeType() == CN)
 		{
-			ocfmRetCode errCodeObj;
+			ocfmRetCode exceptionObj;
 			static char* value = NULL;
 			if (value != NULL)
 			{
@@ -11681,14 +11429,14 @@ void ResetMultiplexedCNForceCycle()
 			try
 			{
 				char indexId[] = MULTIPL_CYCLE_ASSIGN_OBJECT;
-				errCodeObj = GetSubIndexAttributes(MN_NODEID, MN, indexId,
+				exceptionObj = GetSubIndexAttributes(MN_NODEID, MN, indexId,
 						value, ACTUALVALUE, sidxActValue);
 			} catch (...)
 			{
 				delete[] sidxActValue;
 				continue;
 			}
-			if (errCodeObj.code != OCFM_ERR_SUCCESS)
+			if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 			{
 				continue;
 			}
@@ -11792,10 +11540,10 @@ void CopySubIndexDefToAct(INT32 nodeId, NodeType nodeType, bool forceCopy,
 
 void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 {
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	if (cycleValue == NULL || strcmp(cycleValue, "") == 0)
 	{
-		errCodeObj.code = OCFM_ERR_SUCCESS;
+		exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 		//return stErrorInfo;
 		return;
 	}
@@ -11830,12 +11578,12 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 		try
 		{
 
-			errCodeObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
+			exceptionObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
 					(char*) "07", ACTUALVALUE, actValue);
 		} catch (...)
 		{
 			delete[] actValue;
-			errCodeObj.code = OCFM_ERR_SUCCESS;
+			exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
 			return;
 		}
 
@@ -11875,10 +11623,6 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 					{
 						return;
 					}
-					else
-					{
-						//continue the function
-					}
 					delete[] ForcedCycleValue;
 				}
 			} // end of if loop 1
@@ -11895,9 +11639,6 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 						|| strcmp(objNode->GetForcedCycleValue(), "") == 0)
 				{
 					continue;
-				}
-				else
-				{
 				}
 
 				char* forcedCycleValue = new char[strlen(
@@ -11921,10 +11662,6 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 				if (tempCycleValue >= actualValueCN || actualValueCN == 1)
 				{
 					continue;
-				}
-				else
-				{
-					//continue the function
 				}
 				actualValueCN--;
 				cycleNumberGlobal = actualValueCN;
@@ -11954,50 +11691,47 @@ void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
 
 ocfmRetCode CheckMutliplexAssigned()
 {
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	NodeCollection *nodeCollObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	INT32 nodesCount = 0;
 	nodesCount = nodeCollObj->GetCNNodesCount();
-	errCodeObj.code = OCFM_ERR_SUCCESS;
-	errCodeObj.errorString = NULL;
 
 	try
 	{
 		bool setErrFlag = false;
 		if (nodesCount == 0)
 		{
-			errCodeObj.code = OCFM_ERR_NO_CN_NODES_FOUND;
-			return errCodeObj;
+			exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
+			return exceptionObj;
 		}
 		if (false == CheckIfMultiplexedCNExist())
 		{
-			return errCodeObj;
+			return exceptionObj;
 		}
 		char* actValue = new char[50];
 		actValue[0] = 0;
 		INT32 subIndexPos = 0;
 		INT32 indexPos = 0;
-		errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F98",
+		exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F98",
 				(char*) "07", &subIndexPos, &indexPos);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			errCodeObj.code = OCFM_ERR_MULTIPLEX_ASSIGN_ERROR;
-			CopyCustomErrorString(&errCodeObj,
-					(char*) "In MN the SubIndex 07 of the Index 1F98 does not exist. So multiplexing cannot be supported");
+			exceptionObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
+			exceptionObj.setErrorString(string("In MN the SubIndex 07 of the Index 1F98 does not exist. So multiplexing cannot be supported"));
 			delete[] actValue;
-			return errCodeObj;
+			return exceptionObj;
 		}
-		errCodeObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
+		exceptionObj = GetSubIndexAttributes(MN_NODEID, MN, (char*) "1F98",
 				(char*) "07", ACTUALVALUE, actValue);
-		if (errCodeObj.code != OCFM_ERR_SUCCESS)
+		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
 			delete[] actValue;
-			return errCodeObj;
+			return exceptionObj;
 		}
 
-		errCodeObj.errorString = new char[500];
-		strcpy(errCodeObj.errorString, "CN with nodeid ");
+		ostringstream errorString;
+		errorString<<"CN with nodeid ";
 		INT32 tempActualValue = 0;
 		if (strncmp(actValue, "0x", 2) == 0 || strncmp(actValue, "0X", 2) == 0)
 		{
@@ -12019,8 +11753,6 @@ ocfmRetCode CheckMutliplexAssigned()
 			{
 				if (nodeObj->GetStationType() == MULTIPLEXED)
 				{
-
-					ocfmRetCode errCodeObj1;
 					static char* tempValue = NULL;
 					if (tempValue != NULL)
 					{
@@ -12035,7 +11767,7 @@ ocfmRetCode CheckMutliplexAssigned()
 					subIndActValue[0] = 0;
 					try
 					{
-						errCodeObj1 = GetSubIndexAttributes(MN_NODEID, MN,
+						exceptionObj = GetSubIndexAttributes(MN_NODEID, MN,
 								acMultiCycleAssignObj, tempValue, ACTUALVALUE,
 								subIndActValue);
 					} catch (...)
@@ -12044,7 +11776,7 @@ ocfmRetCode CheckMutliplexAssigned()
 						//delete[] strConvertedValue;
 						continue;
 					}
-					if (errCodeObj1.code == OCFM_ERR_SUCCESS)
+					if (exceptionObj.getErrorCode() == OCFM_ERR_SUCCESS)
 					{
 					}
 					else
@@ -12084,9 +11816,7 @@ ocfmRetCode CheckMutliplexAssigned()
 						}
 						else
 						{
-							sprintf(errCodeObj.errorString, "%s%d, ",
-									errCodeObj.errorString,
-									nodeObj->GetNodeId());
+							errorString<<nodeObj->GetNodeId();
 							setErrFlag = true;
 						}
 					}
@@ -12099,23 +11829,22 @@ ocfmRetCode CheckMutliplexAssigned()
 		} //end of for loop
 		if (setErrFlag == true)
 		{
-			errCodeObj.code = OCFM_ERR_MULTIPLEX_ASSIGN_ERROR;
-			errCodeObj.errorString[strlen(errCodeObj.errorString) - 2] = 0;
-			strcat(errCodeObj.errorString,
-					" multiplex cycle value exceeds the multiplex prescalar");
+			exceptionObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
+			errorString<<" multiplex cycle value exceeds the multiplex prescalar";
+			exceptionObj.setErrorString(errorString.str());
 		}
 		delete[] actValue;
 	} //end of try
-	catch (ocfmException* ex)
+	catch (ocfmRetCode& ex)
 	{
-		return ex->_ocfmRetCode;
+		return ex;
 	}
-	return errCodeObj;
+	return exceptionObj;
 }
 
 UINT32 GetFreeCycleNumber(UINT32 parmCycleNumber)
 {
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	NodeCollection *nodeCollObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	INT32 nodeCount = 0;
@@ -12125,9 +11854,7 @@ UINT32 GetFreeCycleNumber(UINT32 parmCycleNumber)
 
 	if (nodeCount == 0)
 	{
-		errCodeObj.code = OCFM_ERR_NO_CN_NODES_FOUND;
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(errCodeObj.code);
+		exceptionObj.setErrorCode(OCFM_ERR_NO_CN_NODES_FOUND);
 		return parmCycleNumber;
 	}
 	for (UINT32 cycleNumberLC = 1; cycleNumberLC < parmCycleNumber;
@@ -12167,11 +11894,7 @@ UINT32 GetFreeCycleNumber(UINT32 parmCycleNumber)
 					{
 						break;
 					}
-					else
-					{
-						//continue the function
 					}
-				}
 			} // end of if loop 1
 			if (nodeLC == nodeCollObj->GetNumberOfNodes() - 1)
 			{
@@ -12238,11 +11961,7 @@ bool IsMultiplexCycleNumberContinuous(UINT32 parmCycleNumber)
 					{
 						break;
 					}
-					else
-					{
-						//continue the function
 					}
-				}
 			} // end of if loop 1
 			if (nodeLC == nodeCollObj->GetNumberOfNodes() - 1)
 			{
@@ -12262,10 +11981,10 @@ void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType)
 	}
 	INT32 subIndexPos;
 	INT32 indexPos;
-	ocfmRetCode errCodeObj;
-	errCodeObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
+	ocfmRetCode exceptionObj;
+	exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
 			(char*) "03", &subIndexPos, &indexPos);
-	if (errCodeObj.code != OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		return;
 	}
@@ -12342,29 +12061,6 @@ void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType)
 	delete[] tempVal;
 }
 
-void CopyCustomErrorString(ocfmRetCode* errCodeObj, char* customErrStr)
-{
-	if ((NULL == errCodeObj) || (NULL == customErrStr))
-	{
-		return;
-	}
-	else
-	{
-		//Nothing to do
-	}
-
-	if (0 == strlen(customErrStr))
-	{
-		return;
-	}
-	else
-	{
-		//Nothing to do
-	}
-
-	errCodeObj->errorString = new char[strlen(customErrStr) + ALLOC_BUFFER];
-	strcpy(errCodeObj->errorString, customErrStr);
-}
 
 bool CheckIfMultiplexedCNExist()
 {
@@ -12396,8 +12092,8 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 	}
 
 	IndexCollection *indexCollObj = NULL;
-	ocfmRetCode errCodeObj;
-	errCodeObj.errorString = NULL;
+	ocfmRetCode exceptionObj;
+
 	INT32 indexPos;
 
 	indexCollObj = nodeObj->GetIndexCollection();
@@ -12405,9 +12101,9 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 
 	strcpy(tempIndexId, indexId);
 
-	errCodeObj = IfIndexExists(MN_NODEID, MN, tempIndexId, &indexPos);
+	exceptionObj = IfIndexExists(MN_NODEID, MN, tempIndexId, &indexPos);
 	delete[] tempIndexId;
-	if (errCodeObj.code == OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() == OCFM_ERR_SUCCESS)
 	{
 		Index *indexObj = NULL;
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
@@ -12439,9 +12135,9 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 				}
 				INT32 nodePos;
 				bool bFlag = false;
-				errCodeObj = IfNodeExists(nodeIdVal, nodeType, &nodePos, bFlag);
+				exceptionObj = IfNodeExists(nodeIdVal, nodeType, &nodePos, bFlag);
 
-				if (((OCFM_ERR_SUCCESS == errCodeObj.code ) && (true == bFlag)) && ((CN == nodeType) || (true == allowMNSubindex)))
+				if (((OCFM_ERR_SUCCESS == exceptionObj.getErrorCode() ) && (true == bFlag)) && ((CN == nodeType) || (true == allowMNSubindex)))
 				{
 					//continue
 				}
@@ -12468,24 +12164,24 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 
 bool ValidateCNPresTimeout(char* subIndexId, char* presTimeOutVal)
 {
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	INT32 sidxPos = 0;
 	INT32 indexPos = 0;
 	bool retval = false;
 
-	errCodeObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F92", subIndexId,
+	exceptionObj = IfSubIndexExists(MN_NODEID, MN, (char*) "1F92", subIndexId,
 			&sidxPos, &indexPos);
-	if (errCodeObj.code != OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		return retval;
 	}
 
 	INT32 nodeId = (INT32) HexToInt(subIndexId);
-	errCodeObj = IfSubIndexExists(nodeId, CN, (char*) "1F98", (char*) "03",
+	exceptionObj = IfSubIndexExists(nodeId, CN, (char*) "1F98", (char*) "03",
 			&sidxPos, &indexPos);
 
 	char* defaultValueCN = new char[50];
-	if (errCodeObj.code == OCFM_ERR_SUCCESS)
+	if (exceptionObj.getErrorCode() == OCFM_ERR_SUCCESS)
 	{
 		GetSubIndexAttributes(nodeId, CN, (char*) "1F98", (char*) "03",
 				DEFAULTVALUE, defaultValueCN);
@@ -12545,7 +12241,7 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 		return;
 	}
 	INT32 nodeId;
-	ocfmRetCode errCodeObj;
+	ocfmRetCode exceptionObj;
 	INT32 subIndexPos = 0;
 	INT32 indexPos = 0;
 	char* tempNodeIdCN = new char[10];
@@ -12564,9 +12260,9 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 	Index *indexObj;
 	SubIndex* sidxObj;
 
-	errCodeObj = IfSubIndexExists(MN_NODEID, MN, indexId, tempOldNodeIdCN,
+	exceptionObj = IfSubIndexExists(MN_NODEID, MN, indexId, tempOldNodeIdCN,
 			&subIndexPos, &indexPos);
-	if (OCFM_ERR_SUCCESS == errCodeObj.code)
+	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
 		sidxObj = indexObj->GetSubIndexbyIndexValue(tempOldNodeIdCN);
@@ -12581,13 +12277,9 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 						(char*) sidxObj->GetActualValue());
 				tempOldFlg = sidxObj->GetFlagIfIncludedCdc();
 			}
-			errCodeObj = IfSubIndexExists(MN_NODEID, MN, indexId, tempNodeIdCN,
+			exceptionObj = IfSubIndexExists(MN_NODEID, MN, indexId, tempNodeIdCN,
 					&subIndexPos, &indexPos);
-			if (OCFM_ERR_SUCCESS == errCodeObj.code)
-			{
-				//set the value alone
-			}
-			else
+			if (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode())
 			{
 				return;
 			}
@@ -12669,8 +12361,8 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj)
 {
 	if ((NULL == indexCollObj) || (NULL == indexObj))
 	{
-		ocfmException exceptionObj;
-		exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+		ocfmRetCode exceptionObj;
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -12888,8 +12580,8 @@ void SortNodeID(INT32 *nodeIDColl, INT32 collectionSize)
 	{
 		if (NULL == nodeIDColl)
 		{
-			ocfmException exceptionObj;
-			exceptionObj.OCFMException(OCFM_ERR_INVALID_PARAMETER);
+			ocfmRetCode exceptionObj;
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
 #if defined DEBUG
 			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
 #endif
@@ -12910,7 +12602,7 @@ void SortNodeID(INT32 *nodeIDColl, INT32 collectionSize)
 				}
 			}
 		}
-	} catch (ocfmException& ex)
+	} catch (ocfmRetCode& ex)
 	{
 		throw ex;
 	}

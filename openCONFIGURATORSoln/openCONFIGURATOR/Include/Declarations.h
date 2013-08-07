@@ -62,7 +62,7 @@
 #include <stddef.h>
 #include <time.h>
 #include "Exports.h"
-#include "Error.h"
+#include "Exception.h"
 #include "Enums.h"
 #include "UtilityClasses.h"
 

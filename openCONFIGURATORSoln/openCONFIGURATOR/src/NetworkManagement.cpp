@@ -143,15 +143,14 @@ void NetworkManagement::CalculateMaxPDOCount()
 {
 	char* tpdoChannelValue = new char[5];
 	char* featureName = new char[20];
-	maxPDOCount = 0;
+	maxPDOCount = 0;		
+	ocfmRetCode ex;
 	if ((NULL == tpdoChannelValue) || (NULL == featureName))
 	{
 #if defined DEBUG
 		cout << "Memory allocation error" << __FUNCTION__ << endl;
 #endif
-
-		ocfmException ex;
-		ex.OCFMException(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 		throw ex;
 	}
 	else
@@ -164,8 +163,7 @@ void NetworkManagement::CalculateMaxPDOCount()
 		//Min value = 0; Maxvalue = 256 (EPSG specification)
 		if (maxPDOCount > 256)
 		{
-			ocfmException ex;
-			ex.OCFMException(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+			ex.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
 			throw ex;
 		}
 	}
