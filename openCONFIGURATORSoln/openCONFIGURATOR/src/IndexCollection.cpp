@@ -72,7 +72,7 @@
 
 IndexCollection::IndexCollection(void)
 {
-	indexCount = 0;
+
 }
 
 /*************************************************************************/
@@ -90,7 +90,7 @@ IndexCollection::~IndexCollection(void)
 
 void IndexCollection::AddIndex(Index objIndex)
 {
-	INT32 itemPosition = indexCollection.Add();
+	
 	char* subStr = new char[SUBINDEX_LEN];
 	subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
 	if ((0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16")))
@@ -107,30 +107,27 @@ void IndexCollection::AddIndex(Index objIndex)
 		objIndex.SetPDOType(PDO_INVALID);
 	}
 	delete[] subStr;
-	indexCollection[itemPosition] = objIndex;
-	//cout << "iItemPosition" << iItemPosition << endl;
-	indexCount = indexCollection.Count();
+	
+	indexCollection.push_back(objIndex);
 }
 
 void IndexCollection::DeleteIndex(INT32 indexPosition)
 {
-	indexCollection.Remove(indexPosition);
-	indexCount = indexCollection.Count();
+	indexCollection.erase(indexCollection.begin() + indexPosition);
 }
 
 void IndexCollection::DeleteIndexCollection()
 {
-	indexCollection.Clear();
-	indexCount = indexCollection.Count();
+	indexCollection.clear();
 }
 
 //TODO: unused function
 void IndexCollection::DeletePDOs()
 {
-	INT32 loopCount;
+	UINT32 loopCount;
 	char* subStr = new char[SUBINDEX_LEN];
 	Index objIndex;
-	for (loopCount = 0; loopCount < indexCount; loopCount++)
+	for (loopCount = 0; loopCount < indexCollection.size(); loopCount++)
 	{
 		objIndex = indexCollection[loopCount];
 		subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
@@ -138,8 +135,7 @@ void IndexCollection::DeletePDOs()
 				|| (0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16"))
 				|| (0 == strcmp(subStr, "18")))
 		{
-			indexCollection.Remove(loopCount);
-			indexCount = indexCollection.Count();
+			indexCollection.erase(indexCollection.begin() + loopCount);
 			loopCount = 0;
 		}
 	}
@@ -148,18 +144,17 @@ void IndexCollection::DeletePDOs()
 
 void IndexCollection::DeletePIObjects()
 {
-	INT32 iLoopCount = 0;
+	UINT32 iLoopCount = 0;
 	char* subStr = new char[1+1];
 
 	Index objIndex;
-	for (iLoopCount = 0; iLoopCount < indexCount; iLoopCount++)
+	for (iLoopCount = 0; iLoopCount < indexCollection.size(); iLoopCount++)
 	{
 		objIndex = indexCollection[iLoopCount];
 		subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 1);
 		if ((0 == strcmp(subStr, "A")) || (0 == strcmp(subStr, "a")))
 		{
-			indexCollection.Remove(iLoopCount);
-			indexCount = indexCollection.Count();
+			indexCollection.erase(indexCollection.begin() + iLoopCount);
 			iLoopCount = 0;
 		}
 	}
@@ -180,7 +175,7 @@ Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
 		strcpy(idxIdUpper, indexId);
 		idxIdUpper = ConvertToUpper(idxIdUpper);
 
-		for (INT32 loopCount = 0; loopCount < indexCount; loopCount++)
+		for (UINT32 loopCount = 0; loopCount < indexCollection.size(); loopCount++)
 		{
 			objIndex = indexCollection[loopCount];
 			//NULL check values 
@@ -208,6 +203,6 @@ Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
 
 INT32 IndexCollection::GetNumberofIndexes()
 {
-	return indexCount;
+	return indexCollection.size();
 }
 

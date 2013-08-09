@@ -57,7 +57,7 @@
 /* Includes */
 
 #include "Index.h"
-
+#include <vector>
 using namespace std;
 
 /**
@@ -146,7 +146,6 @@ class IndexCollection
 		Index* GetIndexbyIndexValue(char* indexId);
 
 	private:
-		INT32 indexCount;
-		TCollection<Index> indexCollection;
+		vector<Index> indexCollection;
 };
 #endif // IndexCollection_h

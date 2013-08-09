@@ -72,7 +72,6 @@
 
 Index::Index(void)
 {
-	sidxCount = subIndexCollection.Count();
 	pdoType = PDO_INVALID;
 }
 
@@ -105,9 +104,8 @@ void Index::SetPDOType(PDOType varPDOType)
 
 void Index::AddSubIndex(SubIndex objSubIndex)
 {
-	INT32 iItemPosition = subIndexCollection.Add();
-	subIndexCollection[iItemPosition] = objSubIndex;
-	sidxCount = subIndexCollection.Count();
+	subIndexCollection.push_back(objSubIndex);
+
 #if defined DEBUG
 	cout << __FUNCTION__ << "\t Index" << Index::GetIndexValue();
 	cout << "\tSubindex:" << objSubIndex.GetIndexValue() << endl;
@@ -116,19 +114,18 @@ void Index::AddSubIndex(SubIndex objSubIndex)
 
 void Index::DeleteSubIndex(INT32 subIndexPosition)
 {
-	subIndexCollection.Remove(subIndexPosition);
-	sidxCount = subIndexCollection.Count();
+	subIndexCollection.erase(subIndexCollection.begin() + (subIndexPosition));
 }
 
 void Index::DeleteSubIndexCollection()
 {
-	subIndexCollection.Clear();
-	sidxCount = subIndexCollection.Count();
+	subIndexCollection.clear();
+
 }
 
 INT32 Index::GetNumberofSubIndexes()
 {
-	return subIndexCollection.Count();
+	return subIndexCollection.size();
 }
 
 SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
@@ -146,7 +143,7 @@ SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
 		strcpy(sidxIdUpper, subIndexId);
 		sidxIdUpper = ConvertToUpper(sidxIdUpper);
 
-		for (INT32 loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
+		for (UINT32 loopCount = 0; loopCount < subIndexCollection.size(); loopCount++)
 		{
 			objSidx = &subIndexCollection[loopCount];
 			//Check for null , alignment changes
@@ -185,10 +182,10 @@ void Index::SwapSubObjects(INT32 fromPosition, INT32 toPosition)
 
 void Index::UpdateArraySubObjects()
 {
-	INT32 loopCount = 0;
+	UINT32 loopCount = 0;
 	SubIndex* objSidx = NULL;
 
-	for (loopCount = 0; loopCount < subIndexCollection.Count(); loopCount++)
+	for (loopCount = 0; loopCount < subIndexCollection.size(); loopCount++)
 	{
 		objSidx = &subIndexCollection[loopCount];
 		//Check for null , alignment changes

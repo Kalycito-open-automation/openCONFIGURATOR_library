@@ -105,33 +105,28 @@ INT32 ApplicationProcess::CheckFileStatus(char* fileName)
 
 void ApplicationProcess::AddComplexDataType(ComplexDataType objectCdT)
 {
-	INT32 itemPosition = CDTCollection.Add();
-
-	objectCdT.cDtObjPosition = itemPosition;
-	CDTCollection[itemPosition] = objectCdT;
+	CDTCollection.push_back(objectCdT);
 }
 
 void ApplicationProcess::DeleteComplexDataTypeCollection()
 {
-	CDTCollection.Clear();
+	CDTCollection.clear();
 }
 
 void ApplicationProcess::AddParameter(Parameter objectParameter)
 {
-	INT32 itemPosition = ParameterCollection.Add();
+	ParameterCollection.push_back(objectParameter);
 
-	//objectParameter.paraIndex = itemPosition;
-	ParameterCollection[itemPosition] = objectParameter;
 }
 
 void ApplicationProcess::DeleteParameterCollection()
 {
-	ParameterCollection.Clear();
+	ParameterCollection.clear();
 }
 
 INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(char *uniqueIdRef)
 {
-	for (INT32 loopCount = 0; loopCount < ParameterCollection.Count();
+	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
 			loopCount++)
 	{
 		Parameter parameterObj;
@@ -146,7 +141,7 @@ INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(char *uniqueIdRef)
 
 Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(char *uniqueIdRef)
 {
-	for (INT32 loopCount = 0; loopCount < ParameterCollection.Count();
+	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
 			loopCount++)
 	{
 		Parameter parameterObj;
@@ -162,7 +157,7 @@ Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(char *uniqueIdRef)
 
 INT32 ApplicationProcess::GetCDTUniqueIDRef(char *uniqueIdRef)
 {
-	for (INT32 loopCount = 0; loopCount < CDTCollection.Count(); loopCount++)
+	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
 		ComplexDataType complexDtObj;
 
@@ -177,7 +172,7 @@ INT32 ApplicationProcess::GetCDTUniqueIDRef(char *uniqueIdRef)
 
 ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(char *uniqueId)
 {
-	for (INT32 loopCount = 0; loopCount < CDTCollection.Count(); loopCount++)
+	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
 		ComplexDataType complexDtObj;
 
@@ -192,7 +187,7 @@ ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(char *uniqueId)
 
 ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(char *uniqueRefId)
 {
-	for (INT32 iLoopCount = 0; iLoopCount < CDTCollection.Count(); iLoopCount++)
+	for (UINT32 iLoopCount = 0; iLoopCount < CDTCollection.size(); iLoopCount++)
 	{
 		ComplexDataType complexDtObj;
 
@@ -219,7 +214,7 @@ void ApplicationProcess::UpdatePreviousCDTUId(char* uniqueID, INT32 cDtPosition)
 {
 	ComplexDataType* complexDtObj;
 
-	complexDtObj = CDTCollection.GetAddress(cDtPosition);
+	complexDtObj = &CDTCollection[cDtPosition];
 	complexDtObj->prevUniqueId = new char[strlen(uniqueID) + 1];
 	strcpy(complexDtObj->prevUniqueId, uniqueID);
 }
@@ -236,7 +231,7 @@ Parameter ApplicationProcess::GetUniqueIDRefbyParameterIndex(
 
 INT32 ApplicationProcess::GetCDTCount()
 {
-	return CDTCollection.Count();
+	return CDTCollection.size();
 }
 
 //This function has same operation as GetCDTByDtIndex

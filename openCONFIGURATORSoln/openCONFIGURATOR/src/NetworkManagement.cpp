@@ -89,18 +89,17 @@ NetworkManagement::~NetworkManagement(void)
 
 void NetworkManagement::AddFeature(Feature objFeature)
 {
-	INT32 itemPosition = FeatureCollection.Add();
-	FeatureCollection[itemPosition] = objFeature;
+	FeatureCollection.push_back(objFeature);
 }
 
 char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
 		char* featureName)
 {
-	INT32 loopCount = 0;
+	UINT32 loopCount = 0;
 	char* retString = NULL;
 	Feature objFeature;
 
-	for (loopCount = 0; loopCount < FeatureCollection.Count(); loopCount++)
+	for (loopCount = 0; loopCount < FeatureCollection.size(); loopCount++)
 	{
 		objFeature = FeatureCollection[loopCount];
 		if (objFeature.featureType == featureType
@@ -118,7 +117,7 @@ char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
 
 UINT32 NetworkManagement::GetNumberOfFeatures()
 {
-	return FeatureCollection.Count();
+	return FeatureCollection.size();
 }
 
 Feature* NetworkManagement::GetFeature(UINT32 featurePosition)
@@ -128,10 +127,8 @@ Feature* NetworkManagement::GetFeature(UINT32 featurePosition)
 
 void NetworkManagement::DeleteFeatureCollections()
 {
-	if (0 != FeatureCollection.Count())
-	{
-		FeatureCollection.Clear();
-	}
+	FeatureCollection.clear();
+
 }
 
 INT32 NetworkManagement::GetMaxPDOCount()

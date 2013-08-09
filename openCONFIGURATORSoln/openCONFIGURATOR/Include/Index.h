@@ -57,11 +57,12 @@
 /*****************************************************************************/
 /* Includes */
 
-#include "TCollection.h"
+#include <vector>
 #include "Declarations.h"
 #include "BaseIndex.h"
 #include "SubIndex.h"
 
+using namespace std;
 /**
  *****************************************************************************
  \class		Index
@@ -170,8 +171,7 @@ class Index: public BaseIndex
 		SubIndex* GetSubIndexbyIndexValue(char* subIndexId);
 
 	private:
-		INT32 sidxCount;
 		PDOType pdoType;
-		TCollection<SubIndex> subIndexCollection;
+		vector<SubIndex> subIndexCollection;
 };
 #endif // Index_h

@@ -200,27 +200,23 @@ void Node::CreateDataTypeCollection()
 
 void Node::AddProcessImage(ProcessImage piObj)
 {
-	INT32 iItemPosition = PICollection.Add();
-	PICollection[iItemPosition] = piObj;
+	PICollection.push_back(piObj);
 }
 
 void Node::AddNETProcessImage(NETProcessImage netPIobj)
 {
-	INT32 iItemPosition = NETPIColl.Add();
-	NETPIColl[iItemPosition] = netPIobj;
+	NETPIColl.push_back(netPIobj);
 }
 
 void Node::AddMNPDOvar(MNPdoVariable pdoVarObj, PDOType pdotype)
 {
 	if (PDO_RPDO == pdotype)
 	{
-		INT32 iItemPosition = MNPDOOUTVarCollection.Add();
-		MNPDOOUTVarCollection[iItemPosition] = pdoVarObj;
+		MNPDOOUTVarCollection.push_back(pdoVarObj);
 	}
 	else if (PDO_TPDO == pdotype)
 	{
-		INT32 iItemPosition = MNPDOINVarCollection.Add();
-		MNPDOINVarCollection[iItemPosition] = pdoVarObj;
+		MNPDOINVarCollection.push_back(pdoVarObj);
 	}
 }
 
@@ -324,9 +320,9 @@ ProcessImage* Node::GetPIbyParaIndex(INT32 paramerterPos)
 {
 	ProcessImage* piObj = NULL;
 
-	for (INT32 piLC = 0; piLC < PICollection.Count(); piLC++)
+	for (UINT32 piLC = 0; piLC < PICollection.size(); piLC++)
 	{
-		piObj = PICollection.GetAddress(piLC);
+		piObj = &PICollection[piLC];
 
 		if (piObj->parameterPos == paramerterPos)
 		{
@@ -338,26 +334,16 @@ ProcessImage* Node::GetPIbyParaIndex(INT32 paramerterPos)
 
 void Node::DeleteCollectionsForPI()
 {
-	if (0 != MNPDOINVarCollection.Count())
-	{
-		MNPDOINVarCollection.Clear();
-	}
-	if (0 != MNPDOOUTVarCollection.Count())
-	{
-		MNPDOOUTVarCollection.Clear();
-	}
-	if (0 != PICollection.Count())
-	{
-		PICollection.Clear();
-	}
+	MNPDOINVarCollection.clear();
+	MNPDOOUTVarCollection.clear();
+	PICollection.clear();
+
 }
 
 void Node::DeleteCollectionsForNETPI()
 {
-	if (0 != NETPIColl.Count())
-	{
-		NETPIColl.Clear();
-	}
+
+	NETPIColl.clear();
 }
 
 StationType Node::GetStationType()

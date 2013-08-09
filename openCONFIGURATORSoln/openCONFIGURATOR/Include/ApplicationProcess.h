@@ -59,8 +59,8 @@
 /* Includes */
 
 #include <string>
+#include <vector>
 #include "ComplexDataType.h"
-#include "TCollection.h"
 
 using namespace std;
 
@@ -78,8 +78,8 @@ class ApplicationProcess
 
 		char *xddFileName;			/**< Usage to be documented */
 		char *projectPath;			/**< Usage to be documented */
-		TCollection<ComplexDataType> CDTCollection;		/**< Usage to be documented */
-		TCollection<Parameter> ParameterCollection;		/**< Usage to be documented */
+		vector<ComplexDataType> CDTCollection;		/**< Usage to be documented */
+		vector<Parameter> ParameterCollection;		/**< Usage to be documented */
 
 		/*****************************************************************************/
 		/**

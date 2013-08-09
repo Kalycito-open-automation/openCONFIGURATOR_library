@@ -59,9 +59,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "TCollection.h"
+#include <vector>
 #include "UtilityClasses.h"
 
+using namespace std;
 
 /**
  ******************************************************************************************************
@@ -79,7 +80,7 @@ class ComplexDataType
 		char* prevUniqueId;				/**< Usage to be documented */
 		AppProcessCommon *nameIdAttr;	/**< Usage to be documented */
 
-		TCollection<VarDeclaration> varDeclarationCollection;	/**< Variable collection */
+		vector<VarDeclaration> varDeclarationCollection;	/**< Variable collection */
 	
 		/*****************************************************************************/
 		/**

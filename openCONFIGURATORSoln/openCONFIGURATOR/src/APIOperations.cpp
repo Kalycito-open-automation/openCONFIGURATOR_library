@@ -4943,8 +4943,8 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 #if defined DEBUG
 	cout<<"iStartBitOffset: "<<startBitOffset<<"iOffset"<<offsetVal<<"iDataSize"<<dataSize<<"iTotalBytesMapped"<<totalBytesMapped<<endl;
 #endif
-	for (INT32 varDeclLC = 0;
-			varDeclLC < cdtObj->varDeclarationCollection.Count(); varDeclLC++)
+	for (UINT32 varDeclLC = 0;
+			varDeclLC < cdtObj->varDeclarationCollection.size(); varDeclLC++)
 	{
 
 		VarDeclaration varDeclObj;
@@ -5046,9 +5046,9 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 				{
 					startBitOffset = 0;
 					dataSize = 0;
-					for (INT32 bitStrCount = varDeclLC;
+					for (UINT32 bitStrCount = varDeclLC;
 							bitStrCount
-									< cdtObj->varDeclarationCollection.Count();
+									< cdtObj->varDeclarationCollection.size();
 							bitStrCount++)
 					{
 						VarDeclaration varDeclBitStr;
@@ -5130,8 +5130,8 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 	{
 		cdtObj = appProcessObj->GetCDTbyUniqueID(cdtObj->prevUniqueId);
 
-		for (INT32 iLoopCount = (lastVarIndexGlobal + 1);
-				iLoopCount < cdtObj->varDeclarationCollection.Count();
+		for (UINT32 iLoopCount = (lastVarIndexGlobal + 1);
+				iLoopCount < cdtObj->varDeclarationCollection.size();
 				iLoopCount++)
 		{
 			if (!cdtCompletedGlobal)
@@ -5196,7 +5196,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 		if (nodeObj->GetApplicationProcess() != NULL)
 		{
 			appProcessObj = nodeObj->GetApplicationProcess();
-			if (appProcessObj->ParameterCollection.Count() != 0)
+			if (appProcessObj->ParameterCollection.size() != 0)
 			{
 				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniqueidRefId);
 				if (parameterObj == NULL)
@@ -8379,7 +8379,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 				nodeObjMN = nodeCollObj->GetNodePtr(MN, MN_NODEID);
 				indexCollObj = nodeObjMN->GetIndexCollection();
 
-				if (nodeObj.MNPDOOUTVarCollection.Count() != 0)
+				if (nodeObj.MNPDOOUTVarCollection.size() != 0)
 				{
 					if (CHAINED != currCNStation)
 					{
@@ -8474,8 +8474,8 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						//delete[] arrangedNodeIDbyStation;
 						throw exceptionObj;
 					}
-					INT32 pdoOutLC = 0;
-					for (pdoOutLC = 0; pdoOutLC < nodeObj.MNPDOOUTVarCollection.Count(); pdoOutLC++)
+					UINT32 pdoOutLC = 0;
+					for (pdoOutLC = 0; pdoOutLC < nodeObj.MNPDOOUTVarCollection.size(); pdoOutLC++)
 					{
 						MNPdoVariable mnPDOObj;
 						mnPDOObj = nodeObj.MNPDOOUTVarCollection[pdoOutLC];
@@ -8530,7 +8530,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					}
 				}
 
-				if (nodeObj.MNPDOINVarCollection.Count() != 0)
+				if (nodeObj.MNPDOINVarCollection.size() != 0)
 				{
 					/* Create PDO_RxCommParam_XXh_REC 1400 Index*/
 					Index* indexObjTemp;
@@ -8593,8 +8593,8 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					}
 
 					indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
-					INT32 pdoInLC = 0;
-					for (pdoInLC = 0; pdoInLC < nodeObj.MNPDOINVarCollection.Count(); pdoInLC++)
+					UINT32 pdoInLC = 0;
+					for (pdoInLC = 0; pdoInLC < nodeObj.MNPDOINVarCollection.size(); pdoInLC++)
 					{
 						MNPdoVariable mnPDOobj;
 						mnPDOobj = nodeObj.MNPDOINVarCollection[pdoInLC];
@@ -9018,10 +9018,10 @@ ocfmRetCode FreeProjectMemory()
 		nodeObj = nodeCollObj->GetNodebyColIndex(i);
 		nodeObj->DeleteCollectionsForPI();
 		nodeObj->DeleteCollectionsForNETPI();
-		nodeObj->MNPDOINVarCollection.Clear();
-		nodeObj->MNPDOOUTVarCollection.Clear();
-		nodeObj->NETPIColl.Clear();
-		nodeObj->PICollection.Clear();
+		nodeObj->MNPDOINVarCollection.clear();
+		nodeObj->MNPDOOUTVarCollection.clear();
+		nodeObj->NETPIColl.clear();
+		nodeObj->PICollection.clear();
 
 		ApplicationProcess *applObj = NULL;
 		applObj = nodeObj->GetApplicationProcess();

@@ -108,10 +108,10 @@ class Node
 		/*****************************************************************************/
 		NetworkManagement *GetNetworkManagement();
 
-		TCollection<ProcessImage> PICollection;
-		TCollection<MNPdoVariable> MNPDOINVarCollection;
-		TCollection<MNPdoVariable> MNPDOOUTVarCollection;
-		TCollection<NETProcessImage> NETPIColl;
+		vector<ProcessImage> PICollection;
+		vector<MNPdoVariable> MNPDOINVarCollection;
+		vector<MNPdoVariable> MNPDOOUTVarCollection;
+		vector<NETProcessImage> NETPIColl;
 
 		/*****************************************************************************/
 		/**

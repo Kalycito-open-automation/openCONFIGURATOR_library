@@ -58,7 +58,7 @@
 
 #include <string>
 #include "ComplexDataType.h"
-#include "TCollection.h"
+#include <vector>
 
 using namespace std;
 
@@ -138,9 +138,10 @@ class NetworkManagement
 		/*****************************************************************************/
 		char* GetNwMgmtFeatureValue(FeatureType featureType, char* featureName);
 
-		TCollection<Feature> FeatureCollection;
+		
 
 	private:
+		vector<Feature> FeatureCollection;
 		INT32 maxPDOCount;
 };
 

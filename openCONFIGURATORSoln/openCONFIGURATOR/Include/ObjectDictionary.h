@@ -57,14 +57,15 @@
 /* Includes */
 
 #include <libxml/xmlreader.h>
+#include <vector>
 #include "Index.h"
 #include "DataTypeCollection.h"
 #include "IndexCollection.h"
 #include "Declarations.h"
 #include "Node.h"
-#include "TCollection.h"
 #include "Internal.h"
 
+using namespace std;
 /**
  *****************************************************************************
  \class			ObjectDictionary
@@ -86,15 +87,16 @@ class ObjectDictionary
 			INDEX = 0, SUBINDEX
 		};
 
-		typedef struct sattrIdxSIdx
+		class sattrIdxSIdx
 		{
-				char* Idx;
-				char* startIndex;
-				char* endIndex;
-				ObjectType objectType;
-		} sattrIdxSIdx;
+		public:
+			char* Idx;
+			char* startIndex;
+			char* endIndex;
+			ObjectType objectType;
+		};
 
-		TCollection<sattrIdxSIdx> attribCollObj;
+		vector<sattrIdxSIdx> attribCollObj;
 	public:
 
 		static Node* objDictNode;

@@ -89,7 +89,7 @@ ObjectDictionary::ObjectDictionary(void)
 	objDictNode->CreateDataTypeCollection();
 	objDictNode->CreateApplicationProcess();
 	objDictNode->CreateNetworkManagement();
-	varsattrIdxSIdx = attribCollObj.Count();
+	varsattrIdxSIdx = attribCollObj.size();
 }
 
 /*************************************************************************/
@@ -252,10 +252,7 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 
 void ObjectDictionary::AddSameAttributesObjects(sattrIdxSIdx attrIdxPos)
 {
-	INT32 itemPos = attribCollObj.Add();
-
-	attribCollObj[itemPos] = attrIdxPos;
-	varsattrIdxSIdx = attribCollObj.Count();
+	attribCollObj.push_back(attrIdxPos);
 }
 
 void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
@@ -318,7 +315,7 @@ Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
 	}
 	else
 	{
-		for (INT32 iLoopCount = 0; iLoopCount < attribCollObj.Count();
+		for (UINT32 iLoopCount = 0; iLoopCount < attribCollObj.size();
 				iLoopCount++)
 		{
 			sattrIdxSIdx stAttrIdx;
@@ -370,7 +367,7 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
 	}
 	else
 	{
-		for (INT32 attribLC = 0; attribLC < attribCollObj.Count(); attribLC++)
+		for (UINT32 attribLC = 0; attribLC < attribCollObj.size(); attribLC++)
 		{
 			sattrIdxSIdx attribObj;
 			attribObj = attribCollObj[attribLC];

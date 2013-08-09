@@ -95,7 +95,5 @@ ComplexDataType::~ComplexDataType(void)
 
 void ComplexDataType::AddVarDeclaration(VarDeclaration varDeclarationObject)
 {
-	INT32 itemPosition = varDeclarationCollection.Add();
-	varDeclarationCollection[itemPosition] = varDeclarationObject;
-	varDeclarationCollCount = varDeclarationCollection.Count();
+	varDeclarationCollection.push_back(varDeclarationObject);
 }

@@ -71,7 +71,7 @@
 
 DataTypeCollection::DataTypeCollection(void)
 {
-	dataTypeCollectionCount = dataTypeCollectionObj.Count();
+
 }
 
 /*************************************************************************/
@@ -89,20 +89,17 @@ DataTypeCollection::~DataTypeCollection(void)
 
 void DataTypeCollection::AddDataType(DataType objDataType)
 {
-	INT32 itemPosition = dataTypeCollectionObj.Add();
-	dataTypeCollectionObj[itemPosition] = objDataType;
-	dataTypeCollectionCount = dataTypeCollectionObj.Count();
+	dataTypeCollectionObj.push_back(objDataType);
 }
 
 void DataTypeCollection::DeleteDataTypeCollection()
 {
-	dataTypeCollectionObj.Clear();
-	dataTypeCollectionCount = dataTypeCollectionObj.Count();
+	dataTypeCollectionObj.clear();
 }
 
 INT32 DataTypeCollection::GetNumberOfDataTypes()
 {
-	return dataTypeCollectionObj.Count();
+	return dataTypeCollectionObj.size();
 }
 
 DataType* DataTypeCollection::GetDataTypeElement(INT32 dataTypePosition)

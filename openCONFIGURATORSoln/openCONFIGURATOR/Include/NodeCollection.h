@@ -58,6 +58,9 @@
 
 #include "Declarations.h"
 #include "Node.h"
+#include <vector>
+
+using namespace std;
 
 /**
  *****************************************************************************
@@ -191,7 +194,6 @@ class NodeCollection
 	private:
 		static bool instanceFlag;
 		static NodeCollection *objNodeColl;
-		TCollection<Node> nodeCollObj;
-		INT32 nodeCount;
+		vector<Node> nodeCollObj;
 };
 #endif // NodeCollection_h

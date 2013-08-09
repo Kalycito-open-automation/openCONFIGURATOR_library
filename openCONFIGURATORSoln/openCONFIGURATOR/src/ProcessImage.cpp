@@ -119,7 +119,7 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[])
 	{
 		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
-		for (INT32 piLoopCount = 0; piLoopCount < objNode->PICollection.Count();
+		for (UINT32 piLoopCount = 0; piLoopCount < objNode->PICollection.size();
 				piLoopCount++)
 		{
 			if (INPUT == objNode->PICollection[piLoopCount].directionType)
@@ -148,7 +148,7 @@ INT32 GroupNETPIVariables(PIDirectionType directionType,
 	{
 		objNode = objNodeCol->GetNodebyColIndex(iOutLoopCount);
 
-		for (INT32 iInLoopCount = 0; iInLoopCount < objNode->NETPIColl.Count();
+		for (UINT32 iInLoopCount = 0; iInLoopCount < objNode->NETPIColl.size();
 				iInLoopCount++)
 		{
 			if (objNode->NETPIColl[iInLoopCount].directionType == directionType)
@@ -177,8 +177,8 @@ void SetUniquePIVarName()
 	{
 		objNode = objNodeCol->GetNodebyColIndex(nodeLoopCount);
 
-		for (INT32 iInLoopCount = 0;
-				iInLoopCount < objNode->PICollection.Count(); iInLoopCount++)
+		for (UINT32 iInLoopCount = 0;
+				iInLoopCount < objNode->PICollection.size(); iInLoopCount++)
 		{
 			INT32 uniqNameCnt = 1;
 			bool nameMatched = false;
@@ -192,8 +192,8 @@ void SetUniquePIVarName()
 				continue;
 			}
 			//it is possible that the changed var name matching a previous entry
-			for (INT32 iInChkLoopCount = 0;
-					iInChkLoopCount < objNode->PICollection.Count();
+			for (UINT32 iInChkLoopCount = 0;
+					iInChkLoopCount < objNode->PICollection.size();
 					iInChkLoopCount++)
 			{
 				if (iInChkLoopCount == iInLoopCount)
@@ -1420,7 +1420,7 @@ INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo,
 	objNodeCol = NodeCollection::GetNodeColObjectPointer();
 	objNode = objNodeCol->GetNodePtr(CN, nodeId);
 
-	INT32 itemTotal = objNode->NETPIColl.Count();
+	INT32 itemTotal = objNode->NETPIColl.size();
 	for (; itemNo < itemTotal; itemNo++)
 	{
 		if (NULL == objNode->NETPIColl[itemNo].moduleName)

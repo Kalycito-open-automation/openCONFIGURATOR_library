@@ -1402,8 +1402,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST "uniqueID",
 					BAD_CAST objCDT->nameIdAttr->GetUniqueID());
 
-				for (INT32 varDeclLC = 0;
-				        varDeclLC < objCDT->varDeclarationCollection.Count();
+				for (UINT32 varDeclLC = 0;
+					varDeclLC < objCDT->varDeclarationCollection.size();
 				        varDeclLC++)
 				{
 					VarDeclaration vd;
@@ -1534,8 +1534,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		{
 			appProcessObj = nodeObj.GetApplicationProcess();
 
-			for (INT32 parameterLC = 0;
-			        parameterLC < appProcessObj->ParameterCollection.Count();
+			for (UINT32 parameterLC = 0;
+				parameterLC < appProcessObj->ParameterCollection.size();
 			        parameterLC++)
 			{
 				Parameter parameterObj;

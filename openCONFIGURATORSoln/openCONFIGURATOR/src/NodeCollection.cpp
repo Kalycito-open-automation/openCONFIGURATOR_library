@@ -78,7 +78,7 @@ NodeCollection* NodeCollection::objNodeColl = NULL;
 
 NodeCollection::NodeCollection(void)
 {
-	nodeCount = nodeCollObj.Count();
+
 }
 
 /*************************************************************************/
@@ -96,21 +96,18 @@ NodeCollection::~NodeCollection(void)
 
 INT32 NodeCollection::GetNumberOfNodes()
 {
-	return nodeCount;
+	return nodeCollObj.size();
 }
 
 void NodeCollection::AddNode(Node nodeObj)
 {
-	INT32 iItemPosition = nodeCollObj.Add();
+	nodeCollObj.push_back(nodeObj);
 
-	nodeCollObj[iItemPosition] = nodeObj;
-	nodeCount = nodeCollObj.Count();
 }
 
 void NodeCollection::DeleteNode(INT32 nodePos)
 {
-	nodeCollObj.Remove(nodePos);
-	nodeCount = nodeCollObj.Count();
+	nodeCollObj.erase(nodeCollObj.begin() + nodePos);
 }
 
 NodeCollection* NodeCollection::GetNodeColObjectPointer()
@@ -135,10 +132,10 @@ NodeCollection NodeCollection::GetNodeColObject()
 
 Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
 {
-	INT32 nodeLC = 0;
+	UINT32 nodeLC = 0;
 	Node objNode;
 
-	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
+	for (nodeLC = 0; nodeLC < nodeCollObj.size(); nodeLC++)
 	{
 		objNode = objNodeColl->nodeCollObj[nodeLC];
 
@@ -153,10 +150,10 @@ Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
 
 Node* NodeCollection::GetNodePtr(NodeType nodeType, INT32 nodeId)
 {
-	INT32 nodeLC = 0;
+	UINT32 nodeLC = 0;
 	Node* objNode = NULL;
 
-	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
+	for (nodeLC = 0; nodeLC < nodeCollObj.size(); nodeLC++)
 	{
 		objNode = &(objNodeColl->nodeCollObj[nodeLC]);
 
@@ -172,10 +169,10 @@ Node* NodeCollection::GetNodePtr(NodeType nodeType, INT32 nodeId)
 //TODO: unused function
 Node NodeCollection::GetNode(INT32 nodeId)
 {
-	INT32 nodeLC = 0;
+	UINT32 nodeLC = 0;
 	Node objNode;
 
-	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
+	for (nodeLC = 0; nodeLC < nodeCollObj.size(); nodeLC++)
 	{
 		objNode = objNodeColl->nodeCollObj[nodeLC];
 
@@ -189,10 +186,10 @@ Node NodeCollection::GetNode(INT32 nodeId)
 
 Node NodeCollection::GetMNNode()
 {
-	INT32 nodeLC;
+	UINT32 nodeLC;
 	Node objNode;
 
-	for (nodeLC = 0; nodeLC < nodeCount; nodeLC++)
+	for (nodeLC = 0; nodeLC < nodeCollObj.size(); nodeLC++)
 	{
 		objNode = objNodeColl->nodeCollObj[nodeLC];
 
@@ -219,7 +216,7 @@ INT32 NodeCollection::GetCNNodesCount()
 {
 	INT32 cnNodeCount = 0;
 
-	for (INT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.Count();
+	for (UINT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.size();
 			nodeCountLC++)
 	{
 		if (nodeCollObj[nodeCountLC].GetNodeType() == CN)

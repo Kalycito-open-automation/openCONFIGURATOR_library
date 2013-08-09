@@ -57,7 +57,9 @@
 /* Includes */
 
 #include "Declarations.h"
-#include "TCollection.h"
+#include <vector>
+
+using namespace std;
 
 /**
  ****************************************************************************
@@ -129,7 +131,6 @@ class DataTypeCollection
 		DataType* GetDataTypeByName(char* dataTypeValue);
 
 	private:
-		INT32 dataTypeCollectionCount;					/**< Usage to be documented */
-		TCollection<DataType> dataTypeCollectionObj;	/**< Usage to be documented */
+		vector<DataType> dataTypeCollectionObj;	/**< Usage to be documented */
 };
 #endif // DataTypeCollection_h
