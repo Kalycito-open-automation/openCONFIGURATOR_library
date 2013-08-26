@@ -71,11 +71,7 @@ using namespace std;
 class NodeCollection
 {
 	public:
-		NodeCollection(void);
 		~NodeCollection(void);
-
-	public:
-
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the count of Node objects in the collection list
@@ -182,17 +178,11 @@ class NodeCollection
 		 */
 		/*****************************************************************************/
 		INT32 GetCNNodesCount();
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to return the NodeCollection object to be used as the collection list
-		 
-		 \return	NodeCollection
-		 */
-		/*****************************************************************************/
-		static NodeCollection GetNodeColObject();
 
 	private:
-		static bool instanceFlag;
+		NodeCollection(void);
+		NodeCollection(const NodeCollection&);
+
 		static NodeCollection *objNodeColl;
 		vector<Node> nodeCollObj;
 };

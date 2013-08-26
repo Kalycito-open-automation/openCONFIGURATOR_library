@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -60,8 +60,6 @@
 
 /****************************************************************************/
 /* Global Variables */
-
-bool NodeCollection::instanceFlag = false;
 NodeCollection* NodeCollection::objNodeColl = NULL;
 
 //==========================================================================//
@@ -72,7 +70,7 @@ NodeCollection* NodeCollection::objNodeColl = NULL;
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -85,13 +83,17 @@ NodeCollection::NodeCollection(void)
 /* Destructor */
 
 /**
- 
+
 
  */
 
 NodeCollection::~NodeCollection(void)
 {
-	instanceFlag = false;
+	if( NULL != NodeCollection::objNodeColl)
+	{
+		delete NodeCollection::objNodeColl;
+		NodeCollection::objNodeColl = NULL;
+	}
 }
 
 INT32 NodeCollection::GetNumberOfNodes()
@@ -112,22 +114,11 @@ void NodeCollection::DeleteNode(INT32 nodePos)
 
 NodeCollection* NodeCollection::GetNodeColObjectPointer()
 {
-	if (!instanceFlag)
+	if (NodeCollection::objNodeColl == NULL)
 	{
 		objNodeColl = new NodeCollection();
-		instanceFlag = true;
 	}
 	return objNodeColl;
-}
-
-NodeCollection NodeCollection::GetNodeColObject()
-{
-	if (!instanceFlag)
-	{
-		objNodeColl = new NodeCollection();
-		instanceFlag = true;
-	}
-	return *objNodeColl;
 }
 
 Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
@@ -140,7 +131,7 @@ Node NodeCollection::GetNode(NodeType nodeType, INT32 nodeId)
 		objNode = objNodeColl->nodeCollObj[nodeLC];
 
 		if ((objNode.GetNodeType() == nodeType)
-				&& (objNode.GetNodeId() == nodeId))
+		        && (objNode.GetNodeId() == nodeId))
 		{
 			return objNode;
 		}
@@ -158,7 +149,7 @@ Node* NodeCollection::GetNodePtr(NodeType nodeType, INT32 nodeId)
 		objNode = &(objNodeColl->nodeCollObj[nodeLC]);
 
 		if ((objNode->GetNodeType() == nodeType)
-				&& (objNode->GetNodeId() == nodeId))
+		        && (objNode->GetNodeId() == nodeId))
 		{
 			return objNode;
 		}
@@ -217,7 +208,7 @@ INT32 NodeCollection::GetCNNodesCount()
 	INT32 cnNodeCount = 0;
 
 	for (UINT32 nodeCountLC = 0; nodeCountLC < nodeCollObj.size();
-			nodeCountLC++)
+	        nodeCountLC++)
 	{
 		if (nodeCollObj[nodeCountLC].GetNodeType() == CN)
 		{
