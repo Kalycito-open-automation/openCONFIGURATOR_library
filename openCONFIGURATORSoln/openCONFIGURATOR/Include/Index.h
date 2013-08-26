@@ -168,7 +168,7 @@ class Index: public BaseIndex
 		 \return		SubIndex*
 		 */
 		/*****************************************************************************/
-		SubIndex* GetSubIndexbyIndexValue(char* subIndexId);
+		SubIndex* GetSubIndexbyIndexValue(const char* subIndexId);
 
 	private:
 		PDOType pdoType;

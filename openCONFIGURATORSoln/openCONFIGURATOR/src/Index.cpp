@@ -133,7 +133,7 @@ SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
 	return &subIndexCollection[subIndexPosition];
 }
 
-SubIndex* Index::GetSubIndexbyIndexValue(char* subIndexId)
+SubIndex* Index::GetSubIndexbyIndexValue(const char* subIndexId)
 {
 	SubIndex* objSidx = NULL;
 
