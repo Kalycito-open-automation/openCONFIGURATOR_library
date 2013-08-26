@@ -167,7 +167,7 @@ class Node
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetNodeName(char* nodeNameStr);
+		void SetNodeName(const char* nodeNameStr);
 
 		/*****************************************************************************/
 		/**

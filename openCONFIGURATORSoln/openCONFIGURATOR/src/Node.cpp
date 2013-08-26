@@ -144,7 +144,7 @@ char* Node::GetNodeName()
 	return nodeName;
 }
 
-void Node::SetNodeName(char* nodeNameStr)
+void Node::SetNodeName(const char* nodeNameStr)
 {
 	if (NULL != nodeName)
 	{
@@ -279,11 +279,6 @@ IndexCollection* Node::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
 			}
 			pdoIndexCollObj->AddIndex(*indexObj);
 		}
-		else
-		{
-			//other than TPDO or RPDO
-		}
-
 	}
 	return pdoIndexCollObj;
 }
