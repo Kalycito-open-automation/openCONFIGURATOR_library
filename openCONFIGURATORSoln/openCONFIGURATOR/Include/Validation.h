@@ -87,7 +87,7 @@ bool CheckIfDataTypeExists(const char* dataValue, INT32 nodeId);
  \retval	FALSE		if the object of given Node ID and datatype is not present in the NodeCollection list
  */
 /*****************************************************************************/
-bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId);
+bool CheckIfDataTypeByNameExists(const char* dtName, INT32 nodeId);
 /*****************************************************************************/
 /**
  \brief		This API shall be used to check for the presence of SubIndex in Index of given node ID and type in the collection list
@@ -102,8 +102,8 @@ bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId);
  \retval	FALSE			if the required SubIndex does not exist
  */
 /*****************************************************************************/
-bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
-		char* subIndexId);
+bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
+		const char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to retrieve the version number of the tool that was used during generation from the XML file contents and checks if it matches with the tool version
@@ -118,7 +118,6 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
 bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
 bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj);
-
 /**
  \brief		Checks if the SubObject has the property to be mapped as a PDO or not
 
@@ -146,7 +145,7 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj);
  \param[in]		accessType		Character pointer to the value of AccessType property of the object
  \return		bool			Returns true if the accessType is valid
  */
-bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* accessType);
+bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, const char* accessType);
 
 /**
  \brief		Normalizes the value field and updates the base index Obj with the normalized value
@@ -162,6 +161,6 @@ void NormalizeAttributeValue(BaseIndex *idxObj, AttributeType attrType);
  \param[in]		dataTypeValue		Character pointer to the value of dataType property of the object
  \return		bool				Returns true if the dataType is valid
  */
-bool CheckIfStandardDatatypes(char* dataTypeValue);
+bool CheckIfStandardDatatypes(const char* dataTypeValue);
 
 #endif // Validation_h

@@ -321,7 +321,7 @@ bool CheckIfDataTypeExists(const char* dataValue, INT32 nodeId)
 	}
 }
 
-bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId)
+bool CheckIfDataTypeByNameExists(const char* dtName, INT32 nodeId)
 {
 	NodeCollection *nodeCollObj = NULL;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -340,8 +340,8 @@ bool CheckIfDataTypeByNameExists(char* dtName, INT32 nodeId)
 	}
 }
 
-bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, char* indexID,
-		char* subIndexId)
+bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
+		const char* subIndexId)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
@@ -737,7 +737,7 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidx
 	return retVal;
 }
 
-bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, char* pdoMappingVal, char* accessType)
+bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, const char* accessType)
 {
 	bool retVal = false;
 	char* accessTypeUpper = new char[strlen(accessType) + STR_ALLOC_BUFFER];

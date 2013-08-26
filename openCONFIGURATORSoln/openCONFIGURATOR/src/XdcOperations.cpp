@@ -667,7 +667,6 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 
 	INT32 retValue;
 	VarDeclaration varDeclObj;
-	varDeclObj.Initialize();
 	retValue = xmlTextReaderRead(reader);
 
 	if (1 != retValue)
@@ -683,7 +682,6 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	                         (char*) "struct")))
 	{
 		VarDeclaration objTempVarDecl;
-		objTempVarDecl.Initialize();
 
 		try
 		{
@@ -971,7 +969,6 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 				nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 				ApplicationProcess* appProcessObj;
 				Parameter parameterObj;
-				parameterObj.Initialize();
 				nodeObj = nodeCollObj->GetNodePtr(nodeType, nodePos);
 				if (1 == xmlTextReaderHasAttributes(reader))
 				{
@@ -1407,7 +1404,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				        varDeclLC++)
 				{
 					VarDeclaration vd;
-					vd.Initialize();
 					vd = objCDT->varDeclarationCollection[varDeclLC];
 					// Start varDeclaration Tag
 					bytesWritten = xmlTextWriterStartElement(xtwWriter,
@@ -2739,7 +2735,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 	}
 }
 
-bool CheckIfStandardDatatypes(char* dataTypeValue)
+bool CheckIfStandardDatatypes(const char* dataTypeValue)
 {
 	bool retVal = false;
 	if (NULL != dataTypeValue)

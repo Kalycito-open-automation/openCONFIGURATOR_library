@@ -271,7 +271,7 @@ void SetUniquePIVarName()
 	}
 }
 
-PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize)
+PIDataInfo* GetIECDT(const char* iecDataType, INT32 dataSize)
 {
 	PIDataInfo *stDataInfo = new PIDataInfo;
 	stDataInfo->dtName = new char[strlen(iecDataType) + 1];

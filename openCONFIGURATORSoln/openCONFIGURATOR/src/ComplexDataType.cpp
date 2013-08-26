@@ -73,7 +73,6 @@
 ComplexDataType::ComplexDataType(void)
 {
 	nameIdAttr = new AppProcessCommon();
-	nameIdAttr->Initialize();
 	//varIndex = -1;
 	prevUniqueId = NULL;
 	cDtObjPosition = -1;

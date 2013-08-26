@@ -266,7 +266,7 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[]);
  \param		dataSize		Integer to hold the value of data size
  \return		PIDataInfo*
  */
-PIDataInfo* GetIECDT(char* iecDataType, INT32 dataSize);
+PIDataInfo* GetIECDT(const char* iecDataType, INT32 dataSize);
 
 /**
  \brief		This function shall compute and return the INPUT offset for the process image variables

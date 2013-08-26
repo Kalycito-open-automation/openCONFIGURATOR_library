@@ -4948,7 +4948,6 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 	{
 
 		VarDeclaration varDeclObj;
-		varDeclObj.Initialize();
 		varDeclObj = cdtObj->varDeclarationCollection[varDeclLC];
 
 		if (varDeclObj.namIdDtAttr->GetDtUniqueRefId() != NULL)
@@ -5052,8 +5051,6 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 							bitStrCount++)
 					{
 						VarDeclaration varDeclBitStr;
-
-						varDeclBitStr.Initialize();
 						varDeclBitStr =
 								cdtObj->varDeclarationCollection[bitStrCount];
 						if (BITSTRING
@@ -6825,7 +6822,6 @@ ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId,
 		indexObj->SetNodeID(nodeObj.GetNodeId());
 
 		DataType tempDTObj;
-		tempDTObj.Initialize();
 
 		switch (attributeType)
 		{
@@ -6948,7 +6944,6 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 
 		indexObj = indexCollObj->GetIndex(indexPos);
 		DataType tempDTObj;
-		tempDTObj.Initialize();
 
 		switch (attributeType)
 		{
@@ -7067,7 +7062,6 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		subIndexObj = indexObj->GetSubIndex(sidxPos);
 
 		DataType tempDTObj;
-		tempDTObj.Initialize();
 
 		switch (attributeType)
 		{
@@ -7212,7 +7206,6 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 		subIndexObj = indexObj->GetSubIndex(subIndexPos);
 
 		DataType tempDTObj;
-		tempDTObj.Initialize();
 
 		switch (attributeType)
 		{

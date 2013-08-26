@@ -73,7 +73,10 @@ private:
 public:
 	AppProcessCommon(void)
 	{
-		this->Initialize();
+		name = NULL;
+		uniqueId = NULL;
+		dataType = NULL;
+		dataTypeUniqueIDRef = NULL;
 	}
 
 
@@ -86,9 +89,9 @@ public:
 	\brief		This function is used to get the uniqueId of the interface variable or structure component
 	\return		char*	uniqueId of the interface variable or structure component
 	*/
-	char* GetUniqueID()
+	const char* GetUniqueID()
 	{
-		return (uniqueId);
+		return this->uniqueId;
 	}
 
 	/**
@@ -96,8 +99,11 @@ public:
 	\param[in]	varUniqueID		Character pointer to the uniqueId to be set
 	\return		void
 	*/
-	void SetUniqueID(char* varUniqueID)
+	void SetUniqueID(const char* varUniqueID)
 	{
+		if(this->uniqueId != NULL){
+			delete[] this->uniqueId;
+		}
 		uniqueId = new char[strlen(varUniqueID) + 1];
 		strcpy(uniqueId, varUniqueID);
 	}
@@ -106,9 +112,9 @@ public:
 	\brief		This function is used to get the name of the interface variable or structure component	
 	\return		char*	name of the interface variable or structure component
 	*/
-	char* GetName()
+	const char* GetName()
 	{
-		return (name);
+		return this->name;
 	}
 
 	/**
@@ -116,8 +122,11 @@ public:
 	\param[in]	attrName	Character pointer to the name to be set
 	\return		void
 	*/
-	void SetName(char* attrName)
+	void SetName(const char* attrName)
 	{
+		if(this->name != NULL){
+			delete[] name;
+		}
 
 		name = new char[strlen(attrName) + 1];
 		strcpy(name, attrName);
@@ -128,9 +137,9 @@ public:
 	\brief		This function is used to get the dataType of the interface variable or structure component
 	\return		char*	dataType of the interface variable or structure component
 	*/
-	char* GetDataType()
+	const char* GetDataType()
 	{
-		return (dataType);
+		return this->dataType;
 	}
 
 	/**
@@ -138,9 +147,11 @@ public:
 	\param[in]	dtStr	Character pointer to the dataType to be set
 	\return		void
 	*/
-	void SetDataType(char* dtStr)
+	void SetDataType(const char* dtStr)
 	{
-
+		if(this->dataType != NULL){
+			delete[] dataType;
+		}
 		dataType = new char[strlen(dtStr) + 1];
 		strcpy(dataType, dtStr);
 	}
@@ -149,9 +160,9 @@ public:
 	\brief		This function is used to get the uniqueIdReference of the interface variable or structure component
 	\return		char*	dataTypeUniqueIdReference of the interface variable or structure component
 	*/
-	char* GetDtUniqueRefId()
+	const char* GetDtUniqueRefId()
 	{
-		return (dataTypeUniqueIDRef);
+		return this->dataTypeUniqueIDRef;
 	}
 
 	/**
@@ -159,23 +170,13 @@ public:
 	\param[in]	uniqueRefID		Character pointer to the uniqueId Reference to be set
 	\return		void	
 	*/
-	void SetDtUniqueRefId(char* uniqueRefID)
+	void SetDtUniqueRefId(const char* uniqueRefID)
 	{
-
+		if(this->dataTypeUniqueIDRef != NULL){
+			delete[] dataTypeUniqueIDRef;
+		}
 		dataTypeUniqueIDRef = new char[strlen(uniqueRefID) + 1];
 		strcpy(dataTypeUniqueIDRef, uniqueRefID);
-	}
-
-	/**
-	\brief		This function is used to initialise the members to a default value.
-	\return		void
-	*/
-	void Initialize()
-	{
-		name = NULL;
-		uniqueId = NULL;
-		dataType = NULL;
-		dataTypeUniqueIDRef = NULL;
 	}
 };
 
@@ -198,22 +199,16 @@ public:
 
 	VarDeclaration(void)
 	{
-		this->Initialize();
+		namIdDtAttr = new AppProcessCommon();
+		strcpy(size, "");
+		initialValue = NULL;
+		structUniqueId = NULL;
 	}
 
 
 	~VarDeclaration(void)
 	{
-
-	}
-
-	void Initialize(void)
-	{
-		namIdDtAttr = new AppProcessCommon();
-		namIdDtAttr->Initialize();
-		strcpy(size, "");
-		initialValue = NULL;
-		structUniqueId = NULL;
+		
 	}
 };
 
@@ -241,14 +236,13 @@ public:
 	{
 
 	}
-
 	/**
 	\brief		This function is used to get the dataType
 	\return		char*
 	*/
-	char* GetName()
+	const char* GetName()
 	{
-		return (dataTypeName);
+		return this->dataTypeName;
 	}
 	
 	/**
@@ -256,24 +250,14 @@ public:
 	\param[in]	tempDataTypeName	Character pointer to the dataType to be set
 	\return		void
 	*/
-	void SetName(char* tempDataTypeName)
+	void SetName(const char* tempDataTypeName)
 	{
-
+		if(this->dataTypeName != NULL){
+			delete[] dataTypeName;
+		}
 		dataTypeName = new char[strlen(tempDataTypeName) + 1];
 		strcpy(dataTypeName, tempDataTypeName);
 	}
-	
-	/**
-	\brief		This function is used to initialise the members to a default value.
-	\return		void
-	*/
-	void Initialize()
-	{
-		dataTypeName = NULL;
-		dataTypeValue = NULL;
-		dataSize = 0;
-	}
-
 };
 
 /** 
@@ -293,19 +277,12 @@ public:
 	*/
 	Feature(void)
 	{
-		this->Initialize();
+		name = NULL;
+		value = NULL;
 	}
-
 
 	~Feature(void)
 	{
-	}
-
-
-	void Initialize()
-	{
-		name = NULL;
-		value = NULL;
 	}
 };
 
@@ -337,18 +314,9 @@ public:
 		dataSize = 0;
 	}
 
-
 	~MNPdoVariable(void)
 	{
-	}
 
-	void Initialize()
-	{
-		indexId = NULL;
-		subIndexId = NULL;
-		offsetVal = 0;
-		value = NULL;
-		dataSize = 0;
 	}
 };
 
@@ -372,22 +340,14 @@ public:
 	*/
 	Parameter(void)
 	{
-		nameIdDtAttr = NULL;
+		nameIdDtAttr = new AppProcessCommon();
 		accessStr = NULL;
+		size = 0;
 	}
-
 
 	~Parameter(void)
 	{
-
-	}
-
-	void Initialize()
-	{
-		nameIdDtAttr = new AppProcessCommon();
-		nameIdDtAttr->Initialize();
-		accessStr = NULL;
-		size = 0;
+		
 	}
 
 };

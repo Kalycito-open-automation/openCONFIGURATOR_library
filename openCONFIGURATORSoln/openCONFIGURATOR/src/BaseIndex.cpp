@@ -80,7 +80,6 @@ BaseIndex::BaseIndex(void)
 	indexId = NULL;
 	name = NULL;
 	highLimit = NULL;
-	dataType.Initialize();
 	dataTypeValue = NULL;
 	defaultValue = NULL;
 	actualValue = NULL;
