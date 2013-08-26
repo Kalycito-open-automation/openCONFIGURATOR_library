@@ -57,6 +57,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <sstream>
 #include "../Include/Declarations.h"
 #include "../Include/Internal.h"
 #include "../Include/ProcessImage.h"
@@ -85,32 +86,6 @@ char* ConvertToUpper(char* str)
 		str[loopCount] = toupper(str[loopCount]);
 	}
 	return str;
-}
-
-//TODO: To add a parameter for destination to avoid new delete memory leak.
-char* StringToUpper(char* srcStr)
-{
-	if (NULL == srcStr)
-	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#ifdef DEBUG
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;  
-#endif 
-		throw objException;
-	}
-	UINT32 uiLoopCount;
-	UINT32 uiStringLen = strlen(srcStr);
-
-	char* strUpp = new char[uiStringLen + STR_ALLOC_BUFFER];
-
-	for (uiLoopCount = 0; uiLoopCount < uiStringLen; ++uiLoopCount)
-	{
-		strUpp[uiLoopCount] = toupper(srcStr[uiLoopCount]);
-	}
-
-	strUpp[uiLoopCount] = '\0';
-	return strUpp;
 }
 
 char* Reverse(char* str)
@@ -175,14 +150,18 @@ char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len)
 	{
 		if ((startPos + len) > strlen(srcStr))
 		{
-			//cout<<"Error: "<< strlen(destStr) << " " << __FUNCTION__ <<" wrong inputs. startPos:"<<startPos<<" Len:"<<len <<" Total available:"<<strlen(srcStr)<<endl;
+#if defined DEBUG
+			cout<<"Error: "<< strlen(destStr) << " " << __FUNCTION__ <<" wrong inputs. startPos:"<<startPos<<" Len:"<<len <<" Total available:"<<strlen(srcStr)<<endl;
+#endif
 		}
-
-		strncpy(destStr, (const char*) (srcStr + startPos), len);
-		destStr[len] = '\0';
-		#if defined DEBUG
-			cout << "src:" << srcStr << " DestStr: "<< destStr << endl;
-		#endif
+		else
+		{
+			strncpy(destStr, (const char*) (srcStr + startPos), len);
+			destStr[len] = '\0';
+			#if defined DEBUG
+				cout << "src:" << srcStr << " DestStr: "<< destStr << endl;
+			#endif
+		}
 	}
 	else
 	{
@@ -257,49 +236,16 @@ char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
 	return destStr;
 }
 
-ULONG HexToInt(char *hexStr)
+ULONG HexToInt(const char *hexStr)
 {
-	UINT32 loopCount = 0;
-	ULONG retValue = 0;
-	UINT32 hexStrLen = strlen(hexStr);
-
-	for (loopCount = 0; loopCount < hexStrLen; loopCount++)
-	{
-		if (IsAscii(hexStr[loopCount]))
-		{
-			hexStr[loopCount] = toupper(hexStr[loopCount]);
-		}
-		if (hexStr[loopCount] <= 57)
-		{
-			retValue += (hexStr[loopCount] - 48)
-					* (1 << (4 * ((hexStrLen - 1) - loopCount)));
-		}
-		else
-		{
-			retValue += (hexStr[loopCount] - 55)
-					* (1 << (4 * ((hexStrLen - 1) - loopCount)));
-		}
-	}
+	ULONG retValue;   
+	stringstream inputStream;
+	inputStream << hex << hexStr;
+	inputStream >> retValue;
 	return retValue;
 }
 
-bool IsAscii(char argVar)
-{
-	UINT32 uiCount;
-
-	uiCount = argVar;
-
-	if (48 <= uiCount && 57 >= uiCount)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
-bool CheckIfNotPDO(char* indexId)
+bool CheckIfNotPDO(const char* indexId)
 {
 	if ((0 == strncmp(indexId, "14xx", 2)) || (0 == strncmp(indexId, "16xx", 2))
 			|| (0 == strncmp(indexId, "18xx", 2))
@@ -314,7 +260,7 @@ bool CheckIfNotPDO(char* indexId)
 	}
 }
 
-bool CheckIfManufactureSpecificObject(char* indexId)
+bool CheckIfManufactureSpecificObject(const char* indexId)
 {
 	UINT32 manufactureIndexid;
 
@@ -329,7 +275,7 @@ bool CheckIfManufactureSpecificObject(char* indexId)
 	}
 }
 
-bool CheckIfMappingPDO(char* indexId)
+bool CheckIfMappingPDO(const char* indexId)
 {
 	if ((0 == strncmp(indexId, "1A", 2)) || (0 == strncmp(indexId, "16", 2)))
 	{
@@ -341,35 +287,6 @@ bool CheckIfMappingPDO(char* indexId)
 	}
 }
 
-//TODO: Function is not used.
-bool CheckAllowedCNIndexes(char* indexId)
-{
-	if ((false == CheckIfNotPDO((char*) indexId))
-			|| CheckIfManufactureSpecificObject((char*) indexId)
-			|| (0 == strcmp(indexId, "1F98")) || (0 == strcmp(indexId, "1020"))
-			|| (0 == strcmp(indexId, "1F9B")) || (0 == strcmp(indexId, "1F81"))
-			|| (0 == strcmp(indexId, "1006")))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//TODO: function is not used.
-bool CheckBlockedMNIndexes(char* indexId)
-{
-	if (0 == strcmp(indexId, "1F81"))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 char* ConvertStringToHex(char* srcStr)
 {
@@ -444,7 +361,7 @@ bool CheckIfHex(const char* srcStr)
 
 }
 
-INT32 GetConfigDate()
+INT32 GetConfigDate(void)
 {
 //Time & date are calculated since 1984
 	INT32 daysCount = 0;
@@ -480,7 +397,7 @@ INT32 GetConfigDate()
 	return daysCount;
 }
 
-INT32 GetConfigTime()
+INT32 GetConfigTime(void)
 {
 	time_t rawtime;
 	struct tm *timeInfo;
@@ -496,25 +413,8 @@ INT32 GetConfigTime()
 	return milliSeconds;
 }
 
-//TODO: function is not used.
-INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen)
-{
-	UINT32 uiLoopCount;
 
-	if (NULL == destData || NULL == srcData)
-	{
-		return -1;
-	}
-
-	for (uiLoopCount = 0; uiLoopCount < srcLen; uiLoopCount++)
-	{
-		*(destData + uiLoopCount) = *(srcData + (srcLen - 1) - uiLoopCount);
-	}
-
-	return 0;
-}
-
-bool CheckAllowedDTForMapping(char* dataTypeName)
+bool CheckAllowedDTForMapping(const char* dataTypeName)
 {
 	bool retVal = false;
 	if( NULL != dataTypeName)
@@ -548,7 +448,7 @@ bool CheckAllowedDTForMapping(char* dataTypeName)
 }
 
 //TODO: Add a parameter to return the value to avoid new delete memory issues
-char* GetLastAvailableCycleNumber()
+char* GetLastAvailableCycleNumber(void)
 {
 	char* retForcedCycleValue = new char[20];
 	ocfmRetCode retCode;
@@ -634,7 +534,7 @@ void CheckAndCorrectName(char* srcStr)
 	}
 }
 
-bool CheckIfValueZero(char* srcStr)
+bool CheckIfValueZero(const char* srcStr)
 {
 	if (NULL == srcStr || 0 == strcmp(srcStr, ""))
 	{
@@ -664,8 +564,7 @@ bool CheckIfValueZero(char* srcStr)
 	}
 }
 
-//TODO: Change as const char*
-INT32 GetDecimalValue(char* srcStr)
+INT32 GetDecimalValue(const char* srcStr)
 {
 	if (NULL == srcStr || 0 == strcmp(srcStr, ""))
 	{
@@ -688,7 +587,7 @@ INT32 GetDecimalValue(char* srcStr)
 	return srcValue;
 }
 
-bool CheckAccessTypeForInclude(char* accessType)
+bool CheckAccessTypeForInclude(const char* accessType)
 {
 	bool retInclude;
 	if (NULL == accessType)

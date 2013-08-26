@@ -6413,7 +6413,7 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 	//delete[] nodeIdbyStnArranged;
 }
 
-INT32 GetCNDataLen(char* cdcBuffer)
+INT32 GetCNDataLen(const char* cdcBuffer)
 {
 	ocfmRetCode errCodeObj;
 	INT32 count = 0;
@@ -6460,7 +6460,7 @@ INT32 GetCNDataLen(char* cdcBuffer)
 }
 
 
-Index* GetMNIndexValues(char* indexId)
+Index* GetMNIndexValues(const char* indexId)
 {
 	NodeCollection* nodeCollObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -8255,11 +8255,6 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
 	delete[] indexNo;
 	delete[] sidxId;
 }
-//TODO REVIEW 
-ocfmRetCode GenerateMNOBD()
-{
-	return (GenerateMNOBD(false));
-}
 
 ocfmRetCode GenerateMNOBD(bool IsBuild)
 {
@@ -9474,7 +9469,7 @@ bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader)
 	return true;
 }
 
-bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
+bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath)
 {
 
 	char* nodeName = NULL;
@@ -9702,7 +9697,7 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath)
 	return true;
 }
 
-bool SaveProjectXML(char* projectPath, char* projectName)
+bool SaveProjectXML(const char* projectPath, const char* projectName)
 {
 	PjtSettings* pjtSettingsObj;
 	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
@@ -11538,7 +11533,7 @@ void CopySubIndexDefToAct(INT32 nodeId, NodeType nodeType, bool forceCopy,
 	}
 }
 
-void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue)
+void CheckAndReAssignMultiplex(INT32 nodeId, const char* cycleValue)
 {
 	ocfmRetCode exceptionObj;
 	if (cycleValue == NULL || strcmp(cycleValue, "") == 0)

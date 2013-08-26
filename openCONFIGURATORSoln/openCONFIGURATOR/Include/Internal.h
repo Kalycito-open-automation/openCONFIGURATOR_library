@@ -188,7 +188,7 @@ char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue);
  \retval	FALSE		if given Index ID is of PDO type
  */
 /*****************************************************************************/
-bool CheckIfNotPDO(char* indexId);
+bool CheckIfNotPDO(const char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return a substring of the input parameter string from the given startPos for given len
@@ -231,7 +231,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild = false);
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode GenerateMNOBD(bool IsBuild);
+ocfmRetCode GenerateMNOBD(bool IsBuild = false);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given Index ID corresponds to the range for Manufaturer Specific Object
@@ -243,19 +243,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild);
  \retval	FALSE		if the given Index ID does not correspond to the range for Manufaturer Specific Object
  */
 /*****************************************************************************/
-bool CheckIfManufactureSpecificObject(char* indexId);
-/*****************************************************************************/
-/**
- \brief		This function shall be used to check if the given character value is any ASCII character other than 0 to 9
-
- \param		argVar		Character to hold the input parameter
-
- \return	BOOL
- \retval	TRUE		if given character value is any ASCII character other than 0 to 9
- \retval	FALSE		if given character value is any ASCII character from 0 to 9
- */
-/*****************************************************************************/
-bool IsAscii(char argVar);
+bool CheckIfManufactureSpecificObject(const char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to pad the left side portion of the string with the given padChar and for the given padLength
@@ -277,7 +265,7 @@ char* PadLeft(char* str, char padChar, INT32 padLength);
  \return	ULONG
  */
 /*****************************************************************************/
-ULONG HexToInt(char *hexStr);
+ULONG HexToInt(const char *hexStr);
 /*****************************************************************************************/
 /**
  \brief			This function shall return the Index class pointer for the index id of the MN
@@ -287,31 +275,7 @@ ULONG HexToInt(char *hexStr);
  \return		Index*
  */
 /******************************************************************************************/
-Index* GetMNIndexValues(char* indexId);
-/*****************************************************************************/
-/**
- \brief		This function shall be used to check if the given Index ID is allowed for use as a CN index
-
- \param		indexId      	Character pointer to the value of Index ID
-
- \return	BOOL
- \retval	TRUE			if the given Index ID is allowed for use as a CN index
- \retval	FALSE			if the given Index ID is not allowed for use as a CN index
- */
-/*****************************************************************************/
-bool CheckAllowedCNIndexes(char* indexId);
-/*****************************************************************************/
-/**
- \brief		This function shall be used to check if the given Index ID is allowed for use in MN
-
- \param		indexId		Character pointer to hold the value of Index ID
-
- \return	BOOL
- \retval	TRUE		if the given Index ID is not allowed for use in MN
- \retval	FALSE		if the given Index ID is allowed for use in MN
- */
-/*****************************************************************************/
-bool CheckBlockedMNIndexes(char* indexId);
+Index* GetMNIndexValues(const char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall get the parameter access code by providing the access type
@@ -335,7 +299,7 @@ char* GetParameterAccess(char* accessStr);
  \retval	FALSE				if end element condition is not satisfied
  */
 /*****************************************************************************/
-bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement);
+bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compareElement);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given elementId is XML_READER_TYPE_ELEMENT and if srcElement and compareElement strings are the same
@@ -349,7 +313,7 @@ bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement);
  \retval	FALSE				if start element condition is not satisfied
  */
 /*****************************************************************************/
-bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement);
+bool CheckStartElement(INT32 elementId, const char *srcElement, const char *compareElement);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given datatype is a simple datatype
@@ -362,7 +326,7 @@ bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement);
  \retval	FALSE			if the given datatype is not a simple datatype
  */
 /*****************************************************************************/
-bool CheckifSimpleDT(char *datatypeName, char *dataSize);
+bool CheckifSimpleDT(const char *datatypeName, char *dataSize);
 /*****************************************************************************/
 /**
  \brief		This function shall return the string with CN node id
@@ -428,7 +392,7 @@ char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding);
  \return	INT32
  */
 /******************************************************************************************/
-INT32 GetCNDataLen(char* cdcBuffer);
+INT32 GetCNDataLen(const char* cdcBuffer);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given Index ID is of mapping PDO type
@@ -440,7 +404,7 @@ INT32 GetCNDataLen(char* cdcBuffer);
  \retval	FALSE		if the given Index ID is not of mapping PDO type
  */
 /*****************************************************************************/
-bool CheckIfMappingPDO(char* indexId);
+bool CheckIfMappingPDO(const char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given string is hexadecimal
@@ -557,7 +521,7 @@ INT32 GetConfigTime();
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath);
+bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath);
 /*****************************************************************************/
 /**
  \brief		This function shall save the project details into the project location
@@ -571,7 +535,7 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, char* projectPath);
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool SaveProjectXML(char* projectPath, char* projectName);
+bool SaveProjectXML(const char* projectPath, const char* projectName);
 /*****************************************************************************/
 /**
  \brief		This function shall set the actual value to the sub index in the index specified
@@ -627,28 +591,6 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 INT32 GetNodeTotalIndexSubIndex(INT32 nodeId);
 /*****************************************************************************/
 /**
- \brief		This function shall be used to reverse the order of entries in the source memory of length 'srcLen' and store in the destionation memory
-
- \param		destData		Unsigned integer pointer to destination data memory
- \param		srcData     	Unsigned integer pointer to source data memory
- \param		srcLen		 	Unsigned integer to hold number of entries in source to reversed
-
- \return	INT32
- */
-/*****************************************************************************/
-INT32 ReverseData(UINT8 *destData, UINT8 *srcData, UINT32 srcLen);
-/*****************************************************************************/
-/**
- \brief		This function shall be used to return the input parameter string in upper case format
-
- \param		str		Character pointer to the source string
-
- \return	char*
- */
-/*****************************************************************************/
-char* StringToUpper(char* str);
-/*****************************************************************************/
-/**
  \brief		This function shall be used to set the flag to enable inclusion in CDC generation for the required CN indices
 
  \param		nodeId     Integer to hold the value of Node ID
@@ -690,7 +632,7 @@ void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType);
  \retval	FALSE				if the given data type is not of string type
  */
 /*****************************************************************************/
-bool CheckIfStringDatatypes(char* dataTypeValue);
+bool CheckIfStringDatatypes(const char* dataTypeValue);
 /*****************************************************************************/
 /**
  \brief		This function auto generates the values in the other required MN indices
@@ -783,7 +725,7 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId);
  \retval	FALSE				if the given dataTypeName is not allowed for mapping
  */
 /*****************************************************************************/
-bool CheckAllowedDTForMapping(char* dataTypeName);
+bool CheckAllowedDTForMapping(const char* dataTypeName);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding feature object attributes in the calling function
@@ -853,7 +795,7 @@ void CheckAndCorrectName(char* srcStr);
  \return	void
  */
 /*****************************************************************************/
-void CheckAndReAssignMultiplex(INT32 nodeId, char* cycleValue);
+void CheckAndReAssignMultiplex(INT32 nodeId, const char* cycleValue);
 /*****************************************************************************/
 /**
  \brief		This function checks 'multiplexed' SubIndex (0x1F98/0x07) is assigned or not
@@ -965,7 +907,7 @@ void UpdateCNMultiPrescal(IndexCollection* indexCollObj, char* multiPrescalVal);
  \retval	FALSE		if value is not 0
  */
 /*****************************************************************************/
-bool CheckIfValueZero(char* srcStr);
+bool CheckIfValueZero(const char* srcStr);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the decimal version of the input string is hex/ascii string
@@ -975,7 +917,7 @@ bool CheckIfValueZero(char* srcStr);
  \return	INT32
  */
 /*****************************************************************************/
-INT32 GetDecimalValue(char* srcStr);
+INT32 GetDecimalValue(const char* srcStr);
 /*****************************************************************************/
 /**
  \brief		This function shall reset the Multiplexed CN's forced cycle value
@@ -995,17 +937,6 @@ void ResetMultiplexedCNForceCycle();
  */
 /*****************************************************************************/
 bool CheckIfMultiplexedCNExist();
-/*****************************************************************************/
-/**
- \brief		This function shall copy the custom error description to be thrown to the exception handler
-
- \param		errCodeObj		Struct pointer of type ocfmRetCode to the Errorcode & error string
- \param		customErrStr	Character pointer to the custom error description
-
- \return	void
- */
-/*****************************************************************************/
-void CopyCustomErrorString(ocfmRetCode* errCodeObj, char* customErrStr);
 /*****************************************************************************************/
 /**
  \brief		This function shall update the 'Actual Value' attribute of sub index of the NMT_MultipleCyleAssign object (0x1F9B) of the CN with reference to corresponding entry in MN OBD
@@ -1081,7 +1012,7 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
  \retval	FALSE			if accessType does not allow inclusion in CDC generation
  */
 /*****************************************************************************/
-bool CheckAccessTypeForInclude(char* accessType);
+bool CheckAccessTypeForInclude(const char* accessType);
 SubIndex* DuplicateSubIndexObject(SubIndex* objSubindex);
 /*****************************************************************************/
 /**
@@ -1187,14 +1118,6 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId);
 /*****************************************************************************/
 void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
 		char* socToleranceValue);
-/*****************************************************************************/
-/**
- \brief		This function shall sort the Node ID by the station type
-
- \return	INT32*
- */
-/*****************************************************************************/
-INT32* ArrangeNodeIDbyStation();
 /*****************************************************************************/
 /**
  \brief		This function shall sort the Node ID in a given Node ID collection

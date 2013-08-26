@@ -570,7 +570,7 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	}
 	}
 
-bool CheckifSimpleDT(char *datatypeName, char *dataSize)
+bool CheckifSimpleDT(const char *datatypeName, char *dataSize)
 {
 	INT32 arrSizeLC = 0;
 	char *simpleElement = NULL;
@@ -615,7 +615,7 @@ void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl)
 	}
 }
 
-bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement)
+bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compareElement)
 {
 	if ((XML_READER_TYPE_END_ELEMENT == elementId)
 	        && (!strcmp(srcElement, compareElement)))
@@ -628,7 +628,7 @@ bool CheckEndElement(INT32 elementId, char *srcElement, char *compareElement)
 	}
 }
 
-bool CheckStartElement(INT32 elementId, char *srcElement, char *compareElement)
+bool CheckStartElement(INT32 elementId, const char *srcElement, const char *compareElement)
 {
 	if ((XML_READER_TYPE_ELEMENT == elementId)
 	        && (!strcmp(srcElement, compareElement)))
@@ -2512,7 +2512,7 @@ INT32 GetDataSize(char* dataTypeVal)
 	return retSize;
 }
 
-bool CheckIfStringDatatypes(char* dataTypeValue)
+bool CheckIfStringDatatypes(const char* dataTypeValue)
 {
 	bool retVal = false;
 	if (NULL != dataTypeValue)
