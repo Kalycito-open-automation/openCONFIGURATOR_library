@@ -452,7 +452,7 @@ bool CheckIfMappingPDO(char* indexId);
  \retval	FALSE		if the given string is not hexadecimal
  */
 /*****************************************************************************/
-bool CheckIfHex(char* srcStr);
+bool CheckIfHex(const char* srcStr);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the XAP configurations to the given xml file pointer

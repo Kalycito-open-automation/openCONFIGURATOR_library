@@ -423,8 +423,8 @@ char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding)
 
 	return hexTemp;
 }
-//TODO: change parameter as const char*
-bool CheckIfHex(char* srcStr)
+
+bool CheckIfHex(const char* srcStr)
 {
 	if (NULL == strchr(srcStr, 'x'))
 	{

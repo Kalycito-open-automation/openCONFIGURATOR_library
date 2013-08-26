@@ -88,7 +88,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetName(char* nameStr);
+		void SetName(const char* nameStr);
 
 		/*****************************************************************************/
 		/**
@@ -107,7 +107,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetIndexValue(char* idxId);
+		void SetIndexValue(const char* idxId);
 
 		/*****************************************************************************/
 		/**
@@ -126,7 +126,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetDefaultValue(char* value);
+		void SetDefaultValue(const char* value);
 
 		/*****************************************************************************/
 		/**
@@ -145,7 +145,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetActualValue(char* value);
+		void SetActualValue(const char* value);
 
 		/*****************************************************************************/
 		/**
@@ -164,7 +164,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetAccessType(char* accessStr);
+		void SetAccessType(const char* accessStr);
 
 		/*****************************************************************************/
 		/**
@@ -183,7 +183,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetLowLimit(char* lowLimitStr);
+		void SetLowLimit(const char* lowLimitStr);
 
 		/*****************************************************************************/
 		/**
@@ -202,7 +202,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetHighLimit(char* highLimitStr);
+		void SetHighLimit(const char* highLimitStr);
 
 		/******************************************************************************/
 		/**
@@ -260,7 +260,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetPDOMapping(char* pdoMappingStr);
+		void SetPDOMapping(const char* pdoMappingStr);
 
 		/*****************************************************************************/
 		/**
@@ -287,7 +287,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetObjectType(char* objTypeStr);
+		void SetObjectType(const char* objTypeStr);
 
 		/******************************************************************************/
 		/**
@@ -320,7 +320,7 @@ class BaseIndex
 		 \retval	FALSE		if index value is invalid
 		 */
 		/*****************************************************************************/
-		bool IsIndexValueValid(char* hexValue);
+		bool IsIndexValueValid(const char* hexValue);
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to save the changes of the Index properties
@@ -350,7 +350,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetUniqueIDRef(char* uniqueIdStr);
+		void SetUniqueIDRef(const char* uniqueIdStr);
 
 		/******************************************************************************/
 		/**
@@ -368,7 +368,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetDataTypeValue(char* dataTypeStr);
+		void SetDataTypeValue(const char* dataTypeStr);
 
 		/******************************************************************************/
 		/**

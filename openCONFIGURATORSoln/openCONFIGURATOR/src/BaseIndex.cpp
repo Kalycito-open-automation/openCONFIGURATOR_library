@@ -116,7 +116,7 @@ const char* BaseIndex::GetName()
 	return name;
 }
 
-void BaseIndex::SetName(char* nameStr)
+void BaseIndex::SetName(const char* nameStr)
 {
 	if (NULL != name)
 	{
@@ -139,7 +139,7 @@ const char* BaseIndex::GetIndexValue()
 	return indexId;
 }
 
-void BaseIndex::SetIndexValue(char* idxId)
+void BaseIndex::SetIndexValue(const char* idxId)
 {
 	if (NULL != indexId)
 	{
@@ -161,7 +161,7 @@ const char* BaseIndex::GetLowLimit()
 	}
 }
 
-void BaseIndex::SetLowLimit(char* lowLimitStr)
+void BaseIndex::SetLowLimit(const char* lowLimitStr)
 {
 	if (NULL != lowLimit)
 	{
@@ -183,7 +183,7 @@ const char* BaseIndex::GetHighLimit()
 	}
 }
 
-void BaseIndex::SetHighLimit(char* highLimitStr)
+void BaseIndex::SetHighLimit(const char* highLimitStr)
 {
 	if (NULL != highLimit)
 	{
@@ -198,7 +198,7 @@ const char* BaseIndex::GetDefaultValue()
 	return defaultValue;
 }
 
-void BaseIndex::SetDefaultValue(char* value)
+void BaseIndex::SetDefaultValue(const char* value)
 {
 	if (NULL != defaultValue)
 	{
@@ -217,7 +217,7 @@ const char* BaseIndex::GetActualValue()
 	return actualValue;
 }
 
-void BaseIndex::SetActualValue(char* value)
+void BaseIndex::SetActualValue(const char* value)
 {
 	if (NULL != actualValue)
 	{
@@ -232,7 +232,7 @@ const char* BaseIndex::GetAccessType()
 	return accessType;
 }
 
-void BaseIndex::SetAccessType(char* accessStr)
+void BaseIndex::SetAccessType(const char* accessStr)
 {
 	if (NULL != accessType)
 	{
@@ -266,11 +266,11 @@ ObjectType BaseIndex::GetEObjectType()
 	return objectType;
 }
 
-void BaseIndex::SetObjectType(char* objTypeStr)
+void BaseIndex::SetObjectType(const char* objTypeStr)
 {
 	char* tempObjtype = new char[strlen(objTypeStr) + STR_ALLOC_BUFFER];
-
 	strcpy(tempObjtype, objTypeStr);
+
 	tempObjtype = ConvertToUpper(tempObjtype);
 	if ((0 == strcmp(tempObjtype, "5"))
 			|| (0 == strcmp(tempObjtype, "DEFTYPE")))
@@ -327,7 +327,7 @@ const char* BaseIndex::GetPDOMapping()
 	}
 }
 
-void BaseIndex::SetPDOMapping(char* pdoMappingStr)
+void BaseIndex::SetPDOMapping(const char* pdoMappingStr)
 {
 	char* varStrBuff = new char[strlen(pdoMappingStr) + STR_ALLOC_BUFFER];
 
@@ -416,7 +416,7 @@ char* BaseIndex::GetUniqueIDRef()
 	return uniqueIdRef;
 }
 
-void BaseIndex::SetUniqueIDRef(char* uniqueIdStr)
+void BaseIndex::SetUniqueIDRef(const char* uniqueIdStr)
 {
 	uniqueIdRef = new char[strlen(uniqueIdStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) uniqueIdRef, uniqueIdStr);
@@ -434,7 +434,7 @@ char* BaseIndex::GetDataTypeValue()
 	}
 }
 
-void BaseIndex::SetDataTypeValue(char* dataTypeStr)
+void BaseIndex::SetDataTypeValue(const char* dataTypeStr)
 {
 	dataTypeValue = new char[strlen(dataTypeStr) + STR_ALLOC_BUFFER];
 	strcpy((char*) dataTypeValue, dataTypeStr);
@@ -458,7 +458,7 @@ void BaseIndex::SaveChanges(char* idxIdStr, char* nameStr)
 	name = nameStr;
 }
 
-bool BaseIndex::IsIndexValueValid(char* hexValue)
+bool BaseIndex::IsIndexValueValid(const char* hexValue)
 {
 	ULONG value;
 	bool retFlag = true;
