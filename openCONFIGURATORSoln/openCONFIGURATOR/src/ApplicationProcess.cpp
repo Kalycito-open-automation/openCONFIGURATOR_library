@@ -89,7 +89,11 @@ ApplicationProcess::~ApplicationProcess(void)
 	//Add destructor code here
 }
 
-INT32 ApplicationProcess::CheckFileStatus(char* fileName)
+vector<Parameter> ApplicationProcess::GetParameterCollection(void){
+	return this->ParameterCollection;
+}
+
+INT32 ApplicationProcess::CheckFileStatus(const char* fileName)
 {
 	ifstream file(fileName, ios::in | ios::binary | ios::ate);
 
@@ -116,7 +120,6 @@ void ApplicationProcess::DeleteComplexDataTypeCollection()
 void ApplicationProcess::AddParameter(Parameter objectParameter)
 {
 	ParameterCollection.push_back(objectParameter);
-
 }
 
 void ApplicationProcess::DeleteParameterCollection()
@@ -124,7 +127,7 @@ void ApplicationProcess::DeleteParameterCollection()
 	ParameterCollection.clear();
 }
 
-INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(char *uniqueIdRef)
+INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(const char *uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
 			loopCount++)
@@ -139,7 +142,7 @@ INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(char *uniqueIdRef)
 	return 0;
 }
 
-Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(char *uniqueIdRef)
+Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(const char *uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
 			loopCount++)
@@ -155,7 +158,7 @@ Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(char *uniqueIdRef)
 	return NULL;
 }
 
-INT32 ApplicationProcess::GetCDTUniqueIDRef(char *uniqueIdRef)
+INT32 ApplicationProcess::GetCDTUniqueIDRef(const char *uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
@@ -170,7 +173,7 @@ INT32 ApplicationProcess::GetCDTUniqueIDRef(char *uniqueIdRef)
 	return 0;
 }
 
-ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(char *uniqueId)
+ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(const char *uniqueId)
 {
 	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
@@ -185,7 +188,7 @@ ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(char *uniqueId)
 	return NULL;
 }
 
-ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(char *uniqueRefId)
+ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(const char *uniqueRefId)
 {
 	for (UINT32 iLoopCount = 0; iLoopCount < CDTCollection.size(); iLoopCount++)
 	{
@@ -210,7 +213,7 @@ ComplexDataType* ApplicationProcess::GetCDTByDtIndex(INT32 cDtPosition)
 	return &CDTCollection[cDtPosition];
 }
 
-void ApplicationProcess::UpdatePreviousCDTUId(char* uniqueID, INT32 cDtPosition)
+void ApplicationProcess::UpdatePreviousCDTUId(const char* uniqueID, INT32 cDtPosition)
 {
 	ComplexDataType* complexDtObj;
 
@@ -234,8 +237,3 @@ INT32 ApplicationProcess::GetCDTCount()
 	return CDTCollection.size();
 }
 
-//This function has same operation as GetCDTByDtIndex
-ComplexDataType* ApplicationProcess::GetCDTbyCount(INT32 cDtPosition)
-{
-	return &CDTCollection[cDtPosition];
-}

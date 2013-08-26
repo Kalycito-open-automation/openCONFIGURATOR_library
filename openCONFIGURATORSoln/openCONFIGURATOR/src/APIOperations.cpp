@@ -5196,7 +5196,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 		if (nodeObj->GetApplicationProcess() != NULL)
 		{
 			appProcessObj = nodeObj->GetApplicationProcess();
-			if (appProcessObj->ParameterCollection.size() != 0)
+			if (appProcessObj->GetParameterCollection().size() != 0)
 			{
 				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniqueidRefId);
 				if (parameterObj == NULL)

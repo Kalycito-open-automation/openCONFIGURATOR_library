@@ -72,14 +72,23 @@ using namespace std;
  ********************************************************************************************************/
 class ApplicationProcess
 {
-	public:
-		ApplicationProcess(void);
-		~ApplicationProcess(void);
-
+	private:
 		char *xddFileName;			/**< Usage to be documented */
 		char *projectPath;			/**< Usage to be documented */
 		vector<ComplexDataType> CDTCollection;		/**< Usage to be documented */
 		vector<Parameter> ParameterCollection;		/**< Usage to be documented */
+
+	public:
+		ApplicationProcess(void);
+		~ApplicationProcess(void);
+		/*****************************************************************************/
+		/**
+		 \brief		This function shall be used to get the current ParameterCollection
+		 
+		 \return	vector<ComplexDataType>
+		 */
+		/*****************************************************************************/
+		vector<Parameter> GetParameterCollection();
 
 		/*****************************************************************************/
 		/**
@@ -126,7 +135,7 @@ class ApplicationProcess
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void UpdatePreviousCDTUId(char* uniqueID, INT32 cDtPosition);
+		void UpdatePreviousCDTUId(const char* uniqueID, INT32 cDtPosition);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall return the ComplexDataType collection count
@@ -144,7 +153,7 @@ class ApplicationProcess
 		 \return	INT32
 		 */
 		/*****************************************************************************/
-		INT32 CheckFileStatus(char* fileName);
+		INT32 CheckFileStatus(const char* fileName);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the parameter index with unique reference ID
@@ -154,7 +163,7 @@ class ApplicationProcess
 		 \return	INT32
 		 */
 		/*****************************************************************************/
-		INT32 GetParameterIndexbyUniqueIDRef(char *uniqueIdRef);
+		INT32 GetParameterIndexbyUniqueIDRef(const char *uniqueIdRef);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the position of ComplexDataType object with given unique reference ID in the collection list
@@ -164,17 +173,7 @@ class ApplicationProcess
 		 \return	INT32
 		 */
 		/*****************************************************************************/
-		INT32 GetCDTUniqueIDRef(char *uniqueIdRef);
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to get the pointer to the ComplexDataType object with given Index position in the collection list
-
-		 \param		cDtPosition		Integer to hold the Index of CDT collection
-
-		 \return	ComplexDataType*
-		 */
-		/*****************************************************************************/
-		ComplexDataType* GetCDTbyCount(INT32 cDtPosition);
+		INT32 GetCDTUniqueIDRef(const char *uniqueIdRef);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the pointer to the ComplexDataType object with given unique reference ID in the collection list
@@ -184,7 +183,7 @@ class ApplicationProcess
 		 \return	ComplexDataType*
 		 */
 		/*****************************************************************************/
-		ComplexDataType* GetCDTbyUniqueID(char *uniqueId);
+		ComplexDataType* GetCDTbyUniqueID(const char *uniqueId);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the pointer to the ComplexDataType object with given dataTypeStr string in the collection list
@@ -194,7 +193,7 @@ class ApplicationProcess
 		 \return	ComplexDataType*
 		 */
 		/*****************************************************************************/
-		ComplexDataType* GetCDTByDtUniqueRefID(char *dataTypeStr);
+		ComplexDataType* GetCDTByDtUniqueRefID(const char *dataTypeStr);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the pointer to the ComplexDataType object with given Index position in the collection list
@@ -214,7 +213,7 @@ class ApplicationProcess
 		 \return	Parameter*
 		 */
 		/*****************************************************************************/
-		Parameter* GetParameterbyUniqueIDRef(char *uniqueIdRef);
+		Parameter* GetParameterbyUniqueIDRef(const char *uniqueIdRef);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to get the Parameter object given its Index position in the collection list

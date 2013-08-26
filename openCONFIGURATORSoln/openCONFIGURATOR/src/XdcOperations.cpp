@@ -1394,7 +1394,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
-				objCDT = appProcessObj->GetCDTbyCount(cdtLC);
+				objCDT = appProcessObj->GetCDTByDtIndex(cdtLC);
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "name",
 				               BAD_CAST objCDT->nameIdAttr->GetName());
@@ -1535,7 +1535,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			appProcessObj = nodeObj.GetApplicationProcess();
 
 			for (UINT32 parameterLC = 0;
-				parameterLC < appProcessObj->ParameterCollection.size();
+				parameterLC < appProcessObj->GetParameterCollection().size();
 			        parameterLC++)
 			{
 				Parameter parameterObj;
