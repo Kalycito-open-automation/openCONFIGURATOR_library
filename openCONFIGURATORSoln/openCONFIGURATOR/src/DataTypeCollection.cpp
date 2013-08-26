@@ -107,7 +107,7 @@ DataType* DataTypeCollection::GetDataTypeElement(INT32 dataTypePosition)
 	return &dataTypeCollectionObj[dataTypePosition];
 }
 
-DataType* DataTypeCollection::GetDataType(char* dataTypeValue)
+DataType* DataTypeCollection::GetDataType(const char* dataTypeValue)
 {
 	DataType* objDataType = NULL;
 
@@ -125,7 +125,7 @@ DataType* DataTypeCollection::GetDataType(char* dataTypeValue)
 	return objDataType;
 }
 
-DataType* DataTypeCollection::GetDataTypeByName(char* dataTypeValue)
+DataType* DataTypeCollection::GetDataTypeByName(const char* dataTypeValue)
 {
 	DataType* objDataType = NULL;
 

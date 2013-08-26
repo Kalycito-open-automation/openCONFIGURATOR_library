@@ -118,7 +118,7 @@ class DataTypeCollection
 		 \return		DataType*
 		 */
 		/*****************************************************************************/
-		DataType* GetDataType(char* dataTypeValue);
+		DataType* GetDataType(const char* dataTypeValue);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the DataType object whose dataTypeValue matches the given parameter
@@ -128,7 +128,7 @@ class DataTypeCollection
 		 \return	DataType*
 		 */
 		/*****************************************************************************/
-		DataType* GetDataTypeByName(char* dataTypeValue);
+		DataType* GetDataTypeByName(const char* dataTypeValue);
 
 	private:
 		vector<DataType> dataTypeCollectionObj;	/**< Usage to be documented */
