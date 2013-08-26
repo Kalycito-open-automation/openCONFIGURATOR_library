@@ -299,7 +299,7 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
 	return objException;
 }
 
-bool CheckIfDataTypeExists(char* dataValue, INT32 nodeId)
+bool CheckIfDataTypeExists(const char* dataValue, INT32 nodeId)
 {
 	NodeCollection* nodeCollObj = NULL;
 	DataTypeCollection* dtCollObj = NULL;

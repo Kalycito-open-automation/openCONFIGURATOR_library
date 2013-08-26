@@ -65,9 +65,7 @@ using namespace std;
 /* Global Variables */
 
 INT32 lastObjDictIdxParsed = 0;
-bool ObjectDictionary::instanceFlag = false;
 ObjectDictionary* ObjectDictionary::objectDictionary = NULL;
-Node* ObjectDictionary::objDictNode = NULL;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -102,15 +100,19 @@ ObjectDictionary::ObjectDictionary(void)
 
 ObjectDictionary::~ObjectDictionary(void)
 {
-	//Add destructor code here
+	if( NULL != ObjectDictionary::objectDictionary)
+	{
+		delete ObjectDictionary::objectDictionary;
+		delete this->objDictNode;
+		ObjectDictionary::objectDictionary = NULL;
+	}
 }
 
 ObjectDictionary* ObjectDictionary::GetObjDictPtr()
 {
-	if (!instanceFlag)
+	if (ObjectDictionary::objectDictionary == NULL)
 	{
 		objectDictionary = new ObjectDictionary();
-		instanceFlag = true;
 	}
 	return objectDictionary;
 }
@@ -390,58 +392,11 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
 		return NULL;
 	}
 }
-
-bool ObjectDictionary::CheckInTheRange(char* idxId, char* startIdx,
-		char* endIdx)
+bool ObjectDictionary::CheckInTheRange(const char* idxId, const char* startIdx,
+		const char* endIdx)
 {
 	if (HexToInt(idxId) >= HexToInt(startIdx)
 			&& (HexToInt(idxId) <= HexToInt(endIdx)))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//TODO: Unused function
-INT32 ObjectDictionary::IfObjectDictIndexExists(char* idxId)
-{
-	Index* objIndex = NULL;
-	IndexCollection* objIndexCol;
-
-	objIndexCol = objDictNode->GetIndexCollection();
-	objIndex = objIndexCol->GetIndexbyIndexValue(idxId);
-
-	if (NULL == objIndex)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//TODO: Unused function
-INT32 ObjectDictionary::IfObjectDictSubIndexExists(char* idxId, char* sIdxId)
-{
-	SubIndex* objSIdx = NULL;
-	Index* objIndex = NULL;
-	IndexCollection* objIndexCol;
-
-	objIndexCol = objDictNode->GetIndexCollection();
-	objIndex = objIndexCol->GetIndexbyIndexValue(idxId);
-
-	if (NULL == objIndex)
-	{
-		return true;
-	}
-
-	objSIdx = objIndex->GetSubIndexbyIndexValue(sIdxId);
-
-	if (NULL == objSIdx)
 	{
 		return true;
 	}

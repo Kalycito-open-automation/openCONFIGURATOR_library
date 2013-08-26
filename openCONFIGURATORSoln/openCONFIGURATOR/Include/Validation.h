@@ -74,7 +74,7 @@
  \retval	FALSE			if the object of given Node ID and datatype is not present in the NodeCollection list
  */
 /*****************************************************************************/
-bool CheckIfDataTypeExists(char* dataValue, INT32 nodeId);
+bool CheckIfDataTypeExists(const char* dataValue, INT32 nodeId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the object of given Node ID and datatype is present in the NodeCollection list

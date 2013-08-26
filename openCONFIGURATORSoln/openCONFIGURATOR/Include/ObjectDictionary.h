@@ -74,14 +74,13 @@ using namespace std;
  *****************************************************************************/
 class ObjectDictionary
 {
-	public:
+	private:
 		ObjectDictionary(void);
 		~ObjectDictionary(void);
+		ObjectDictionary( const ObjectDictionary&);
 
-	private:
-		static bool instanceFlag;
 		INT32 varsattrIdxSIdx;
-
+		Node* objDictNode;
 		enum ObjectType
 		{
 			INDEX = 0, SUBINDEX
@@ -98,12 +97,8 @@ class ObjectDictionary
 
 		vector<sattrIdxSIdx> attribCollObj;
 	public:
-
-		static Node* objDictNode;
 		static ObjectDictionary* objectDictionary;
 
-		void CheckIfSameIndex(char* Index);
-		Index* GetIndexDictAttribues(char* Index);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to process the Object Dictionary file and generate the DataTypeCollection, IndexCollection and SubIndexCollection lists
@@ -168,27 +163,6 @@ class ObjectDictionary
 		SubIndex* GetObjectDictSubIndex(char* idxId, char* sIdxId);
 		/*****************************************************************************/
 		/**
-		 \brief		This function shall be used to check if an Object Dictionary Index exists at the given Index ID in the collection list
-		 
-		 \param		idxId		Character pointer to the value of index
-
-		 \return	INT32
-		 */
-		/*****************************************************************************/
-		INT32 IfObjectDictIndexExists(char* idxId);
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to check if an Object Dictionary SubIndex exists at the given SubIndex ID in the collection list
-		 
-		 \param		idxId      Character pointer to the value of Index
-		 \param		sIdxId	   Character pointer to the value of SubIndex
-		 
-		 \return	INT32
-		 */
-		/*****************************************************************************/
-		INT32 IfObjectDictSubIndexExists(char* idxId, char* sIdxId);
-		/*****************************************************************************/
-		/**
 		 \brief		This is a member function of CObjectDictionary returns the range of the object dictionary ids
 		 
 		 \param		idxId		Character Pointer Variable to hold the value of Index
@@ -200,7 +174,7 @@ class ObjectDictionary
 		 \retval	FALSE		to check	
 		 */
 		/*****************************************************************************/
-		bool CheckInTheRange(char* idxId, char* startIdx, char* endIdx);
+		bool CheckInTheRange(const char* idxId, const char* startIdx, const char* endIdx);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the name of the Index given the Object Name and Index ID
