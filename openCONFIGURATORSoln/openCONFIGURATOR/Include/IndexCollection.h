@@ -143,7 +143,7 @@ class IndexCollection
 		 \return	Index*
 		 */
 		/*****************************************************************************/
-		Index* GetIndexbyIndexValue(char* indexId);
+		Index* GetIndexbyIndexValue(const char* indexId);
 
 	private:
 		vector<Index> indexCollection;

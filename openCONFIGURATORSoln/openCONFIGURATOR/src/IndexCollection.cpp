@@ -166,7 +166,7 @@ Index* IndexCollection::GetIndex(INT32 indexPosition)
 	return &indexCollection[indexPosition];
 }
 
-Index* IndexCollection::GetIndexbyIndexValue(char* indexId)
+Index* IndexCollection::GetIndexbyIndexValue(const char* indexId)
 {
 	Index objIndex;
 	if(NULL != indexId)
