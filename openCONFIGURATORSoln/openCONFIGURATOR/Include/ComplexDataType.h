@@ -94,7 +94,6 @@ class ComplexDataType
 		void AddVarDeclaration(VarDeclaration varDeclarationObject);
 
 	private:
-		INT32 varDeclarationCollCount;	/**< Total number of variables under varCollection tag */
 
 };
 #endif // complexdatatype_h

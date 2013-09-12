@@ -76,7 +76,6 @@ ComplexDataType::ComplexDataType(void)
 	nameIdAttr->Initialize();
 	//varIndex = -1;
 	prevUniqueId = NULL;
-	varDeclarationCollCount = 0;
 	cDtObjPosition = -1;
 }
 
