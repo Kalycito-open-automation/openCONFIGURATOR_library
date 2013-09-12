@@ -57,6 +57,59 @@
 #include "Exports.h"
 
 /*****************************************************************************/
+/* Macro definition */
+
+/** Defines the Managing Node id. */
+#define MN_NODEID			240
+/** Defines the broadcast Node id. */
+#define BROADCAST_NODEID	0
+
+/** Defines the maximum number of ProcessImage variable that is contributed by a controlled Node. */
+#define PI_VAR_COUNT		4000
+
+/** Defines the Poll response default payload value. */
+#define PRES_DEFAULT_PAYLOAD	36
+/** Defines the Poll request default payload value. */
+#define PREQ_DEFAULT_PAYLOAD	36
+
+/** Defines the length of the string for which the number of entries value for an MN in the CDC. */
+#define OFFSET_NUM_ENTRIES_MN		0
+/** Defines the length of the string for which the number of entries value for an CN in the CDC. */
+#define OFFSET_NUM_ENTRIES_CN		7
+/** Defines the remaining length of the index id to be packed as a hexadecimal value. */
+#define OFFSET_INDEX				0
+/** Defines the remaining length of the subindex id to be packed as a hexadecimal value. */
+#define OFFSET_SUBINDEX				2
+/** Defines the offset size. */
+#define OFFSET_SIZE					3
+/** Defines the offset data size. */
+#define OFFSET_DATA					7
+
+/** Defines the maximum length of the index id. */
+#define	INDEX_SIZE					4
+/** Defines the maximum length of the subindex id. */
+#define	SUBINDEX_SIZE				2
+/** Defines the maximum length of the Node id. */
+#define NODE_ID						3
+
+/** Defines the maximum length of the error string. */
+#define ERR_STRING_LEN				100
+
+/** Defines the length of the index id to be packed as a hexadecimal value. */
+#define OFFSET_FIRST_INDEX_IN_MN_OBD	4
+
+/** Defines the total no of characters for the value in 1F22 index. */
+#define OFFSET_FIRST_INDEX_IN_1F22		11
+/** Defines the maximum number of cross traffic stations allowed for a controlled node. */
+#define MAX_CN_CROSS_TRAFFIC_STN		3
+
+/** Defines the index id for the NMT_MultiplCycleAssign_AU8 object.  */
+#define MULTIPL_CYCLE_ASSIGN_OBJECT			"1F9B"
+/** Defines the index id for the NMT_MNCNPResTimeout_AU32 object. */
+#define MNCN_POLLRESPONSE_TIMEOUT_OBJECT	"1F92"
+
+
+/*****************************************************************************/
 /* Typedefs */
 
 /** unsigned char as UINT8 */
