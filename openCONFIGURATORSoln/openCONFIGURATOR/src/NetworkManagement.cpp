@@ -93,7 +93,7 @@ void NetworkManagement::AddFeature(Feature objFeature)
 }
 
 char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
-		char* featureName)
+		const char* featureName)
 {
 	UINT32 loopCount = 0;
 	char* retString = NULL;

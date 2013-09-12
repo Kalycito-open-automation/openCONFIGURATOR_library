@@ -385,7 +385,7 @@ void BaseIndex::SetDataType(char* dataTypeName)
 	}
 }
 
-void BaseIndex::SetDataTypeName(char* dataTypeName, INT32 nodeIdVal)
+void BaseIndex::SetDataTypeName(const char* dataTypeName, INT32 nodeIdVal)
 {
 	DataType* objDataType = NULL;
 	NodeCollection* objNodeCol = NULL;

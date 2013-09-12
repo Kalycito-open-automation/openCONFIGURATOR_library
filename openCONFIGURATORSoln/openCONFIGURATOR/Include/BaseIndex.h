@@ -241,7 +241,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetDataTypeName(char* dataTypeName, INT32 nodeIdVal);
+		void SetDataTypeName(const char* dataTypeName, INT32 nodeIdVal);
 
 		/******************************************************************************/
 		/**

@@ -302,7 +302,7 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
 //cout<<__FUNCTION__<< " Ends"<<endl;
 }
 
-Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
+Index* ObjectDictionary::GetObjectDictIndex(const char* indexId)
 {
 	Index* idxObj = NULL;
 	IndexCollection* idxCollObj = NULL;
@@ -338,7 +338,7 @@ Index* ObjectDictionary::GetObjectDictIndex(char* indexId)
 	}
 }
 
-SubIndex* ObjectDictionary::GetObjectDictSubIndex(char* idxId, char* sIdxId)
+SubIndex* ObjectDictionary::GetObjectDictSubIndex(const char* idxId, const char* sIdxId)
 {
 	SubIndex* sidxObj = NULL;
 	Index* idxObj = NULL;

@@ -136,7 +136,7 @@ class NetworkManagement
 		 \return	char*
 		 */
 		/*****************************************************************************/
-		char* GetNwMgmtFeatureValue(FeatureType featureType, char* featureName);
+		char* GetNwMgmtFeatureValue(FeatureType featureType, const char* featureName);
 
 		
 

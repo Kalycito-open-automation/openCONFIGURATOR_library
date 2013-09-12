@@ -465,7 +465,7 @@ void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName,
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath);
+ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath);
 /*****************************************************************************/
 /**
  \brief		This function shall get the 'Auto' info from the Project xml and store it in the object
@@ -861,7 +861,7 @@ ocfmRetCode CheckUpperAndLowerLimits(char* lowLimitVal, char* highLimitVal);
  \return	ocfmRetCode
  */
 /*****************************************************************************/
-ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId);
+ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, const char* indexId);
 
 /*****************************************************************************************/
 /**
@@ -973,7 +973,7 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool ValidateCNPresTimeout(char* subIndexId, char* presTimeOutVal);
+bool ValidateCNPresTimeout(const char* subIndexId, const char* presTimeOutVal);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to update the Sub Index entry of the Indices 0x1F81, 0x1F92, 0x1F9B of the CN in the MN OBD
@@ -1272,8 +1272,8 @@ void ResetAllSubIndexFlag(Index* indexObj);
  \return	ocfmRetCode			ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
-		char* sidxId, AttributeType attributeType, char* attributeValue);
+ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, const char* indexId,
+		const char* sidxId, AttributeType attributeType, const char* attributeValue);
 /*****************************************************************************/
 /**
  \brief		This function shall set the system time during time of build
@@ -1301,7 +1301,7 @@ const char* GetBuildTime();
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode ParseFile(char* fileName, INT32 nodePos, NodeType nodeType);
+ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the hexadecimal string version of the given string parameter

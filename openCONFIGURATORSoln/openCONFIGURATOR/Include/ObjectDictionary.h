@@ -149,7 +149,7 @@ class ObjectDictionary
 		 \return	Index*
 		 */
 		/*****************************************************************************/
-		Index* GetObjectDictIndex(char* indexId);
+		Index* GetObjectDictIndex(const char* indexId);
 		/*****************************************************************************/
 		/**
 		 \brief		This is a member function of CObjectDictionary returns the object dictonary for sub index
@@ -160,7 +160,7 @@ class ObjectDictionary
 		 \return	SubIndex*
 		 */
 		/*****************************************************************************/
-		SubIndex* GetObjectDictSubIndex(char* idxId, char* sIdxId);
+		SubIndex* GetObjectDictSubIndex(const char* idxId, const char* sIdxId);
 		/*****************************************************************************/
 		/**
 		 \brief		This is a member function of CObjectDictionary returns the range of the object dictionary ids

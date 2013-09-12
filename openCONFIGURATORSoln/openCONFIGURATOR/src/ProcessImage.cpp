@@ -390,7 +390,7 @@ bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules,
 	return false;
 }
 
-void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[],
+void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 		ProcessImage piOutCol[], INT32 inVar, INT32 outVar)
 {
 	char* xapFileName = new char[strlen(fileName) + ALLOC_BUFFER];
@@ -656,7 +656,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	delete[] mainBuffer;
 }
 
-void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[],
+void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 		ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar)
 {
 	char* netFileName = new char[strlen(fileName) + ALLOC_BUFFER];
@@ -1406,7 +1406,7 @@ char* GetPIName(char* indexId)
 	return retPiName;
 }
 
-bool CheckIfProcessImageIdx(char* idxId)
+bool CheckIfProcessImageIdx(const char* idxId)
 {
 	return ((0 <= strcmp(idxId, "A000")) && (0 >= strcmp(idxId, "AFFF")));
 }

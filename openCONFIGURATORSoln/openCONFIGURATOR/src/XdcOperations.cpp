@@ -753,7 +753,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	}
 }
 
-ocfmRetCode ValidateXDDFile(char *fileName)
+ocfmRetCode ValidateXDDFile(const char *fileName)
 {
 
 	ocfmRetCode exceptionObject;
@@ -798,7 +798,7 @@ ocfmRetCode ValidateXDDFile(char *fileName)
 	return exceptionObject;
 	}
 
-ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType)
+ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType)
 {
 	ocfmRetCode exceptionObject;
 
@@ -1110,7 +1110,7 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 	}
 }
 
-ocfmRetCode ParseFile(char* fileName, INT32 nodePos, NodeType nodeType)
+ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 {
 	xmlTextReaderPtr reader;
 	ocfmRetCode objException;
@@ -1183,7 +1183,7 @@ ocfmRetCode ParseFile(char* fileName, INT32 nodePos, NodeType nodeType)
 	return objException;
 }
 
-ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType)
+ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 {
 	INT32 nodePos;
 	ocfmRetCode objException;

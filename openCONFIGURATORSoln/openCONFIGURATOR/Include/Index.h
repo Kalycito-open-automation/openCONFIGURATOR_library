@@ -58,7 +58,6 @@
 /* Includes */
 
 #include <vector>
-#include "Declarations.h"
 #include "BaseIndex.h"
 #include "SubIndex.h"
 

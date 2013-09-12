@@ -129,7 +129,7 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 	}
 }
 
-ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
+ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 		INT32 *idxPos)
 {
 	INT32 nodePos;
@@ -214,8 +214,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId,
 	return exceptionObj;
 }
 
-ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId,
-		char* sidxId, INT32* sidxPos, INT32* idxPos)
+ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId, const char* sidxId, INT32* sidxPos, INT32* idxPos)
 {
 	ocfmRetCode objException;
 	try

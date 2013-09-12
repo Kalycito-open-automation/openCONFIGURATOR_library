@@ -148,7 +148,7 @@ static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-static void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
+static void SetDefaultIndexAttributes(const char* indexId, Index* indexObj,
 		Index* dictIndexObj)
 {
 	if ((NULL == dictIndexObj) || (NULL == indexObj))
@@ -260,7 +260,7 @@ static void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
 	}
 }
 
-static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
+static void SetDefaultSubIndexAttributes(const char* subIndexId, SubIndex* sidxObj,
 		SubIndex* dictSidxObj)
 {
 	if ((NULL == dictSidxObj) || (NULL == sidxObj))
@@ -374,7 +374,7 @@ static void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
 	return;
 }
 
-ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName)
+ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, const char* nodeName)
 {
 	ocfmRetCode errCodeObj;
 	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
@@ -586,7 +586,7 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 		}
 
 		char* sidxStr = new char[SUBINDEX_LEN];
-		sidxStr = IntToAscii(nodeObj.GetNodeId(), sidxStr, 16);
+		IntToAscii(nodeObj.GetNodeId(), sidxStr, 16);
 		sidxStr = PadLeft(sidxStr, '0', 2);
 
 		errCodeObj = IfSubIndexExists(MN_NODEID, MN,
@@ -741,7 +741,7 @@ ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType)
 	return errCodeObj;
 }
 
-ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
+ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, const char* indexId)
 {
 	ocfmRetCode errCodeObj;
 	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
@@ -799,8 +799,7 @@ ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 	return errCodeObj;
 }
 
-ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
-		char* subIndexID)
+ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, const char* indexId, const char* subIndexID)
 {
 	INT32 sidxPos = 0;
 	INT32 idxPos = 0;
@@ -871,8 +870,8 @@ ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 	return errCodeObj;
 }
 
-ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
-		char* subIndexId)
+ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, const char* indexId,
+		const char* subIndexId)
 {
 	INT32 sidxPos = 0;
 	INT32 idxPos = 0;
@@ -1021,7 +1020,7 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId,
 	return errCodeObj;
 }
 
-ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
+ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, const char* indexId)
 {
 	ocfmRetCode errCodeObj;
 	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
@@ -1127,7 +1126,7 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, char* indexId)
 	return errCodeObj;
 }
 
-ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
+ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, const char* indexId)
 {
 	ocfmRetCode errCodeObj;
 	INT32 indexPos = 0;
@@ -1268,7 +1267,7 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId)
 }
 
 ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
-		char* indexId, char* indexValue, char* indexName, bool includeInCDC)
+		const char* indexId, const char* indexValue, const char* indexName, bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
 	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
@@ -1342,7 +1341,7 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 }
 
 ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
-		char* indexId, char* sidxId, char* indexValue, char* indexName,
+		const char* indexId, const char* sidxId, const char* indexValue, const char* indexName,
 		bool includeInCDC)
 {
 	ocfmRetCode errCodeObj;
@@ -1748,8 +1747,8 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 	return errCodeObj;
 }
 
-ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, char* indexId,
-		char* sidxId, AttributeType attributeType, char* attributeValue)
+ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType,const char* indexId,
+		const char* sidxId, AttributeType attributeType, const char* attributeValue)
 {
 	ocfmRetCode errCodeObj;
 	errCodeObj.setErrorCode(OCFM_ERR_UNKNOWN);
@@ -1991,7 +1990,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 						if (true == CheckIfStringDatatypes(dtObj.dataTypeName))
 						{
 							INT32 len = strlen(sidxObj->GetActualValue());
-							dataSizeStr = IntToAscii(len, dataSizeStr, 16);
+							IntToAscii(len, dataSizeStr, 16);
 							dataSizeStr = PadLeft(dataSizeStr, '0', 8);
 							strcat(cdcBuffer, dataSizeStr);
 							padLength = len * 2;
@@ -1999,8 +1998,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 						}
 						else
 						{
-							dataSizeStr = IntToAscii(dtObj.dataSize,
-									dataSizeStr, 16);
+							IntToAscii(dtObj.dataSize,dataSizeStr, 16);
 							dataSizeStr = PadLeft(dataSizeStr, '0', 8);
 							strcat(cdcBuffer, dataSizeStr);
 							padLength = dtObj.dataSize * 2;
@@ -4314,7 +4312,7 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId)
 	return noOfCDCEntries;
 }
 
-ocfmRetCode GenerateCDC(char* cdcPath)
+ocfmRetCode GenerateCDC(const char* cdcPath)
 {
 
 	Node nodeObjMN;
@@ -6702,7 +6700,7 @@ void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName,
 	xmlFreeDoc(xmlDocObj);
 }
 
-ocfmRetCode GenerateXAP(char* xapFilePath)
+ocfmRetCode GenerateXAP(const char* xapFilePath)
 {
 	NodeCollection* nodeCollObj = NULL;
 	ocfmRetCode exceptionObj;
@@ -6756,7 +6754,7 @@ ocfmRetCode GenerateXAP(char* xapFilePath)
 	return exceptionObj;
 }
 
-ocfmRetCode GenerateNET(char* netFilePath)
+ocfmRetCode GenerateNET(const char* netFilePath)
 {
 	NodeCollection* nodeCollObj;
 	ocfmRetCode exceptionObj;
@@ -6791,7 +6789,7 @@ ocfmRetCode GenerateNET(char* netFilePath)
 	return exceptionObj;
 }
 
-ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId,
+ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId,
 		AttributeType attributeType, char* outAttributeValue)
 {
 	INT32 indexPos;
@@ -7027,7 +7025,7 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 }
 
 ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType,
-		char* indexId, char* sidxId, AttributeType attributeType,
+		const char* indexId, const char* sidxId, AttributeType attributeType,
 		char* outAttributeValue)
 {
 	ocfmRetCode exceptionObj;
@@ -7409,8 +7407,7 @@ ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount)
 	return stErrorInfo;
 }
 
-ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId,
-		INT32* outSubIndexCount)
+ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, const char* indexId, INT32* outSubIndexCount)
 {
 	ocfmRetCode exceptionObj;
 
@@ -7457,7 +7454,7 @@ ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId,
 	return exceptionObj;
 }
 
-void LoadObjectDictionary(char* xmlFilePath)
+void LoadObjectDictionary(const char* xmlFilePath)
 {
 
 	xmlTextReaderPtr xmlReader;
@@ -7686,7 +7683,7 @@ ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos,
 }
 
 ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType,
-		char* indexId, INT32 subIndexPos, char* outSubIndexID)
+		const char* indexId, INT32 subIndexPos, char* outSubIndexID)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj;
@@ -7895,7 +7892,7 @@ ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType)
 	return exceptionObj;
 }
 
-ocfmRetCode SaveProject(char* projectPath, char* projectName)
+ocfmRetCode SaveProject(const char* projectPath, const char* projectName)
 {
 	Node nodeObj;
 	NodeCollection *nodeCollObj = NULL;
@@ -9046,7 +9043,7 @@ ocfmRetCode FreeProjectMemory()
 	return exceptionObj;
 }
 
-ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
+ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName)
 {
 	NodeCollection *nodeCollObj;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
@@ -9163,7 +9160,7 @@ ocfmRetCode OpenProject(char* projectPath, char* projectFileName)
 	return exceptionObj;
 }
 
-ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, char* projectPath)
+ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath)
 {
 	const xmlChar *xmlName;
 	ocfmRetCode exceptionObj;
@@ -12150,7 +12147,7 @@ void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
 	}
 }
 
-bool ValidateCNPresTimeout(char* subIndexId, char* presTimeOutVal)
+bool ValidateCNPresTimeout(const char* subIndexId, const char* presTimeOutVal)
 {
 	ocfmRetCode exceptionObj;
 	INT32 sidxPos = 0;
@@ -12289,10 +12286,6 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 			SetSubIndexAttribute(MN_NODEID, MN, indexId, tempOldNodeIdCN,
 					ACTUALVALUE, (char*) "");
 		}
-	}
-	else
-	{
-		//no operation
 	}
 	delete[] tempNodeIdCN;
 	delete[] tempOldNodeIdCN;

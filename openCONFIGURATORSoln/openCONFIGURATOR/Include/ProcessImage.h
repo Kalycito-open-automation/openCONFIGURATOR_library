@@ -297,7 +297,7 @@ INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType);
  \param		outVar			Integer to hold the number of variables to be written in XAP header for the OUT ProcessImage
  \return	void	
  */
-void GenerateXAPHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar);
+void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar);
 
 /**
  \brief		This function shall be used to add PDO index to MN based on the given Index and SubIndex IDs
@@ -344,7 +344,7 @@ char* GetPIName(char* indexId);
  \retval	TRUE		if given IndexID belongs to the range allocated for ProcessImage
  \retval	FALSE		if given IndexID does not belong to the range allocated for ProcessImage
  */
-bool CheckIfProcessImageIdx(char* idxId);
+bool CheckIfProcessImageIdx(const char* idxId);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to XAP header file
@@ -367,7 +367,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionTyp
  \param		iOutVar          Integer to hold output value 
  \return	void	
  */
-void GenerateNETHeaderFile(char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar);
+void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
