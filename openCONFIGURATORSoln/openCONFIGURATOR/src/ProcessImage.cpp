@@ -59,10 +59,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include "../Include/openCONFIGURATOR.h"
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
 #include "../Include/ProcessImage.h"
+#include "../Include/NodeCollection.h"
 
 /****************************************************************************************************/
 /* Defines */

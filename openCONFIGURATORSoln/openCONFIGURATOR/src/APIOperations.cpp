@@ -72,7 +72,6 @@
 #else
 #include <sys/stat.h>
 #endif
-#include "../Include/openCONFIGURATOR.h"
 #include "../Include/Exception.h"
 #include "../Include/Internal.h"
 #include "../Include/ObjectDictionary.h"
@@ -80,6 +79,7 @@
 #include "../Include/Declarations.h"
 #include "../Include/Validation.h"
 #include "../Include/APIOperations.h"
+#include "../Include/NodeCollection.h"
 
 /****************************************************************************/
 /* Defines */

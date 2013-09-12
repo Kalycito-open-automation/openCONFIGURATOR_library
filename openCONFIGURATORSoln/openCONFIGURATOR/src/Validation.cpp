@@ -61,6 +61,7 @@
 #include <sstream>
 #include "../Include/Validation.h"
 #include "../Include/Exception.h"
+#include "../Include/NodeCollection.h"
 
 using namespace std;
 //==========================================================================//

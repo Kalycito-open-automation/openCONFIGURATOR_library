@@ -62,10 +62,10 @@
 #include <errno.h>
 //#include <limits.h>
 #include <string.h>
-#include "../Include/openCONFIGURATOR.h"
 #include "../Include/Declarations.h"
 #include "../Include/Exception.h"
 #include "../Include/Validation.h"
+#include "../Include/NodeCollection.h"
 
 /*****************************************************************************/
 /* Defines */
