@@ -59,8 +59,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "Declarations.h"
 #include "TCollection.h"
+#include "UtilityClasses.h"
+
 
 /**
  ******************************************************************************************************
@@ -78,7 +79,7 @@ class ComplexDataType
 		char* prevUniqueId;				/**< Usage to be documented */
 		AppProcessCommon *nameIdAttr;	/**< Usage to be documented */
 
-		TCollection<varDeclaration> varDeclarationCollection;	/**< Variable collection */
+		TCollection<VarDeclaration> varDeclarationCollection;	/**< Variable collection */
 	
 		/*****************************************************************************/
 		/**
@@ -89,7 +90,7 @@ class ComplexDataType
 		 \return		void
 		 */
 		/*****************************************************************************/
-		void AddVarDeclaration(varDeclaration varDeclarationObject);
+		void AddVarDeclaration(VarDeclaration varDeclarationObject);
 
 	private:
 		INT32 varDeclarationCollCount;	/**< Total number of variables under varCollection tag */

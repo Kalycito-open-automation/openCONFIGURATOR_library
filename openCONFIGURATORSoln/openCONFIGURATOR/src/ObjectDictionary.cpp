@@ -421,11 +421,11 @@ INT32 ObjectDictionary::IfObjectDictIndexExists(char* idxId)
 
 	if (NULL == objIndex)
 	{
-		return TRUE;
+		return true;
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -441,18 +441,18 @@ INT32 ObjectDictionary::IfObjectDictSubIndexExists(char* idxId, char* sIdxId)
 
 	if (NULL == objIndex)
 	{
-		return TRUE;
+		return true;
 	}
 
 	objSIdx = objIndex->GetSubIndexbyIndexValue(sIdxId);
 
 	if (NULL == objSIdx)
 	{
-		return TRUE;
+		return true;
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 }
 

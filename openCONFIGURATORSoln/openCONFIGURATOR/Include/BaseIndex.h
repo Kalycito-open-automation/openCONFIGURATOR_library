@@ -378,7 +378,7 @@ class BaseIndex
 		 \return	Flag			
 		 */
 		/*****************************************************************************/
-		Flag GetFlagIfIncludedCdc();
+		bool GetFlagIfIncludedCdc();
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to enable/disable the Index's inclusion in CDC generation
@@ -388,7 +388,7 @@ class BaseIndex
 		 \return	void			
 		 */
 		/*****************************************************************************/
-		void SetFlagIfIncludedCdc(Flag flagVal);
+		void SetFlagIfIncludedCdc(bool flagVal);
 
 		/**
 		 \brief		This function shall be used to delete the memory occupied by the members of the class
@@ -411,6 +411,6 @@ class BaseIndex
 		PDOMapping pdoMapping;			/**< Pdomapping of the object */
 		INT32 nodeId;					/**< Usage to be documented */
 		INT32 parameterIndex;			/**< Usage to be documented */
-		Flag includeInCDC;				/**< Include in CDC flag */
+		bool includeInCDC;				/**< Include in CDC flag */
 };
 #endif //BaseIndex_h

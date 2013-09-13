@@ -63,6 +63,8 @@
 #include <time.h>
 #include "Exports.h"
 #include "Error.h"
+#include "Enums.h"
+#include "UtilityClasses.h"
 
 //using namespace std;
 
@@ -141,432 +143,6 @@ typedef long int LONG;
 /** unsigned long int as ULONG */
 typedef unsigned long int ULONG;
 
-/******************************************************************************
- Enumerations
- *****************************************************************************/
-
-/** An enum ObjectType.
- * ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
- */
-typedef enum
-{
-	DEFTYPE = 5,	/**< 5: Denotes a static data type definition */
-	DEFSTRUCT = 6,	/**< 6: Defines a record type */
-	VAR = 7,		/**< 7: Denotes a single value */
-	ARRAY = 8,		/**< 8: A multiple data field object where each data field is a simple variable of the SAME basic data type */
-	RECORD = 9		/**< 9: A multiple data field object where the data fields may be any combination of simple variables */
-} ObjectType;
-
-/** An enum PDOMapping.
- * This enum holds the list of PDO mapping type for the Object and SubObject
- */
-DLLEXPORT typedef enum
-{
-	NOT_DEFINED = -1,	/**< Indicates the object has a default value set to not defined */
-	NO,					/**< Indicates the object must not be mapped into a Process Data Objects */
-	DEFAULT,			/**< Indicates the object is part of the default mapping */
-	OPTIONAL,			/**< Indicates the object can be mapped into both Receive and Transmit Process Data Objects */
-	RPDO,				/**< Indicates the object shall be mapped into a Receive Process Data Objects */
-	TPDO				/**< Indicates the object shall be mapped into a Transmit Process Data Objects */
-} PDOMapping;
-
-/** This enum holds the list of PDO mapping type for the Object and SubObject */
-typedef PDOMapping *pdoMapping;
-
-/** An enum NodeType.
- * This enum holds the list of available type of Nodes
- */
-typedef enum
-{
-	MN = 0,		/**< To indicate an Managing Node */
-	CN = 1		/**< To indicate an Controlled Node or Slave */
-} NodeType;
-
-/** An enum PDOType.
- * This enum holds the list of available type of Process Data Objects
- */
-typedef enum
-{
-	PDO_INVALID = 0,	/**< Indicates the object is not a Process Data Object */
-	PDO_TPDO = 1,		/**< 1: Indicates the Transmit Process Data Objects */
-	PDO_RPDO = 2		/**< 2: Indicates the Receive Process Data Objects */
-} PDOType;
-
-/** An enum FeatureType.
- * This enum holds the types of network management features for a Node
- */
-typedef enum
-{
-	GENERAL_FEATURES = 0,	/**< General features */
-	MN_FEATURES = 1,		/**< Managing node features */
-	CN_FEATURES = 2			/**< Controlled node features */
-} FeatureType;
-
-/** An enum ParameterAccess.
- * This enum holds the list of accessTypes that defines which operations valid for the parameter
- */
-typedef enum
-{
-	constant,			/**< Const access */
-	ro,					/**< Read only */
-	wr,					/**< Write only */
-	rw,					/**< Read and write access */
-	readWriteInput,		/**< Read and write access, but represents process input data */
-	readWriteOutput,	/**< Read and write, access, but represents process output data */
-	noAccess			/**< access denied */
-} ParameterAccess;
-
-/** An enum IEC_Datatype.
- * This enum holds the list of available IEC datatypes
- */
-typedef enum IEC_Datatype
-{
-	BITSTRING = 0,	/**< Bit string (1 bit) */
-	BOOL,			/**< Bool (1 bit) */
-	BYTE,			/**< Byte (8 bits) */
-	_CHAR,			/**< Char (8 bits) */
-	DWORD,			/**< Dword (32 bits) */
-	LWORD,			/**< Lword (64 bits) */
-	SINT,			/**< Signed short integer (1 byte) */
-	INT,			/**< Signed integer (2 bytes) */
-	DINT,			/**< Double integer (4 bytes) */
-	LINT,			/**< Long integer (8 bytes) */
-	USINT,			/**< Unsigned short integer (1 byte) */
-	UINT,			/**< Unsigned integer (2 bytes) */
-	UDINT,			/**< Unsigned double integer (4 bytes) */
-	ULINT,			/**< Unsigned long integer (8 bytes) */
-	REAL,			/**< REAL (4 bytes) */
-	LREAL,			/**< LREAL (8 bytes) */
-	STRING,			/**< STRING */
-	WSTRING			/**< WSTRING to hold multi byte strings */
-} IEC_Datatype;
-
-/** 
- * A struct to represent DataTypeList under the Application layer tag
- */
-struct DataType
-{
-		char* dataTypeName;			/**< DataType of the interface variable or structure component */
-		char* dataTypeValue;		/**< Value for the dataType */
-		INT32 dataSize;				/**< DataSize for the dataType */
-		IEC_Datatype iecDataType;	/**< To represent the equivalent IEC datatype */
-		/**
-		\brief		This function is used to get the dataType
-		 
-		\return		char*
-		*/
-		char* GetName()
-		{
-			return (dataTypeName);
-		}
-		/**
-		\brief		This function is used to set the dataType	
-		\param[in]	tempDataTypeName	Character pointer to the dataType to be set
-		\return		void
-		*/
-		//TODO: Review. setName not called
-		void SetName(char* tempDataTypeName)
-		{
-			dataTypeName = new char[strlen(tempDataTypeName) + 1];
-			strcpy(dataTypeName, tempDataTypeName);
-		}
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			dataTypeName = NULL;
-			dataTypeValue = NULL;
-			dataSize = 0;
-		}
-};
-
-/** 
- * A struct to represent the common members under the Application process tag
- */
-typedef struct AppProcessCommon
-{
-		char* name;					/**< Name of the interface variable or structure component */
-		char* uniqueId;				/**< Unique Id of the interface variable or structure component */
-		char* dataType;				/**< Nested datatype of the interface variable or structure component */
-		char* dataTypeUniqueIDRef;	/**< Datatype Unique Id reference of the interface variable or structure component */
-		/**
-		\brief		This function is used to get the uniqueId of the interface variable or structure component
-		\return		char*	uniqueId of the interface variable or structure component
-		*/
-		char* GetUniqueID()
-		{
-			return (uniqueId);
-		}
-
-		/**
-		\brief		This function is used to set the uniqueId of the interface variable or structure component
-		\param[in]	varUniqueID		Character pointer to the uniqueId to be set
-		\return		void
-		*/
-		void SetUniqueID(char* varUniqueID)
-		{
-			uniqueId = new char[strlen(varUniqueID) + 1];
-			strcpy(uniqueId, varUniqueID);
-		}
-
-		/**
-		\brief		This function is used to get the name of the interface variable or structure component	
-		\return		char*	name of the interface variable or structure component
-		*/
-		char* GetName()
-		{
-			return (name);
-		}
-
-		/**
-		\brief		This function is used to set the name of the interface variable or structure component
-		\param[in]	attrName	Character pointer to the name to be set
-		\return		void
-		*/
-		void SetName(char* attrName)
-		{
-			name = new char[strlen(attrName) + 1];
-			strcpy(name, attrName);
-		}
-
-		/**
-		\brief		This function is used to get the dataType of the interface variable or structure component
-		\return		char*	dataType of the interface variable or structure component
-		*/
-		char* GetDataType()
-		{
-			return (dataType);
-		}
-
-		/**
-		\brief		This function is used to set the dataType of the interface variable or structure component
-		\param[in]	dtStr	Character pointer to the dataType to be set
-		\return		void
-		*/
-		void SetDataType(char* dtStr)
-		{
-			dataType = new char[strlen(dtStr) + 1];
-			strcpy(dataType, dtStr);
-		}
-
-		/**
-		\brief		This function is used to get the uniqueIdReference of the interface variable or structure component
-		\return		char*	dataTypeUniqueIdReference of the interface variable or structure component
-		*/
-		char* GetDtUniqueRefId()
-		{
-			return (dataTypeUniqueIDRef);
-		}
-
-		/**
-		\brief		This function is used to set the uniqueIdReference of the interface variable or structure component
-		\param[in]	uniqueRefID		Character pointer to the uniqueId Reference to be set
-		\return		void	
-		*/
-		void SetDtUniqueRefId(char* uniqueRefID)
-		{
-			dataTypeUniqueIDRef = new char[strlen(uniqueRefID) + 1];
-			strcpy(dataTypeUniqueIDRef, uniqueRefID);
-		}
-
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			name = NULL;
-			uniqueId = NULL;
-			dataType = NULL;
-			dataTypeUniqueIDRef = NULL;
-		}
-} appProcessCommon;
-
-/** 
- * A struct to represent the interface variable or structure component and their attributes
- */
-struct varDeclaration
-{
-		AppProcessCommon* namIdDtAttr;		/**< To hold the common attributes of the interface variable or structure component */
-		char size[5];						/**< To hold the size of the interface variable or structure component */
-		char* initialValue; 				/**< To hold the initial value of the interface variable or structure component */
-		char* structUniqueId;				/**< To hold the unique id of the struct component */
-
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			namIdDtAttr = new AppProcessCommon;
-			namIdDtAttr->Initialize();
-			strcpy(size, "");
-			initialValue = NULL;
-			structUniqueId = NULL;
-		}
-};
-
-/** 
- * A struct to represent the parameter list under the Application process tag
- */
-typedef struct Parameter
-{
-		AppProcessCommon nameIdDtAttr;		/**< To hold the common attributes for a parameter */
-		INT32 size;							/**< To hold the nested size of the parameter */
-		char* accessStr;					/**< To hold the access for the parameter: */
-		//char* dataType;
-		//INT32 structIndex;
-		//INT32 paraIndex;
-
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			nameIdDtAttr.Initialize();
-			accessStr = NULL;
-			size = 0;
-		}
-} Parameter;
-
-/** 
- * A struct to represent members of the Network management features
- */
-typedef struct Feature
-{
-		char* name;					/**< Name of the feature */
-		char* value;				/**< Value of the feature */
-		FeatureType featureType;	/**< Type of the feature */
-
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			name = NULL;
-			value = NULL;
-		}
-} Feature;
-
-/** 
- * A struct to represent the process data objects for the MN, which is used in generating the MN PDO index & subindex.
- */
-typedef struct MNPdoVariable
-{
-		char* indexId;			/**< Holds the IndexId of the Index to be created */
-		char* subIndexId;		/**< Holds the IndexId of the SubIndex to be created */
-		INT32 offsetVal; 		/**< Holds the Offset value of the PDO */
-		char* value;			/**< Holds the mapping configuration */	
-		INT32 dataSize;			/**< To hold the size of the PDO data */
-		PDOType pdoType;		/**< To hold the type of the PDO */
-
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			indexId = NULL;
-			subIndexId = NULL;
-			offsetVal = 0;
-			value = NULL;
-			dataSize = 0;
-		}
-} MNPdoVariable;
-
-/** An enum AttributeType.
- * This enum holds the list of attributes for the object or subobject can hold
- */
-typedef enum
-{
-	NAME = 0,		/**< Name attribute */
-	OBJECTTYPE,		/**< Object Type attribute */
-	DATATYPE,		/**< Data Type attribute */
-	ACCESSTYPE,		/**< Access Type attribute */
-	DEFAULTVALUE,	/**< Default value attribute */
-	ACTUALVALUE,	/**< Actual value attribute */
-	PDOMAPPING,		/**< PDO Mapping attribute */
-	LOWLIMIT,		/**< Low limit attribute */
-	HIGHLIMIT,		/**< High limit attribute */
-	FLAGIFINCDC,	/**< Include in CDC attribute */
-} AttributeType;
-
-/** An enum Flag.
- * This enum holds the list of boolean flags
- */
-typedef enum
-{
-	FALSE = 0,	/**< False */
-	TRUE		/**< True */
-} Flag;
-
-/** An enum DateTime.
- * This enum holds the date & time attribute
- */
-typedef enum
-{
-	DATE = 0,	/**< Date attribute */
-	TIME		/**< Time attribute */
-} DateTime;
-
- /** @defgroup OTHERS Others
- *	@ingroup API
- *  These are the other typedefs, enums visible as API
- *  @{
- */
- 
-/** An enum AutoGenerate.
- * This enum lists of generate modes available for the generation of the MN object dictionary.
- */
-typedef enum
-{
-	NO_AG = 0,	/**< Specifies the option for no auto generate mode */
-	YES_AG = 1	/**< Specifies the option for auto generate mode */
-} AutoGenerate;
-
-/** An enum AutoSave.
- * This enum lists of save modes available for the values & objects in the project.
- */
-typedef enum
-{
-	YES_AS = 0,		/**< Saves the configuration automatically */
-	PROMPT_AS,		/**< Prompts the user to for saving the configuration */
-	DISCARD_AS		/**< Discards the configuration */
-} AutoSave;
-
-/** An enum ViewMode.
- * This enum lists of view modes available for the objects in the project.
- */
-typedef enum
-{
-	SIMPLE = 0,	/**< Simple tree mode */
-	EXPERT		/**<  Advanced tree mode */
-} ViewMode;
-
-/** An enum ProjectSettings.
- * This enum lists of project settings attributes available for the project.
- */
-typedef enum
-{
-	AUTOGENERATE = 0,	/**< Specifies the autogenerate attriubte */
-	AUTOSAVE			/**< Specifies the autosave attribute */
-} ProjectSettings;
-
-/** An enum StationType.
- * This enum holds the list of available Controlled Node's station types
- */
-typedef enum
-{
-	NORMAL = 0,		/**< Normal station */
-	MULTIPLEXED,	/**< The node is multiplexed access */
-	CHAINED			/**< Chained station */
-} StationType;
-
-/** @} */ // end of Others
 /******************************************************************************
  * Function Declarations
  *****************************************************************************/
@@ -716,7 +292,7 @@ DLLEXPORT ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-DLLEXPORT ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue, char* indexName, Flag includeInCDC);
+DLLEXPORT ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue, char* indexName, bool includeInCDC);
 
 /**
  \brief		This API shall be used to set the attributes [IndexValue, IndexName & flagIfInCdc] of a sub index for a node
@@ -731,7 +307,7 @@ DLLEXPORT ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, c
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-DLLEXPORT ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* indexValue, char* indexName, Flag includeInCDC);
+DLLEXPORT ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* indexValue, char* indexName, bool includeInCDC);
 
 /**
  \brief		This API shall be used to check for the presence of a Node of given node ID and type in the collection list. If the node is present, the nodePos and nodeExist parameters are updated to reflect this in the calling function
@@ -1028,7 +604,7 @@ DLLEXPORT ocfmRetCode GenerateMNOBD();
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-DLLEXPORT ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+DLLEXPORT ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
 
 /**
  \brief		This API shall be used to set all the attributes of a Sub Index for a node
@@ -1050,7 +626,7 @@ DLLEXPORT ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, cha
 
  \return		ocfmRetCode			ConfigurationErrors
  */
-DLLEXPORT ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, Flag includeInCDC);
+DLLEXPORT ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
 
 /**
  \brief		This API shall be used to get the specific network management feature value for a node

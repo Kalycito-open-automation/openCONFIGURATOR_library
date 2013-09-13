@@ -93,8 +93,9 @@ typedef enum PDODataType
 /**
  * A struct to manage the dataType, size and the datatype name
  */
-typedef struct PIDataInfo
+class PIDataInfo
 {
+public:
 		IEC_Datatype iecDtVar;	/**< Value for the dataType */
 		INT32 dataSize;			/**< Size of the data */
 		char* dtName;			/**< Name of the dataType */
@@ -107,7 +108,7 @@ typedef struct PIDataInfo
 			dtName = NULL;
 			dataSize = 0;
 		}
-} PIDataInfo;
+};
 
 /*****************************************************************************/
 /* Structures */
@@ -115,8 +116,9 @@ typedef struct PIDataInfo
 /** 
  * A struct to represent ProcessImage variables
  */
-struct ProcessImage
+class ProcessImage
 {
+public:
 		char* name;							/**< Name of the process image variable */
 		char direction[5];					/**< Direction of the process image variable */
 		PIDataInfo dataInfo;				/**< Details about the data of the process image variable */
@@ -132,6 +134,7 @@ struct ProcessImage
 		char* varDeclName;					/**< ProcessImage variable Name */
 		char* moduleIndex;					/**< Module index Id */
 		PIDirectionType directionType;		/**< ProcessImage direction type(N/W point of view) */
+		
 		/**
 		\brief		This function is used to initialise the members to a default value.
 		\return		void
@@ -157,8 +160,9 @@ struct ProcessImage
 /** 
  * A struct to represent ProcessImage variables in a C# format
  */
-struct NETProcessImage
+class NETProcessImage
 {
+public:
 		char* name;						/**< ProcessImage name for the C# format */
 		char* lastName;					/**< Usage to be documented */
 		char* moduleName;				/**< Slave module name */
@@ -185,18 +189,20 @@ struct NETProcessImage
 /** 
  * A struct to represent the ProcessImage indexes list & datatype and directions
  */
-typedef struct piIndexTable
+class PIIndexTable
 {
+public:
 		char addressStr[10];		/**< PI variable address Id */
 		PDODataType dtObj;			/**< DataType for the PI object */
 		PIDirectionType direction;	/**< Direction of the PI object */
-} PIIndexTable;
+};
 
 /** 
  * A struct to represent ProcessImage offsets
  */
-struct Offsets
+class Offsets
 {
+public:
 		INT32 prevOffset;		/**< To represent the previous offset */
 		INT32 currOffset;		/**< To represent the current offset */
 };
@@ -204,29 +210,32 @@ struct Offsets
 /** 
  * A struct to represent processimage objects
  */
-struct PIObject
+class PIObject
 {
-		char* indexId;		/**< PI variables IndexId */
-		char* sIdxId;		/**< PI variables SubIndexId */
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Initialize()
-		{
-			indexId = NULL;
-			sIdxId = NULL;
-		}
+public:
+	char* indexId;		/**< PI variables IndexId */
+	char* sIdxId;		/**< PI variables SubIndexId */
+	
+	/**
+	\brief		This function is used to initialise the members to a default value.
+	\return		void
+	*/
+	void Initialize()
+	{
+		indexId = NULL;
+		sIdxId = NULL;
+	}
 
 };
 
 /** 
  * A struct to represent Module Collection
  */
-struct ModuleCol
+class ModuleCol
 {
-		INT32 moduleNo;			/**< To denote the module number */
-		char moduleName[50];	/**< To denote the module name */
+public:
+	INT32 moduleNo;			/**< To denote the module number */
+	char moduleName[50];	/**< To denote the module name */
 };
 
 /*****************************************************************************/

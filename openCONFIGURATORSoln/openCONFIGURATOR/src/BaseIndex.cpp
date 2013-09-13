@@ -90,7 +90,7 @@ BaseIndex::BaseIndex(void)
 	//objectType = 0; //TODO: Review initialisation
 	pdoMapping = NOT_DEFINED;
 	parameterIndex = -1;
-	includeInCDC = FALSE;
+	includeInCDC = false;
 }
 
 /****************************************************************************************************/
@@ -554,12 +554,12 @@ bool BaseIndex::IsIndexValueValid(char* hexValue)
 	return retFlag;
 }
 
-void BaseIndex::SetFlagIfIncludedCdc(Flag flagVal)
+void BaseIndex::SetFlagIfIncludedCdc(bool flagVal)
 {
 	includeInCDC = flagVal;
 }
 
-Flag BaseIndex::GetFlagIfIncludedCdc()
+bool BaseIndex::GetFlagIfIncludedCdc()
 {
 	return includeInCDC;
 }

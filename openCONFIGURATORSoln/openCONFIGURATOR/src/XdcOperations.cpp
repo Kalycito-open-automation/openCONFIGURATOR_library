@@ -228,11 +228,11 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 	{
 		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
 		{
-			indexObj->SetFlagIfIncludedCdc(FALSE);
+			indexObj->SetFlagIfIncludedCdc(false);
 		}
 		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
 		{
-			indexObj->SetFlagIfIncludedCdc(TRUE);
+			indexObj->SetFlagIfIncludedCdc(true);
 		}
 		else
 		{
@@ -309,11 +309,11 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 	{
 		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
 		{
-			sidxObj->SetFlagIfIncludedCdc(FALSE);
+			sidxObj->SetFlagIfIncludedCdc(false);
 		}
 		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
 		{
-			sidxObj->SetFlagIfIncludedCdc(TRUE);
+			sidxObj->SetFlagIfIncludedCdc(true);
 		}
 		else
 		{
@@ -459,12 +459,12 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 
 	if (!strcmp(ConvertToUpper((char*) xcName), "UNIQUEID"))
 	{
-		parameterObj->nameIdDtAttr.SetUniqueID((char*) xcValue);
+		parameterObj->nameIdDtAttr->SetUniqueID((char*) xcValue);
 	}
 	else if (!strcmp(ConvertToUpper((char*) xcName), "NAME"))
 	{
 		CheckAndCorrectName((char*) xcValue);
-		parameterObj->nameIdDtAttr.SetName((char*) xcValue);
+		parameterObj->nameIdDtAttr->SetName((char*) xcValue);
 	}
 	else if (!strcmp(ConvertToUpper((char*) xcName), "ACCESS"))
 	{
@@ -521,7 +521,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 
 		if (CheckifSimpleDT((char*) name, (char*) abSize))
 		{
-			parameterObj->nameIdDtAttr.SetDataType((char*) name);
+			parameterObj->nameIdDtAttr->SetDataType((char*) name);
 			parameterObj->size = atoi((char*) abSize);
 #if defined DEBUG
 			cout<<"Setting DataType:"<<parameterObj->nameIdDtAttr.GetDataType()<<" Size:"<<parameterObj->size<<endl;
@@ -530,7 +530,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name,
 		                      (char*) "dataTypeIDRef"))
 		{
-			if (TRUE == xmlTextReaderHasAttributes(reader))
+			if (1 == xmlTextReaderHasAttributes(reader))
 			{
 				xmlTextReaderMoveToNextAttribute(reader);
 				value = xmlTextReaderConstValue(reader);
@@ -538,7 +538,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 
 				if (0 == strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
 				{
-					parameterObj->nameIdDtAttr.SetDtUniqueRefId((char*) value);
+					parameterObj->nameIdDtAttr->SetDtUniqueRefId((char*) value);
 				}
 			}
 		}
@@ -596,7 +596,7 @@ bool CheckifSimpleDT(char *datatypeName, char *dataSize)
 	return false;
 }
 
-void SetVarDecAttributes(xmlTextReaderPtr reader, varDeclaration& vdecl)
+void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl)
 {
 	const xmlChar *name = NULL;
 	const xmlChar *value = NULL;
@@ -674,7 +674,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	}
 
 	INT32 retValue;
-	varDeclaration varDeclObj;
+	VarDeclaration varDeclObj;
 	varDeclObj.Initialize();
 	retValue = xmlTextReaderRead(reader);
 
@@ -690,7 +690,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	while (!(CheckEndElement(xmlTextReaderNodeType(reader), (char*) name,
 	                         (char*) "struct")))
 	{
-		varDeclaration objTempVarDecl;
+		VarDeclaration objTempVarDecl;
 		objTempVarDecl.Initialize();
 
 		try
@@ -972,7 +972,7 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 	try
 	{
 		//If the NodeTYPE is ELEMENT
-		if (TRUE == xmlTextReaderNodeType(reader))
+		if (1 == xmlTextReaderNodeType(reader))
 		{
 			if (!strcmp(((char*) name), "defType"))
 			{
@@ -1418,13 +1418,13 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST objCDT->nameIdAttr->GetName());
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "uniqueID",
-				               BAD_CAST objCDT->nameIdAttr->uniqueId);
+					BAD_CAST objCDT->nameIdAttr->GetUniqueID());
 
 				for (INT32 varDeclLC = 0;
 				        varDeclLC < objCDT->varDeclarationCollection.Count();
 				        varDeclLC++)
 				{
-					varDeclaration vd;
+					VarDeclaration vd;
 					vd.Initialize();
 					vd = objCDT->varDeclarationCollection[varDeclLC];
 					// Start varDeclaration Tag
@@ -1443,7 +1443,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST vd.namIdDtAttr->GetName());
 					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 					               BAD_CAST "uniqueID",
-					               BAD_CAST vd.namIdDtAttr->uniqueId);
+						BAD_CAST vd.namIdDtAttr->GetUniqueID());
 					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 					               BAD_CAST "size", BAD_CAST vd.size);
 
@@ -1572,13 +1572,13 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				}
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "uniqueID",
-				               BAD_CAST parameterObj.nameIdDtAttr.GetUniqueID());
+					BAD_CAST parameterObj.nameIdDtAttr->GetUniqueID());
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "access", BAD_CAST parameterObj.accessStr);
 
-				if(parameterObj.nameIdDtAttr.GetDataType() != NULL)
+				if(parameterObj.nameIdDtAttr->GetDataType() != NULL)
 				{
-					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST parameterObj.nameIdDtAttr.GetDataType());
+					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST parameterObj.nameIdDtAttr->GetDataType());
 					if (bytesWritten < 0)
 					{
 						printf("Error at xmlTextWriterStartElement: Parameter - Datatype\n");
@@ -1594,7 +1594,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					}
 				}
 
-				if(parameterObj.nameIdDtAttr.GetDtUniqueRefId() != NULL)
+				if(parameterObj.nameIdDtAttr->GetDtUniqueRefId() != NULL)
 				{
 					// Start dataTypeIDRef Tag
 					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "dataTypeIDRef");
@@ -1604,7 +1604,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						objException.OCFMException(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
-					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter, BAD_CAST "uniqueIDRef", BAD_CAST parameterObj.nameIdDtAttr.GetDtUniqueRefId());
+					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter, BAD_CAST "uniqueIDRef", BAD_CAST parameterObj.nameIdDtAttr->GetDtUniqueRefId());
 					// End dataTypeIDRef Tag
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (0 > bytesWritten)
@@ -2259,14 +2259,14 @@ void SetFlagForRequiredCNIndexes(INT32 nodeId)
 		        || CheckIfManufactureSpecificObject(
 		            (char*) idxObj->GetIndexValue()))
 		{
-			idxObj->SetFlagIfIncludedCdc(TRUE);
+			idxObj->SetFlagIfIncludedCdc(true);
 			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
 			        sidxLC++)
 			{
 				sidxObj = idxObj->GetSubIndex(sidxLC);
 				if (sidxObj != NULL)
 				{
-					sidxObj->SetFlagIfIncludedCdc(TRUE);
+					sidxObj->SetFlagIfIncludedCdc(true);
 				}
 
 			}
@@ -2306,18 +2306,18 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 		        || strcmp((char*) idxObj->GetIndexValue(), "1F92") == 0
 		        || strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
 		{
-			idxObj->SetFlagIfIncludedCdc(TRUE);
+			idxObj->SetFlagIfIncludedCdc(true);
 			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
 			        sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
 				sidxObj = idxObj->GetSubIndex(sidxLC);
-				sidxObj->SetFlagIfIncludedCdc(TRUE);
+				sidxObj->SetFlagIfIncludedCdc(true);
 			}
 		}
 		else if (strcmp((char*) idxObj->GetIndexValue(), "1F8A") == 0)
 		{
-			idxObj->SetFlagIfIncludedCdc(TRUE);
+			idxObj->SetFlagIfIncludedCdc(true);
 			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
 			        sidxLC++)
 			{
@@ -2325,7 +2325,7 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 				sidxObj = idxObj->GetSubIndex(sidxLC);
 				if (strcmp((char*) sidxObj->GetIndexValue(), "02") == 0)
 				{
-					sidxObj->SetFlagIfIncludedCdc(TRUE);
+					sidxObj->SetFlagIfIncludedCdc(true);
 					break;
 				}
 			}

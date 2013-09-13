@@ -93,13 +93,13 @@ INT32 ApplicationProcess::CheckFileStatus(char* fileName)
 {
 	ifstream file(fileName, ios::in | ios::binary | ios::ate);
 
-	if (TRUE == (file.is_open()))
+	if (true == (file.is_open()))
 	{
-		return TRUE;
+		return true;
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -136,7 +136,7 @@ INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(char *uniqueIdRef)
 	{
 		Parameter parameterObj;
 		parameterObj = ParameterCollection[loopCount];
-		if (0 == strcmp(uniqueIdRef, parameterObj.nameIdDtAttr.GetUniqueID()))
+		if (0 == strcmp(uniqueIdRef, parameterObj.nameIdDtAttr->GetUniqueID()))
 		{
 			return loopCount;
 		}
@@ -152,7 +152,7 @@ Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(char *uniqueIdRef)
 		Parameter parameterObj;
 
 		parameterObj = ParameterCollection[loopCount];
-		if (0 == strcmp(uniqueIdRef, parameterObj.nameIdDtAttr.GetUniqueID()))
+		if (0 == strcmp(uniqueIdRef, parameterObj.nameIdDtAttr->GetUniqueID()))
 		{
 			return &ParameterCollection[loopCount];
 		}

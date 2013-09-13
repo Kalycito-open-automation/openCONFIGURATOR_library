@@ -131,12 +131,13 @@
 
 #define BUILDTIME_BUF_LEN 80
 
-typedef struct
+class BuildTime
 {
+	public:
 		time_t rawtime;
 		struct tm * timeinfo;
 		char buffer[BUILDTIME_BUF_LEN];
-} BuildTime;
+};
 
 /*****************************************************************************/
 /* Externs */
@@ -1484,7 +1485,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj);
  \return	void
  */
 /*****************************************************************************/
-void SetVarDecAttributes(xmlTextReaderPtr reader, varDeclaration& vdecl);
+void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to process the attributes of given Node Type and Position and add these details to relevant collection lists
