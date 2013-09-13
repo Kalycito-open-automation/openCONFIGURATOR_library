@@ -57,33 +57,37 @@ PROJECT (OPENCONFIGURATOR)
 # Set additional settings for MS Visual Studio Compiler
 ###############################################################################
 IF (MSVC)
-	SET(CMAKE_CXX_FLAGS "/Zi /nologo /W3 /WX- /Od /Oy- /Ob0 /D _CRT_SECURE_NO_WARNINGS /Gm- /EHsc /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /analyze- /errorReport:queue /GR-")
+	SET(CMAKE_CXX_FLAGS "/Zi /nologo /W4 /WX- /Od /Oy- /Ob0 /D _CRT_SECURE_NO_WARNINGS /Gm- /EHsc /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /analyze- /errorReport:queue /GR-")
 	SET(CMAKE_CXX_FLAGS_RELEASE "/MD")
 	SET(CMAKE_CXX_FLAGS_DEBUG "/MDd")
-ENDIF (MSVC)
+ELSEIF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -Weffc++")
+ENDIF(MSVC)
 	
 ###############################################################################
 # Set options
 ###############################################################################
 IF (WIN32)
 	OPTION (OPEN_CONFIGURATOR_DLL "Build openCONFIGURATOR static library" ON)
-	OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK library" ON)
-ELSE(WIN32)
-	OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK library" ON)
-ENDIF (WIN32)	
+ELSE(WIN32)	
+ENDIF (WIN32)
+OPTION (OPEN_CONFIGURATOR_DOCUMENTATION "Build openCONFIGURATOR source code documentation." OFF)
+OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK library" OFF)	
 
 ###############################################################################
 # Add a target to generate API documentation with Doxygen
 ###############################################################################
 FIND_PACKAGE(Doxygen)
-IF(DOXYGEN_FOUND)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/openCONFIGURATOR.doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-ADD_CUSTOM_TARGET(DOCUMENTATION ALL
-${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-ENDIF(DOXYGEN_FOUND)
+IF (OPEN_CONFIGURATOR_DOCUMENTATION)
+	IF(DOXYGEN_FOUND)
+		CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/openCONFIGURATOR.doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+		ADD_CUSTOM_TARGET(
+			DOCUMENTATION ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating API documentation with Doxygen" VERBATIM
+		)
+	ENDIF(DOXYGEN_FOUND)
+ENDIF()
 
 
 ###############################################################################
@@ -93,7 +97,7 @@ ADD_SUBDIRECTORY(openCONFIGURATOR)
 ###############################################################################
 # Add a target to generate TCL wrapper
 ###############################################################################
-IF(${OPEN_CONFIGURATOR_TCL_WRAPPER})
+IF(OPEN_CONFIGURATOR_TCL_WRAPPER)
 	ADD_SUBDIRECTORY(openCONFIGURATORWrapper)
-ENDIF(${OPEN_CONFIGURATOR_TCL_WRAPPER})
+ENDIF(OPEN_CONFIGURATOR_TCL_WRAPPER)
 
