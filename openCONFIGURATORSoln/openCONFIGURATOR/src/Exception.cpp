@@ -123,7 +123,7 @@ void ocfmRetCode::setErrorCode(ConfiguratorError error)
 			this->errorString = "Invalid Attribute type";
 			break;
 		case OCFM_ERR_NO_NODES_FOUND:
-			this->errorString = "No Nodes found";
+			this->errorString = "There are no nodes configured. Node collection is NULL.";
 			break;
 		case OCFM_ERR_NO_INDEX_FOUND:
 			this->errorString = "No Indexes found";

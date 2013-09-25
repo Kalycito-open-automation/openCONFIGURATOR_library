@@ -52,17 +52,19 @@
 # ensure working support of VS.NET 2010 and version strings
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.8)
 
-PROJECT (OPENCONFIGURATOR) 
+PROJECT (openCONFIGURATOR) 
 ###############################################################################
 # Set additional settings for MS Visual Studio Compiler
 ###############################################################################
 IF (MSVC)
-	SET(CMAKE_CXX_FLAGS "/Zi /nologo /W4 /WX- /Od /Oy- /Ob0 /D _CRT_SECURE_NO_WARNINGS /Gm- /EHsc /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /analyze- /errorReport:queue /GR-")
-	SET(CMAKE_CXX_FLAGS_RELEASE "/MD")
-	SET(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+	SET(CMAKE_CXX_FLAGS "/Zi /nologo /W4 /WX- /Od /Oy- /Ob0 /D _CRT_SECURE_NO_WARNINGS /Gm- /EHsc /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /analyze- /errorReport:queue /GR")
+	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /DDEBUG")
 ELSEIF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -Weffc++")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Weffc++ -std=c++03")
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 ENDIF(MSVC)
+
 	
 ###############################################################################
 # Set options

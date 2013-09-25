@@ -105,11 +105,6 @@ void Index::SetPDOType(PDOType varPDOType)
 void Index::AddSubIndex(SubIndex objSubIndex)
 {
 	subIndexCollection.push_back(objSubIndex);
-
-#if defined DEBUG
-	cout << __FUNCTION__ << "\t Index" << Index::GetIndexValue();
-	cout << "\tSubindex:" << objSubIndex.GetIndexValue() << endl;
-#endif
 }
 
 void Index::DeleteSubIndex(INT32 subIndexPosition)

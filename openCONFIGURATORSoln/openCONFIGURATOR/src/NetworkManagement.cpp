@@ -56,6 +56,7 @@
 
 #include "../Include/NetworkManagement.h"
 #include "../Include/Internal.h"
+#include "../Include/Logging.h"
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -144,10 +145,10 @@ void NetworkManagement::CalculateMaxPDOCount()
 	ocfmRetCode ex;
 	if ((NULL == tpdoChannelValue) || (NULL == featureName))
 	{
-#if defined DEBUG
-		cout << "Memory allocation error" << __FUNCTION__ << endl;
-#endif
+		string errorString("Local variable 'tpdoChannelValue', 'featureName' must not be NULL.");
+		LOG_FATAL() << errorString;
 		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.setErrorString(errorString);
 		throw ex;
 	}
 	else
@@ -161,6 +162,7 @@ void NetworkManagement::CalculateMaxPDOCount()
 		if (maxPDOCount > 256)
 		{
 			ex.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+			LOG_FATAL() << "Error: " << ex.getErrorString();
 			throw ex;
 		}
 	}

@@ -62,6 +62,7 @@
 #include "../Include/Validation.h"
 #include "../Include/Exception.h"
 #include "../Include/NodeCollection.h"
+#include "../Include/Logging.h"
 
 using namespace std;
 //==========================================================================//
@@ -81,17 +82,13 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 		if (NULL == nodePos)
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+			LOG_FATAL() << "Parameter 'nodePos' must not be NULL.";
 			throw &exceptionObj;
 		}
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		if (NULL == nodeCollObj)
 		{
-#if defined DEBUG
-			cout << "IfNodeExists: pobjNodeCollection is NULL!" << endl;
-#endif
+			LOG_FATAL() << "Local variable 'nodeCollObj' must not be NULL.";
 			exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 			return exceptionObj;
 		}
@@ -116,11 +113,13 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos,
 				}
 			}
 			exceptionObj.setErrorCode(OCFM_ERR_NODEID_NOT_FOUND);
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 		else
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 	} catch (ocfmRetCode& ex)
@@ -141,9 +140,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 		if ((NULL == indexId) || (NULL == idxPos))
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+			LOG_FATAL() << "Parameter 'indexId', 'idxPos' must not be NULL.";
 			throw exceptionObj;
 		}
 
@@ -152,6 +149,7 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 		if ((true != bFlag) && (OCFM_ERR_SUCCESS != exceptionObj.getErrorCode()))
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_NODEID);
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 		Node nodeObj;
@@ -223,9 +221,7 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 				|| (NULL == sidxPos))
 		{
 			objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-			cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+			LOG_FATAL() << "Parameter 'idxId', 'sidxId', 'idxPos', 'sidxPos' must not be NULL.";
 			throw objException;
 		}
 		Node nodeObj;
@@ -415,10 +411,6 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 	{
 		return retVal;
 	}
-#if defined DEBUG
-	cout << "\nName:" << name << endl;
-	cout << "Value:" << value << endl;
-#endif
 	// Check for Version Tool-Project Version
 	if (0 == strcmp(ConvertToUpper((char*) name), "VERSION"))
 	{
@@ -430,25 +422,19 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 
 			if (true == CheckToolVersion((char*) value))
 			{
-#if defined DEBUG
-				cout << "Version number matched" << endl;
-#endif
+				LOG_INFO() << "Project version match.";
 				retVal = true;
 			}
 			else
 			{
-#if defined DEBUG
-				cout << "Version number MisMatch" << endl;
-#endif
+				LOG_INFO() << "Project version mismatch.";
 				retVal = false;
 			}
 		}
 	}
 	else
 	{
-#if defined DEBUG
-		cout << "Error! IfVersionNumberMatches function can't find VERSION" << endl;
-#endif
+		LOG_ERROR() << "Project version could not be found.";
 		retVal = false;
 	}
 	return retVal;
@@ -469,10 +455,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		strcat(varCommIdx, varIdx);
 		//If varIdx != "00" throw error as only the 1st object 1A00 shall be implemented on a CN
 		if (0 != strcmp(varIdx, "00"))
-		{
-			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
+		{			
 			errorString<<"The TPDO object is not valid for CN with Node name: '"<<nodeObj->GetNodeName()<<"', Node ID: '"<<nodeObj->GetNodeId()<<"' \nReason: Only the TPDO object pair 1800 and 1A00 shall be implemented for a CN";
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
 			exceptionObj.setErrorString(errorString.str());
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			delete[] varIdx;
 			delete[] varCommIdx;
 			throw exceptionObj;
@@ -497,10 +484,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	commIndexObj = indexCollObj->GetIndexbyIndexValue(varCommIdx);
 	if (NULL == commIndexObj)
 	{
-		//throw exception as matching communication index not found for a CN
-		exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
+		//throw exception as matching communication index not found for a CN		
 		errorString<<"Communication Param object 0x"<<varCommIdx<<" not found in the node "<<nodeObj->GetNodeName()<<"( "<<nodeObj->GetNodeId()<<" )";
+		exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
 		exceptionObj.setErrorString(errorString.str());
+		LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 		delete[] varCommIdx;
 		throw exceptionObj;
 	}
@@ -513,7 +501,7 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		//Throw exception as Target node id sidx not found in a CN TPDO comm param object
 		exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
 		errorString<<"In CN: "<<nodeObj->GetNodeId()<<". SubObject PDO_Target_Node_Id(0x01) in Object 0x"<<commIndexObj->GetIndexValue()<<" not found.";
-		
+		LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 		throw exceptionObj;
 	}
 
@@ -521,10 +509,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	{
 		if (0 == strlen(subIndexObj->GetActualValue()))
 		{
-			//Throw exception as wrong Target node id for TPDO CN
-			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+			//Throw exception as wrong Target node id for TPDO CN			
 			errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 			exceptionObj.setErrorString(errorString.str());
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetActualValue());
@@ -533,10 +522,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		{
 			if ((BROADCAST_NODEID != mappedNodeId))
 			{
-				//Throw exception as wrong Target node id for TPDO CN
-				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+				//Throw exception as wrong Target node id for TPDO CN				
 				errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01. It Should be always 0 for a CN's TPDO";
+				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 				exceptionObj.setErrorString(errorString.str());
+				LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 				throw exceptionObj;
 			}
 			else
@@ -579,10 +569,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	{
 		//Actual value not configured. So checking default value
 		if (0 == strlen(subIndexObj->GetDefaultValue()))
-		{
-			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+		{			
 			errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid default PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 			exceptionObj.setErrorString(errorString.str());
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetDefaultValue());
@@ -590,10 +581,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		{
 			if ((BROADCAST_NODEID != mappedNodeId))
 			{
-				//Throw exception as wrong Target node id for TPDO CN
-				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
+				//Throw exception as wrong Target node id for TPDO CN				
 				errorString<<"In CN: "<<nodeObj->GetNodeId()<<". Invalid default PDO_Target_Node_Id value configured in Object "<<commIndexObj->GetIndexValue()<<"/01. It Should be always 0 for a CN's TPDO";
+				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 				exceptionObj.setErrorString(errorString.str());
+				LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 				throw exceptionObj;
 			}
 			else
@@ -635,9 +627,10 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	else
 	{
 		//Throw exception as Both default & Actual Target node id  value is not configured
-		exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 		errorString<<"In CN: "<<nodeObj->GetNodeId()<<". PDO_Target_Node_Id value not configured in Object "<<commIndexObj->GetIndexValue()<<"/01";
+		exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 		exceptionObj.setErrorString(errorString.str());
+		LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 		throw exceptionObj;
 	}
 
@@ -684,9 +677,6 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj)
 					break;
 		}
 	}
-#if defined DEBUG
-	cout<<indexObj->GetPDOMapping()<<"PDO Mapping in Index:"<<indexObj->GetIndexValue()<<endl;
-#endif
 	return retVal;
 }
 //TODO: Remove indexObj - unused
@@ -730,9 +720,6 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidx
 					break;
 		}
 	}
-#if defined DEBUG
-	cout<<sidxObj->GetPDOMapping()<<" PDO Mapping in "<<indexObj->GetIndexValue()<<"/"<<sidxObj->GetIndexValue()<<endl;
-#endif
 	return retVal;
 }
 
@@ -749,10 +736,9 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
 	
 	switch(pdoTypeVal)
 	{
-	case PDO_RPDO:
-		#if defined DEBUG
-			cout<<"Checking for AccesType: "<<accessTypeUpper<<" with PDOmapping: "<<pdoMappingUpper<<" in an RPDO";
-		#endif
+		case PDO_RPDO:
+		{
+			LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an RPDO.";
 			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
 				if((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
@@ -780,10 +766,10 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
 				retVal = false;
 			}
 			break;
-	case PDO_TPDO:
-		#if defined DEBUG
-			cout<<"Checking for AccesType: "<<accessTypeUpper<<" with PDOmapping: "<<pdoMappingUpper<<" in an TPDO";
-		#endif
+		}
+		case PDO_TPDO:
+		{
+			LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an TPDO.";
 			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
 				if((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
@@ -811,15 +797,13 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
 				retVal = false;
 			}
 			break;
-	default:
-		retVal = false;
-		break;
+		}
+		default:
+			retVal = false;
+			break;
 	}
 
 	delete[] pdoMappingUpper;
 	delete[] accessTypeUpper;
-	#if defined DEBUG
-		cout<<" : Returning: "<<retVal<<endl;
-	#endif
 	return retVal;
 }

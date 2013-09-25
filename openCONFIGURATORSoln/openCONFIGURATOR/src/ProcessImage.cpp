@@ -63,6 +63,7 @@
 #include "../Include/Exception.h"
 #include "../Include/ProcessImage.h"
 #include "../Include/NodeCollection.h"
+#include "../Include/Logging.h"
 
 /****************************************************************************************************/
 /* Defines */
@@ -186,9 +187,7 @@ void SetUniquePIVarName()
 			piObjTemp1 = &objNode->PICollection[iInLoopCount];
 			if( piObjTemp1 == NULL)
 			{
-#if defined DEBUG
-				cout<<"PICollection Null object. Node ID:"<<objNode->GetNodeId()<<" iInLoopCount:"<<iInLoopCount<<endl;
-#endif
+				LOG_WARN() << "Local variable 'piObjTemp1' must not be NULL for node " << objNode->GetNodeId() << "." ;
 				continue;
 			}
 			//it is possible that the changed var name matching a previous entry
@@ -205,7 +204,7 @@ void SetUniquePIVarName()
 				piObjTemp2 = &objNode->PICollection[iInChkLoopCount];
 				if( piObjTemp2 == NULL)
 				{
-					cout<<"PICollection Null object. Node ID:"<<objNode->GetNodeId()<<" InLC:"<<iInLoopCount<<" OutLC:"<<iInChkLoopCount<<endl;
+					LOG_WARN() << "Local variable 'piObjTemp2' must not be NULL for node " << objNode->GetNodeId() << "." ;
 					continue;
 				}
 				//check module index, module name, directiontype and variable name
@@ -404,6 +403,7 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	{
 
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -419,6 +419,7 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	if ((uiStrLength != fwrite(varComment, sizeof(char), uiStrLength, xapFile)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] varComment;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -430,10 +431,10 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 			+ strlen(INCLUDE_GUARD_START) + ALLOC_BUFFER];
 	if (NULL == xapHeaderIncludeGuard)
 	{
-#if defined DEBUG
-		cout << "Memory allocation error" << __FUNCTION__ << endl;
-#endif
+		string errorString("Local variable 'xapHeaderIncludeGuard' must not be NULL.");
+		LOG_FATAL() << errorString;
 		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.setErrorString(errorString);
 		delete[] xapFileName;
 		fclose(xapFile);
 		throw ex;
@@ -448,6 +449,7 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] xapHeaderIncludeGuard;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -467,6 +469,7 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	if (NULL == (xapFile = fopen(xapFileName, "a+")))
 	{
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -486,6 +489,7 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] xapHeaderIncludeGuard;
 		fclose(xapFile);
 		throw ex;
@@ -638,6 +642,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	{
 
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] mainBuffer;
 		delete[] tempBuffer;
 		throw ex;
@@ -650,6 +655,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			!= fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] mainBuffer;
 		throw ex;
 	}
@@ -669,6 +675,7 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 	if (NULL == (netFile = fopen(netFileName, "w+")))
 	{
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] netFileName;
 		throw ex;
 	}
@@ -705,6 +712,7 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 		if ((mainBufLen != fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
 		{
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+			LOG_FATAL() << "Error: " << ex.getErrorString();
 			fclose(netFile);
 			delete[] mainBuffer;
 			throw ex;
@@ -730,6 +738,7 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 		if ((tempBufLen != fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
 		{
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+			LOG_FATAL() << "Error: " << ex.getErrorString();
 			fclose(netFile);
 			delete[] tempBuffer;
 			throw ex;
@@ -827,6 +836,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			!= fwrite(tempBuffer1, sizeof(char), tempBuf1Len, netHeader)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] mainBuffer;
 		delete[] tempBuffer1;
 		delete[] tempBuffer2;
@@ -839,6 +849,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBuf1Len != fwrite(mainBuffer, sizeof(char), tempBuf1Len, netHeader)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] tempBuffer2;
 		delete[] mainBuffer;
 		throw ex;
@@ -851,6 +862,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			!= fwrite(tempBuffer2, sizeof(char), tempBuf1Len, netHeader)))
 	{
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		delete[] tempBuffer2;
 		throw ex;
 	}
@@ -1065,9 +1077,7 @@ void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId)
 	{
 		ocfmRetCode objException;
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'objDataType', 'idxId', 'sIdxId' must not be NULL.";
 		throw objException;
 	}
 
@@ -1126,14 +1136,13 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			}
 			else
 			{
-#if defined DEBUG
-				cout << "enumPdoType is not TPDO or RPDO _1\n" << endl;
-#endif
+				LOG_ERROR() << "Local variable 'pdoTypeVal' is neither TPDO nor RPDO.";
 			}
 			/* Add subindex 00 */
 			stRetCode = AddSubIndex(MN_NODEID, MN, indexId, (char*) "00");
 			if (OCFM_ERR_SUCCESS != stRetCode.getErrorCode())
 			{
+				LOG_FATAL() << "Error: " << stRetCode.getErrorString();
 				throw stRetCode;
 			}
 		}
@@ -1142,9 +1151,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 	stRetCode = AddSubIndex(MN_NODEID, MN, indexId, sIdxId);
 	if (OCFM_ERR_SUCCESS != stRetCode.getErrorCode())
 	{
-#ifdef DEBUG
-		cout << __LINE__ << " AddSubIndex error in line" << endl;  
-#endif 
+		LOG_FATAL() << "AddSubIndex() returned error code " << stRetCode.getErrorCode() << ".";
 		throw stRetCode;
 	}
 
@@ -1180,9 +1187,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			}
 			else
 			{
-#if defined DEBUG
-				cout << "enumPdoType is not TPDO or RPDO _2\n" << endl;
-#endif
+				LOG_ERROR() << "Local variable 'pdoTypeVal' is neither TPDO nor RPDO.";
 			}
 			delete[] pdoMap;
 		}
@@ -1214,9 +1219,6 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 {
 	PIObject stPIObject;
 	stPIObject.Initialize();
-#if defined DEBUG
-	cout << __FUNCTION__ << ":: dtType:" << dtType << " dirType:" << dirType << " offsetVal:" << offsetVal << " dataSizeBits:" << dataSizeBits << endl;
-#endif
 	stPIObject.indexId = new char[INDEX_LEN];
 	stPIObject.sIdxId = new char[SUBINDEX_LEN];
 
@@ -1240,18 +1242,12 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 				stPIObject.indexId = IntToAscii(addressVal, stPIObject.indexId, 16);
 				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
-
-				#if defined DEBUG
-				cout << "indexId: "<<stPIObject.indexId<<" sIdxId:"<<stPIObject.sIdxId<<endl;
-				#endif
-
 			}
 			else
 			{
 				strcpy(stPIObject.indexId, piIndexTable[idx].addressStr);
 				stPIObject.sIdxId = IntToAscii(subIndex, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
-
 			}
 		}
 	}

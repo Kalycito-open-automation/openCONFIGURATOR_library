@@ -60,6 +60,7 @@
 #include "../Include/Declarations.h"
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
+#include "../Include/Logging.h"
 #include <sstream>
 
 using namespace std;
@@ -298,9 +299,7 @@ void BaseIndex::SetObjectType(const char* objTypeStr)
 	}
 	else
 	{
-#ifdef DEBUG
-		cout << "Error! setObjectType failed\n" << endl;
-#endif
+		LOG_FATAL() << "Unknown object type '" << tempObjtype << "'.";
 	}
 	delete[] tempObjtype;
 }
@@ -355,9 +354,7 @@ void BaseIndex::SetPDOMapping(const char* pdoMappingStr)
 	else
 	{
 		pdoMapping = NOT_DEFINED;
-#ifdef DEBUG
-		cout << "Error! setPDOMapping failed: "<<pdoMappingStr<<" index: "<< indexId<<endl;
-#endif
+		LOG_FATAL() << "Unknown PDOMapping type '" << varStrBuff << "'.";
 	}
 	delete[] varStrBuff;
 }
@@ -502,11 +499,11 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 				retFlag = true;
 			}
 			else
-			{
-
-				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			{				
 				errorString << "The entered value("<<hexValue<<") is less than the lower limit("<<this->lowLimit<<")";
+				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(errorString.str());
+				LOG_FATAL() << "Error: " << errorString.str();
 				throw objException;
 				//bFlag = false;
 				//return bFlag;
@@ -535,10 +532,11 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 				retFlag = true;
 			}
 			else
-			{
-				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			{				
 				errorString<<"The entered value("<<hexValue<<") is greater than the upper limit("<<this->highLimit<<")";
+				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(errorString.str());
+				LOG_FATAL() << "Error: " << errorString.str();
 				throw objException;
 				//bFlag = false;
 			}

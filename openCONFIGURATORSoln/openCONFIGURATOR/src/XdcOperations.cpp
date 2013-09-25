@@ -66,6 +66,7 @@
 #include "../Include/Exception.h"
 #include "../Include/Validation.h"
 #include "../Include/NodeCollection.h"
+#include "../Include/Logging.h"
 
 /*****************************************************************************/
 /* Defines */
@@ -141,9 +142,7 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 	if (NULL == indexObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'indexObj' must not be NULL.";
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -248,9 +247,7 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 	if (NULL == sidxObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'sidxObj' must not be NULL.";
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -312,12 +309,10 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 		{
 			sidxObj->SetFlagIfIncludedCdc(true);
 		}
-		}
+	}
 	else
 	{
-#ifdef DEBUG
-		cout << "Error! setSubIndexAttributes fails\n" << endl;
-#endif
+		LOG_ERROR() << "Unknown XML-Attribute '" << name << "'.";
 	}
 }
 
@@ -330,9 +325,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 	if (NULL == dtObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#ifdef DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'dtObj' must not be NULL.";
 		throw objException;
 	}
 	dtObj->dataTypeName = NULL;
@@ -353,6 +346,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 		if (1 != iRetVal)
 		{
 			objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+			LOG_FATAL() << "Error: " << objException.getErrorString();
 			throw objException;
 		}
 		while (XML_READER_TYPE_ELEMENT != xmlTextReaderNodeType(reader))
@@ -361,6 +355,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 			if (iRetVal != 1)
 			{
 				objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+				LOG_FATAL() << "Error: " << objException.getErrorString();
 				throw objException;
 			}
 		}
@@ -428,9 +423,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 		}
 		else
 		{
-#ifdef DEBUG
-			cout << __FUNCTION__ << " unhandled datatype: " << dtObj->dataTypeName << endl;
-#endif
+			LOG_ERROR() << "Unknown data type: " << dtObj->dataTypeName;
 		}
 	}
 }
@@ -444,9 +437,7 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 	if (NULL == parameterObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'parameterObj' must not be NULL.";
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -482,9 +473,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	if (NULL == parameterObj)
 	{
 		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'parameterObj' must not be NULL.";
 		throw exceptionObj;
 	}
 	iRetVal = xmlTextReaderRead(reader);
@@ -492,6 +481,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	if (1 != iRetVal)
 	{
 		exceptionObj.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+		LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 		throw exceptionObj;
 	}
 
@@ -506,6 +496,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 		if (1 != iRetVal)
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 
@@ -518,9 +509,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 		{
 			parameterObj->nameIdDtAttr->SetDataType((char*) name);
 			parameterObj->size = atoi((char*) abSize);
-#if defined DEBUG
-			cout << "Setting DataType:" << parameterObj->nameIdDtAttr->GetDataType() << " Size:" << parameterObj->size<<endl;
-#endif
+			LOG_DEBUG() << "Setting DataType: " << parameterObj->nameIdDtAttr->GetDataType() << ", Size: " << parameterObj->size;
 		}
 		if (CheckStartElement(xmlTextReaderNodeType(reader), (char*) name,
 		                      (char*) "dataTypeIDRef"))
@@ -549,9 +538,7 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	if (NULL == cdtObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'cdtObj' must not be NULL.";
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -659,9 +646,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	if (NULL == cdtObj)
 	{
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'cdtObj' must not be NULL.";
 		throw objException;
 	}
 
@@ -672,6 +657,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	if (1 != retValue)
 	{
 		objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+		LOG_FATAL() << "Error: " << objException.getErrorString();
 		throw objException;
 	}
 
@@ -690,6 +676,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 			if (1 != retValue)
 			{
 				objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
+				LOG_FATAL() << "Error: " << objException.getErrorString();
 				throw objException;
 			}
 		}
@@ -1131,12 +1118,14 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 			if (0 != retValue)
 			{
 				objException.setErrorCode(OCFM_ERR_PARSE_XML);
+				LOG_FATAL() << "Error: " << objException.getErrorString();
 				throw objException;
 			}
 		}
 		else
 		{
 			objException.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
+			LOG_FATAL() << "Error: " << objException.getErrorString();
 			throw objException;
 		}
 	}
@@ -1155,20 +1144,20 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 			if (NULL == nodeCollObj)
 			{
-#if defined DEBUG
-				cout << "Memory allocation error" << __FUNCTION__ << endl;
-#endif
+				string errorString("Local variable 'nodeCollObj' must not be NULL.");
+				LOG_FATAL() << errorString;
 				objException.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+				objException.setErrorString(errorString);
 				throw objException;
 			}
 			nodeObj = nodeCollObj->GetNode(nodeType, nodePos);
 			nmtObj = nodeObj.GetNetworkManagement();
 			if (NULL == nmtObj)
 			{
-#if defined DEBUG
-				cout << "Memory allocation error" << __FUNCTION__ << endl;
-#endif
+				string errorString("Local variable 'nmtObj' must not be NULL.");
+				LOG_FATAL() << errorString;
 				objException.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+				objException.setErrorString(errorString);
 				throw objException;
 			}
 			nmtObj->CalculateMaxPDOCount();
@@ -1198,23 +1187,17 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 			objException = DeleteNodeObjDict(nodeId, nodeType);
 			if (OCFM_ERR_SUCCESS != objException.getErrorCode())
 			{
-#if defined DEBUG
-				cout << "\nDeleteNodeObjDict in ReImport failed\n" << endl;
-#endif
+				LOG_FATAL() << "DeleteNodeObjDict() failed for node " << nodeId << ".";
 			}
 
 			objException = ParseFile(fileName, nodeId, nodeType);
 			if (OCFM_ERR_SUCCESS != objException.getErrorCode())
 			{
-#if defined DEBUG
-				cout << "\nparseFile in ReImport failed\n" << endl;
-#endif
+				LOG_FATAL() << "ParseFile() failed for file '" << fileName << "' and node " << nodeId << ".";
 				objException = DeleteNodeObjDict(nodeId, nodeType);
 				if (OCFM_ERR_SUCCESS != objException.getErrorCode())
 				{
-#if defined DEBUG
-					cout << "\nDeleteNodeObjDict in ReImport failed\n" << endl;
-#endif
+					LOG_FATAL() << "DeleteNodeObjDict() failed for node " << nodeId << ".";
 				}
 			}
 			xmlCleanupParser();
@@ -1248,6 +1231,7 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 		else
 		{
 			objException.setErrorCode(OCFM_ERR_INVALID_NODEID);
+			LOG_FATAL() << "Error: " << objException.getErrorString();
 			throw objException;
 		}
 	}
@@ -1291,9 +1275,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		xtwWriter = xmlNewTextWriterDoc(&xdDoc, 0);
 		if (NULL == xtwWriter)
 		{
-#ifdef DEBUG
-			cout<<"testXmlpxtwWriterDoc: Error creating the xml pxtwWriter\n";  
-#endif 
+			LOG_FATAL() << "Error creating XML-TextWriter.";
 			objException.setErrorCode(OCFM_ERR_CREATE_XML_WRITER_FAILED);
 			throw objException;
 		}
@@ -1304,9 +1286,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               NULL);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterStartDocument\n";  
-#endif 
+			LOG_FATAL() << "Error starting XML-Document.";
 			objException.setErrorCode(OCFM_ERR_XML_START_DOC_FAILED);
 			throw objException;
 		}
@@ -1318,9 +1298,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ISO15745ProfileContainer");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"Error at xmlTextWriterStartElement: ISO15745ProfileContainer\n";  
-#endif 
+			LOG_FATAL() << "Error starting XML-Element 'ISO15745ProfileContainer'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1329,9 +1307,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ISO15745Profile");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"Error at xmlTextWriterStartElement: ISO15745Profile\n";  
-#endif 
+			LOG_FATAL() << "Error starting XML-Element 'ISO15745Profile'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1341,10 +1317,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ProfileBody");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
-		objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+			LOG_FATAL() << "Error starting XML-Element 'ProfileBody'.";
+			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
 
@@ -1353,9 +1327,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ApplicationProcess");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif 
+			LOG_FATAL() << "Error starting XML-Element 'ApplicationProcess'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1366,9 +1338,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "dataTypeList");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'dataTypeList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1385,9 +1355,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST "struct");
 				if (0 > bytesWritten)
 				{
-#ifdef DEBUG
-					cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+					LOG_FATAL() << "Error starting XML-Element 'struct'.";
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
@@ -1410,9 +1378,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST "varDeclaration");
 					if (0 > bytesWritten)
 					{
-#ifdef DEBUG
-						cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+						LOG_FATAL() << "Error starting XML-Element 'varDeclaration'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
@@ -1432,9 +1398,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 
 						if (0 > bytesWritten)
 						{
-#ifdef DEBUG
-							cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+							LOG_FATAL() << "Error starting XML-Element '" << vd.namIdDtAttr->GetDataType() << "'.";
 							objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 							throw objException;
 						}
@@ -1442,9 +1406,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						bytesWritten = xmlTextWriterEndElement(xtwWriter);
 						if (0 > bytesWritten)
 						{
-#ifdef DEBUG
-							cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+							LOG_FATAL() << "Error closing XML-Element 'varDeclaration'.";
 							objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 							throw objException;
 						}
@@ -1455,9 +1417,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						               BAD_CAST "dataTypeIDRef");
 						if (0 > bytesWritten)
 						{
-#ifdef DEBUG
-							cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+							LOG_FATAL() << "Error starting XML-Element 'dataTypeIDRef'.";
 							objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 							throw objException;
 						}
@@ -1470,9 +1430,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						bytesWritten = xmlTextWriterEndElement(xtwWriter);
 						if (0 > bytesWritten)
 						{
-#ifdef DEBUG
-							cout << "testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+							LOG_FATAL() << "Error closing XML-Element 'dataTypeIDRef'.";
 							objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 							throw objException;
 						}
@@ -1482,9 +1440,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (0 > bytesWritten)
 					{
-#ifdef DEBUG
-						cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif 
+						LOG_FATAL() << "Error closing XML-Element 'varDeclaration'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw objException;
 					}
@@ -1494,9 +1450,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				bytesWritten = xmlTextWriterEndElement(xtwWriter);
 				if (0 > bytesWritten)
 				{
-#ifdef DEBUG
-					cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+					LOG_FATAL() << "Error closing XML-Element 'struct'.";
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
@@ -1507,9 +1461,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif 
+			LOG_FATAL() << "Error closing XML-Element 'dataTypeList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -1519,9 +1471,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "parameterList");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'parameterList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1542,9 +1492,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST "parameter");
 				if (0 > bytesWritten)
 				{
-#ifdef DEBUG
-					cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif			
+					LOG_FATAL() << "Error starting XML-Element 'parameter'.";
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
@@ -1559,18 +1507,14 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST parameterObj.nameIdDtAttr->GetDataType());
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-						cout<<"Error at xmlTextWriterStartElement: Parameter - Datatype\n";  
-#endif
+						LOG_FATAL() << "Error starting XML-Element '" << parameterObj.nameIdDtAttr->GetDataType() << "'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw &objException;
 					}
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-						cout<<"Error at xmlTextWriterEndElement: Parameter - Datatype\n";  
-#endif
+						LOG_FATAL() << "Error closing XML-Element '" << parameterObj.nameIdDtAttr->GetDataType() << "'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw &objException;
 					}
@@ -1582,9 +1526,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "dataTypeIDRef");
 					if (0 > bytesWritten)
 					{
-#ifdef DEBUG
-					cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+						LOG_FATAL() << "Error starting XML-Element 'dataTypeIDRef'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
@@ -1593,10 +1535,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (0 > bytesWritten)
 					{
-#ifdef DEBUG
-					cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
-					objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+						LOG_FATAL() << "Error closing XML-Element 'dataTypeIDRef'.";
+						objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw objException;
 					}
 				}
@@ -1605,9 +1545,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				bytesWritten = xmlTextWriterEndElement(xtwWriter);
 				if (0 > bytesWritten)
 				{
-#ifdef DEBUG
-					cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif				
+					LOG_FATAL() << "Error closing XML-Element 'parameter'.";
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 					throw objException;
 				}
@@ -1617,9 +1555,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'parameterList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -1628,9 +1564,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'ApplicationProcess'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -1639,9 +1573,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'ProfileBody'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -1651,9 +1583,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ProfileBody");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'ProfileBody'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1663,9 +1593,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ApplicationLayers");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'ApplicationLayers'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1675,9 +1603,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "DataTypeList");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'DataTypeList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1696,9 +1622,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			               BAD_CAST "defType");
 			if (0 > bytesWritten)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif 
+				LOG_FATAL() << "Error starting XML-Element 'defType'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
@@ -1710,9 +1634,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			               BAD_CAST dtObj->GetName());
 			if (0 > bytesWritten)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+				LOG_FATAL() << "Error starting XML-Element '" << dtObj->GetName() << "'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
@@ -1721,9 +1643,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 			if (0 > bytesWritten)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+				LOG_FATAL() << "Error closing XML-Element 'DataType'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
@@ -1732,9 +1652,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 			if (0 > bytesWritten)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+				LOG_FATAL() << "Error closing XML-Element 'defType'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
@@ -1744,18 +1662,14 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'DataTypeList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 
 		if (0 == idxCollObj->GetNumberofIndexes())
 		{
-#ifdef DEBUG
-			cout<<"SaveNode: No Indexes Found\n";  
-#endif
+			LOG_FATAL() << "Index-Collection empty.";
 			objException.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 			throw objException;
 		}
@@ -1765,9 +1679,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "ObjectList");
 		if (0 > bytesWritten)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'ObjectList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -1779,9 +1691,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			               BAD_CAST "Object");
 			if (0 > bytesWritten)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+				LOG_FATAL() << "Error starting XML-Element 'Object'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
@@ -1882,10 +1792,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST "SubObject");
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-									cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
-									objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+						LOG_FATAL() << "Error starting XML-Element 'SubObject'.";
+						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
 					SubIndex* sidxObj = NULL;
@@ -1999,10 +1907,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-									cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
-									objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+						LOG_FATAL() << "Error closing XML-Element 'SubObject'.";
+						objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 						throw objException;
 					}
 
@@ -2013,10 +1919,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			bytesWritten = xmlTextWriterEndElement(xtwWriter);
 			if (bytesWritten < 0)
 			{
-#ifdef DEBUG
-							cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
-							objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
+				LOG_FATAL() << "Error closing XML-Element 'Object'.";
+				objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 				throw objException;
 			}
 
@@ -2027,9 +1931,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'ObjectList'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -2039,20 +1941,15 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif 
+			LOG_FATAL() << "Error closing XML-Element 'ApplicationLayers'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
 		// Start Network Management Tag
-		bytesWritten = xmlTextWriterStartElement(xtwWriter,
-		               BAD_CAST "NetworkManagement");
+		bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "NetworkManagement");
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'NetworkManagement'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -2064,9 +1961,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		               BAD_CAST "GeneralFeatures");
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+			LOG_FATAL() << "Error starting XML-Element 'GeneralFeatures'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
@@ -2085,9 +1980,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST featureObj->name, BAD_CAST featureObj->value);
 				if (bytesWritten < 0)
 				{
-#ifdef DEBUG
-					cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+					LOG_FATAL() << "Error starting XML-Attribute '" << featureObj->name << "'.";
 					objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 					throw objException;
 				}
@@ -2105,9 +1998,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			               BAD_CAST "MNFeatures");
 			if (bytesWritten < 0)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+				LOG_FATAL() << "Error starting XML-Element 'MNFeatures'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
@@ -2127,9 +2018,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST featureObj->value);
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-						cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif
+						LOG_FATAL() << "Error starting XML-Attribute '" << featureObj->name << "'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
@@ -2150,9 +2039,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			               BAD_CAST "CNFeatures");
 			if (bytesWritten < 0)
 			{
-#ifdef DEBUG
-				cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif 
+				LOG_FATAL() << "Error starting XML-Element 'CNFeatures'.";
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
@@ -2172,10 +2059,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST featureObj->value);
 					if (bytesWritten < 0)
 					{
-#ifdef DEBUG
-							cout<<"testXmlwriterMemory: Error at xmlTextWriterStartElement\n";  
-#endif	
-							objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
+						LOG_FATAL() << "Error starting XML-Attribute '" << featureObj->name << "'.";
+						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 						throw objException;
 					}
 				}
@@ -2194,9 +2079,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif 
+			LOG_FATAL() << "Error closing XML-Element 'ProfileBody'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -2206,9 +2089,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"Error at xmlTextWriterEndElement: ISO15745Profile\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Element 'ISO15745Profile'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -2218,9 +2099,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndElement(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndElement\n";  
-#endif 
+			LOG_FATAL() << "Error closing XML-Element 'ISO15745ProfileContainer'.";
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
 			throw objException;
 		}
@@ -2228,9 +2107,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 		bytesWritten = xmlTextWriterEndDocument(xtwWriter);
 		if (bytesWritten < 0)
 		{
-#ifdef DEBUG
-			cout<<"testXmlwriterDoc: Error at xmlTextWriterEndDocument\n";  
-#endif
+			LOG_FATAL() << "Error closing XML-Document.";
 			objException.setErrorCode(OCFM_ERR_XML_END_DOC_FAILED);
 			throw objException;
 		}
@@ -2366,14 +2243,7 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 
 		/* Add 1006*/
 		strcpy(mnIndex, "1020");
-#if defined DEBUG
-		cout << "string copied" << endl;
-#endif
 		objException = AddIndex(nodeObj->GetNodeId(), CN, mnIndex);
-#if defined DEBUG
-		cout << "stRetCode" << objException.getErrorCode() << endl;
-		cout << "1020 added" << endl;
-#endif
 		if ((objException.getErrorCode() != 0)
 			&& (objException.getErrorCode() != OCFM_ERR_INDEX_ALREADY_EXISTS))
 		{
@@ -2493,17 +2363,13 @@ INT32 GetDataSize(char* dataTypeVal)
 		}
 		else
 		{
-#if defined DEBUG
-			cout << __FUNCTION__ << " Unhandled datatype:" << dataTypeUpper << endl;
-#endif
+			LOG_FATAL() << "Datatype '" << dataTypeUpper << "' not supported.";
 		}
 		delete[] dataTypeUpper;
 	}
 	else
 	{
-#if defined DEBUG
-		cout << __FUNCTION__ << " Could no fetch input datatype:" << endl;
-#endif
+		LOG_FATAL() << "Parameter 'dataTypeVal' must not be NULL.";
 	}
 	return retSize;
 }
@@ -2532,9 +2398,7 @@ bool CheckIfStringDatatypes(const char* dataTypeValue)
 	}
 	else
 	{
-#if defined DEBUG
-		cout << __FUNCTION__ << " Could no fetch input datatype:" << endl;
-#endif
+		LOG_FATAL() << "Parameter 'dataTypeValue' must not be NULL.";
 	}
 	return retVal;
 }
@@ -2547,9 +2411,7 @@ void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)
 	{
 		ocfmRetCode objException;
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#ifdef DEBUG
-		cout << "INVALID_PARAMETER" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'featureObj' must not be NULL.";
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -2584,10 +2446,8 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 			//To avoid issues with big data types only type with maximum of 2 bytes are converted.
 			if (CheckIfStandardDatatypes(dtObj.dataTypeName) && dtObj.dataSize <= 2)
 			{
-
-#if defined DEBUG
-				cout << " Dt: " << dtObj.dataTypeName << " DtSiz: " << dtObj.dataSize ;
-#endif
+				LOG_DEBUG() << "Normalizing value for attribute type '" << "'" << attrType << ".";
+				LOG_DEBUG() << "Datatype size[bytes]: " << dtObj.dataSize;				
 				const char* tmpValue = NULL;
 				if(attrType == ACTUALVALUE)
 				{
@@ -2597,10 +2457,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 				{
 					tmpValue = idxObj->GetDefaultValue();
 				}
-
-#if defined DEBUG
-				cout << " Value before normalization: " << tmpValue ;
-#endif
+				LOG_DEBUG() << "Value before normalization: " << tmpValue;
 				//Set the upper and lower limits for data type range checking
 				/*
 				if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED8") == 0)
@@ -2690,6 +2547,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 				{
 					//convert hex value into long
 					long number = strtol(tmpValue, NULL, 16);
+					LOG_DEBUG() << "Value converted to long: " << number;
 
 					//Check the data type range for specific attribute
 					/*
@@ -2712,9 +2570,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 					{
 						idxObj->SetDefaultValue(hexVal);
 					}					
-#if defined DEBUG
-					cout << " hexVal: " << hexVal ;
-#endif
+					LOG_DEBUG() << "Value after normalization: " << hexVal;
 					delete[] hexVal;
 				}
 				//Check data type attributes with non hex values
@@ -2727,9 +2583,6 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 						throw limitError;
 					}
 				}*/
-#if defined DEBUG
-				cout << endl;
-#endif
 			}
 		}
 	}
@@ -2772,9 +2625,7 @@ bool CheckIfStandardDatatypes(const char* dataTypeValue)
 	}
 	else
 	{
-#if defined DEBUG
-		cout << __FUNCTION__ << " Could no fetch input datatype:" << endl;
-#endif
+		LOG_FATAL() << "Parameter 'dataTypeValue' must not be NULL.";
 	}
 	return retVal;
 }

@@ -58,6 +58,7 @@
 #include "../Include/ObjectDictionary.h"
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
+#include "../Include/Logging.h"
 
 using namespace std;
 
@@ -128,13 +129,11 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 	{
 		if (NULL == name)
 		{
-#if defined DEBUG
-			cout << "Got NULL for name" << endl;
-#endif
+			LOG_FATAL() << "Local variable 'name' must not be NULL.";
 		}
 		if (NULL == value)
 		{
-			//cout << "Got NULL for value\n" << endl;
+			LOG_FATAL() << "Local variable 'value' must not be NULL.";
 		}
 
 		//If the NodeTYPE is ELEMENT
@@ -248,6 +247,7 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 		}
 	} catch (ocfmRetCode& ex)
 	{
+		LOG_FATAL() << "Error: " << ex.getErrorString();
 		throw ex;
 	}
 }

@@ -54,16 +54,12 @@
 #ifndef Exports_h
 #define Exports_h
 
-/****************************************************************************/
-/* Defines */
-
 #define DLLEXPORT
-/** The debug prints to the standard output. */ 
-//#define DEBUG
 
-/* Windows Platform */
+// Windows
 #if defined(_WIN32) && defined(_MSC_VER)
 #undef DLLEXPORT
 #define DLLEXPORT  __declspec(dllexport)
-#endif 
+#endif
+
 #endif // Exports_h

@@ -58,9 +58,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <algorithm>
+#include <iomanip>
 #include "../Include/Declarations.h"
 #include "../Include/Internal.h"
 #include "../Include/ProcessImage.h"
+#include "../Include/Logging.h"
 
 using namespace std;
 
@@ -74,9 +77,7 @@ char* ConvertToUpper(char* str)
 	{
 		ocfmRetCode objException;
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'str' must not be NULL.";
 		throw objException;
 	}
 	UINT32 loopCount = 0;
@@ -94,9 +95,7 @@ char* Reverse(char* str)
 	{
 		ocfmRetCode objException;
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#if defined DEBUG
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'str', must not be NULL.";
 		throw objException;
 	}
 	char* charLeft = str;
@@ -118,9 +117,7 @@ char* PadLeft(char* str, char padChar, INT32 padLength)
 	{
 		ocfmRetCode objException;
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-#ifdef DEBUG
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;  
-#endif
+		LOG_FATAL() << "Parameter 'str', must not be NULL.";
 		throw objException;
 	}
 
@@ -150,24 +147,13 @@ char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len)
 	{
 		if ((startPos + len) > strlen(srcStr))
 		{
-#if defined DEBUG
-			cout<<"Error: "<< strlen(destStr) << " " << __FUNCTION__ <<" wrong inputs. startPos:"<<startPos<<" Len:"<<len <<" Total available:"<<strlen(srcStr)<<endl;
-#endif
+			LOG_ERROR() << "Invalid function call.";
 		}
 		else
 		{
 			strncpy(destStr, (const char*) (srcStr + startPos), len);
 			destStr[len] = '\0';
-			#if defined DEBUG
-				cout << "src:" << srcStr << " DestStr: "<< destStr << endl;
-			#endif
 		}
-	}
-	else
-	{
-#if defined DEBUG
-		cout<<"Error: SubString Returning NULL"<<endl;
-#endif
 	}
 	return destStr;
 }
@@ -294,9 +280,7 @@ char* ConvertStringToHex(char* srcStr)
 
 	if (NULL == srcStr)
 	{
-#if defined DEBUG
-		cout << "INVALID_PARAMETER:" << __FUNCTION__ << __LINE__ << endl;
-#endif
+		LOG_FATAL() << "Parameter 'srcStr', must not be NULL.";
 		return NULL;
 	}
 	srcStrLen = strlen(srcStr);
@@ -304,12 +288,11 @@ char* ConvertStringToHex(char* srcStr)
 	char* tempHexStr = new char[(srcStrLen * 2) + 1];
 	if ((NULL == tempSrcStr) || (NULL == tempHexStr))
 	{
-#if defined DEBUG
-		cout << "Memory allocation error" << __FUNCTION__ << endl;
-#endif
-
+		string errorString("Local variable 'tempSrcStr', 'tempHexStr' must not be NULL.");
+		LOG_FATAL() << errorString;
 		ocfmRetCode ex;
 		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
+		ex.setErrorString(errorString);
 		throw ex;
 	}
 	strcpy(tempSrcStr, (char*) srcStr);
@@ -639,3 +622,21 @@ bool CheckToolVersion(char* currentToolVersion)
 		return false;
 	}
 }
+
+template <typename T>
+string IntToHex(const T number, const unsigned int padLength, const string& prefix, const string& suffix)
+{
+	ostringstream hexStream;
+	hexStream << std::setfill ('0')
+		<< std::setw(padLength)
+		<< std::hex
+		<< std::uppercase
+		<< number
+		<< suffix;
+	return (prefix + hexStream.str());
+}
+
+// Explicit instantiation of the template for required types
+template string IntToHex<unsigned short>(const unsigned short number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string IntToHex<unsigned int>(const unsigned int number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string IntToHex<unsigned long>(const unsigned long number, const unsigned int padLength, const string& prefix, const string& suffix);

@@ -57,6 +57,7 @@
 #include <iostream>
 #include "../Include/ProjectSettings.h"
 #include "../Include/Internal.h"
+#include "../Include/Logging.h"
 
 using namespace std;
 
@@ -80,15 +81,13 @@ PjtSettings* PjtSettings::pjtSettingsObj = NULL;
 
 PjtSettings::PjtSettings(void)
 {
-#if defined DEBUG
-	cout << "\nPjtSettings Objects Initialized!\n" << endl;
-#endif
 	saveMode = DISCARD_AS;
 	generateMode = NO_AG;
 	ipAddress = NULL;
 	pjtVersion = NULL;
 	expertView = false;
 	viewMode = SIMPLE; //TODO: Review initialisation
+	LOG_INFO() << "Project settings initialized.";
 }
 
 /*************************************************************************/
@@ -102,9 +101,6 @@ PjtSettings::PjtSettings(void)
 PjtSettings::~PjtSettings(void)
 {
 	instanceFlag = false;
-#if defined DEBUG
-	cout << "\n\n\n\nPjtSettings Object Deleted!\n" << endl;
-#endif
 }
 
 PjtSettings* PjtSettings::GetPjtSettingsPtr()
@@ -113,9 +109,6 @@ PjtSettings* PjtSettings::GetPjtSettingsPtr()
 	{
 		pjtSettingsObj = new PjtSettings();
 		instanceFlag = true;
-#if defined DEBUG
-		cout << "\n\n\nNew PjtSettings Object Created!\n" << endl;
-#endif
 	}
 	return pjtSettingsObj;
 }
@@ -132,9 +125,6 @@ void PjtSettings::SetSaveAttr(AutoSave autoSaveMode)
 
 AutoGenerate PjtSettings::GetGenerateAttr()
 {
-#if defined DEBUG
-	//cout << "\n Returning AutoGenerate mode:-" << generateMode <<endl;
-#endif	
 	return generateMode;
 }
 

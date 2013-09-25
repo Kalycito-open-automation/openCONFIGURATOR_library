@@ -1393,4 +1393,17 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename);
 /*****************************************************************************/
 void HandleSchemaValidationError(void *ctx, const char *msg, ...);
 
+/************************************************************************
+\brief Convert a number to hexadecimal representation.
+
+\param number    Number to convert to hexadecimal representation.
+\param padLength Pad the hex representation with leading '0's up to padLength. I.e. Converting 10 to hex with padLength == 4 -> 000A.
+\param prefix    Prefix to prepend. I.e. "0x", empty string by default.
+\param suffix    Suffix to append. I.e. "h", empty string by default.
+
+\return A hexadecimal string representation of number.
+************************************************************************/
+template <typename T>
+string IntToHex(const T number, const unsigned int padLength, const string& prefix = "", const string& suffix = "");
+
 #endif // internal_h

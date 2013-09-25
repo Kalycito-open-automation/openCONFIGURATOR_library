@@ -63,6 +63,13 @@ IF (UNIX)
 		MESSAGE(FATAL_ERROR "Libxml2 minimum required version '2.7.2' not found on the system.")
 	ENDIF()
 ELSEIF (WIN32)
+	### Necessary for Boost.Log, only implemented under Windows ###
+	SET(Boost_DEBUG TRUE)
+	SET(Boost_USE_STATIC_RUNTIME OFF)
+	FIND_PACKAGE(Boost 1.54.0 COMPONENTS log date_time filesystem system thread REQUIRED)
+	# Necessary for Auto-Linking under VS
+	ADD_DEFINITIONS(/DBOOST_ALL_DYN_LINK)
+	######
 	FIND_LIBRARY(LIBXML2 NAMES libxml2.lib PATHS ${CMAKE_SOURCE_DIR}/libxml2/lib)
 ENDIF (UNIX)
 
@@ -76,36 +83,35 @@ FILE ( GLOB_RECURSE LIB_HEADERS "${PROJECT_SOURCE_DIR}/Include/*.h" )
 # Set library include directories
 ###############################################################################
 IF(WIN32)
-INCLUDE_DIRECTORIES(
-	${CMAKE_SOURCE_DIR}/libxml2/include 
-	${CMAKE_SOURCE_DIR}/libxml2/iconv/include
-)
+	INCLUDE_DIRECTORIES(
+		${CMAKE_SOURCE_DIR}/libxml2/include 
+		${CMAKE_SOURCE_DIR}/libxml2/iconv/include
+		${Boost_INCLUDE_DIRS}
+	)
 ELSE(WIN32)
-INCLUDE_DIRECTORIES(
-	${LIBXML2_INCLUDE_DIR}
-)
+	INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR})
 ENDIF(WIN32)
+
 ###############################################################################
 # Link library directories
 ###############################################################################
 IF(WIN32)
-LINK_DIRECTORIES(
-${CMAKE_SOURCE_DIR}/libxml2/lib
-)
+	LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/libxml2/lib ${Boost_LIBRARY_DIRS})
 ENDIF(WIN32)
+
 ###############################################################################
 # If DLL option is chosen library type is shared
 ###############################################################################
 SET(LIBRARY_TYPE SHARED)
 
 ###############################################################################
-# Link libxml2 to the openCONF library
+# Link libxml2 and boost to the openCONFIGURATOR library
 ###############################################################################
-SET(ADD_ADDITIONAL_DEPENDENCIES )
+UNSET(ADDITIONAL_DEPENDENCIES)
 IF (WIN32)
-	SET(ADD_ADDITIONAL_DEPENDENCIES ${ADD_ADDITIONAL_DEPENDENCIES} ${LIBXML2} )
+	SET(ADDITIONAL_DEPENDENCIES ${ADDITIONAL_DEPENDENCIES} ${LIBXML2})
 ELSE(WIN32)
-	SET(ADD_ADDITIONAL_DEPENDENCIES ${ADD_ADDITIONAL_DEPENDENCIES} ${LIBXML2_LIBRARIES} )
+	SET(ADDITIONAL_DEPENDENCIES ${ADDITIONAL_DEPENDENCIES} ${LIBXML2_LIBRARIES})
 ENDIF(WIN32)
 
 ###############################################################################
@@ -123,7 +129,7 @@ ENDIF()
 ###############################################################################
 # Create openCONF library 
 ###############################################################################
-TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADD_ADDITIONAL_DEPENDENCIES})
+TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADDITIONAL_DEPENDENCIES})
 
 ###############################################################################
 # Install openCONF library to build dir
