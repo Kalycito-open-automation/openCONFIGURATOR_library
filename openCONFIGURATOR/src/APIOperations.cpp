@@ -7645,9 +7645,9 @@ ocfmRetCode GetNodeCount(UINT32* outNodeCount)
 char* GetPIName(INT32 nodeID)
 {
 	char* nodeIdStr = NULL;
-	char* nodeIdAsci = new char[3];
+	char* nodeIdAsci = new char[4];
 
-	nodeIdStr = new char[6];
+	nodeIdStr = new char[7];
 	strcpy(nodeIdStr, "CN");
 	nodeIdAsci = IntToAscii(nodeID, nodeIdAsci, 10);
 	strcat(nodeIdStr, nodeIdAsci);
