@@ -62,9 +62,14 @@ IF(MSVC)
 	SET(CMAKE_CXX_FLAGS "/Zi /nologo /W4 /WX- /Od /Oy- /Ob0 /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Gm- /EHsc /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /analyze- /errorReport:queue /GR")
 	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /DDEBUG")
+	# \${BUILD_TYPE} will only be correctly evaluated by the INSTALL command!
+	SET(INSTALL_DIR "${CMAKE_BINARY_DIR}/\${BUILD_TYPE}")
+	# This variable will be used by BR.FS.CdcBuilder
+	SET(INSTALL_DIR_VS "${CMAKE_BINARY_DIR}/$(Configuration)")
 ELSEIF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Weffc++ -std=c++03")
 	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+	SET(INSTALL_DIR "${CMAKE_BINARY_DIR}/bin")
 ENDIF(MSVC)
 
 ###############################################################################
@@ -126,7 +131,8 @@ IF(WIN32)
 		ADD_SUBDIRECTORY(openCONFIGURATORTest)
 	ENDIF()
 	IF(OPEN_CONFIGURATOR_NET_WRAPPER AND OPEN_CONFIGURATOR_NET_EXE)
-		INCLUDE_EXTERNAL_MSPROJECT(BR.FS.CdcBuilder ${CMAKE_SOURCE_DIR}/BR.FS.CdcBuilder/BR.FS.CdcBuilder.csproj
+		CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/BR.FS.CdcBuilder/BR.FS.CdcBuilder.csproj ${CMAKE_SOURCE_DIR}/BR.FS.CdcBuilder/BR.FS.CdcBuilder_cmake.csproj)
+		INCLUDE_EXTERNAL_MSPROJECT(BR.FS.CdcBuilder ${CMAKE_SOURCE_DIR}/BR.FS.CdcBuilder/BR.FS.CdcBuilder_cmake.csproj
 			TYPE BB3CF1A9-E8A2-40A9-B628-6983D6C5724E
 			PLATFORM "Any CPU"
 			openCONFIGURATORcsharpWRAPPER)

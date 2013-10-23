@@ -1,587 +1,452 @@
+/************************************************************************
+\file OdApi.cpp
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+************************************************************************/
+
 #include "../Include/OdApi.h"
 #include "../Include/NodeCollection.h"
 #include "../Include/Validation.h"
 #include "../Include/Internal.h"
 #include "../Include/ProjectConfiguration.h"
+#include "../Include/Result.h"
+#include "../Include/Logging.h"
+#include "../Include/NodeApi.h"
+#include "../Include/BoostShared.h"
+
 #include <sstream>
 #include <algorithm>
+#include <cassert>
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::Library::ObjectDictionary;
+using namespace openCONFIGURATOR::Library::Utilities;
 
-DLLEXPORT ocfmRetCode AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
+namespace openCONFIGURATOR 
 {
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
+	namespace Library
 	{
-		ostringstream objectTypeString("");
-		objectTypeString << objectType;
-		string indexString = IntToHex(index, 4, "", "");
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = AddIndex(nodeId, nodeType, indexString.c_str());
-		if (retCode.getErrorCode() != OCFM_ERR_SUCCESS)
-			return retCode;
-		retCode = SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false);
-		if (retCode.getErrorCode() != OCFM_ERR_SUCCESS)
-			return retCode;
-
-		return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		try
+		namespace API
 		{
-			string indexString = IntToHex(index, 4, "", "");
-			NodeType nodeType = (nodeId == 240)
-			                    ? MN
-			                    : CN;
-			INT32 indexPos = 0;
-			bool booleanVal = false;
 
-			if (attributeType == FLAGIFINCDC)
+			DLLEXPORT ocfmRetCode AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
 			{
-				if (attributeValue.compare("0") == 0)
+				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-					booleanVal = false;
+					ostringstream objectTypeString;
+					objectTypeString << objectType;
+					string indexString = IntToHex(index, 4, "", "");
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+
+					ocfmRetCode result = AddIndex(nodeId, nodeType, indexString.c_str());
+					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+						return result;
+					result = SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false);
+					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+						return result;
+
+					return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
 				}
-				else if (attributeValue.compare("1") == 0)
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-					booleanVal = true;
-				}
-				else
-				{
-					string attributeValueLowerCase(attributeValue);
-					transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
-					if (attributeValueLowerCase.compare("true") == 0 || attributeValueLowerCase.compare("false") == 0)
+					try
 					{
-						istringstream inputBoolString(attributeValueLowerCase);
-						inputBoolString >> std::boolalpha >> booleanVal;
-					}
-					else
-					{
-						throw ocfmRetCode(OCFM_ERR_INVALID_VALUE);
-					}
-				}
-			}
+						string indexStr = IntToHex(index, 4, "", "");
 
-			ocfmRetCode retCode = IfIndexExists(nodeId, nodeType, indexString.c_str(), &indexPos);
-			if (OCFM_ERR_SUCCESS != retCode.getErrorCode())
-			{
-				retCode.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
-				return retCode;
-			}
+						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
+						assert(nodeCollectionPtr);
+						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);
 
-			NodeCollection* nodeCollObj = NULL;
-			Node nodeObj;
-			IndexCollection* indexCollObj = NULL;
-			Index* indexObj = NULL;
-
-			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-			if (NULL == nodeCollObj)
-			{
-				retCode.setErrorCode(OCFM_ERR_NO_NODES_FOUND);
-				return retCode;
-			}
-
-			nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
-
-			indexCollObj = nodeObj.GetIndexCollection();
-			if (NULL == indexCollObj)
-			{
-				retCode.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
-				return retCode;
-			}
-
-			indexObj = indexCollObj->GetIndex(indexPos);
-			if (NULL == indexObj)
-			{
-				retCode.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
-				return retCode;
-			}
-
-			if (!attributeValue.empty())
-			{
-				switch (attributeType)
-				{
-				case NAME:
-					indexObj->SetName(attributeValue.c_str());
-					break;
-				case OBJECTTYPE:
-					indexObj->SetObjectType(attributeValue.c_str());
-					if (indexObj->GetEObjectType() == ARRAY)
-					{
-						indexObj->UpdateArraySubObjects();
-					}
-					break;
-				case DATATYPE:
-					if ((CheckIfDataTypeByNameExists(attributeValue.c_str(), indexObj->GetNodeID())) == true)
-					{
-						indexObj->SetDataTypeName(attributeValue.c_str(), nodeId);
-						if (indexObj->GetEObjectType() == ARRAY)
+						if (!node)
 						{
-							indexObj->UpdateArraySubObjects();
+							boost::format formatter(kMsgNonExistingNode);
+							formatter % nodeId;
+							ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
+							result.setErrorString(formatter.str());
+							throw result;
 						}
+
+						IndexCollection* indexCollectionPtr = node->GetIndexCollection();
+						assert(indexCollectionPtr);
+
+						Index* indexPtr = indexCollectionPtr->GetIndexPtr(index);
+						if (!indexPtr)
+						{
+							boost::format formatter(kMsgNonExistingIndex);
+							formatter % index % nodeId;
+							ocfmRetCode result(OCFM_ERR_INDEXID_NOT_FOUND);
+							result.setErrorString(formatter.str());
+							throw result;
+						}
+
+						switch (attributeType)
+						{
+							case ACTUALVALUE:
+								if (indexPtr->IsIndexValueValid(attributeValue.c_str()))
+									indexPtr->SetActualValue(attributeValue.c_str());
+								else
+									throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+								break;
+							case FLAGIFINCDC:
+							{
+								// TODO: Remove as soon as flag is being removed
+								string attributeValueLowerCase(attributeValue);
+								transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
+								if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
+									indexPtr->SetFlagIfIncludedCdc(true);
+								else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
+									indexPtr->SetFlagIfIncludedCdc(false);
+								else
+								{
+									boost::format formatter(kMsgAttributeValueInvalid);
+									formatter % attributeValue
+										% attributeType
+										% index
+										% 0
+										% nodeId
+										% "true or false";
+									ocfmRetCode result(OCFM_ERR_INVALID_VALUE);
+									result.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
+									throw result;
+								}								
+							}
+							case NAME:
+							case OBJECTTYPE:
+							case DATATYPE:
+							case ACCESSTYPE:
+							case DEFAULTVALUE:
+							case PDOMAPPING:
+							case LOWLIMIT:
+							case HIGHLIMIT:
+							default:
+							{
+								boost::format formatter(kMsgUnsupportedAttributeType);
+								formatter % ((int) attributeType);
+								ocfmRetCode result(OCFM_ERR_INVALID_ATTRIBUTETYPE);
+								result.setErrorString(formatter.str());					
+								throw result;
+							}
+						}
+						return ocfmRetCode(OCFM_ERR_SUCCESS);
 					}
+					catch (ocfmRetCode& ex)
+					{
+						LOG_FATAL() << ex.getErrorString();
+						return ex;
+					}
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			ocfmRetCode SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const string attributeValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					try
+					{
+						string indexStr = IntToHex(index, 4, "", "");
+						string subIndexStr = IntToHex(subIndex, 2, "", "");
+
+						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
+						assert(nodeCollectionPtr);
+						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);
+
+						if (!node)
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter % nodeId;
+							ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
+							result.setErrorString(formatter.str());
+							throw result;
+						}
+
+						IndexCollection* indexCollectionPtr = node->GetIndexCollection();
+						assert(indexCollectionPtr);
+
+						Index* indexPtr = indexCollectionPtr->GetIndexPtr(index);
+						if (!indexPtr)
+						{
+							boost::format formatter(kMsgNonExistingIndex);
+							formatter % index % nodeId;
+							ocfmRetCode result(OCFM_ERR_INDEXID_NOT_FOUND);
+							result.setErrorString(formatter.str());
+							throw result;
+						}
+
+						SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(subIndex);
+						if (!subIndexPtr)
+						{
+							boost::format formatter(kMsgNonExistingSubIndex);
+							formatter % index % subIndex % nodeId;
+							ocfmRetCode result(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+							result.setErrorString(formatter.str());
+							throw result;
+						}
+
+						switch (attributeType)
+						{
+				
+							case ACTUALVALUE:
+								if (subIndexPtr->IsIndexValueValid(attributeValue.c_str()))
+									subIndexPtr->SetActualValue(attributeValue.c_str());
+								else
+									throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+								break;
+							case FLAGIFINCDC:
+							{
+								// TODO: Remove as soon as flag is being removed
+								string attributeValueLowerCase(attributeValue);
+								transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
+								if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
+									subIndexPtr->SetFlagIfIncludedCdc(true);
+								else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
+									subIndexPtr->SetFlagIfIncludedCdc(false);
+								else
+								{
+									boost::format formatter(kMsgAttributeValueInvalid);
+									formatter % attributeValue
+										% attributeType
+										% index
+										% subIndex
+										% nodeId
+										% "true or false";
+									ocfmRetCode result(OCFM_ERR_INVALID_VALUE);
+									result.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
+									throw result;
+								}
+								break;
+							}
+							case NAME:
+							case OBJECTTYPE:
+							case DATATYPE:
+							case ACCESSTYPE:
+							case DEFAULTVALUE:
+							case PDOMAPPING:
+							case LOWLIMIT:
+							case HIGHLIMIT:
+							default:
+							{
+								boost::format formatter(kMsgUnsupportedAttributeType);
+								formatter % ((int) attributeType);
+								ocfmRetCode result(OCFM_ERR_INVALID_ATTRIBUTETYPE);
+								result.setErrorString(formatter.str());
+								throw result;
+							}	
+						}
+						return ocfmRetCode(OCFM_ERR_SUCCESS);
+					}
+					catch (ocfmRetCode& ex)
+					{
+						LOG_FATAL() << ex.getErrorString();
+						return ex;
+					}
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const string actualValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+					return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, string& attributeValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					string indexString = IntToHex(index, 4, "", "");
+					char* attributeValueTemp = new char[50];
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+
+					ocfmRetCode result = GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp);
+					if (result.getErrorCode() == OCFM_ERR_SUCCESS)
+					{
+						attributeValue.clear();
+						attributeValue.append(attributeValueTemp);
+					}
+					delete[] attributeValueTemp;
+					return result;
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					string indexString = IntToHex(index, 4, "", "");
+					string subIndexString = IntToHex(subIndexId, 2, "", "");
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+
+					ocfmRetCode result = AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
+					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+						return result;
+
+					return SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false);
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+					return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, string& attributeValue)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					string indexString = IntToHex(index, 4, "", "");
+					string subIndexString = IntToHex(subIndexId, 2, "", "");
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+					char* attributeValueTemp = new char [50];
+
+					ocfmRetCode result = GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp);
+					if (result.getErrorCode() == OCFM_ERR_SUCCESS)
+					{
+						attributeValue.clear();
+						attributeValue.append(attributeValueTemp);
+					}
+					delete[] attributeValueTemp;
+					return result;
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
+			DLLEXPORT bool IsExistingIndex(const UINT32 nodeId, const UINT32 index)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+					if (!node)
+						return false;
 					else
-					{
-						retCode.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-						return retCode;
-					}
-					break;
-				case ACCESSTYPE:
-					indexObj->SetAccessType(attributeValue.c_str());
-					break;
-				case DEFAULTVALUE:
-					indexObj->SetDefaultValue(attributeValue.c_str());
-					break;
-				case ACTUALVALUE:
-					if (indexObj->IsIndexValueValid(attributeValue.c_str()))
-					{
-						indexObj->SetActualValue(attributeValue.c_str());
-					}
+						return node->GetIndexCollection()->ContainsIndex(index, 0);
+				}
+				return false;
+			}
+
+			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
+			DLLEXPORT bool IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+					if (!node)
+						return false;
+					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+					if (!indexPtr)
+						return false;
+					return indexPtr->ContainsSubIndex(subIndex);
+				}
+				return false;
+			}
+
+			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
+			DLLEXPORT UINT32 GetIndexCount(const UINT32 nodeId)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+					if (!node)
+						return 0;
+					return node->GetIndexCollection()->Size();
+				}
+				return 0;
+			}
+
+			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
+			DLLEXPORT UINT32 GetSubIndexCount(const UINT32 nodeId, const UINT32 index)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+					if (!node)
+						return 0;
+					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+					if (!indexPtr)
+						return 0;
+					return indexPtr->GetNumberofSubIndexes();
+				}
+				return 0;
+			}
+
+			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
+			DLLEXPORT UINT32 GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+					if (!node)
+						return 0;
+					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+					if (!indexPtr)
+						return 0;
+					SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(0);
+					if (!subIndexPtr)
+						return 0;
+					const char* value = (getDefault) 
+						? subIndexPtr->GetDefaultValue()
+						: subIndexPtr->GetActualValue();
+					if (!value)
+						return 0;
+					string valueStr = value;
+					if (valueStr.substr(0, 2) == "0x")
+						return HexToInt<UINT32>(valueStr);
 					else
-					{
-						retCode.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-						return retCode;
-					}
-					break;
-				case PDOMAPPING:
-					indexObj->SetPDOMapping(attributeValue.c_str());
-					break;
-				case LOWLIMIT:
-					retCode = CheckUpperAndLowerLimits(attributeValue.c_str(), indexObj->GetHighLimit());
-					if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-					{
-						indexObj->SetLowLimit(attributeValue.c_str());
-					}
-					else
-					{
-						retCode.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
-						return retCode;
-					}
-					break;
-				case HIGHLIMIT:
-					retCode = CheckUpperAndLowerLimits(indexObj->GetLowLimit(), attributeValue.c_str());
-					if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-					{
-						indexObj->SetHighLimit(attributeValue.c_str());
-					}
-					else
-					{
-						retCode.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
-						return retCode;
-					}
-					break;
-				case FLAGIFINCDC:
-					indexObj->SetFlagIfIncludedCdc(booleanVal);
-					break;
-				default:
-					break;
+						return boost::lexical_cast<UINT32>(value);
 				}
-				retCode.setErrorCode(OCFM_ERR_SUCCESS);
+				return 0;
 			}
-			else
+
+			DLLEXPORT ocfmRetCode DeleteIndex(const UINT32 nodeId, const UINT32 index)
 			{
-				retCode.setErrorCode(OCFM_ERR_INVALID_VALUE);
-				return retCode;
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					string indexString = IntToHex(index, 4, "", "");
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+
+					return DeleteIndex(nodeId, nodeType, indexString.c_str());
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
 			}
 
-			//TODO: Clarify what this does exactly
-			if ((ARRAY == indexObj->GetEObjectType())
-			        || (RECORD == indexObj->GetEObjectType()))
+			DLLEXPORT ocfmRetCode DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
 			{
-				//delete the subobject 00 and then add and updates the number of entries
-				retCode = DeleteSubIndex(nodeId, nodeType, indexString.c_str(), (char*)"00");
-				retCode = AddSubobject(nodeId, nodeType, indexString.c_str());
-				UpdateNumberOfEnteriesSIdx(indexObj, nodeType);
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					string indexString = IntToHex(index, 4, "", "");
+					string subIndexString = IntToHex(subIndex, 2, "", "");
+					NodeType nodeType = (nodeId == MN_NODEID)
+						? MN
+						: CN;
+
+					return DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
 			}
 
-			return retCode;
-		}
-		catch (ocfmRetCode exObj)
-		{
-			return exObj;
 		}
 	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const string actualValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		AttributeType attrType = ACTUALVALUE;
-		return SetIndexAttribute(nodeId, index, attrType, actualValue);
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, string& attributeValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		char* attributeValueTemp = new char[50];
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp);
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			attributeValue.clear();
-			attributeValue.append(attributeValueTemp);
-		}
-		delete[] attributeValueTemp;
-		return retCode;
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		string subIndexString = IntToHex(subIndexId, 2, "", "");
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
-		if (retCode.getErrorCode() != OCFM_ERR_SUCCESS)
-			return retCode;
-
-		return SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false);
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, const string attributeValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		try
-		{
-			string indexString = IntToHex(index, 4, "", "");
-			string subIndexString = IntToHex(subIndexId, 2, "", "");
-			NodeType nodeType = (nodeId == 240)
-			                    ? MN
-			                    : CN;
-
-			INT32 sidxPos = 0;
-			INT32 iIndexPos = 0;
-
-			bool booleanVal = false;
-
-			if (attributeType == FLAGIFINCDC)
-			{
-				if (attributeValue.compare("0") == 0)
-				{
-					booleanVal = false;
-				}
-				else if (attributeValue.compare("1") == 0)
-				{
-					booleanVal = true;
-				}
-				else
-				{
-					string attributeValueLowerCase(attributeValue);
-					transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
-					if (attributeValueLowerCase.compare("true") == 0 || attributeValueLowerCase.compare("false") == 0)
-					{
-						istringstream inputBoolString(attributeValueLowerCase);
-						inputBoolString >> std::boolalpha >> booleanVal;
-					}
-					else
-					{
-						throw ocfmRetCode(OCFM_ERR_INVALID_VALUE);
-					}
-				}
-			}
-
-			ocfmRetCode errCodeObj = IfSubIndexExists(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), &sidxPos, &iIndexPos);
-			if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
-			{
-				return errCodeObj;
-			}
-
-			NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-			if (NULL == nodeCollObj)
-			{
-				throw ocfmRetCode(OCFM_ERR_NO_NODES_FOUND);
-			}
-
-			Node nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
-
-			IndexCollection* indexCollObj = nodeObj.GetIndexCollection();
-			if (NULL == indexCollObj)
-			{
-				throw ocfmRetCode(OCFM_ERR_NO_INDEX_FOUND);
-			}
-
-			Index* indexObj = indexCollObj->GetIndex(iIndexPos);
-			if (NULL == indexObj)
-			{
-				throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
-			}
-
-			SubIndex* sidxObj = indexObj->GetSubIndex(sidxPos);
-			if (NULL == sidxObj)
-			{
-				throw ocfmRetCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-			}
-
-			switch (attributeType)
-			{
-			case NAME:
-				sidxObj->SetName(attributeValue.c_str());
-				break;
-			case OBJECTTYPE:
-				sidxObj->SetObjectType(attributeValue.c_str());
-				break;
-			case DATATYPE:
-				if ((CheckIfDataTypeByNameExists(attributeValue.c_str(), indexObj->GetNodeID())) == true)
-				{
-					sidxObj->SetDataTypeName(attributeValue.c_str(), nodeId);
-				}
-				else
-				{
-					throw ocfmRetCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-				}
-				break;
-			case ACCESSTYPE:
-				sidxObj->SetAccessType(attributeValue.c_str());
-				break;
-			case DEFAULTVALUE:
-				sidxObj->SetDefaultValue(attributeValue.c_str());
-				break;
-			case ACTUALVALUE:
-				sidxObj->SetActualValue(attributeValue.c_str());
-				break;
-			case PDOMAPPING:
-				sidxObj->SetPDOMapping(attributeValue.c_str());
-				break;
-			case LOWLIMIT:
-				errCodeObj = CheckUpperAndLowerLimits(attributeValue.c_str(), indexObj->GetHighLimit());
-				if (errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
-				{
-					sidxObj->SetLowLimit(attributeValue.c_str());
-				}
-				else
-				{
-					throw ocfmRetCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
-				}
-				break;
-			case HIGHLIMIT:
-				errCodeObj = CheckUpperAndLowerLimits(indexObj->GetLowLimit(), attributeValue.c_str());
-				if (errCodeObj.getErrorCode() == OCFM_ERR_SUCCESS)
-				{
-					sidxObj->SetHighLimit(attributeValue.c_str());
-				}
-				else
-				{
-					throw ocfmRetCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
-				}
-				break;
-			case FLAGIFINCDC:
-				indexObj->SetFlagIfIncludedCdc(booleanVal);
-				break;
-			default:
-				throw ocfmRetCode(OCFM_ERR_INVALID_ATTRIBUTETYPE);
-			}
-
-			return ocfmRetCode(OCFM_ERR_SUCCESS);
-		}
-		catch (ocfmRetCode& ex)
-		{
-			return ex;
-		}
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, string& attributeValue)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		string subIndexString = IntToHex(subIndexId, 2, "", "");
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-		char* attributeValueTemp = new char [50];
-
-		ocfmRetCode retCode = GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp);
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			attributeValue.clear();
-			attributeValue.append(attributeValueTemp);
-		}
-		delete[] attributeValueTemp;
-		return retCode;
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT bool IsExistingIndex(const UINT32 nodeId, const UINT32 index)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		INT32 indexPosition = 0;
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = IfIndexExists(nodeId, nodeType, indexString.c_str(), &indexPosition);
-
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			return true;
-		}
-		return false;
-	}
-	return false;
-}
-
-DLLEXPORT bool IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		string subIndexString = IntToHex(subIndex, 2, "", "");
-		INT32 indexPosition;
-		INT32 subindexPosition;
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = IfSubIndexExists(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), &indexPosition, &subindexPosition);
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			return true;
-		}
-		return false;
-	}
-	return false;
-}
-
-DLLEXPORT UINT32 GetIndexCount(const UINT32 nodeId)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		UINT32 nrOfIndices;
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = GetIndexCount(nodeId, nodeType, &nrOfIndices);
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			return nrOfIndices;
-		}
-		return 0;
-	}
-	return 0;
-}
-
-DLLEXPORT UINT32 GetSubIndexCount(const UINT32 nodeId, const UINT32 index)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		UINT32 nrOfSubIndices;
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		ocfmRetCode retCode = GetSubIndexCount(nodeId, nodeType, indexString.c_str(), &nrOfSubIndices);
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			return nrOfSubIndices;
-		}
-		return 0;
-	}
-	return 0;
-}
-
-DLLEXPORT UINT32 GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-		string indexString = IntToHex(index, 4, "", "");
-		UINT32 returnValue = 0;
-		stringstream strValue;
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		char* outValue = new char[50];
-
-		if (getDefault == true)
-		{
-			retCode = GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), (char*) "00", DEFAULTVALUE, outValue);
-		}
-		else
-		{
-			retCode = GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), (char*) "00", ACTUALVALUE, outValue);
-		}
-		if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
-		{
-			strValue << outValue;
-			strValue >> returnValue;
-		}
-		delete[] outValue;
-		return returnValue;
-	}
-	return 0;
-}
-
-DLLEXPORT ocfmRetCode DeleteIndex(const UINT32 nodeId, const UINT32 index)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-		string indexString = IntToHex(index, 4, "", "");
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		retCode = DeleteIndex(nodeId, nodeType, indexString.c_str());
-		return retCode;
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		string indexString = IntToHex(index, 4, "", "");
-		string subIndexString = IntToHex(subIndex, 2, "", "");
-
-		NodeType nodeType = (nodeId == 240)
-		                    ? MN
-		                    : CN;
-
-		return DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
 }

@@ -55,10 +55,12 @@
 /* Includes */
 
 #include <stdio.h>
+#include <sstream>
+
 #include "../Include/Node.h"
 #include "../Include/Internal.h"
+#include "../Include/Logging.h"
 
-#include <sstream>
 using namespace std;
 
 //==========================================================================//
@@ -72,13 +74,29 @@ using namespace std;
 
  */
 
-Node::Node(void)
+Node::Node(void) :
+	// MN
+	transmitsPRes(), 
+	// CN	
+	isMandatory(),
+	autostartNode(),
+	resetInOperational(),	
+	verifyAppSwVersion(),
+	autoAppSwUpdateAllowed(),
+	verifyDeviceType(),
+	verifyVendorId(),
+	verifyRevisionNumber(),
+	verifyProductCode(),
+	verifySerialNumber(),
+	// MN & CN
+	isAsyncOnly(),
+	isType1Router(),
+	isType2Router()
 {
-	indexCollObj = NULL;
-	dtCollObj = NULL;
-	indexCollObj = NULL;
-	appProcessObj = NULL;
-	nmtObj = NULL;
+	dtCollObj = new DataTypeCollection();
+	indexCollObj = new IndexCollection();
+	appProcessObj = new ApplicationProcess();
+	nmtObj = new NetworkManagement();
 	nodeName = NULL;
 	hasPdoObjects = false;
 	stationType = NORMAL;
@@ -91,31 +109,6 @@ Node::Node(void)
 	presActualPayload = 0;
 	preqActualPayload = 0;
 	//cout<<"NodeClass: Constructor Executed"<<endl;
-
-	//MN additional properties
-	transmitsPRes = false;
-	asyncSlotTimeout = 0;
-	aSndMaxNumber = 0;
-
-	//CN additional properties
-	forcedMultiplexedCycle = 0;
-
-	autostartNode = true;
-	resetInOperational = true;
-
-	verifyAppSwVersion = false;
-	autoAppSwUpdateAllowed = false;
-	verifyDeviceType = false;
-	verifyVendorId = false;
-	verifyRevisionNumber = false;
-	verifyProductCode = false;
-	verifySerialNumber = false;
-
-	//Both Node
-	isAsyncOnly = false;
-	isType1Router = false;
-	isType2Router = false;
-	isMandatory = false;
 }
 
 /*************************************************************************/
@@ -209,20 +202,6 @@ DataTypeCollection* Node::GetDataTypeCollection()
 	return dtCollObj;
 }
 
-void Node::CreateIndexCollection()
-{
-	IndexCollection* objIndexCollection = NULL;
-	objIndexCollection = new IndexCollection();
-	indexCollObj = objIndexCollection;
-}
-
-void Node::CreateDataTypeCollection()
-{
-	DataTypeCollection* pobjDataTypeCollection = NULL;
-	pobjDataTypeCollection = new DataTypeCollection();
-	dtCollObj = pobjDataTypeCollection;
-}
-
 void Node::AddProcessImage(ProcessImage piObj)
 {
 	PICollection.push_back(piObj);
@@ -245,22 +224,6 @@ void Node::AddMNPDOvar(MNPdoVariable pdoVarObj, PDOType pdotype)
 	}
 }
 
-void Node::CreateApplicationProcess()
-{
-	ApplicationProcess* appProcess = NULL;
-
-	appProcess = new ApplicationProcess();
-	appProcessObj = appProcess;
-}
-
-void Node::CreateNetworkManagement()
-{
-	NetworkManagement* nmtObject = NULL;
-
-	nmtObject = new NetworkManagement();
-	nmtObj = nmtObject;
-}
-
 IndexCollection* Node::GetPDOIndexCollection(PDOType pdotype)
 {
 	IndexCollection* objPdoIndexCollection = new IndexCollection();
@@ -268,7 +231,7 @@ IndexCollection* Node::GetPDOIndexCollection(PDOType pdotype)
 	for (INT32 iLoopCount = 0; iLoopCount < indexCollObj->GetNumberofIndexes();
 	        iLoopCount++)
 	{
-		objIndex = indexCollObj->GetIndex(iLoopCount);
+		objIndex = indexCollObj->GetIndexByPosition(iLoopCount);
 
 		if (objIndex->GetPDOType() == pdotype)
 		{
@@ -286,7 +249,7 @@ IndexCollection* Node::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
 	for (INT32 indexLC = 0; indexLC < indexCollObj->GetNumberofIndexes();
 	        indexLC++)
 	{
-		indexObj = indexCollObj->GetIndex(indexLC);
+		indexObj = indexCollObj->GetIndexByPosition(indexLC);
 		if ((indexObj->GetPDOType() == PDO_TPDO))
 		{
 			if ((0 == strncmp(indexObj->GetIndexValue(), "1A", 2))
@@ -315,7 +278,7 @@ IndexCollection* Node::GetIndexCollectionWithoutPDO()
 	for (INT32 indexLC = 0; indexLC < indexCollObj->GetNumberofIndexes();
 	        indexLC++)
 	{
-		indexObj = indexCollObj->GetIndex(indexLC);
+		indexObj = indexCollObj->GetIndexByPosition(indexLC);
 		if (CheckIfNotPDO((char*) indexObj->GetIndexValue()))
 		{
 			indexCollObject->AddIndex(*indexObj);
@@ -381,7 +344,7 @@ char* Node::GetForcedCycleValue()
 	return forcedCycle;
 }
 
-ocfmRetCode Node::SetForcedCycle(char* tempForcedCycleVal)
+ocfmRetCode Node::SetForcedCycle(const char* tempForcedCycleVal)
 {
 	//add or update 1f9b
 	ocfmRetCode exObj;
@@ -572,41 +535,17 @@ INT32 Node::GetPReqActPayloadValue()
 	return preqActualPayload;
 }
 
-//MN additional properties
-bool Node::GetTransmitsPRes(void)
+boost::optional<bool> Node::TransmitsPRes(void)
 {
 	return this->transmitsPRes;
 }
+
 void Node::SetTransmitsPRes(bool transmitsPRes)
 {
 	this->transmitsPRes = transmitsPRes;
 }
-UINT32 Node::GetAsyncSlotTimeout(void)
-{
-	return this->asyncSlotTimeout;
-}
-void Node::SetAsyncSlotTimeout(UINT32 asyncSlotTimeout)
-{
-	this->asyncSlotTimeout = asyncSlotTimeout;
-}
-UINT32 Node::GetASndMaxNumber(void)
-{
-	return this->aSndMaxNumber;
-}
-void Node::SetASndMaxNumber(UINT32 aSndMaxNumber)
-{
-	this->aSndMaxNumber = aSndMaxNumber;
-}
 
-UINT32 Node::GetForcedMultiplexedCycle(void)
-{
-	return this->forcedMultiplexedCycle;
-}
-void Node::SetForcedMultiplexedCycle(UINT32 forcedMultiplexedCycle)
-{
-	this->forcedMultiplexedCycle = forcedMultiplexedCycle;
-}
-bool Node::GetAutostartNode(void)
+boost::optional<bool> Node::GetAutostartNode(void)
 {
 	return this->autostartNode;
 }
@@ -614,107 +553,227 @@ void Node::SetAutostartNode(bool autostartNode)
 {
 	this->autostartNode = autostartNode;
 }
-bool Node::GetResetInOperational(void)
+
+boost::optional<bool> Node::GetResetInOperational(void)
 {
 	return this->resetInOperational;
 }
+
 void Node::SetResetInOperational(bool resetInOperational)
 {
 	this->resetInOperational = resetInOperational;
 }
-bool Node::GetVerifyAppSwVersion(void)
+
+boost::optional<bool> Node::GetVerifyAppSwVersion(void)
 {
 	return this->verifyAppSwVersion;
 }
+
 void Node::SetVerifyAppSwVersion(bool verifyAppSwVersion)
 {
 	this->verifyAppSwVersion = verifyAppSwVersion;
 }
-bool Node::GetAutoAppSwUpdateAllowed(void)
+
+boost::optional<bool> Node::GetAutoAppSwUpdateAllowed(void)
 {
 	return this->autoAppSwUpdateAllowed;
 }
+
 void Node::SetAutoAppSwUpdateAllowed(bool autoAppSwUpdateAllowed)
 {
 	this->autoAppSwUpdateAllowed = autoAppSwUpdateAllowed;
 }
-bool Node::GetVerifyDeviceType(void)
+
+boost::optional<bool> Node::GetVerifyDeviceType(void)
 {
 	return this->verifyDeviceType;
 }
+
 void Node::SetVerifyDeviceType(bool verifyDeviceType)
 {
 	this->verifyDeviceType = verifyDeviceType;
 }
-bool Node::GetVerifyVendorId(void)
+
+boost::optional<bool> Node::GetVerifyVendorId(void)
 {
 	return this->verifyVendorId;
 }
+
 void Node::SetVerifyVendorId(bool verifyVendorId)
 {
 	this->verifyVendorId = verifyVendorId;
 }
-bool Node::GetVerifyRevisionNumber(void)
+
+boost::optional<bool> Node::GetVerifyRevisionNumber(void)
 {
 	return this->verifyRevisionNumber;
 }
+
 void Node::SetVerifyRevisionNumber(bool verifyRevisionNumber)
 {
 	this->verifyRevisionNumber = verifyRevisionNumber;
 }
-bool Node::GetVerifyProductCode(void)
+
+boost::optional<bool> Node::GetVerifyProductCode(void)
 {
 	return this->verifyProductCode;
 }
+
 void Node::SetVerifyProductCode(bool verifyProductCode)
 {
 	this->verifyProductCode = verifyProductCode;
 }
-bool Node::GetVerifySerialNumber(void)
+
+boost::optional<bool> Node::GetVerifySerialNumber(void)
 {
 	return this->verifySerialNumber;
 }
+
 void Node::SetVerifySerialNumber(bool verifySerialNumber)
 {
 	this->verifySerialNumber = verifySerialNumber;
 }
 
-//Both Node
-bool Node::GetIsMandatory(void)
+boost::optional<bool> Node::IsMandatory(void)
 {
 	return this->isMandatory;
 }
+
 void Node::SetIsMandatory(bool isMandatory)
 {
 	this->isMandatory = isMandatory;
 }
 
-bool Node::GetIsAsyncOnly(void)
+boost::optional<bool> Node::IsAsyncOnly(void)
 {
 	return this->isAsyncOnly;
 }
+
 void Node::SetIsAsyncOnly(bool isAsyncOnly)
 {
 	this->isAsyncOnly =isAsyncOnly;
 }
 
-bool Node::GetIsType1Router(void)
+boost::optional<bool> Node::IsType1Router(void)
 {
 	return this->isType1Router;
 }
+
 void Node::SetIsType1Router(bool isType1Router)
 {
 	this->isType1Router = isType1Router;
 }
 
-bool Node::GetIsType2Router(void)
+boost::optional<bool> Node::IsType2Router(void)
 {
 	return this->isType2Router;
 }
+
 void Node::SetIsType2Router(bool isType2Router)
 {
 	this->isType2Router= isType2Router;
 }
+
+template<typename T>
+boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subIndex, const T value)
+{
+	LOG_DEBUG() 
+		<< std::hex 
+		<< std::showbase
+		<< std::boolalpha
+		<< "Setting actualValue for " << index << "/" << subIndex
+		<< " on node " << this->nodeId
+		<< " to '" << value << "'.";
+	Index& indexObj = this->indexCollObj->GetIndexRef(index);
+	std::ostringstream convertToString;
+	convertToString << std::boolalpha << value;
+	std::stringstream convertFromString;
+	boost::optional<T> oldActualValue;
+	const char* oldActualValuePtr = NULL;
+
+	// Retrieve old actual value and store it
+	if (subIndex == 0 && !indexObj.HasSubIndices())
+	{
+		// Client intends to write to Index		
+		oldActualValuePtr = indexObj.GetActualValue();
+	} 
+	else
+	{
+		// Client intends to write to SubIndex
+		SubIndex& subIndexObj = indexObj.GetSubIndexRef(subIndex);
+		oldActualValuePtr = subIndexObj.GetActualValue();
+	}
+	if (oldActualValuePtr)
+	{
+		std::string oldActualValueStr = oldActualValuePtr;
+		LOG_DEBUG() << "Old actualValue: '" << oldActualValueStr << "'";
+		if (boost::algorithm::starts_with(oldActualValueStr, "0x")) 
+			convertFromString << std::hex << oldActualValueStr.substr(2);
+		else
+			convertFromString << std::boolalpha << oldActualValueStr;
+		T temporary;
+		convertFromString >> temporary;
+		oldActualValue = temporary;
+	}
+	else
+	{
+		LOG_DEBUG() << "Old actualValue: NULL";
+	}
+
+	// Write new value
+	if (subIndex == 0 && !indexObj.HasSubIndices())
+	{
+		indexObj.SetActualValue(convertToString.str().c_str());
+	} 
+	else
+	{
+		SubIndex& subIndexObj = indexObj.GetSubIndexRef(subIndex);
+		subIndexObj.SetActualValue(convertToString.str().c_str());
+	}
+	LOG_DEBUG() << "New actualValue: '" << convertToString.str().c_str() << "'";
+	return oldActualValue;
+}
+
+template<typename T>
+boost::optional<T> Node::GetActualValue(const UINT32 index, const UINT32 subIndex)
+{
+	Index& indexObj = this->indexCollObj->GetIndexRef(index);
+	std::stringstream convertFromString;
+	boost::optional<T> actualValue;
+	const char* actualValuePtr = NULL;
+
+	if (subIndex == 0 && !indexObj.HasSubIndices())
+	{
+		// Client intends to read to Index		
+		actualValuePtr = indexObj.GetActualValue();
+	} 
+	else
+	{
+		// Client intends to read SubIndex
+		SubIndex& subIndexObj = indexObj.GetSubIndexRef(subIndex);
+		actualValuePtr = subIndexObj.GetActualValue();
+	}
+	if (actualValuePtr != NULL && strlen(actualValuePtr) != 0)
+	{
+		std::string actualValueStr = actualValuePtr;
+		if (boost::algorithm::starts_with(actualValueStr, "0x")) 
+			convertFromString << std::hex << actualValueStr.substr(2);
+		else
+			convertFromString << std::boolalpha << actualValueStr;
+		T temporary;
+		convertFromString >> temporary;
+		actualValue = temporary;
+	}
+	return actualValue;
+}
+
+template boost::optional<UINT32> Node::SetActualValue<UINT32>(const UINT32 index, const UINT32 subIndex, const UINT32 value);
+template boost::optional<bool> Node::SetActualValue<bool>(const UINT32 index, const UINT32 subIndex, const bool value);
+template boost::optional<std::string> Node::SetActualValue<std::string>(const UINT32 index, const UINT32 subIndex, const std::string value);
+
+template boost::optional<UINT32> Node::GetActualValue<UINT32>(const UINT32 index, const UINT32 subIndex);
+template boost::optional<bool> Node::GetActualValue<bool>(const UINT32 index, const UINT32 subIndex);
+template boost::optional<std::string> Node::GetActualValue<std::string>(const UINT32 index, const UINT32 subIndex);
 
 #ifndef __GNUC__
 #pragma endregion Properties

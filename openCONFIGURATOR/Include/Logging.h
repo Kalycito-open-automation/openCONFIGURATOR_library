@@ -14,11 +14,16 @@
 /************************************************************************/
 /*						Boost logging                                   */
 /************************************************************************/
+#pragma warning(push, 0) // Store current warning state and set global warning level 0
+
 #include <boost/log/core/core.hpp>
 #include "boost/log/sources/severity_logger.hpp"
 #include "boost/log/sources/global_logger_storage.hpp"
 #include "boost/log/trivial.hpp"
 #include "boost/log/attributes/named_scope.hpp"
+
+#pragma warning(pop) // Restore previous warning state
+#pragma warning (disable:4503 4714) // Boost-Headers themselves disable this warning, reinstate
 
 // Create global severity logger with multi threading support
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(sev_logger, boost::log::sources::severity_logger_mt<boost::log::trivial::severity_level>);

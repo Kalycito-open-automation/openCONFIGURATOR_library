@@ -1,85 +1,77 @@
+/************************************************************************
+\file	LibraryConfiguration.cpp
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+************************************************************************/
+
 #include "../Include/LibraryConfiguration.h"
 #include "../Include/Enums.h"
+#include "../Include/Constants.h"
+#include "../Include/Logging.h"
+
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#ifndef NDEBUG
+		#include <iostream>
+#endif
 
 using namespace std;
 
-#define OBJECT_DICTIONARY_FILE "od.xml"
-#define XDD_SCHEMA_FILE "xddschema/Powerlink_Main.xsd"
-#define PROJECT_SCHEMA_FILE "OC_ProjectFile/openCONFIGURATOR.xsd"
-#define TXT2CDC_FILE "txt2cdc"
+const string LibraryConfiguration::kDefaultLibResourcePath = "resources";
+const string LibraryConfiguration::kLibResourcePathEnvVar = "OPENCONFIGURATOR_LIBRARY_RESOURCEPATH";
+const string LibraryConfiguration::kRelXDDSchemaPath = "xddschema/Powerlink_Main.xsd";
+const string LibraryConfiguration::kRelProjectFileSchemaPath = "OC_ProjectFile/openCONFIGURATOR.xsd";
+const string LibraryConfiguration::kTxt2CdcFile = "txt2cdc";
+const string LibraryConfiguration::kObjectDictionaryFile = "od.xml";
 
-LibraryConfiguration* LibraryConfiguration::instance = NULL;
-
-LibraryConfiguration::LibraryConfiguration(void)
-{
-	libResourcePath = "./resources";
-	this->InitFilePaths();
-}
-
-LibraryConfiguration::~LibraryConfiguration(void)
-{
-	delete LibraryConfiguration::instance;
-	LibraryConfiguration::instance = NULL;
-}
-
-LibraryConfiguration* LibraryConfiguration::GetInstance(void)
-{
-	if (LibraryConfiguration::instance == NULL)
-	{
-		instance = new LibraryConfiguration();
-	}
-	return instance;
-}
+string LibraryConfiguration::libResourcePath;
 
 const string& LibraryConfiguration::GetLibResourcePath()
-{
-	return this->libResourcePath;
+{	
+	if (LibraryConfiguration::libResourcePath.empty())
+	{
+		const char* libResourcePathEnvVar = std::getenv(kLibResourcePathEnvVar.c_str());
+		if (libResourcePathEnvVar) 
+			LibraryConfiguration::libResourcePath = libResourcePathEnvVar;
+		else
+			LibraryConfiguration::libResourcePath = kDefaultLibResourcePath;
+#ifndef NDEBUG
+		cout << "Library resource path evaluated to: " << LibraryConfiguration::libResourcePath << endl;
+#endif
+	}	
+	return LibraryConfiguration::libResourcePath;
 }
 
-void LibraryConfiguration::SetLibResourcePath(const string& libResourcePath)
+const string LibraryConfiguration::GetObjectDictinaryFilePath(void)
 {
-	this->libResourcePath = libResourcePath;
+	return string(LibraryConfiguration::GetLibResourcePath()
+		+ kPathSeparator 
+		+ kObjectDictionaryFile);
 }
 
-bool LibraryConfiguration::Initialize(const string& libResourcePath)
+const string LibraryConfiguration::GetXddSchemaFilePath(void)
 {
-	GetInstance()->SetLibResourcePath(libResourcePath);
-	GetInstance()->InitFilePaths();
-
-	return true;
-
+	return string(LibraryConfiguration::GetLibResourcePath()
+		+ kPathSeparator 
+		+ kRelXDDSchemaPath);
 }
 
-const string& LibraryConfiguration::GetObjectDictinaryFilePath(void)
+const string LibraryConfiguration::GetProjectFileSchemaFilePath(void)
 {
-	return this->objectDictinaryFilePath;
+	return string(LibraryConfiguration::GetLibResourcePath()
+		+ kPathSeparator 
+		+ kRelProjectFileSchemaPath);
 }
 
-const string& LibraryConfiguration::GetXddSchemaFilePath(void)
+const string LibraryConfiguration::GetTxt2CdcFilePath(void)
 {
-	return this->xddSchemaFilePath;
-}
+	string path(LibraryConfiguration::GetLibResourcePath()
+		+ kPathSeparator 
+		+ kTxt2CdcFile);
 
-const string& LibraryConfiguration::GetProjectFileSchemaFilePath(void)
-{
-	return this->projectFileSchemaFilePath;
-}
-
-const string& LibraryConfiguration::GetTxt2CdcFilePath(void)
-{
-	return this->txt2CdcFilePath;
-}
-
-bool LibraryConfiguration::stringCompare(const string & l, const string & r)                                                                                   
-{                                                                                                                                    
-   return (l==r);                                                                                                                         
-}
-
-void LibraryConfiguration::InitFilePaths(void)
-{
-	this->objectDictinaryFilePath = libResourcePath + PATH_SEPARATOR + OBJECT_DICTIONARY_FILE;
-	this->xddSchemaFilePath = libResourcePath + PATH_SEPARATOR + XDD_SCHEMA_FILE;
-	this->projectFileSchemaFilePath = libResourcePath + PATH_SEPARATOR + PROJECT_SCHEMA_FILE;
-	this->txt2CdcFilePath = libResourcePath + PATH_SEPARATOR + TXT2CDC_FILE;
+#if defined(_WIN32) && defined(_MSC_VER)
+		return (path + ".exe");
+#else
+		return path;
+#endif
 }

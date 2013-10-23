@@ -67,7 +67,6 @@ class DLLEXPORT ocfmRetCode : public exception
 public:
 	ocfmRetCode(void);
 	ocfmRetCode(ConfiguratorError errorCode);
-	ocfmRetCode(const ocfmRetCode& origin);
 	~ocfmRetCode(void) throw ();
 
 	/**

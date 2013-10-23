@@ -61,7 +61,10 @@
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
 #include "../Include/Logging.h"
+#include "../Include/BoostShared.h"
+
 #include <sstream>
+
 
 using namespace std;
 //==========================================================================//
@@ -454,6 +457,9 @@ void BaseIndex::SaveChanges(char* idxIdStr, char* nameStr)
 	name = nameStr;
 }
 
+// FIXME:
+// 1. This method will never return false (fix all calls)
+// 2. This method should return ocfmRetCode (or a refactored version)
 bool BaseIndex::IsIndexValueValid(const char* hexValue)
 {
 	ULONG value;
@@ -499,11 +505,11 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 				retFlag = true;
 			}
 			else
-			{				
+			{
 				errorString << "The entered value("<<hexValue<<") is less than the lower limit("<<this->lowLimit<<")";
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(errorString.str());
-				LOG_FATAL() << "Error: " << errorString.str();
+				LOG_FATAL() << errorString.str();
 				throw objException;
 				//bFlag = false;
 				//return bFlag;
@@ -536,7 +542,7 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 				errorString<<"The entered value("<<hexValue<<") is greater than the upper limit("<<this->highLimit<<")";
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(errorString.str());
-				LOG_FATAL() << "Error: " << errorString.str();
+				LOG_FATAL() << errorString.str();
 				throw objException;
 				//bFlag = false;
 			}
@@ -577,6 +583,17 @@ void BaseIndex::DeleteAllMemberMemory()
 	if(uniqueIdRef != NULL)
 		delete[] uniqueIdRef;
 }
+
+UINT32 BaseIndex::GetIndex() const
+{
+	UINT32 index = 0;
+	std::stringstream convert;
+
+	convert << std::hex << this->indexId;
+	convert >> index;
+	return index;
+}
+
 #ifndef __GNUC__
 #pragma endregion MemberFunctions
 #endif

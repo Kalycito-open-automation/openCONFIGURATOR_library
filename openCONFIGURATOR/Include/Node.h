@@ -63,6 +63,8 @@
 #include "ProcessImage.h"
 #include "NetworkManagement.h"
 
+#include "BoostShared.h"
+
 /**
  ******************************************************************************************************
  \class			Node
@@ -212,39 +214,6 @@ class Node
 
 		/*****************************************************************************/
 		/**
-		 \brief		This function shall be used to create an IndexCollection object for the node
-		 
-		 \return	void
-		 */
-		/*****************************************************************************/
-		void CreateIndexCollection();
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to create a new DataTypeCollection object
-		 
-		 \return	void
-		 */
-		/*****************************************************************************/
-		void CreateDataTypeCollection();
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to create a new ApplicationProcess object
-		 
-		 \return	void
-		 */
-		/*****************************************************************************/
-		void CreateApplicationProcess();
-		/*****************************************************************************/
-		/**
-		 \brief		This function shall be used to create a new NetworkManagement object
-		 
-		 \return	void
-		 */
-		/*****************************************************************************/
-		void CreateNetworkManagement();
-
-		/*****************************************************************************/
-		/**
 		 \brief		This function shall be used to add a ProcessImage object to the collection list 
 		 
 		 \param		piObj  Class variable of ProcessImage to hold the object
@@ -371,7 +340,7 @@ class Node
 		 \return	ocfmRetCode		ConfiguratorErrors
 		 */
 		/*****************************************************************************/
-		ocfmRetCode SetForcedCycle(char* tempForcedCycleVal);
+		ocfmRetCode SetForcedCycle(const char* tempForcedCycleVal);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to reset the force cycle value of the Node
@@ -457,58 +426,69 @@ class Node
 		INT32 GetPReqActPayloadValue();
 		
 		//MN additional properties
-		bool GetTransmitsPRes(void);
+		boost::optional<bool> TransmitsPRes(void);
 		void SetTransmitsPRes(bool transmitsPRes);
 
-		UINT32 GetAsyncSlotTimeout(void);
-		void SetAsyncSlotTimeout(UINT32 asyncSlotTimeout);
-
-		UINT32 GetASndMaxNumber(void);
-		void SetASndMaxNumber(UINT32 aSndMaxNumber);
-
 		//CN additional properties
-		UINT32 GetForcedMultiplexedCycle(void);
-		void SetForcedMultiplexedCycle(UINT32 forcedMultiplexedCycle);
-
-		bool GetAutostartNode(void);
+		boost::optional<bool> GetAutostartNode(void);
 		void SetAutostartNode(bool autostartNode);
 
-		bool GetResetInOperational(void);
+		boost::optional<bool> GetResetInOperational(void);
 		void SetResetInOperational(bool resetInOperational);
 
-		bool GetVerifyAppSwVersion(void);
+		boost::optional<bool> GetVerifyAppSwVersion(void);
 		void SetVerifyAppSwVersion(bool verifyAppSwVersion);
 
-		bool GetAutoAppSwUpdateAllowed(void);
+		boost::optional<bool> GetAutoAppSwUpdateAllowed(void);
 		void SetAutoAppSwUpdateAllowed(bool autoAppSwUpdateAllowed);
 
-		bool GetVerifyDeviceType(void);
+		boost::optional<bool> GetVerifyDeviceType(void);
 		void SetVerifyDeviceType(bool verifyDeviceType);
 
-		bool GetVerifyVendorId(void);
+		boost::optional<bool> GetVerifyVendorId(void);
 		void SetVerifyVendorId(bool verifyVendorId);
 
-		bool GetVerifyRevisionNumber(void);
+		boost::optional<bool> GetVerifyRevisionNumber(void);
 		void SetVerifyRevisionNumber(bool verifyRevisionNumber);
 
-		bool GetVerifyProductCode(void);
+		boost::optional<bool> GetVerifyProductCode(void);
 		void SetVerifyProductCode(bool verifyProductCode);
 
-		bool GetVerifySerialNumber(void);
+		boost::optional<bool> GetVerifySerialNumber(void);
 		void SetVerifySerialNumber(bool verifySerialNumber);
 
-		//Both Node
-		bool GetIsMandatory(void);
+		boost::optional<bool> IsMandatory(void);
 		void SetIsMandatory(bool isMandatory);
 
-		bool GetIsAsyncOnly(void);
+		boost::optional<bool> IsAsyncOnly(void);
 		void SetIsAsyncOnly(bool isAsyncOnly);
 
-		bool GetIsType1Router(void);
+		boost::optional<bool> IsType1Router(void);
 		void SetIsType1Router(bool isType1Router);
 
-		bool GetIsType2Router(void);
+		boost::optional<bool> IsType2Router(void);
 		void SetIsType2Router(bool isType2Router);
+
+		/************************************************************************
+		\brief	Set the actualValue of an index/subIndex in this Nodes' OD to value.
+		\param index 16bit index of the Index.
+		\param subIndex	8bit index of the SubIndex.
+		\param value Value to set.
+		\return The previous actualValue if it existed.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		template<typename T>
+		boost::optional<T> SetActualValue(const UINT32 index, const UINT32 subIndex, const T value);
+
+		/************************************************************************
+		\brief	Get the actualValue of an index/subIndex in this Nodes' OD.
+		\param index 16bit index of the Index.
+		\param subIndex	8bit index of the SubIndex.
+		\return The actualValue of the index/subIndex.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		template<typename T>
+		boost::optional<T> GetActualValue(const UINT32 index, const UINT32 subIndex);
 
 	private:
 		DataTypeCollection *dtCollObj;
@@ -521,35 +501,35 @@ class Node
 		INT32 presActualPayload;
 		INT32 preqActualPayload;
 		bool hasPdoObjects;
+		// FIXME: member is not necessary, since its value can be inferred from 0x1F9B/<nodeId> != 0
 		bool isForcedCycle;
 		//TODO: const char*
 		char* nodeName;
+		// FIXME: member is not necessary, since the forced cycle for this node
+		// can be read from 0x1F9B/<nodeId>
 		char* forcedCycle;
 		char* presTimeOut;
 		StationType stationType;
 		NodeType nodeType;
 
-		//MN additional properties
-		bool transmitsPRes;
-		UINT32 asyncSlotTimeout;
-		UINT32 aSndMaxNumber;
+		// MN 
+		boost::optional<bool> transmitsPRes;
 
-		//CN additional properties
-		UINT32 forcedMultiplexedCycle;
-		bool autostartNode;
-		bool resetInOperational;
-		bool verifyAppSwVersion;
-		bool autoAppSwUpdateAllowed;
-		bool verifyDeviceType;
-		bool verifyVendorId;
-		bool verifyRevisionNumber;
-		bool verifyProductCode;
-		bool verifySerialNumber;
+		// CN 
+		boost::optional<bool> isMandatory;
+		boost::optional<bool> autostartNode;
+		boost::optional<bool> resetInOperational;
+		boost::optional<bool> verifyAppSwVersion;
+		boost::optional<bool> autoAppSwUpdateAllowed;
+		boost::optional<bool> verifyDeviceType;
+		boost::optional<bool> verifyVendorId;
+		boost::optional<bool> verifyRevisionNumber;
+		boost::optional<bool> verifyProductCode;
+		boost::optional<bool> verifySerialNumber;
 		
-		//Both Node
-		bool isMandatory;
-		bool isAsyncOnly;
-		bool isType1Router;
-		bool isType2Router;
+		// MN & CN		
+		boost::optional<bool> isAsyncOnly;
+		boost::optional<bool> isType1Router;
+		boost::optional<bool> isType2Router;
 };
 #endif // Node_h

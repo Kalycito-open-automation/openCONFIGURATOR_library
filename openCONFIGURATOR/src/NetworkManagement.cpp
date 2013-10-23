@@ -143,28 +143,18 @@ void NetworkManagement::CalculateMaxPDOCount()
 	char* featureName = new char[20];
 	maxPDOCount = 0;		
 	ocfmRetCode ex;
-	if ((NULL == tpdoChannelValue) || (NULL == featureName))
+
+	strcpy(featureName, "PDOTPDOChannels");
+	strcpy(tpdoChannelValue,
+		GetNwMgmtFeatureValue(MN_FEATURES, featureName));
+	maxPDOCount = atoi((char*) tpdoChannelValue);
+	//check is made for validating the value in MN xdd
+	//Min value = 0; Maxvalue = 256 (EPSG specification)
+	if (maxPDOCount > 256)
 	{
-		string errorString("Local variable 'tpdoChannelValue', 'featureName' must not be NULL.");
-		LOG_FATAL() << errorString;
-		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-		ex.setErrorString(errorString);
+		ex.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+		LOG_FATAL() << ex.getErrorString();
 		throw ex;
-	}
-	else
-	{
-		strcpy(featureName, "PDOTPDOChannels");
-		strcpy(tpdoChannelValue,
-				GetNwMgmtFeatureValue(MN_FEATURES, featureName));
-		maxPDOCount = atoi((char*) tpdoChannelValue);
-		//check is made for validating the value in MN xdd
-		//Min value = 0; Maxvalue = 256 (EPSG specification)
-		if (maxPDOCount > 256)
-		{
-			ex.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
-			LOG_FATAL() << "Error: " << ex.getErrorString();
-			throw ex;
-		}
 	}
 	delete[] tpdoChannelValue;
 	delete[] featureName;

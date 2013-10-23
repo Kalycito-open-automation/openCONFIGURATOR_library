@@ -1,140 +1,92 @@
+/************************************************************************
+\file ImportExportApi.cpp
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+************************************************************************/
+
 #include "../Include/ImportExportApi.h"
 #include "../Include/Internal.h"
 #include "../Include/ProjectConfiguration.h"
+#include "../Include/BoostShared.h"
+
 #include <sstream>
+
 using namespace std;
 
-DLLEXPORT ocfmRetCode GenerateProcessImageDescription(const OutputLanguage lang, const string outputPath, const string fileName)
+namespace openCONFIGURATOR 
 {
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
+	namespace Library
 	{
-		ostringstream outputFile;
-		//Prepare output path
-		if (!outputPath.empty())
+		namespace API
 		{
-			//Path not empty
-			if (outputPath.find_first_of(".") == 1)
-			{
-				//Path relative
-				outputFile << ProjectConfiguration::GetInstance()->GetProjectPath();
-				outputFile << PATH_SEPARATOR;
-				outputFile << outputPath;
-			}
-			else
-			{
-				//Path absolute
-				outputFile << outputPath;
-			}
-		}
-		else if (!ProjectConfiguration::GetInstance()->GetDefaultOutputPath().empty())
-		{
-			//Default output path not empty
-			if (ProjectConfiguration::GetInstance()->GetDefaultOutputPath().find_first_of(".") == 1)
-			{
-				//Path relative
-				outputFile << ProjectConfiguration::GetInstance()->GetProjectPath();
-				outputFile << PATH_SEPARATOR;
-				outputFile << ProjectConfiguration::GetInstance()->GetDefaultOutputPath();
-			}
-			else
-			{
-				//Path absolute
-				outputFile << ProjectConfiguration::GetInstance()->GetDefaultOutputPath();
-			}
-		}
-		else
-		{
-			return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
-		}
 
-		//Prepare output file name
-		if (!fileName.empty())
-		{
-			outputFile << PATH_SEPARATOR;
-			outputFile << fileName.substr(0, fileName.find_last_of("."));
-		}
-		else if (!ProjectConfiguration::GetInstance()->GetDefaultOutputPath().empty())
-		{
-			outputFile << PATH_SEPARATOR;
-			outputFile << "PI";
-		}
+			const string kDefaultProcessImageFileName = "PI";
+			const string kDefaultStackConfigFileName = "mnobd";
 
-		switch (lang)
-		{
-		case C:
-			return GenerateXAP(outputFile.str().c_str());
-			break;
-		case CSHARP:
-			return GenerateNET(outputFile.str().c_str());
-			break;
-		case XML:
-			return GenerateXAP(outputFile.str().c_str());
-			break;
-		default:
-			return ocfmRetCode(OCFM_ERR_UNKNOWN);
-			break;
+			static boost::filesystem::path getAbsOutputPath(string path)
+			{
+				boost::filesystem::path absOutputPath(path);
+				if (path.empty() && !ProjectConfiguration::GetInstance().GetDefaultOutputPath().empty())
+				{
+					boost::filesystem::path absDefaultOutputPath(ProjectConfiguration::GetInstance().GetDefaultOutputPath());
+					if (absDefaultOutputPath.is_relative())
+					{
+						absDefaultOutputPath = ProjectConfiguration::GetInstance().GetProjectPath();
+						absDefaultOutputPath.append(
+							ProjectConfiguration::GetInstance().GetDefaultOutputPath().begin(),
+							ProjectConfiguration::GetInstance().GetDefaultOutputPath().end());
+					}
+					absOutputPath = absDefaultOutputPath;
+				}
+				return absOutputPath;
+			}
+
+			DLLEXPORT ocfmRetCode GenerateProcessImageDescription(const OutputLanguage lang, const string outputPath, const string fileName)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
+					if (absOutputPath.empty())		
+						return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
+
+					string fallbackFileName = (fileName.empty())
+						? kDefaultProcessImageFileName
+						: fileName.substr(0, fileName.find_last_of("."));
+					absOutputPath.append(fallbackFileName.begin(), fallbackFileName.end());
+
+					switch (lang)
+					{
+						case C:
+							return GenerateXAP(absOutputPath.generic_string().c_str());
+						case CSHARP:
+							return GenerateNET(absOutputPath.generic_string().c_str());
+						case XML:
+							return GenerateXAP(absOutputPath.generic_string().c_str());
+						default:
+							return ocfmRetCode(OCFM_ERR_UNKNOWN);
+							break;
+					}
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
+			DLLEXPORT ocfmRetCode GenerateStackConfiguration(const string outputPath, const string fileName)
+			{
+				if (ProjectConfiguration::GetInstance().IsInitialized())
+				{
+					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
+					if (absOutputPath.empty())		
+						return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
+
+					string fallbackFileName = (fileName.empty())
+						? kDefaultStackConfigFileName
+						: fileName.substr(0, fileName.find_last_of("."));
+					absOutputPath.append(fallbackFileName.begin(), fallbackFileName.end());
+					return GenerateCDC(absOutputPath.generic_string().c_str(), ProjectConfiguration::GetInstance());
+				}
+				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+			}
+
 		}
 	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
-}
-
-DLLEXPORT ocfmRetCode GenerateStackConfiguration(const string outputPath, const string fileName)
-{
-	if (ProjectConfiguration::GetInstance()->GetProjectLoaded())
-	{
-		ocfmRetCode retValue(OCFM_ERR_SUCCESS);
-		ostringstream outputFile;
-		//Prepare output path
-		if (!outputPath.empty())
-		{
-			//Path not empty
-			if (outputPath.find_first_of(".") == 1)
-			{
-				//Path relative
-				outputFile << ProjectConfiguration::GetInstance()->GetProjectPath();
-				outputFile << PATH_SEPARATOR;
-				outputFile << outputPath;
-			}
-			else
-			{
-				//Path absolute
-				outputFile << outputPath;
-			}
-		}
-		else if (!ProjectConfiguration::GetInstance()->GetDefaultOutputPath().empty())
-		{
-			//Default output path not empty
-			if (ProjectConfiguration::GetInstance()->GetDefaultOutputPath().find_first_of(".") == 1)
-			{
-				//Path relative
-				outputFile << ProjectConfiguration::GetInstance()->GetProjectPath();
-				outputFile << PATH_SEPARATOR;
-				outputFile << ProjectConfiguration::GetInstance()->GetDefaultOutputPath();
-			}
-			else
-			{
-				//Path absolute
-				outputFile << ProjectConfiguration::GetInstance()->GetDefaultOutputPath();
-			}
-		}
-		else
-		{
-			return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
-		}
-
-		if (!fileName.empty())
-		{
-			outputFile << PATH_SEPARATOR;
-			outputFile << fileName.substr(0, fileName.find_last_of("."));
-		}
-		else if (!ProjectConfiguration::GetInstance()->GetDefaultOutputPath().empty())
-		{
-			outputFile << PATH_SEPARATOR;
-			outputFile << "mnobd";
-		}
-		return GenerateCDC(outputFile.str().c_str(), *ProjectConfiguration::GetInstance());
-
-	}
-	return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
 }
 

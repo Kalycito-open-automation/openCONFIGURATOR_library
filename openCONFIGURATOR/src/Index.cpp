@@ -55,8 +55,12 @@
 /* Includes */
 
 #include <stdio.h>
+#include <sstream>
+
 #include "../Include/Index.h"
 #include "../Include/Internal.h"
+#include "../Include/Logging.h"
+#include "../Include/BoostShared.h"
 
 //==========================================================================//
 // 				F U N C T I O N  D E C L A R A T I O N S 					//
@@ -123,7 +127,7 @@ INT32 Index::GetNumberofSubIndexes()
 	return subIndexCollection.size();
 }
 
-SubIndex* Index::GetSubIndex(INT32 subIndexPosition)
+SubIndex* Index::GetSubIndexByPosition(INT32 subIndexPosition)
 {
 	return &subIndexCollection[subIndexPosition];
 }
@@ -191,6 +195,51 @@ void Index::UpdateArraySubObjects()
 	}
 	objSidx = NULL;
 }
+
+bool Index::HasSubIndices() const
+{
+	return (!this->subIndexCollection.empty());
+}
+
+bool Index::operator== (const Index& index) const
+{
+	return (index.GetIndex() == this->GetIndex());
+}
+
+bool Index::ContainsSubIndex(const UINT32 subIndex)
+{
+	return (this->GetSubIndexPtr(subIndex) != NULL);
+}
+
+SubIndex* Index::GetSubIndexPtr(const UINT32 subIndex)
+{
+	vector<SubIndex>::iterator it = this->subIndexCollection.begin();
+	for (;
+		it != this->subIndexCollection.end() && (it->GetIndex() != subIndex);
+		++it)
+	{}
+	if (it == this->subIndexCollection.end())
+		return NULL;
+	else
+		return &(*it);
+}
+
+SubIndex& Index::GetSubIndexRef(const UINT32 subIndex)
+{
+	SubIndex* subIndexPtr = this->GetSubIndexPtr(subIndex);
+	if (subIndexPtr)
+		return *subIndexPtr;
+	else
+	{
+		boost::format formatter("SubIndex %#x/%#x does not exist in OD.");
+		formatter % this->GetIndex() % subIndex;
+		ocfmRetCode result(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+		result.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw result;
+	}
+}
+
 #ifndef __GNUC__
 #pragma endregion MemberFunctions
 #endif

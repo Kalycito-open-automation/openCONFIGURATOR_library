@@ -95,6 +95,7 @@ class BaseIndex
 		 \brief		This function shall be used to return the Index ID
 		 
 		 \return	const char*
+		 \deprecated Method will be removed. Use GetIndex() instead.
 		 */
 		/*****************************************************************************/
 		const char* GetIndexValue();
@@ -395,6 +396,14 @@ class BaseIndex
 		 \return	void			
 		 */
 		void DeleteAllMemberMemory();
+
+		/************************************************************************
+		\return The index of this object.<br/>
+				16bit wide for instances of Index, 8bits wide for instances of SubIndex.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		UINT32 GetIndex() const;
+
 	protected:
 		const char* name;				/**< Name of the object */
 		const char* indexId;			/**< IndexId of the object */

@@ -14,6 +14,8 @@
 #include <string>
 #include <iostream>
 
+#pragma warning(push, 0) // Store current warning state and set global warning level 0
+
 #include "boost/log/utility/setup/from_stream.hpp"
 #include "boost/log/utility/setup/from_settings.hpp"
 #include "boost/log/utility/setup/settings.hpp"
@@ -26,7 +28,11 @@
 #include "boost/bind.hpp"
 #include "boost/optional.hpp"
 
+#pragma warning(pop) // Restore previous warning state
+#pragma warning (disable:4503 4714) // Boost-Headers themselves disable this warning, reinstate
+
 #include "../Include/Constants.h"
+#include "../Include/LibraryConfiguration.h"
 
 namespace logging = boost::log;
 
@@ -150,10 +156,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,	DWORD fdwReason, LPVOID lpReserved)
 			}
 
 			// Read settings from settings file into file object
-			std::ifstream file("boost_log_settings.ini");
+			std::string libResourcePath = LibraryConfiguration::GetLibResourcePath() + kPathSeparator + "boost_log_settings.ini";
+			std::ifstream file(libResourcePath);
 			if (file.fail())
 			{
-				std::cerr << "Error loading Boost.Log settings file 'boost_log_settings.ini'." << std::endl;
+				std::cerr << "Error loading Boost.Log settings file '" << libResourcePath << "'." << std::endl;
 				return false;
 			}
 

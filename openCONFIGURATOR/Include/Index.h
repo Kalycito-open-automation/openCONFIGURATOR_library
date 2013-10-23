@@ -157,7 +157,7 @@ class Index: public BaseIndex
 		 \return	SubIndex*
 		 */
 		/*****************************************************************************/
-		SubIndex* GetSubIndex(INT32 subIndexPosition);
+		SubIndex* GetSubIndexByPosition(INT32 subIndexPosition);
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return the SubIndex object(whose subIndexId value matches the given parameter) from the collection list
@@ -168,6 +168,54 @@ class Index: public BaseIndex
 		 */
 		/*****************************************************************************/
 		SubIndex* GetSubIndexbyIndexValue(const char* subIndexId);
+
+		/************************************************************************
+		\return true if this Index has subIndices, false otherwise.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		bool HasSubIndices() const;
+
+		/************************************************************************
+		\brief Equality operator.
+		
+		\param index Index for comparison.
+		
+		\return true if this instances' index is numerically equal to the index of the argument.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		bool operator== (const Index& index) const;
+
+		/************************************************************************
+		\brief Query if this Index contains a SubIndex with the given index.
+		
+		\param subIndex 8bit index of the SubIndex to query.		
+		
+		\return true if a SubIndex with the given index exists, false otherwise.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		bool ContainsSubIndex(const UINT32 subIndex);
+
+		/************************************************************************
+		\brief Gets a pointer to a SubIndex by its index.
+		
+		\param subIndex	8bit index of the SubIndex.
+		
+		\return Pointer to the SubIndex-Object or NULL if not found.
+		\note The returned pointer will possibly be invalidated by adding/removing SubIndex-Objects after obtaining it.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		SubIndex* GetSubIndexPtr(const UINT32 subIndex);
+
+		/************************************************************************
+		\brief Gets a reference to a SubIndex by its index.
+		
+		\param subIndex	8bit index of the SubIndex.
+		
+		\return Reference to the SubIndex-Object.
+		\note The returned reference will possibly be invalidated by adding/removing SubIndex-Objects after obtaining it.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		SubIndex& GetSubIndexRef(const UINT32 subIndex);
 
 	private:
 		PDOType pdoType;

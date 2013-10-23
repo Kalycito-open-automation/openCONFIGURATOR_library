@@ -64,8 +64,11 @@
 #include "../Include/Internal.h"
 #include "../Include/ProcessImage.h"
 #include "../Include/Logging.h"
+#include "../Include/Result.h"
+#include "../Include/BoostShared.h"
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -73,12 +76,14 @@ using namespace std;
 
 char* ConvertToUpper(char* str)
 {
-	if (NULL == str)
+	if (!str)
 	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'str' must not be NULL.";
-		throw objException;
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'str'";
+		ocfmRetCode exceptionObj(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw exceptionObj;
 	}
 	UINT32 loopCount = 0;
 
@@ -91,12 +96,14 @@ char* ConvertToUpper(char* str)
 
 char* Reverse(char* str)
 {
-	if (NULL == str)
+	if (!str)
 	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'str', must not be NULL.";
-		throw objException;
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'str'";
+		ocfmRetCode exceptionObj(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw exceptionObj;
 	}
 	char* charLeft = str;
 	char* charRight = charLeft + strlen(str) - 1;
@@ -113,12 +120,14 @@ char* Reverse(char* str)
 
 char* PadLeft(char* str, char padChar, INT32 padLength)
 {
-	if (NULL == str)
+	if (!str)
 	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'str', must not be NULL.";
-		throw objException;
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'str'";
+		ocfmRetCode exceptionObj(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw exceptionObj;
 	}
 
 	INT32 iStringLen = strlen(str);
@@ -286,15 +295,6 @@ char* ConvertStringToHex(char* srcStr)
 	srcStrLen = strlen(srcStr);
 	char* tempSrcStr = new char[srcStrLen + 1];
 	char* tempHexStr = new char[(srcStrLen * 2) + 1];
-	if ((NULL == tempSrcStr) || (NULL == tempHexStr))
-	{
-		string errorString("Local variable 'tempSrcStr', 'tempHexStr' must not be NULL.");
-		LOG_FATAL() << errorString;
-		ocfmRetCode ex;
-		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-		ex.setErrorString(errorString);
-		throw ex;
-	}
 	strcpy(tempSrcStr, (char*) srcStr);
 	strcpy(srcStr, "");
 	for (INT32 iloopCntr = 0; iloopCntr < srcStrLen; iloopCntr++)
@@ -624,7 +624,7 @@ bool CheckToolVersion(char* currentToolVersion)
 }
 
 template <typename T>
-string IntToHex(const T number, const unsigned int padLength, const string& prefix, const string& suffix)
+string openCONFIGURATOR::Library::Utilities::IntToHex(const T number, const unsigned int padLength, const string& prefix, const string& suffix)
 {
 	ostringstream hexStream;
 	hexStream << std::setfill ('0')
@@ -637,6 +637,21 @@ string IntToHex(const T number, const unsigned int padLength, const string& pref
 }
 
 // Explicit instantiation of the template for required types
-template string IntToHex<unsigned short>(const unsigned short number, const unsigned int padLength, const string& prefix, const string& suffix);
-template string IntToHex<unsigned int>(const unsigned int number, const unsigned int padLength, const string& prefix, const string& suffix);
-template string IntToHex<unsigned long>(const unsigned long number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned short>(const unsigned short number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned int>(const unsigned int number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned long>(const unsigned long number, const unsigned int padLength, const string& prefix, const string& suffix);
+
+template <typename T>
+T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
+{
+	stringstream stream;
+	T number = 0;
+	stream << std::hex << hexString;
+	stream >> number;
+	return number;
+}
+
+// Explicit instantiation of the template for required types
+template unsigned short openCONFIGURATOR::Library::Utilities::HexToInt<unsigned short>(const string& hexString);
+template unsigned int openCONFIGURATOR::Library::Utilities::HexToInt<unsigned int>(const string& hexString);
+template unsigned long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long>(const string& hexString);

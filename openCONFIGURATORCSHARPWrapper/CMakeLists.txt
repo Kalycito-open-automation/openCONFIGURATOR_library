@@ -54,7 +54,11 @@ PROJECT (OPENCONFIGURATOR_CSHARPWRAPPER)
 ###############################################################################
 # Ensure SWIG installation
 ###############################################################################
-FIND_PACKAGE(SWIG REQUIRED)
+FIND_PACKAGE(SWIG)
+IF(NOT SWIG_FOUND)		
+	MESSAGE(SEND_ERROR "SWIG not found. Add its directory to your Path-Variable or set SWIG_EXECUTABLE to point to swig.exe.")
+	MESSAGE(FATAL_ERROR "Your Path-Variable: $ENV{Path}")
+ENDIF()
 INCLUDE(${SWIG_USE_FILE})
 
 ###############################################################################
@@ -90,6 +94,6 @@ SWIG_LINK_LIBRARIES(openCONFIGURATORcsharpWRAPPER openCONFIGURATOR)
 ###############################################################################
 INSTALL(
 	TARGETS openCONFIGURATORcsharpWRAPPER
-	ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/bin
-	LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/bin
+	ARCHIVE DESTINATION ${INSTALL_DIR}
+	LIBRARY DESTINATION ${INSTALL_DIR}
 )

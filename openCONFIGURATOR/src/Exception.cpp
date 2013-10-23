@@ -61,20 +61,12 @@
 //==========================================================================//
 
 ocfmRetCode::ocfmRetCode(void)
-{
-	this->setErrorCode(OCFM_ERR_SUCCESS);
-}
+	: errorString(), code(OCFM_ERR_SUCCESS)
+{}
 
 ocfmRetCode::ocfmRetCode(ConfiguratorError errorCode)
-{
-	this->setErrorCode(errorCode);
-}
-
-ocfmRetCode::ocfmRetCode(const ocfmRetCode& origin)
-{
-	this->code = origin.code;
-	this->errorString = origin.getErrorString();
-}
+	: errorString(), code(errorCode)
+{}
 
 ocfmRetCode::~ocfmRetCode(void) throw ()
 {

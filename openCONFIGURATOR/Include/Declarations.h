@@ -116,7 +116,7 @@ ocfmRetCode GenerateXAP(const char* xapFilePath);
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
-ocfmRetCode GenerateCDC(const char* cdcPath, ProjectConfiguration& projectConfiguration);
+ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& projectConfiguration);
 
 /**
  \brief		This API shall be used to generate the process image variables in a C# .NET usable format
@@ -255,6 +255,7 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, const ch
  \param[out]	idxPos			Integer pointer to the IndexPos
 
  \return		ocfmRetCode		ConfiguratorErrors
+ \deprecated	Use IndexCollection::ContainsIndex(const UINT32 index) of the respective Node to query for Index-existence.
  */
 ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId, INT32 *idxPos);
 
@@ -306,6 +307,7 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, const char* i
  \param[out]	outNodeCount	Integer pointer to NodeCount
 
  \return		ocfmRetCode		ConfiguratorErrors
+ \deprecated	Use NodeCollection::GetNumberOfNodes() instead.
  */
  ocfmRetCode GetNodeCount(UINT32* outNodeCount);
 

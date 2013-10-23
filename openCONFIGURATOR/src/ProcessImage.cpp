@@ -59,11 +59,16 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+
 #include "../Include/Internal.h"
 #include "../Include/Exception.h"
 #include "../Include/ProcessImage.h"
 #include "../Include/NodeCollection.h"
 #include "../Include/Logging.h"
+#include "../Include/Result.h"
+#include "../Include/BoostShared.h"
+
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 /****************************************************************************************************/
 /* Defines */
@@ -401,9 +406,11 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 
 	if (NULL == (xapFile = fopen(xapFileName, "w+ ")))
 	{
-
+		boost::format formatter(kMsgFileReadFailed);
+		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -418,8 +425,11 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	UINT32 uiStrLength = strlen(varComment);
 	if ((uiStrLength != fwrite(varComment, sizeof(char), uiStrLength, xapFile)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] varComment;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -429,16 +439,6 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	//write include guard for the headerfile
 	char* xapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_CHECK)
 			+ strlen(INCLUDE_GUARD_START) + ALLOC_BUFFER];
-	if (NULL == xapHeaderIncludeGuard)
-	{
-		string errorString("Local variable 'xapHeaderIncludeGuard' must not be NULL.");
-		LOG_FATAL() << errorString;
-		ex.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-		ex.setErrorString(errorString);
-		delete[] xapFileName;
-		fclose(xapFile);
-		throw ex;
-	}
 	strcpy(xapHeaderIncludeGuard, INCLUDE_GUARD_CHECK);
 	strcat(xapHeaderIncludeGuard, "\n");
 	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_START);
@@ -448,8 +448,11 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	if ((uiStrLength
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] xapHeaderIncludeGuard;
 		delete[] xapFileName;
 		fclose(xapFile);
@@ -468,8 +471,11 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	/* write Output structure */
 	if (NULL == (xapFile = fopen(xapFileName, "a+")))
 	{
+		boost::format formatter(kMsgFileReadFailed);
+		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] xapFileName;
 		throw ex;
 	}
@@ -488,8 +494,11 @@ void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
 	if ((uiStrLength
 			!= fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] xapHeaderIncludeGuard;
 		fclose(xapFile);
 		throw ex;
@@ -640,9 +649,11 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBufferLen
 			!= fwrite(tempBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
-
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % "C/C++ Header";
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] mainBuffer;
 		delete[] tempBuffer;
 		throw ex;
@@ -654,8 +665,11 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBufferLen
 			!= fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % "C/C++ Header";
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] mainBuffer;
 		throw ex;
 	}
@@ -674,8 +688,11 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 	/* write Input structure */
 	if (NULL == (netFile = fopen(netFileName, "w+")))
 	{
+		boost::format formatter(kMsgFileReadFailed);
+		formatter % netFileName;
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] netFileName;
 		throw ex;
 	}
@@ -711,8 +728,11 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 
 		if ((mainBufLen != fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
 		{
+			boost::format formatter(kMsgFileWriteFailed);
+			formatter % netFileName;
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-			LOG_FATAL() << "Error: " << ex.getErrorString();
+			ex.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			fclose(netFile);
 			delete[] mainBuffer;
 			throw ex;
@@ -737,8 +757,11 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 
 		if ((tempBufLen != fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
 		{
+			boost::format formatter(kMsgFileWriteFailed);
+			formatter % netFileName;
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-			LOG_FATAL() << "Error: " << ex.getErrorString();
+			ex.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			fclose(netFile);
 			delete[] tempBuffer;
 			throw ex;
@@ -835,8 +858,11 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBuf1Len
 			!= fwrite(tempBuffer1, sizeof(char), tempBuf1Len, netHeader)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % ".NET Header";
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] mainBuffer;
 		delete[] tempBuffer1;
 		delete[] tempBuffer2;
@@ -848,8 +874,11 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 	if ((tempBuf1Len != fwrite(mainBuffer, sizeof(char), tempBuf1Len, netHeader)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % ".NET Header";
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] tempBuffer2;
 		delete[] mainBuffer;
 		throw ex;
@@ -861,8 +890,11 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	if ((tempBuf1Len
 			!= fwrite(tempBuffer2, sizeof(char), tempBuf1Len, netHeader)))
 	{
+		boost::format formatter(kMsgFileWriteFailed);
+		formatter % ".NET Header";
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		ex.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] tempBuffer2;
 		throw ex;
 	}
@@ -1075,10 +1107,12 @@ void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId)
 {
 	if ((NULL == objDataType) || (NULL == idxId) || (NULL == sIdxId))
 	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'objDataType', 'idxId', 'sIdxId' must not be NULL.";
-		throw objException;
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'objDataType', 'idxId', 'sIdxId'";
+		ocfmRetCode exceptionObj(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw exceptionObj;
 	}
 
 	NodeCollection *nodeCollObj = NULL;
@@ -1142,7 +1176,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 			stRetCode = AddSubIndex(MN_NODEID, MN, indexId, (char*) "00");
 			if (OCFM_ERR_SUCCESS != stRetCode.getErrorCode())
 			{
-				LOG_FATAL() << "Error: " << stRetCode.getErrorString();
+				LOG_FATAL() << stRetCode.getErrorString();
 				throw stRetCode;
 			}
 		}

@@ -57,6 +57,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <algorithm>
+#include <cassert>
 #include <libxml/xmlreader.h>
 #include <libxml/parser.h>
 #include <libxml/xmlschemas.h>
@@ -69,6 +70,10 @@
 #include "../Include/NodeCollection.h"
 #include "../Include/Logging.h"
 #include "../Include/LibraryConfiguration.h"
+#include "../Include/Result.h"
+#include "../Include/BoostShared.h"
+
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 /*****************************************************************************/
 /* Defines */
@@ -139,10 +144,13 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 	const xmlChar *value = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == indexObj)
+	if (!indexObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'indexObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'indexObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -244,10 +252,13 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 	const xmlChar *value = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == sidxObj)
+	if (!sidxObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'sidxObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'sidxObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -322,10 +333,13 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 	const xmlChar *xcValue = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == dtObj)
+	if (!dtObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'dtObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'dtObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 	dtObj->dataTypeName = NULL;
@@ -346,7 +360,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 		if (1 != iRetVal)
 		{
 			objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-			LOG_FATAL() << "Error: " << objException.getErrorString();
+			LOG_FATAL() << objException.getErrorString();
 			throw objException;
 		}
 		while (XML_READER_TYPE_ELEMENT != xmlTextReaderNodeType(reader))
@@ -355,7 +369,7 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 			if (iRetVal != 1)
 			{
 				objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-				LOG_FATAL() << "Error: " << objException.getErrorString();
+				LOG_FATAL() << objException.getErrorString();
 				throw objException;
 			}
 		}
@@ -434,10 +448,13 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 	const xmlChar *xcValue = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == parameterObj)
+	if (!parameterObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'parameterObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'parameterObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -470,10 +487,13 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	INT32 iRetVal;
 	ocfmRetCode exceptionObj;
 
-	if (NULL == parameterObj)
+	if (!parameterObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'parameterObj'";
 		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'parameterObj' must not be NULL.";
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw exceptionObj;
 	}
 	iRetVal = xmlTextReaderRead(reader);
@@ -481,7 +501,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	if (1 != iRetVal)
 	{
 		exceptionObj.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-		LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
+		LOG_FATAL() << exceptionObj.getErrorString();
 		throw exceptionObj;
 	}
 
@@ -496,7 +516,7 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 		if (1 != iRetVal)
 		{
 			exceptionObj.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-			LOG_FATAL() << "Error: " << exceptionObj.getErrorString();
+			LOG_FATAL() << exceptionObj.getErrorString();
 			throw exceptionObj;
 		}
 
@@ -535,10 +555,13 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	const xmlChar *value = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == cdtObj)
+	if (!cdtObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'cdtObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'cdtObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 	//Retrieve the pxcName and Value of an attribute
@@ -643,10 +666,13 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	const xmlChar *value = NULL;
 	ocfmRetCode objException;
 
-	if (NULL == cdtObj)
+	if (!cdtObj)
 	{
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'cdtObj'";
 		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'cdtObj' must not be NULL.";
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw objException;
 	}
 
@@ -657,7 +683,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	if (1 != retValue)
 	{
 		objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-		LOG_FATAL() << "Error: " << objException.getErrorString();
+		LOG_FATAL() << objException.getErrorString();
 		throw objException;
 	}
 
@@ -676,7 +702,7 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 			if (1 != retValue)
 			{
 				objException.setErrorCode(OCFM_ERR_XML_FILE_CORRUPTED);
-				LOG_FATAL() << "Error: " << objException.getErrorString();
+				LOG_FATAL() << objException.getErrorString();
 				throw objException;
 			}
 		}
@@ -742,37 +768,36 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 
 ocfmRetCode ValidateXDDFile(const char *fileName)
 {
-
 	ocfmRetCode exceptionObject;
-	exceptionObject.setErrorCode(OCFM_ERR_SUCCESS);
 
-	//Begin XDD schema validation
-	xmlDocPtr xdd_file_ptr;
-
-		//File name must not be null
+	//File name must not be null
 	if(fileName != NULL)
 	{
-			//Parse XML
-			xdd_file_ptr = xmlParseFile(fileName);
+		//Parse XML
+		xmlDocPtr xdd_file_ptr = xmlParseFile(fileName);
 
 		if(xdd_file_ptr != NULL)
 		{	
 			//Call Validation Function with the parse file
-			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetInstance()->GetXddSchemaFilePath().c_str());
+			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetXddSchemaFilePath().c_str());
 		}
 		else
 		{
-		exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
+			exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
 		}
 
-			//CleanUp XML Parser
-			xmlCleanupParser();
-			xmlMemoryDump();
-		}
+		//CleanUp XML Parser
+		xmlCleanupParser();
+		xmlMemoryDump();
+	}
 	else
 	{
-		exceptionObject.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		}
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'fileName'";
+		exceptionObject.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+	}
 	if(exceptionObject.getErrorCode() == OCFM_ERR_SCHEMA_VALIDATION_FAILED)
 	{
 		string errorString(exceptionObject.getErrorString());
@@ -780,45 +805,41 @@ ocfmRetCode ValidateXDDFile(const char *fileName)
 		errorString.append("Error occured in file: " + fileNameString);
 		exceptionObject.setErrorString(errorString);
 	}
-
 	return exceptionObject;
-	}
+}
 
 ocfmRetCode ValidateProjectFile(const string& fileName)
 {
-
 	ocfmRetCode exceptionObject;
-	exceptionObject.setErrorCode(OCFM_ERR_SUCCESS);
 
-	//Begin XDD schema validation
-	xmlDocPtr xdd_file_ptr;
-
-		//File name must not be null
+	//File name must not be null
 	if(fileName.c_str() != NULL)
 	{
-			//Parse XML
-			xdd_file_ptr = xmlParseFile(fileName.c_str());
+		//Parse XML
+		xmlDocPtr xdd_file_ptr = xmlParseFile(fileName.c_str());
 
 		if(xdd_file_ptr != NULL)
 		{
 			//Call Validation Function with the parse file
-			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetInstance()->GetProjectFileSchemaFilePath().c_str());
-
+			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetProjectFileSchemaFilePath().c_str());
 		}
 		else
 		{
-		exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
+			exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
 		}
 
-			//CleanUp XML Parser
-			xmlCleanupParser();
-			xmlMemoryDump();
-		}
+		//CleanUp XML Parser
+		xmlCleanupParser();
+		xmlMemoryDump();
+	}
 	else
 	{
-		exceptionObject.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		}
-
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'fileName'";
+		exceptionObject.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+	}
 	return exceptionObject;
 }
 
@@ -855,7 +876,7 @@ ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType)
 
 		/* Copy default value of pdos to act value*/
 		CopyPDODefToAct(nodeId, nodeType);
-		CopyMNPropDefToAct(nodeId, nodeType);
+		//CopyMNPropDefToAct(nodeId, nodeType);
 		CalculateCNPollResponse(nodeId, nodeType);
 		SetCNLossObjects(nodeId, nodeType);
 		exceptionObject.setErrorCode(OCFM_ERR_SUCCESS);
@@ -1077,7 +1098,7 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 				}
 
 				idxCollObj = nodeObj->GetIndexCollection();
-				idxObj = idxCollObj->GetIndex(lastIndexParsed);
+				idxObj = idxCollObj->GetIndexByPosition(lastIndexParsed);
 
 				NormalizeAttributeValue(&sidxObj, DEFAULTVALUE);
 				NormalizeAttributeValue(&sidxObj, ACTUALVALUE);
@@ -1155,14 +1176,17 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 			if (0 != retValue)
 			{
 				objException.setErrorCode(OCFM_ERR_PARSE_XML);
-				LOG_FATAL() << "Error: " << objException.getErrorString();
+				LOG_FATAL() << objException.getErrorString();
 				throw objException;
 			}
 		}
 		else
 		{
+			boost::format formatter(kMsgFileReadFailed);
+			formatter % fileName;
 			objException.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-			LOG_FATAL() << "Error: " << objException.getErrorString();
+			objException.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			throw objException;
 		}
 	}
@@ -1179,24 +1203,9 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 			NodeCollection *nodeCollObj = NULL;
 			NetworkManagement *nmtObj = NULL;
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-			if (NULL == nodeCollObj)
-			{
-				string errorString("Local variable 'nodeCollObj' must not be NULL.");
-				LOG_FATAL() << errorString;
-				objException.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-				objException.setErrorString(errorString);
-				throw objException;
-			}
+			assert(nodeCollObj);
 			nodeObj = nodeCollObj->GetNode(nodeType, nodePos);
 			nmtObj = nodeObj.GetNetworkManagement();
-			if (NULL == nmtObj)
-			{
-				string errorString("Local variable 'nmtObj' must not be NULL.");
-				LOG_FATAL() << errorString;
-				objException.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
-				objException.setErrorString(errorString);
-				throw objException;
-			}
 			nmtObj->CalculateMaxPDOCount();
 			return objException;
 		}
@@ -1255,7 +1264,7 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 			}
 			/* Copy default value of pdos to act value*/
 			CopyPDODefToAct(nodeId, nodeType);
-			CopyMNPropDefToAct(nodeId, nodeType);
+			//CopyMNPropDefToAct(nodeId, nodeType);
 			CalculateCNPollResponse(nodeId, nodeType);
 			SetCNLossObjects(nodeId, nodeType);
 			if (nodeType == MN)
@@ -1267,8 +1276,11 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 		}
 		else
 		{
+			boost::format formatter(kMsgNodeIdInvalid);
+			formatter % nodeId;
 			objException.setErrorCode(OCFM_ERR_INVALID_NODEID);
-			LOG_FATAL() << "Error: " << objException.getErrorString();
+			objException.setErrorString(formatter.str());
+			LOG_FATAL() << objException.getErrorString();
 			throw objException;
 		}
 	}
@@ -1704,10 +1716,13 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			throw objException;
 		}
 
-		if (0 == idxCollObj->GetNumberofIndexes())
+		if (idxCollObj->GetNumberofIndexes() == 0)
 		{
-			LOG_FATAL() << "Index-Collection empty.";
+			boost::format formatter(kMsgObjectDictoryEmpty);
+			formatter % nodeObj.GetNodeId();
 			objException.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
+			objException.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			throw objException;
 		}
 
@@ -1733,7 +1748,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				throw objException;
 			}
 
-			idxObj = idxCollObj->GetIndex(idxLC);
+			idxObj = idxCollObj->GetIndexByPosition(idxLC);
 
 			if (NULL != idxObj->GetIndexValue())
 			{
@@ -1834,7 +1849,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						throw objException;
 					}
 					SubIndex* sidxObj = NULL;
-					sidxObj = idxObj->GetSubIndex(sidxLC);
+					sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
 					if (sidxObj->GetIndexValue() != NULL)
 						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 						               BAD_CAST "subIndex",
@@ -2178,7 +2193,7 @@ void SetFlagForRequiredCNIndexes(INT32 nodeId)
 
 	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
 	{
-		idxObj = idxCollObj->GetIndex(idxLC);
+		idxObj = idxCollObj->GetIndexByPosition(idxLC);
 
 		if ((CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false)
 		        || (strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
@@ -2192,7 +2207,7 @@ void SetFlagForRequiredCNIndexes(INT32 nodeId)
 			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
 			        sidxLC++)
 			{
-				sidxObj = idxObj->GetSubIndex(sidxLC);
+				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
 				if (sidxObj != NULL)
 				{
 					sidxObj->SetFlagIfIncludedCdc(true);
@@ -2218,7 +2233,7 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 
 	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
 	{
-		idxObj = idxCollObj->GetIndex(idxLC);
+		idxObj = idxCollObj->GetIndexByPosition(idxLC);
 
 		if (CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false
 		        || strcmp((char*) idxObj->GetIndexValue(), "1006") == 0
@@ -2240,7 +2255,7 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 			        sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
-				sidxObj = idxObj->GetSubIndex(sidxLC);
+				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
 				sidxObj->SetFlagIfIncludedCdc(true);
 			}
 		}
@@ -2251,7 +2266,7 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 			        sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
-				sidxObj = idxObj->GetSubIndex(sidxLC);
+				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
 				if (strcmp((char*) sidxObj->GetIndexValue(), "02") == 0)
 				{
 					sidxObj->SetFlagIfIncludedCdc(true);
@@ -2318,54 +2333,54 @@ UINT32 GetDataSize(const string dataTypeVal)
 	//Set default 0 for error case
 	UINT32 retSize = 0;
 
-	if( workDataTypeVal.compare("UNSIGNED8") == 0
-	        || workDataTypeVal.compare("BOOLEAN") == 0
-	        || workDataTypeVal.compare("INTEGER8") == 0)
+	if( workDataTypeVal == "UNSIGNED8"
+		|| workDataTypeVal == "BOOLEAN"
+	    || workDataTypeVal == "INTEGER8")
 	{
 		retSize = 1;
 	}
-	else if (workDataTypeVal.compare("UNSIGNED16") == 0
-	         || workDataTypeVal.compare("INTEGER16") == 0)
+	else if (workDataTypeVal == "UNSIGNED16"
+		|| workDataTypeVal == "INTEGER16")
 	{
 		retSize = 2;
 	}
-	else if (workDataTypeVal.compare("INTEGER24") == 0
-	         || workDataTypeVal.compare("UNSIGNED24") == 0)
+	else if (workDataTypeVal == "INTEGER24"
+		|| workDataTypeVal == "UNSIGNED24")
 	{
 		retSize = 3;
 	}
-	else if (workDataTypeVal.compare("UNSIGNED32") == 0
-	         || workDataTypeVal.compare("INTEGER32") == 0
-	         || workDataTypeVal.compare("REAL32") == 0)
+	else if (workDataTypeVal == "UNSIGNED32"
+		|| workDataTypeVal == "INTEGER32"
+	    || workDataTypeVal == "REAL32")
 	{
 		retSize = 4;
 	}
-	else if (workDataTypeVal.compare("INTEGER40") == 0
-	         || workDataTypeVal.compare("UNSIGNED40") == 0)
+	else if (workDataTypeVal == "INTEGER40"
+		|| workDataTypeVal == "UNSIGNED40")
 	{
 		retSize = 5;
 	}
-	else if (workDataTypeVal.compare("INTEGER48") == 0
-	         || workDataTypeVal.compare("UNSIGNED48") == 0)
+	else if (workDataTypeVal == "INTEGER48"
+		|| workDataTypeVal == "UNSIGNED48")
 	{
 		retSize = 6;
 	}
-	else if (workDataTypeVal.compare("INTEGER56") == 0
-	         || workDataTypeVal.compare("UNSIGNED56") == 0)
+	else if (workDataTypeVal == "INTEGER56"
+	    || workDataTypeVal == "UNSIGNED56")
 	{
 		retSize = 7;
 	}
-	else if (workDataTypeVal.compare("UNSIGNED64") == 0
-	         || workDataTypeVal.compare("INTEGER64") == 0
-	         || workDataTypeVal.compare("REAL64") == 0)
+	else if (workDataTypeVal == "UNSIGNED64"
+	    || workDataTypeVal == "INTEGER64"
+		|| workDataTypeVal == "REAL64")
 	{
 		retSize = 8;
 	}
-	else if (workDataTypeVal.compare("MAC_ADDRESS") == 0)
+	else if (workDataTypeVal == "MAC_ADDRESS")
 	{
 		retSize = 6;
 	}
-	else if (workDataTypeVal.compare("IP_ADDRESS") == 0)
+	else if (workDataTypeVal == "IP_ADDRESS")
 	{
 		retSize = 4;
 	}
@@ -2373,7 +2388,7 @@ UINT32 GetDataSize(const string dataTypeVal)
 	 STRUCT OF
 	 UNSIGNED32 seconds
 	 UNSIGNED32 nanoseconds */
-	else if (workDataTypeVal.compare("NETTIME") == 0)
+	else if (workDataTypeVal == "NETTIME")
 	{
 		retSize = 8;
 	}
@@ -2382,7 +2397,7 @@ UINT32 GetDataSize(const string dataTypeVal)
 	 VOID4 reserved,
 	 UNSIGNED16 days
 	 TIME_DIFFERENCE*/
-	else if (workDataTypeVal.compare("TIME_DIFF") == 0)
+	else if (workDataTypeVal == "TIME_DIFF")
 	{
 		retSize = 6;
 	}
@@ -2391,7 +2406,7 @@ UINT32 GetDataSize(const string dataTypeVal)
 	 VOID4 reserved,
 	 UNSIGNED16 days
 	 TIME_DIFFERENCE*/
-	else if (workDataTypeVal.compare("TIME_OF_DAY") == 0)
+	else if (workDataTypeVal == "TIME_OF_DAY")
 	{
 		retSize = 6;
 	}
@@ -2431,12 +2446,14 @@ void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)
 {
 	const xmlChar *name = NULL;
 	const xmlChar *value = NULL;
-	if (NULL == featureObj)
+	if (!featureObj)
 	{
-		ocfmRetCode objException;
-		objException.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		LOG_FATAL() << "Parameter 'featureObj' must not be NULL.";
-		throw objException;
+		boost::format formatter(kMsgNullArgument);
+		formatter % "'featureObj'";
+		ocfmRetCode result(OCFM_ERR_INVALID_PARAMETER);
+		result.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw result;
 	}
 	//Retrieve the pxcName and Value of an attribute
 	value = xmlTextReaderConstValue(reader);
@@ -2447,7 +2464,6 @@ void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)
 
 	featureObj->value = new char[strlen((char*) value) + STR_ALLOC_BUFFER];
 	strcpy(featureObj->value, (const char*) value);
-
 }
 
 void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)

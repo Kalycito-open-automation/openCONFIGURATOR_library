@@ -155,6 +155,8 @@ class NodeCollection
 		 \param		nodeId		Integer to hold the value of Node id
 
 		 \return	Node* / NULL
+		 \note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
+		 \deprecated Use NodeCollection::GetNodePtr(const UINT32 nodeId) instead.
 		 */
 		/*****************************************************************************/
 		Node* GetNodePtr(NodeType nodeType, INT32 nodeId);
@@ -165,6 +167,8 @@ class NodeCollection
 		 \param		position   Integer to hold value of column index
 		 
 		 \return	Node*
+		 \note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
+		 \deprecated Use NodeCollection::GetNodePtr(const UINT32 nodeId) instead.
 		 */
 		/*****************************************************************************/
 		Node* GetNodebyColIndex(INT32 position);
@@ -178,6 +182,39 @@ class NodeCollection
 		 */
 		/*****************************************************************************/
 		INT32 GetCNNodesCount();
+
+		/************************************************************************
+		\brief Query if this collection contains a Node with the given nodeId.
+		
+		\param nodeId   POWERLINK-NodeId of the Node.
+		
+		\return true if Node exists, false otherwise.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		bool ContainsNode(const UINT32 nodeId);
+		  
+		/************************************************************************
+		\brief Gets a pointer to a Node by its nodeId.
+		
+		\param nodeId POWERLINK-NodeId of the Node.
+		
+		\return Pointer to Node-Object or NULL if not found.
+		\note The returned pointer will possibly be invalidated by adding/removing Node-Objects after obtaining it.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		Node* GetNodePtr(const UINT32 nodeId);
+
+		/************************************************************************
+		\brief Gets a reference to a Node by its nodeId.
+		
+		\param nodeId POWERLINK-NodeId of the Node.
+		
+		\return Reference to Node-Object.
+		\throws ocfmRetCode ConfiguratorError OCFM_ERR_NODEID_NOT_FOUND if nodeId is not in the collection.
+		\note The returned reference will possibly be invalidated by adding/removing Node-Objects after obtaining it.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		Node& GetNodeRef(const UINT32 nodeId);
 
 	private:
 		NodeCollection(void);

@@ -1,117 +1,115 @@
+/************************************************************************
+\file	ProjectConfiguration.cpp
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+\date	11.10.2013
+************************************************************************/
+
 #include "../Include/ProjectConfiguration.h"
+#include "../Include/Logging.h"
+#include "../Include/Result.h"
+#include "../Include/BoostShared.h"
+
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::Library::Utilities;
 
-const char* PROJECT_XML_ROOT_ELEMENT = "openCONFIGURATORProject";
-const char* PROJECT_XML_VERSION_ATTRIBUTE = "version";
+const string PROJECT_XML_ROOT_ELEMENT = "openCONFIGURATORProject";
+const string PROJECT_XML_VERSION_ATTRIBUTE = "version";
 
-const char* PROJECT_XML_PATH_ELEMENT = "Path";
-const char* PROJECT_XML_PATH_ID_ATTRIBUTE = "id";
-const char* PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE = "defaultOutputPath";
-const char* PROJECT_XML_PATH_TXT2CDC_ATTRIBUTE = "txt2CdcPath";
+const string PROJECT_XML_PATH_ELEMENT = "Path";
+const string PROJECT_XML_PATH_ID_ATTRIBUTE = "id";
+const string PROJECT_XML_PATH_PATH_ATTRIBUTE = "path";
+const string PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE = "defaultOutputPath";
 
-const char* PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT = "ProjectConfiguration";
-const char* PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE = "activeAutoGenerationSetting";
-const char* PROJECT_XML_PROJECT_CONFIGURATION_PROJECT_NAME_ATTRIBUTE = "name";
+const string PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT = "ProjectConfiguration";
+const string PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE = "activeAutoGenerationSetting";
+const string PROJECT_XML_PROJECT_CONFIGURATION_PROJECT_NAME_ATTRIBUTE = "name";
 
-const char* PROJECT_XML_SETTING_ELEMENT = "Setting";
-const char* PROJECT_XML_SETTING_NAME_ATTRIBUTE = "name";
-const char* PROJECT_XML_SETTING_VALUE_ATTRIBUTE = "value";
+const string PROJECT_XML_SETTING_ELEMENT = "Setting";
+const string PROJECT_XML_SETTING_NAME_ATTRIBUTE = "name";
+const string PROJECT_XML_SETTING_VALUE_ATTRIBUTE = "value";
 
-const char* PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT = "AutoGenerationSettings";
-const char* PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE = "id";
-const char* PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT = "NetworkConfiguration";
-const char* PROJECT_XML_MANAGING_NODE_ELEMENT = "MN";
-const char* PROJECT_XML_CONTROLLED_NODE_ELEMENT = "CN";
+const string PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT = "AutoGenerationSettings";
+const string PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE = "id";
+const string PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT = "NetworkConfiguration";
+const string PROJECT_XML_MANAGING_NODE_ELEMENT = "MN";
+const string PROJECT_XML_CONTROLLED_NODE_ELEMENT = "CN";
 
-const char* PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE = "cycleTime";
-const char* PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE = "asyncMTU";
-const char* PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE = "multiplexedCycleLength";
-const char* PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE = "prescaler";
+const string PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE = "cycleTime";
+const string PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE = "asyncMTU";
+const string PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE = "multiplexedCycleLength";
+const string PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE = "prescaler";
 
-const char* PROJECT_XML_NODE_NAME_ATTRIBUTE = "name";
-const char* PROJECT_XML_NODE_NODEID_ATTRIBUTE = "nodeID";
-const char* PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE = "pathToXDC";
-const char* PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE = "forcedMultiplexedCycle";
-const char* PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE = "isMultiplexed";
-const char* PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE = "isChained";
-const char* PROJECT_XML_NODE_ISMANDATORY_ATTRIBUTE = "isMandatory";
-const char* PROJECT_XML_NODE_AUTOSTARTNODE_ATTRIBUTE = "autostartNode";
-const char* PROJECT_XML_NODE_RESETINOPERATIONAL_ATTRIBUTE = "resetInOperational";
-const char* PROJECT_XML_NODE_VERIFYAPPSWVERSION_ATTRIBUTE = "verifyAppSwVersion";
-const char* PROJECT_XML_NODE_AUTOAPPSWUPDATEALLOWED_ATTRIBUTE = "autoAppSwUpdateAllowed";
-const char* PROJECT_XML_NODE_VERIFYDEVICETYPE_ATTRIBUTE = "verifyDeviceType";
-const char* PROJECT_XML_NODE_VERIFYVENDORID_ATTRIBUTE = "verifyVendorId";
-const char* PROJECT_XML_NODE_VERIFYREVISIONNUMBER_ATTRIBUTE = "verifyRevisionNumber";
-const char* PROJECT_XML_NODE_VERIFYPRODUCTCODE_ATTRIBUTE = "verifyProductCode";
-const char* PROJECT_XML_NODE_VERIFYSERIALNUMBER_ATTRIBUTE = "verifySerialNumber";
-const char* PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE = "isAsyncOnly";
-const char* PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE = "isType1Router";
-const char* PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE = "isType2Router";
+const string PROJECT_XML_NODE_NAME_ATTRIBUTE = "name";
+const string PROJECT_XML_NODE_NODEID_ATTRIBUTE = "nodeID";
+const string PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE = "pathToXDC";
+const string PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE = "forcedMultiplexedCycle";
+const string PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE = "isMultiplexed";
+const string PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE = "isChained";
+const string PROJECT_XML_NODE_ISMANDATORY_ATTRIBUTE = "isMandatory";
+const string PROJECT_XML_NODE_AUTOSTARTNODE_ATTRIBUTE = "autostartNode";
+const string PROJECT_XML_NODE_RESETINOPERATIONAL_ATTRIBUTE = "resetInOperational";
+const string PROJECT_XML_NODE_VERIFYAPPSWVERSION_ATTRIBUTE = "verifyAppSwVersion";
+const string PROJECT_XML_NODE_AUTOAPPSWUPDATEALLOWED_ATTRIBUTE = "autoAppSwUpdateAllowed";
+const string PROJECT_XML_NODE_VERIFYDEVICETYPE_ATTRIBUTE = "verifyDeviceType";
+const string PROJECT_XML_NODE_VERIFYVENDORID_ATTRIBUTE = "verifyVendorId";
+const string PROJECT_XML_NODE_VERIFYREVISIONNUMBER_ATTRIBUTE = "verifyRevisionNumber";
+const string PROJECT_XML_NODE_VERIFYPRODUCTCODE_ATTRIBUTE = "verifyProductCode";
+const string PROJECT_XML_NODE_VERIFYSERIALNUMBER_ATTRIBUTE = "verifySerialNumber";
+const string PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE = "isAsyncOnly";
+const string PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE = "isType1Router";
+const string PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE = "isType2Router";
 
-const char* PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE = "asyncSlotTimeout";
-const char* PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE = "aSndMaxNumber";
-const char* PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE = "transmitsPRes";
+const string PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE = "asyncSlotTimeout";
+const string PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE = "aSndMaxNumber";
+const string PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE = "transmitsPRes";
 
-const char* PROJECT_XML_VALUE_TRUE = "true";
-const char* PROJECT_XML_VALUE_FALSE = "false";
+const string PROJECT_XML_VALUE_TRUE = "true";
+const string PROJECT_XML_VALUE_FALSE = "false";
 
-ProjectConfiguration* ProjectConfiguration::instance = NULL;
+ProjectConfiguration ProjectConfiguration::instance;
 
-ProjectConfiguration::ProjectConfiguration(void)
+ProjectConfiguration::ProjectConfiguration(void) : 
+	initialized(false),
+	projectFile(),
+	projectPath(),
+	generateMNOBD(true),
+	autogenerationSettingID(),
+	defaultOutputPath(),
+	cycleTime(),
+	asyncMTU(),
+	multiplexedCycleLength(),
+	prescaler()	
+{}
+
+void ProjectConfiguration::ResetConfiguration(void)
 {
-	projectLoaded = false;
+	initialized = false;
 
 	projectFile = "";
 	defaultOutputPath = "";
 	projectPath = "";
-	pathTxt2CdcExecutable = "";
 	generateMNOBD = true;
 
-	cycleTime = 0;
-	asyncMTU = 0;
-	multiplexedCycleLength = 0;
-	prescaler = 0;
+	cycleTime = boost::none;
+	asyncMTU = boost::none;
+	multiplexedCycleLength = boost::none;
+	prescaler = boost::none;
 
 	autogenerationSettingID = "";
-
-	isChosenSetting = false;
-}
-void ProjectConfiguration::resetConfiguration(void)
-{
-	projectLoaded = false;
-
-	projectFile = "";
-	defaultOutputPath = "";
-	projectPath = "";
-	pathTxt2CdcExecutable = "";
-	generateMNOBD = true;
-
-	cycleTime = 0;
-	asyncMTU = 0;
-	multiplexedCycleLength = 0;
-	prescaler = 0;
-
-	autogenerationSettingID = "";
-
-	isChosenSetting = false;
 }
 
 ProjectConfiguration::~ProjectConfiguration(void)
 {
-	delete ProjectConfiguration::instance;
-	ProjectConfiguration::instance = NULL;
+
 }
 
-ProjectConfiguration* ProjectConfiguration::GetInstance(void)
+ProjectConfiguration& ProjectConfiguration::GetInstance(void)
 {
-	if (ProjectConfiguration::instance == NULL)
-	{
-		instance = new ProjectConfiguration();
-	}
-	return instance;
+	return ProjectConfiguration::instance;
 }
 
-const string& ProjectConfiguration::GetDefaultOutputPath()
+const string& ProjectConfiguration::GetDefaultOutputPath() const
 {
 	return defaultOutputPath;
 }
@@ -121,17 +119,17 @@ void ProjectConfiguration::SetDefaultOutputPath(const string& defaultOutputPath)
 	this->defaultOutputPath = defaultOutputPath;
 }
 
-bool ProjectConfiguration::GetProjectLoaded(void)
+bool ProjectConfiguration::IsInitialized(void) const
 {
-	return projectLoaded;
+	return initialized;
 }
 
-void ProjectConfiguration::SetProjectLoaded(bool projectLoaded)
+void ProjectConfiguration::SetInitialized(bool initialized)
 {
-	this->projectLoaded = projectLoaded;
+	this->initialized = initialized;
 }
 
-bool ProjectConfiguration::GetGenerateMNOBD(void)
+bool ProjectConfiguration::GetGenerateMNOBD(void) const
 {
 	return generateMNOBD;
 }
@@ -141,7 +139,7 @@ void ProjectConfiguration::SetGenerateMNOBD(bool generateMNOBD)
 	this->generateMNOBD = generateMNOBD;
 }
 
-const string& ProjectConfiguration::GetProjectPath(void)
+const string& ProjectConfiguration::GetProjectPath(void) const
 {
 	return projectPath;
 }
@@ -151,17 +149,7 @@ void ProjectConfiguration::SetProjectPath(const string& projectPath)
 	this->projectPath = projectPath;
 }
 
-const string& ProjectConfiguration::GetPathTxt2CdcExecutable(void)
-{
-	return pathTxt2CdcExecutable;
-}
-
-void ProjectConfiguration::SetPathTxt2CdcExecutable(const string& pathTxt2CdcExecutable)
-{
-	this->pathTxt2CdcExecutable = pathTxt2CdcExecutable;
-}
-
-const string& ProjectConfiguration::GetProjectFile(void)
+const string& ProjectConfiguration::GetProjectFile(void) const
 {
 	return projectFile;
 }
@@ -171,16 +159,17 @@ void ProjectConfiguration::SetProjectFile(const string& projectFile)
 	this->projectFile = projectFile;
 }
 
-UINT32 ProjectConfiguration::GetCycleTime(void)
+const boost::optional<UINT32>& ProjectConfiguration::GetCycleTime(void) const
 {
 	return this->cycleTime;
 }
+
 void ProjectConfiguration::SetCycleTime(UINT32 cycleTime)
 {
 	this->cycleTime = cycleTime;
 }
 
-UINT32 ProjectConfiguration::GetAsyncMTU(void)
+const boost::optional<UINT32>& ProjectConfiguration::GetAsyncMTU(void) const
 {
 	return this->asyncMTU;
 }
@@ -190,7 +179,7 @@ void ProjectConfiguration::SetAsyncMTU(UINT32 asyncMTU)
 	this->asyncMTU = asyncMTU;
 }
 
-UINT32 ProjectConfiguration::GetMultiplexedCycleLength(void)
+const boost::optional<UINT32>& ProjectConfiguration::GetMultiplexedCycleLength(void) const
 {
 	return this->multiplexedCycleLength;
 }
@@ -200,10 +189,11 @@ void ProjectConfiguration::SetMultiplexedCycleLength(UINT32 multiplexedCycleLeng
 	this->multiplexedCycleLength = multiplexedCycleLength;
 }
 
-UINT32 ProjectConfiguration::GetPrescaler(void)
+const boost::optional<UINT32>& ProjectConfiguration::GetPrescaler(void) const
 {
 	return this->prescaler;
 }
+
 void ProjectConfiguration::SetPrescaler(UINT32 prescaler)
 {
 	this->prescaler = prescaler;
@@ -211,6 +201,7 @@ void ProjectConfiguration::SetPrescaler(UINT32 prescaler)
 
 ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 {
+	LOG_INFO() << "Loading project '" << projectFile << "'.";
 	try
 	{
 		xmlTextReaderPtr xmlReader = xmlReaderForFile(projectFile.c_str(), NULL, 0);
@@ -220,7 +211,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 			INT32 retVal = xmlTextReaderRead(xmlReader);
 			while (retVal == 1)
 			{
-				ProcessProjectElement(xmlReader);
+				ProcessProject(xmlReader);
 				retVal = xmlTextReaderRead(xmlReader);
 			}
 			if (retVal != 0)
@@ -232,78 +223,74 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 		}
 		else
 		{
+			boost::format formatter(kMsgFileReadFailed);
+			formatter % projectFile;
+			ocfmRetCode result(OCFM_ERR_CANNOT_OPEN_FILE);
+			result.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			xmlCleanupParser();
 			xmlMemoryDump();
-			throw ocfmRetCode(OCFM_ERR_CANNOT_OPEN_FILE);
+			throw result;
 		}
 
 		xmlCleanupParser();
 		xmlMemoryDump();
 
+		// FIXME: What is this code block good for?? 
 		NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
 		char* presTimeoutVal = new char[50];
 		presTimeoutVal[0] = 0;
 
-		for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
-			nodeLC++)
+		for (INT32 i = 0; i < nodeCollObj->GetNumberOfNodes(); i++)
 		{
-			Node nodeObj;
-			INT32 nodeId;
-			NodeType nodeType;
-			nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodeLC);
+			Node nodeObj = nodeCollObj->GetNodebyCollectionIndex(i);
+			INT32 nodeId = nodeObj.GetNodeId();
+			NodeType nodeType = nodeObj.GetNodeType();
 
-			nodeType = nodeObj.GetNodeType();
-			nodeId = nodeObj.GetNodeId();
 			CopyPDODefToAct(nodeId, nodeType);
-			CopyMNPropDefToAct(nodeId, nodeType);
+			//CopyMNPropDefToAct(nodeId, nodeType);
 
-			if ((nodeId != MN_NODEID) && (MN != nodeType))
+			if ((nodeId != MN_NODEID) && (nodeType != MN))
 			{
-				char* value = NULL;
-				value = new char[SUBINDEX_LEN];
-				value = IntToAscii(nodeId, value, 16);
-				value = PadLeft(value, '0', 2);
-				GetSubIndexAttributes(MN_NODEID, MN, (char*) "1f92", value,
-					ACTUALVALUE, presTimeoutVal);
-#if defined DEBUG
-				cout << "Actual Value" << nodeId << presTimeoutVal << endl;
-#endif
-				if (((NULL == presTimeoutVal)
-					|| (strcmp(presTimeoutVal, "") == 0))
-					|| (!(ValidateCNPresTimeout(value, presTimeoutVal))))
+				char* nodeIdHexStr = new char[SUBINDEX_LEN];
+				nodeIdHexStr = IntToAscii(nodeId, nodeIdHexStr, 16);
+				nodeIdHexStr = PadLeft(nodeIdHexStr, '0', 2);
+				GetSubIndexAttributes(MN_NODEID, MN, "1f92", nodeIdHexStr, ACTUALVALUE, presTimeoutVal);
+				LOG_DEBUG() << "Actual Value for PollResponse-Timeout (0x1F92) for node " << nodeId << " set to: " << presTimeoutVal;
+				if (((presTimeoutVal == NULL)
+					|| (strlen(presTimeoutVal) == 0))
+					|| (!(ValidateCNPresTimeout(nodeIdHexStr, presTimeoutVal))))
 				{
 					CalculateCNPollResponse(nodeId, nodeType);
 				}
 
-				delete[] value;
+				delete[] nodeIdHexStr;
 			}
 		}
 		delete[] presTimeoutVal;
+		// FIXME end
 
-		SynchronizeMultiplexingCycleLength();
-		SynchronizeCycleTime();
-		SynchronizeAsyncMtu();
-		SynchronizePrescaler();
+		this->OverrideNetworkConfiguration();
 	}
 	catch (ocfmRetCode& exceptionThrown)
 	{
 		return exceptionThrown;
 	}
-
-	projectLoaded = true;
-
+	this->initialized = true;
+	LOG_INFO() << "Project-Load finished.";
 	return ocfmRetCode(OCFM_ERR_SUCCESS);
 }
 
-void ProjectConfiguration::ProcessProjectElement(xmlTextReaderPtr xmlReader)
+void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 {
-	const xmlChar* xmlName = xmlTextReaderConstName(xmlReader);
+	const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
+		? (const char*) xmlTextReaderConstName(xmlReader)
+		: "";
 
 	if (xmlTextReaderNodeType(xmlReader) == 1)
 	{
-		if (strcmp(((const char*) xmlName), PROJECT_XML_ROOT_ELEMENT) == 0)
+		if (xmlName == PROJECT_XML_ROOT_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
@@ -311,7 +298,7 @@ void ProjectConfiguration::ProcessProjectElement(xmlTextReaderPtr xmlReader)
 			}
 		}
 
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_PATH_ELEMENT) == 0)
+		else if (xmlName == PROJECT_XML_PATH_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
@@ -321,34 +308,36 @@ void ProjectConfiguration::ProcessProjectElement(xmlTextReaderPtr xmlReader)
 				}
 			}
 		}
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT) == 0)
+		else if (xmlName == PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
 				while (xmlTextReaderMoveToNextAttribute(xmlReader))
 				{
-					const xmlChar *xmlAttributeName = xmlTextReaderConstName(xmlReader);
-					const xmlChar *xmlAttributeValue = xmlTextReaderConstValue(xmlReader);
+					const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+						? (const char*) xmlTextReaderConstName(xmlReader)
+						: "";
+					const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+						? (const char*) xmlTextReaderConstValue(xmlReader)
+						: "";
 
-					if (strcmp(((char*) xmlAttributeName), PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE) == 0)
+					if (!xmlAttributeName.empty()
+						&& !xmlAttributeValue.empty()
+						&& xmlAttributeValue == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
 					{
-						if ((char*) xmlAttributeValue != NULL)
-						{
-							autogenerationSettingID = string((const char*) xmlAttributeValue);
-						}
+						autogenerationSettingID = xmlAttributeValue;
 					}
 				}
 			}
 		}
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT) == 0)
+		else if (xmlName == PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
 				ProcessAutogenerationSettings(xmlReader);
 			}
 		}
-
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT) == 0)
+		else if (xmlName == PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
@@ -359,11 +348,12 @@ void ProjectConfiguration::ProcessProjectElement(xmlTextReaderPtr xmlReader)
 			}
 
 		}
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_MANAGING_NODE_ELEMENT) == 0 || strcmp(((const char*) xmlName), PROJECT_XML_CONTROLLED_NODE_ELEMENT) == 0)
+		else if (xmlName == PROJECT_XML_MANAGING_NODE_ELEMENT 
+			|| xmlName == PROJECT_XML_CONTROLLED_NODE_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
-				ProcessProjectNode(xmlReader);
+				ProcessNode(xmlReader);
 			}
 		}
 	}
@@ -371,28 +361,33 @@ void ProjectConfiguration::ProcessProjectElement(xmlTextReaderPtr xmlReader)
 
 void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader)
 {
-	string currentAutogenerationSetting("");
+	string currentAutogenerationSetting;
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
-		const xmlChar *xmlName = xmlTextReaderConstName(xmlReader);
-		const xmlChar *xmlValue = xmlTextReaderConstValue(xmlReader);
+		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+			? (const char*) xmlTextReaderConstName(xmlReader)
+			: "";
+		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+			? (const char*) xmlTextReaderConstValue(xmlReader)
+			: "";
 
-		if (strcmp(((const char*) xmlName), PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE) == 0)
+		if (!xmlAttributeName.empty()
+			&& !xmlAttributeValue.empty()
+			&& xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE)
 		{
-			if ((const char*) xmlValue != NULL)
-			{
-				currentAutogenerationSetting = string((const char*) xmlValue);
-			}
+			currentAutogenerationSetting = xmlAttributeValue;
 		}
 	}
-	//Process the chosen AutogenerationSetting
-	if (autogenerationSettingID.compare(currentAutogenerationSetting) == 0)
+	//Process the selected AutogenerationSetting
+	if (currentAutogenerationSetting == this->autogenerationSettingID)
 	{
 		INT32 retVal = xmlTextReaderRead(xmlReader);
 		while (retVal == 1)
 		{
-			const xmlChar* xmlName = xmlTextReaderConstName(xmlReader);
-			if (strcmp(((const char*) xmlName), PROJECT_XML_SETTING_ELEMENT) == 0)
+			const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
+				? (const char*) xmlTextReaderConstName(xmlReader)
+				: "";
+			if (xmlName == PROJECT_XML_SETTING_ELEMENT)
 			{
 				if (xmlTextReaderHasAttributes(xmlReader) == 1)
 				{
@@ -418,500 +413,367 @@ void ProjectConfiguration::ProcessAutogenerationSetting(xmlTextReaderPtr xmlRead
 {
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
-		const xmlChar *xmlName = xmlTextReaderConstName(xmlReader);
-		//const xmlChar *xmlValue = xmlTextReaderConstValue(xmlReader);
+		const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
+			? (const char*) xmlTextReaderConstName(xmlReader)
+			: "";
+		//const xmlChar* xmlValue = xmlTextReaderConstValue(xmlReader);
 
-		if (strcmp(((const char*) xmlName), PROJECT_XML_SETTING_NAME_ATTRIBUTE) == 0)
+		if (xmlName == PROJECT_XML_SETTING_NAME_ATTRIBUTE)
 		{
 			//Process Setting attribute Name
 		}
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_SETTING_VALUE_ATTRIBUTE) == 0)
+		else if (xmlName == PROJECT_XML_SETTING_VALUE_ATTRIBUTE)
 		{
 			//Process Setting attribute Value
 		}
 	}
 }
 
-void ProjectConfiguration::ProcessProjectNode(xmlTextReaderPtr xmlReader)
-{
-	char* nodeName = NULL;
-	char* xdcFileName = NULL;
-	char* forceCycleValue = NULL;
+// TODO: ProcessProjectNode?
+void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
+{	
+	// MN, CN properties
+	boost::optional<string> nodeName;
+	boost::optional<string> pathToXDC;
+	boost::optional<bool> isAsyncOnly;
+	boost::optional<bool> isType1Router;
+	boost::optional<bool> isType2Router;
+	boost::optional<UINT32> nodeId;
 
-	//MN additional properties
-	bool transmitsPRes = false;
-	UINT32 asyncSlotTimeout = 0;
-	UINT32 aSndMaxNumber = 0;
+	// MN properties
+	boost::optional<bool> transmitsPRes;
+	boost::optional<UINT32> asyncSlotTimeout;
+	boost::optional<UINT32> aSndMaxNumber;
 
-	//CN additional properties
-	UINT32 forcedMultiplexedCycle = 0;
-	bool autostartNode = true;
-	bool resetInOperational = true;
-	bool verifyAppSwVersion = false;
-	bool autoAppSwUpdateAllowed = false;
-	bool verifyDeviceType = false;
-	bool verifyVendorId = false;
-	bool verifyRevisionNumber = false;
-	bool verifyProductCode = false;
-	bool verifySerialNumber = false;
-
-	//Stationtype bools
-	bool isChained = false;
-	bool isMultiplexed = false;
-
-	//Both MN & CN
-	bool isMandatory = false;
-	bool isAsyncOnly = false;
-	bool isType1Router = false;
-	bool isType2Router = false;
-
-	INT32 nodeId = 0;
-	NodeType nodeType = CN;
-
-	StationType stationType = NORMAL;
-
+	// CN properties
+	boost::optional<UINT32> forcedMultiplexedCycle;
+	boost::optional<bool> autostartNode;
+	boost::optional<bool> resetInOperational;
+	boost::optional<bool> verifyAppSwVersion;
+	boost::optional<bool> autoAppSwUpdateAllowed;
+	boost::optional<bool> verifyDeviceType;
+	boost::optional<bool> verifyVendorId;
+	boost::optional<bool> verifyRevisionNumber;
+	boost::optional<bool> verifyProductCode;
+	boost::optional<bool> verifySerialNumber;
+	boost::optional<bool> isMandatory;
+	boost::optional<bool> isChained;
+	boost::optional<bool> isMultiplexed;
+	
 	ocfmRetCode exceptionObj(OCFM_ERR_UNKNOWN);
 
+	// Extract all node attributes for CN- and MN-Elements
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
-		const xmlChar *xmlName = xmlTextReaderConstName(xmlReader);
-		const xmlChar *xmlValue = xmlTextReaderConstValue(xmlReader);
+		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+			? (const char*) xmlTextReaderConstName(xmlReader)
+			: "";
+		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+			? (const char*) xmlTextReaderConstValue(xmlReader)
+			: "";
+		
+		if (!xmlAttributeName.empty() && !xmlAttributeValue.empty())
+		{
+			if (xmlAttributeName == PROJECT_XML_NODE_NAME_ATTRIBUTE)
+			{
+				nodeName = xmlAttributeValue;
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_NODEID_ATTRIBUTE)
+			{
+				nodeId = boost::lexical_cast<UINT32>(xmlAttributeValue);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE)
+			{
+				pathToXDC = xmlAttributeValue;
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE)
+			{
+				forcedMultiplexedCycle = boost::lexical_cast<UINT32>(xmlAttributeValue);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE)
+			{
+				isMultiplexed = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE)
+			{
+				isChained = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISMANDATORY_ATTRIBUTE)
+			{
+				isMandatory = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE)
+			{
+				isAsyncOnly = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_AUTOSTARTNODE_ATTRIBUTE)
+			{
+				autostartNode = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_RESETINOPERATIONAL_ATTRIBUTE)
+			{
+				resetInOperational = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYAPPSWVERSION_ATTRIBUTE)
+			{
+				verifyAppSwVersion = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_AUTOAPPSWUPDATEALLOWED_ATTRIBUTE)
+			{
+				autoAppSwUpdateAllowed = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYDEVICETYPE_ATTRIBUTE)
+			{
+				verifyDeviceType = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYVENDORID_ATTRIBUTE)
+			{
+				verifyVendorId = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYSERIALNUMBER_ATTRIBUTE)
+			{
+				verifySerialNumber = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYPRODUCTCODE_ATTRIBUTE)
+			{
+				verifyProductCode = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_VERIFYREVISIONNUMBER_ATTRIBUTE)
+			{
+				verifyRevisionNumber = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE)
+			{
+				isType1Router = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE)
+			{
+				isType2Router = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE)
+			{
+				asyncSlotTimeout = boost::lexical_cast<UINT32>(xmlAttributeValue);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE)
+			{
+				aSndMaxNumber = boost::lexical_cast<UINT32>(xmlAttributeValue);
+			}
+			else if (xmlAttributeName == PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE)
+			{
+				transmitsPRes = (xmlAttributeValue == PROJECT_XML_VALUE_TRUE);
+			}
+		}
+	} //while
 
-		//Process Name attribute
-		if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_NAME_ATTRIBUTE) == 0)
-		{
-			if ((const char*) xmlValue != NULL)
-			{
-				nodeName = new char[strlen((const char*) xmlValue) + ALLOC_BUFFER];
-				strcpy(nodeName, (const char*) xmlValue);
-			}
-		}
-		//Process NodeID attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_NODEID_ATTRIBUTE) == 0)
-		{
-			if ((const char*) xmlValue != NULL)
-			{
-				nodeId = atoi((char*) xmlValue);
+	// Should have been caught by XML-Schema validation
+	assert(nodeId);
+	assert(pathToXDC);
 
-				nodeType = (nodeId == 240)
-					? MN
-					: CN;
-			}
-		}
-		//Process PathToXDC attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE) == 0)
-		{
-			xdcFileName = new char[strlen((const char*) xmlValue) + 1];
-			strcpy(xdcFileName, (const char*) xmlValue);
-		}
-		//Process forcedMultiplexedCycle attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE) == 0)
-		{
-			forceCycleValue = new char[strlen((const char*) xmlValue) + ALLOC_BUFFER];
-			strcpy(forceCycleValue, (const char*) xmlValue);
-
-			istringstream multiCycleString(forceCycleValue);
-			multiCycleString >> forcedMultiplexedCycle;
-		}
-		//Process isMultiplexed attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isMultiplexed = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isMultiplexed = false;
-			}
-		}
-		//Process isChained attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isChained = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isChained = false;
-			}
-		}
-		//Process isMandatory attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISMANDATORY_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isMandatory = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isMandatory = false;
-			}
-		}
-		//Process isAsyncOnly attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isAsyncOnly = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isAsyncOnly = false;
-			}
-		}
-		//Process autostartNode attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_AUTOSTARTNODE_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				autostartNode = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				autostartNode = false;
-			}
-		}
-		//Process resetInOperational attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_RESETINOPERATIONAL_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				resetInOperational = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				resetInOperational = false;
-			}
-		}
-		//Process verifyAppSwVersion attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYAPPSWVERSION_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifyAppSwVersion = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifyAppSwVersion = false;
-			}
-		}
-		//Process autoAppSwUpdateAllowed attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_AUTOAPPSWUPDATEALLOWED_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				autoAppSwUpdateAllowed = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				autoAppSwUpdateAllowed = false;
-			}
-		}
-		//Process verifyDeviceType attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYDEVICETYPE_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifyDeviceType = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifyDeviceType = false;
-			}
-		}
-		//Process verifyVendorId attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYVENDORID_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifyVendorId = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifyVendorId = false;
-			}
-		}
-		//Process verifySerialNumber attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYSERIALNUMBER_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifySerialNumber = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifySerialNumber = false;
-			}
-		}
-		//Process verifyProductCode attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYPRODUCTCODE_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifyProductCode = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifyProductCode = false;
-			}
-		}
-		//Process verifyRevisionNumber attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_VERIFYREVISIONNUMBER_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				verifyRevisionNumber = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				verifyRevisionNumber = false;
-			}
-		}
-		//Process isType1Router attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isType1Router = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isType1Router = false;
-			}
-		}
-		//Process isType2Router attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				isType2Router = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				isType2Router = false;
-			}
-		}
-		//Process asyncSlotTimeout attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE) == 0)
-		{
-
-			istringstream asyncSlotTimeoutString((const char*) xmlValue);
-			asyncSlotTimeoutString >> asyncSlotTimeout;
-		}
-		//Process aSndMaxNumber attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE) == 0)
-		{
-
-			istringstream aSndMaxNumberString((const char*) xmlValue);
-			aSndMaxNumberString >> aSndMaxNumber;
-		}
-		//Process transmitsPRes attribute
-		else if (strcmp(((const char*) xmlName), PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE) == 0)
-		{
-			if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_TRUE) == 0)
-			{
-				transmitsPRes = true;
-			}
-			else if (strcmp(((const char*) xmlValue), PROJECT_XML_VALUE_FALSE) == 0)
-			{
-				transmitsPRes = false;
-			}
-		}
-	}
-
-	if (isChained && isMultiplexed)
+	// Invalid setup. Concurrent Chaining and Multiplexing is not specified.
+	if (isChained.get_value_or(false) && isMultiplexed.get_value_or(false))
 	{
-		throw ocfmRetCode(OCFM_ERR_CHAINED_AND_MULTIPLEXED);
-	}
-	else if (isChained && !isMultiplexed)
-	{
-		stationType = CHAINED;
-	}
-	else if (!isChained && isMultiplexed)
-	{
-		stationType = MULTIPLEXED;
+		ostringstream errorString;
+		errorString << "Configuration error node " << nodeId << ": Simultanous Multiplexing and PRes-Chaining not supported.";
+		ocfmRetCode result(OCFM_ERR_CHAINED_AND_MULTIPLEXED);
+		result.setErrorString(errorString.str());
+		throw result;
 	}
 
-	string xdcFileString(xdcFileName);
-	string tempPath("");
-	//Check if path is relative or absolut
-	if(xdcFileString.find_first_of(".") == 0)
+	// Extract path to XDC and convert to absolute if necessary
+	boost::filesystem::path xdcPath = pathToXDC.get();
+	if (xdcPath.is_relative())
 	{
-		tempPath.append(this->GetProjectPath());
-		tempPath.append(xdcFileString.substr(xdcFileString.find_first_of(".") + 1, xdcFileString.length()));
+		xdcPath = this->GetProjectPath(); // trailing (back)slash
+		xdcPath.append(pathToXDC.get().begin(), pathToXDC.get().end()); // might result in // or \\ which should be ignored by the OS
 	}
-	else
-	{
-		tempPath.append(xdcFileString);
-	}
+	LOG_DEBUG() << "XDC-Path for node " << nodeId.get() << ": " << xdcPath.generic_string<string>();
 
-	if (nodeType == MN)
-	{
-		if (nodeName == NULL)
-		{
-			nodeName = new char[strlen((char*) "MN") + ALLOC_BUFFER];
-			strcpy((char*) nodeName, (char*) "MN");
-			exceptionObj = NewProjectNode(nodeId, MN, nodeName, tempPath.c_str());
-		}
-		else
-		{
-			exceptionObj = NewProjectNode(nodeId, MN, nodeName, tempPath.c_str());
-		}
-	}
-	else
-	{
-		if (nodeName == NULL)
-		{
-			nodeName = new char[strlen((char*) "CN") + ALLOC_BUFFER];
-			strcpy((char*) nodeName, (char*) "CN");
-			exceptionObj = NewProjectNode(nodeId, CN, nodeName, tempPath.c_str());
-		}
-		else
-		{
-			exceptionObj = NewProjectNode(nodeId, CN, nodeName, tempPath.c_str());
-		}
-	}
-
+	// Set a default node name if it was omitted
+	if ((!nodeName || nodeName.get().empty()) && nodeId.get() == MN_NODEID)
+		nodeName = "MN";
+	else if ((!nodeName || nodeName.get().empty()) && nodeId.get() != MN_NODEID) 
+		nodeName = "CN_" + boost::lexical_cast<std::string>(nodeId.get());
+	
+	// Create node
+	exceptionObj = NewProjectNode(nodeId.get(),
+		(nodeId.get() == MN_NODEID) ? MN : CN,
+		nodeName.get().c_str(), 
+		xdcPath.generic_string().c_str());
 	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
-	{
-		delete[] forceCycleValue;
-		delete[] xdcFileName;
-		delete[] nodeName;
 		throw exceptionObj;
-	}
 
-
-	NodeCollection *nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-	Node* nodeObj = nodeCollObj->GetNodePtr(nodeType, nodeId);
-
-	nodeObj->SetStationType(stationType);
-
-	//If Node is multiplexed
-	if (nodeType == CN && forcedMultiplexedCycle != 0 && stationType == MULTIPLEXED)
+	// Override node configuration for certain properties.
+	// Excluded: Bits in 0x1F81, NodeAssignment. Bits in 0x1F80, StartUp
+	Node& nodeObj = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(nodeId.get());
+	if (nodeId.get() == MN_NODEID)
 	{
-		nodeObj->SetForcedCycle(forceCycleValue);
-		nodeObj->SetForceCycleFlag(true);
-		nodeObj->SetForcedMultiplexedCycle(forcedMultiplexedCycle);
-	}
-	else if (nodeType == CN && forcedMultiplexedCycle == 0 || stationType == NORMAL || stationType == CHAINED)
-	{
-		nodeObj->SetForcedCycle("0");
-		nodeObj->SetForceCycleFlag(false);
-		nodeObj->SetForcedMultiplexedCycle(0);
-	}
-	if (nodeType == CN)
-	{
-
-		nodeObj->SetAutostartNode(autostartNode);
-		nodeObj->SetResetInOperational(resetInOperational);
-		nodeObj->SetAutoAppSwUpdateAllowed(autoAppSwUpdateAllowed);
-		nodeObj->SetVerifyAppSwVersion(verifyAppSwVersion);
-		nodeObj->SetVerifyDeviceType(verifyDeviceType);
-		nodeObj->SetVerifyProductCode(verifyProductCode);
-		nodeObj->SetVerifyRevisionNumber(verifyRevisionNumber);
-		nodeObj->SetVerifySerialNumber(verifySerialNumber);
-		nodeObj->SetVerifyVendorId(verifyVendorId);
+		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 2))
+			this->OverrideNodeConfiguration(nodeObj, 0x1F8A, 2, asyncSlotTimeout);
+		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 3))
+			this->OverrideNodeConfiguration(nodeObj, 0x1F8A, 3, aSndMaxNumber);		
 	}
 	else
 	{
-		nodeObj->SetTransmitsPRes(transmitsPRes);
-		nodeObj->SetAsyncSlotTimeout(asyncSlotTimeout);
-		nodeObj->SetASndMaxNumber(aSndMaxNumber);
+		// 0x1F9B should exist on MN and CN if Multiplexing is supported, but typically the
+		// Multiplexed-Cycle assignments will be entered on the MN to be distributed to all CNs.
+		if (isMultiplexed.get_value_or(false))
+		{
+			// NOTE: This only works if MN is defined before all CNs in the openCONFIGURATOR project-config!
+			Node& managingNode = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
+			if (managingNode.GetIndexCollection()->ContainsIndex(0x1F9B, nodeId.get()))
+				this->OverrideNodeConfiguration(managingNode, 0x1F9B, nodeId.get(), forcedMultiplexedCycle);
+		}
 	}
-	nodeObj->SetIsMandatory(isMandatory);
-	nodeObj->SetIsAsyncOnly(isAsyncOnly);
-	nodeObj->SetIsType1Router(isType1Router);
-	nodeObj->SetIsType2Router(isType2Router);
+	
+	StationType stationType = NORMAL;
+	if (isChained.get_value_or(false))
+		stationType = CHAINED;
+	else if (isMultiplexed.get_value_or(false))
+		stationType = MULTIPLEXED;
+	nodeObj.SetStationType(stationType);
 
-	delete[] forceCycleValue;
-	delete[] xdcFileName;
-	delete[] nodeName;
+	// Properties which were not synchronized to the OD of the respective Node
+	// are being set as Node-Properties.
+	if (nodeId.get() != MN_NODEID)
+	{
+		// CN properties
+		if (stationType == MULTIPLEXED)
+		{		
+			nodeObj.SetForceCycleFlag(forcedMultiplexedCycle.get_value_or(0) != 0);
+			nodeObj.SetForcedCycle(boost::lexical_cast<std::string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
+		}
+		else
+		{		
+			nodeObj.SetForceCycleFlag(false);
+			nodeObj.SetForcedCycle("0");
+		}
+		if (isMandatory)
+			nodeObj.SetIsMandatory(isMandatory.get());
+		if (autostartNode)
+			nodeObj.SetAutostartNode(autostartNode.get());
+		if (resetInOperational)
+			nodeObj.SetResetInOperational(resetInOperational.get());
+		if (autoAppSwUpdateAllowed)
+			nodeObj.SetAutoAppSwUpdateAllowed(autoAppSwUpdateAllowed.get());
+		if (verifyAppSwVersion)
+			nodeObj.SetVerifyAppSwVersion(verifyAppSwVersion.get());
+		if (verifyDeviceType)
+			nodeObj.SetVerifyDeviceType(verifyDeviceType.get());
+		if (verifyProductCode)
+			nodeObj.SetVerifyProductCode(verifyProductCode.get());
+		if (verifyRevisionNumber)
+			nodeObj.SetVerifyRevisionNumber(verifyRevisionNumber.get());
+		if (verifySerialNumber)
+			nodeObj.SetVerifySerialNumber(verifySerialNumber.get());
+		if (verifyVendorId)
+			nodeObj.SetVerifyVendorId(verifyVendorId.get());
+	}	
+	else
+	{
+		// MN properties
+		if (transmitsPRes)
+			nodeObj.SetTransmitsPRes(transmitsPRes.get());
+	}
+	// Common properties	
+	if (isAsyncOnly)
+		nodeObj.SetIsAsyncOnly(isAsyncOnly.get());
+	if (isType1Router)
+		nodeObj.SetIsType1Router(isType1Router.get());
+	if (isType2Router)
+		nodeObj.SetIsType2Router(isType2Router.get());	
 }
 
 void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 {
-	const xmlChar *name = xmlTextReaderConstName(xmlReader);
-	const xmlChar *value = xmlTextReaderConstValue(xmlReader);
+	string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+			? (const char*) xmlTextReaderConstName(xmlReader)
+			: "";
+	string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+			? (const char*) xmlTextReaderConstValue(xmlReader)
+			: "";
 
-	if (0 == strcmp((char*) name, PROJECT_XML_PATH_ID_ATTRIBUTE))
+	if (!xmlAttributeName.empty()
+		&& !xmlAttributeValue.empty()
+		&& xmlAttributeName == PROJECT_XML_PATH_ID_ATTRIBUTE)
 	{
-		string id ((const char*) value);
-		if (id.compare(PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE) == 0)
+		if (xmlAttributeValue == PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE)
 		{
-			xmlTextReaderMoveToNextAttribute(xmlReader);
-			value = xmlTextReaderConstValue(xmlReader);
-			name = xmlTextReaderConstName(xmlReader);
-
-			string pathValue((const char*) value);
-			this->SetDefaultOutputPath(pathValue);
-
-		}
-		else if (id.compare(PROJECT_XML_PATH_TXT2CDC_ATTRIBUTE) == 0)
-		{
-			xmlTextReaderMoveToNextAttribute(xmlReader);
-			value = xmlTextReaderConstValue(xmlReader);
-			name = xmlTextReaderConstName(xmlReader);
-
-			string pathValue((const char*) value);
-			this->SetPathTxt2CdcExecutable(pathValue);
+			xmlTextReaderMoveToNextAttribute(xmlReader);			
+			xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+				? (const char*) xmlTextReaderConstName(xmlReader)
+				: "";
+			xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+				? (const char*) xmlTextReaderConstValue(xmlReader)
+				: "";
+			if (!xmlAttributeName.empty()
+				&& !xmlAttributeValue.empty()
+				&& xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE)
+			{
+				this->SetDefaultOutputPath(xmlAttributeValue);
+			}
 		}
 	}
 }
 
+// TODO: Where are the properties set in this method ever used?
+// If these settings are not defined within an MN-XDD, but just the project file, will
+// they be evaluated during the CDC-Generation??
 void ProjectConfiguration::ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader)
 {
-	const xmlChar *name = xmlTextReaderConstName(xmlReader);
-	const xmlChar *value = xmlTextReaderConstValue(xmlReader);
+	string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		? (const char*) xmlTextReaderConstName(xmlReader)
+		: "";
+	string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		? (const char*) xmlTextReaderConstValue(xmlReader)
+		: "";
 
-	stringstream convert;
-	UINT32 tempVal = 0;
-
-	if (0 == strcmp((char*) name, PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE))
+	if (!xmlAttributeName.empty() && !xmlAttributeValue.empty())
 	{
-		convert << value;
-		convert >> tempVal;
-		this->SetCycleTime(tempVal);
-		//0x1006
-	}
-	else if (0 == strcmp((char*) name, PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE))
-	{
-		convert << value;
-		convert >> tempVal;
-		this->SetAsyncMTU(tempVal);
-		//0x1F98/0x8
-	}
-	else if (0 == strcmp((char*) name, PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE))
-	{
-		convert << value;
-		convert >> tempVal;
-		this->SetMultiplexedCycleLength(tempVal);
-		//0x1F98/0x7
-	}
-	else if (0 == strcmp((char*) name, PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE))
-	{
-		convert << value;
-		convert >> tempVal;
-		this->SetPrescaler(tempVal);
-		//0x1F98/0x9
+		if (xmlAttributeName == PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE)
+		{
+			//0x1006
+			this->SetCycleTime(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+		}
+		else if (xmlAttributeName == PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE)
+		{
+			//0x1F98/0x8
+			this->SetAsyncMTU(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+		}
+		else if (xmlAttributeName == PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE)
+		{
+			//0x1F98/0x7
+			this->SetMultiplexedCycleLength(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+		}
+		else if (xmlAttributeName == PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE)
+		{
+			//0x1F98/0x9
+			this->SetPrescaler(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+		}
 	}
 }
 
-//Synchronize 1F98/7 between MN and all CNs
-void ProjectConfiguration::SynchronizeMultiplexingCycleLength(void)
+/*
+// Synchronize 1F98/7 between MN and all CNs
+// FIXME: Why is this done at project-load? If a user changes the cycle-length later via interface,
+// will it still be distributed to all CNs?
+// Shouldn't a cycleLength defined in the MN-XDD just overwrite the setting in the project-settings?
+// TODO: If a setting within the MN-XDD overwrites a setting from the project-file, there should be an INFO log-entry.
+// FIXME: What happens with MN and CN-Settings defined in the project-file AND the respective XDD?
+void ProjectConfiguration::SynchronizeMultiplexedCycleLength(void)
 {
 	stringstream convertString;
 	INT32 indexPos = 0;
 
 	//Check if index 1F98 exists on MN (is mandatory)
+	NodeCollection::GetNodeColObjectPointer()->GetMNNode().GetIndexCollection()->ContainsIndex(0x1F98);
+
 	ocfmRetCode retCode = IfIndexExists(MN_NODEID, MN, "1F98", &indexPos);
 	if (retCode.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		throw retCode;
 	}
 	NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-	if (NULL == nodeCollObj)
+	if (!nodeCollObj)
 	{
 		throw ocfmRetCode(OCFM_ERR_NO_NODES_FOUND);
 	}
@@ -923,7 +785,7 @@ void ProjectConfiguration::SynchronizeMultiplexingCycleLength(void)
 		throw ocfmRetCode(OCFM_ERR_NO_INDEX_FOUND);
 	}
 
-	Index* indexObj = indexCollObj->GetIndex(indexPos);
+	Index* indexObj = indexCollObj->GetIndexByPosition(indexPos);
 	if (NULL == indexObj)
 	{
 		throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
@@ -958,7 +820,7 @@ void ProjectConfiguration::SynchronizeMultiplexingCycleLength(void)
 				{
 					throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
 				}
-				indexObj = indexCollObj->GetIndex(indexPos);
+				indexObj = indexCollObj->GetIndexByPosition(indexPos);
 				if (indexObj == NULL)
 				{
 					throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
@@ -985,6 +847,7 @@ void ProjectConfiguration::SynchronizeMultiplexingCycleLength(void)
 	}
 }
 
+// FIXME: Why??
 void ProjectConfiguration::SynchronizeCycleTime(void)
 {
 	stringstream convertString;
@@ -1009,7 +872,7 @@ void ProjectConfiguration::SynchronizeCycleTime(void)
 		throw ocfmRetCode(OCFM_ERR_NO_INDEX_FOUND);
 	}
 
-	Index* indexObj = indexCollObj->GetIndex(indexPos);
+	Index* indexObj = indexCollObj->GetIndexByPosition(indexPos);
 	if (NULL == indexObj)
 	{
 		throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
@@ -1028,6 +891,7 @@ void ProjectConfiguration::SynchronizeCycleTime(void)
 	}
 }
 
+// FIXME: Why??
 void ProjectConfiguration::SynchronizeAsyncMtu(void)
 {
 	stringstream convertString;
@@ -1052,7 +916,7 @@ void ProjectConfiguration::SynchronizeAsyncMtu(void)
 		throw ocfmRetCode(OCFM_ERR_NO_INDEX_FOUND);
 	}
 
-	Index* indexObj = indexCollObj->GetIndex(indexPos);
+	Index* indexObj = indexCollObj->GetIndexByPosition(indexPos);
 	if (NULL == indexObj)
 	{
 		throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
@@ -1076,6 +940,7 @@ void ProjectConfiguration::SynchronizeAsyncMtu(void)
 	}
 }
 
+// FIXME: Why??
 void ProjectConfiguration::SynchronizePrescaler(void)
 {
 	stringstream convertString;
@@ -1100,7 +965,7 @@ void ProjectConfiguration::SynchronizePrescaler(void)
 		throw ocfmRetCode(OCFM_ERR_NO_INDEX_FOUND);
 	}
 
-	Index* indexObj = indexCollObj->GetIndex(indexPos);
+	Index* indexObj = indexCollObj->GetIndexByPosition(indexPos);
 	if (NULL == indexObj)
 	{
 		throw ocfmRetCode(OCFM_ERR_INDEXID_NOT_FOUND);
@@ -1117,9 +982,106 @@ void ProjectConfiguration::SynchronizePrescaler(void)
 		string actualValue(actualValue);
 		if (!actualValue.empty())
 		{
-			//Set ProjectConfiguration multiplexedCycleLength
 			convertString << actualValue;
-			convertString >> this->asyncMTU;
+			convertString >> this->prescaler;
 		}
 	}
+}
+*/
+
+void ProjectConfiguration::OverrideNetworkConfiguration()
+{
+	LOG_INFO() << "Overriding network-configuration...";
+	Node& node = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
+	this->OverrideNodeConfiguration(node, 0x1006, 0, this->cycleTime);
+	this->OverrideNodeConfiguration(node, 0x1F98, 7, this->multiplexedCycleLength);
+	this->OverrideNodeConfiguration(node, 0x1F98, 8, this->asyncMTU);	
+	this->OverrideNodeConfiguration(node, 0x1F98, 9, this->prescaler);
+	LOG_INFO() << "Overriding network-configuration done.";
+}
+
+template<typename T>
+void ProjectConfiguration::OverrideNodeConfiguration(Node& node, 
+	const UINT32 index, 
+	const UINT32 subIndex, 
+	boost::optional<T>& projectConfigValue) const
+{
+	LOG_DEBUG() 
+		<< std::hex
+		<< std::showbase
+		<< "Overriding configuration for node " << node.GetNodeId()
+		<< ", index " << index << "/" << subIndex << ".";
+	boost::optional<T> currActualValue = node.GetActualValue<T>(index, subIndex);
+	if (currActualValue)
+	{
+		// There is an actualValue for the index/subIndex, it
+		// overrides the project-config
+		std::string projectConfigValueStr = projectConfigValue
+			? boost::lexical_cast<std::string>(projectConfigValue.get())
+			: "NULL";
+		LOG_DEBUG()
+			<< std::hex
+			<< std::showbase
+			<< "Overwrote project-configuration value '"
+			<< projectConfigValueStr << "'"
+			<< " with actualValue '" << currActualValue.get() << "'.";
+		projectConfigValue = currActualValue;
+	}
+	else
+	{
+		// There is no actualValue, set the project-config value
+		// as actual value if it is valid
+		if (projectConfigValue)
+		{
+			node.SetActualValue(index, subIndex, projectConfigValue.get());
+			std::string currActualValueStr = currActualValue
+				? boost::lexical_cast<std::string>(currActualValue.get())
+				: "NULL";
+			LOG_DEBUG() 
+				<< std::hex
+				<< std::showbase
+				<< "Overwrote actualValue '" << currActualValueStr
+				<< "' of node with project-configuration value '"
+				<< projectConfigValue.get() << "'.";
+		}
+		else
+		{
+			LOG_DEBUG() << "Nothing to override.";
+		}
+	}
+
+	/*
+	Index& indexRef = node.GetIndexCollection()->GetIndexRef(index);
+	SubIndex* subIndexPtr = indexRef.GetSubIndexPtr(subIndex);
+	const char* actualValue = (subIndexPtr == NULL)
+		? indexRef.GetActualValue()
+		: subIndexPtr->GetActualValue();
+	std::stringstream converter;
+	if (actualValue != NULL && strlen(actualValue) != 0)
+	{
+		// There is an actualValue for the index/subIndex, it
+		// overrides the project-config
+		string actualValueStr(actualValue);
+		if (boost::algorithm::starts_with(actualValueStr, "0x")) 
+			converter << std::hex << actualValueStr.substr(2);
+		else
+			converter << std::boolalpha << actualValueStr;
+		T temporary;
+		converter >> temporary;
+		projectConfigValue = temporary;
+	}
+	else
+	{
+		// There is no actualValue, set the project-config value
+		// as actual value if there is a valid one
+		if (projectConfigValue)
+		{
+			converter << std::boolalpha << projectConfigValue.get();
+			if (subIndexPtr != NULL)
+				subIndexPtr->SetActualValue(converter.str().c_str());
+			else
+				indexRef.SetActualValue(converter.str().c_str());
+		}
+	}
+	*/
 }

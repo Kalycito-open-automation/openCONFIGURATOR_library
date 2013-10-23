@@ -1,9 +1,6 @@
-#include "../Include/UtilityApi.h"
-#include "../Include/LibraryConfiguration.h"
-#include <string>
-using namespace std;
+/************************************************************************
+\file UtilityApi.cpp
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+************************************************************************/
 
-DLLEXPORT bool SetLibraryResourcePath(const string libraryResourcePath)
-{
-	return LibraryConfiguration::Initialize(libraryResourcePath);
-}
+#include "../Include/UtilityApi.h"

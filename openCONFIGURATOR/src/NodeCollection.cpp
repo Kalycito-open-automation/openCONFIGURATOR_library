@@ -55,8 +55,15 @@
 /* Includes */
 
 #include <stdio.h>
+#include <sstream>
+
 #include "../Include/NodeCollection.h"
 #include "../Include/Node.h"
+#include "../Include/Logging.h"
+#include "../Include/Result.h"
+#include "../Include/BoostShared.h"
+
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 /****************************************************************************/
 /* Global Variables */
@@ -212,4 +219,38 @@ INT32 NodeCollection::GetCNNodesCount()
 		}
 	}
 	return cnNodeCount;
+}
+
+bool NodeCollection::ContainsNode(const UINT32 nodeId)
+{
+	return (this->GetNodePtr(nodeId) != NULL);
+}
+
+Node* NodeCollection::GetNodePtr(const UINT32 nodeId)
+{
+	vector<Node>::iterator it = this->nodeCollObj.begin();
+	for (;
+		it != this->nodeCollObj.end() && (((UINT32)it->GetNodeId()) != nodeId);
+		++it)
+	{}
+	if (it == this->nodeCollObj.end())
+		return NULL;
+	else
+		return &(*it);
+}
+
+Node& NodeCollection::GetNodeRef(const UINT32 nodeId)
+{
+	Node* node = this->GetNodePtr(nodeId);
+	if (node)
+		return *node;
+	else
+	{
+		boost::format formatter(kMsgNonExistingNode);
+		formatter % nodeId;
+		ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
+		result.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw result;
+	}
 }

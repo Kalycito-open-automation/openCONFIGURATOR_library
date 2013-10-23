@@ -56,6 +56,8 @@
 
 #include "Exports.h"
 
+#include <string>
+
 /*****************************************************************************/
 /* Macro definition */
 
@@ -140,6 +142,7 @@ typedef unsigned long int ULONG;
  */
 enum ObjectType
 {
+	INVALID = 0,
 	DEFTYPE = 5,	/**< 5: Denotes a static data type definition */
 	DEFSTRUCT = 6,	/**< 6: Defines a record type */
 	VAR = 7,		/**< 7: Denotes a single value */
@@ -383,5 +386,39 @@ DLLEXPORT enum OutputLanguage {
 	CSHARP,
 	XML
 };
+
+namespace openCONFIGURATOR 
+{
+	namespace Library
+	{
+		namespace ObjectDictionary
+		{
+			namespace AccessType
+			{
+				/************************************************************************
+				\brief	Accesstype for objects/subobjects of the ObjectDictionary.
+
+						See EPSG DS 301, v1.1.0, v1.2.0
+				\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+				************************************************************************/
+				enum AccessType 
+				{
+					INVALID,
+					RW,
+					WO, 
+					RO, 
+					CONST, 
+					COND,
+					RWS,/**< From v1.2.0 upwards! */
+					WOS	/**< From v1.2.0 upwards! */
+				};
+			}
+
+			AccessType::AccessType GetAccessType(const std::string& accessType);
+			::ObjectType GetObjectType(const std::string& objectType);
+
+		}
+	}
+}
 
 #endif // ENUMS_H_

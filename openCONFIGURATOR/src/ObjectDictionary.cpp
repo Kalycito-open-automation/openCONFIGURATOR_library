@@ -84,10 +84,6 @@ ObjectDictionary::ObjectDictionary(void)
 {
 	objDictNode = new Node();
 	objDictNode->SetNodeId(-100);
-	objDictNode->CreateIndexCollection();
-	objDictNode->CreateDataTypeCollection();
-	objDictNode->CreateApplicationProcess();
-	objDictNode->CreateNetworkManagement();
 	varsattrIdxSIdx = attribCollObj.size();
 }
 
@@ -209,7 +205,7 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 				//bool same = false;
 				Index* idxObj = NULL;
 				idxCollObj = objDictNode->GetIndexCollection();
-				idxObj = idxCollObj->GetIndex(lastObjDictIdxParsed);
+				idxObj = idxCollObj->GetIndexByPosition(lastObjDictIdxParsed);
 
 				//Set the NodeID
 				sidxObj.SetNodeID(-100);
@@ -247,7 +243,7 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 		}
 	} catch (ocfmRetCode& ex)
 	{
-		LOG_FATAL() << "Error: " << ex.getErrorString();
+		LOG_FATAL() << ex.getErrorString();
 		throw ex;
 	}
 }

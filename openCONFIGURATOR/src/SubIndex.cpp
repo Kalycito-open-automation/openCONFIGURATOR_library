@@ -87,3 +87,7 @@ SubIndex::~SubIndex(void)
 	//Add destructor code here
 }
 
+bool SubIndex::operator== (const SubIndex& subIndex) const
+{
+	return (subIndex.GetIndex() == this->GetIndex());
+}

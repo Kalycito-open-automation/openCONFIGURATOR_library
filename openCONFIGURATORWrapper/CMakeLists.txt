@@ -112,6 +112,6 @@ SWIG_LINK_LIBRARIES(openConfiguratorWrapper openCONFIGURATOR ${TCL_LIBRARY})
 ###############################################################################
 INSTALL(
 	TARGETS openConfiguratorWrapper 
-	ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/bin
-	LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/bin
+	ARCHIVE DESTINATION ${INSTALL_DIR}
+	LIBRARY DESTINATION ${INSTALL_DIR}
 )

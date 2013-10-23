@@ -71,5 +71,15 @@ class SubIndex: public BaseIndex
 	public:
 		SubIndex(void);
 		~SubIndex(void);
+
+		/************************************************************************
+		\brief Equality operator.
+		
+		\param subIndex SubIndex for comparison
+		
+		\return true if this instances' index is numerically equal to the index of the argument.
+		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		bool operator== (const SubIndex& subIndex) const;
 };
 #endif // SubIndex_h

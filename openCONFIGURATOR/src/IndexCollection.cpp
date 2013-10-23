@@ -55,8 +55,13 @@
 /* Includes */
 
 #include <stdio.h>
+#include <sstream>
+#include <algorithm>
+
 #include "../Include/IndexCollection.h"
 #include "../Include/Internal.h"
+#include "../Include/Logging.h"
+#include "../Include/BoostShared.h"
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -161,7 +166,7 @@ void IndexCollection::DeletePIObjects()
 	delete[] subStr;
 }
 
-Index* IndexCollection::GetIndex(INT32 indexPosition)
+Index* IndexCollection::GetIndexByPosition(INT32 indexPosition)
 {
 	return &indexCollection[indexPosition];
 }
@@ -206,3 +211,56 @@ INT32 IndexCollection::GetNumberofIndexes()
 	return indexCollection.size();
 }
 
+bool IndexCollection::ContainsIndex(const UINT32 index, const UINT32 subIndex)
+{
+	Index* indexPtr = this->GetIndexPtr(index);
+	// Index not found
+	if (!indexPtr)
+		return false;
+	// Index has no subIndices and subIndex 0 was requested
+	if (subIndex == 0 && !indexPtr->HasSubIndices())
+		return true;
+	// Index has subIndices and subIndex != 0 was requested
+	return indexPtr->ContainsSubIndex(subIndex);
+}
+
+Index* IndexCollection::GetIndexPtr(const UINT32 index)
+{
+	vector<Index>::iterator it = this->indexCollection.begin();
+	for (;
+		it != this->indexCollection.end() && (it->GetIndex() != index);
+		++it)
+	{}
+	if (it == this->indexCollection.end())
+		return NULL;
+	else
+		return &(*it);
+}
+
+Index& IndexCollection::GetIndexRef(const UINT32 index)
+{
+	Index* indexPtr = this->GetIndexPtr(index);
+	if (indexPtr)
+	{
+		return *indexPtr;
+	}
+	else
+	{
+		boost::format formatter("Index %#x does not exist in OD.");
+		formatter % index;
+		ocfmRetCode result(OCFM_ERR_INDEXID_NOT_FOUND);
+		result.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw result;
+	}
+}
+
+bool IndexCollection::IsEmpty() const
+{
+	return this->indexCollection.empty();
+}
+
+UINT32 IndexCollection::Size() const
+{
+	return this->indexCollection.size();
+}

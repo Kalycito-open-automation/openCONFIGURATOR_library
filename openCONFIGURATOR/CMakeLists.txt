@@ -86,10 +86,13 @@ IF(WIN32)
 	INCLUDE_DIRECTORIES(
 		${CMAKE_SOURCE_DIR}/libxml2/include 
 		${CMAKE_SOURCE_DIR}/libxml2/iconv/include
-		${Boost_INCLUDE_DIRS}
-	)
+		${Boost_INCLUDE_DIRS})
 ELSE(WIN32)
-	INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR})
+	INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR})	
+	# This will cause the Boost-Headers to be included via GNU GCC's "-isystem"
+	# option and hence will treat the Boost-Headers as system headers
+	# (and suppress warnings for them).
+	INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
 ENDIF(WIN32)
 
 ###############################################################################
@@ -132,45 +135,53 @@ ENDIF()
 TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADDITIONAL_DEPENDENCIES})
 
 ###############################################################################
-# Install openCONF library to build dir and copy resources
+# Install openCONF library and dependencies to build dir
 ###############################################################################
 IF(WIN32)
 	FILE (GLOB_RECURSE LIBS "${CMAKE_SOURCE_DIR}/resources/lib/*.dll")
-	INSTALL(
-		FILES ${LIBS} DESTINATION ${CMAKE_SOURCE_DIR}/bin
-	)
+	INSTALL(FILES ${LIBS} DESTINATION ${INSTALL_DIR})
+	
+	# Install Boost libraries
+	FILE (GLOB BOOST_DEBUG_LIBS "${Boost_LIBRARY_DIRS}/*mt-gd*.dll")
+	FILE (GLOB BOOST_RELEASE_LIBS "${Boost_LIBRARY_DIRS}/*mt-1*.dll")
+	INSTALL(FILES ${BOOST_DEBUG_LIBS} DESTINATION ${INSTALL_DIR} CONFIGURATIONS Debug)
+	INSTALL(FILES ${BOOST_RELEASE_LIBS} DESTINATION ${INSTALL_DIR} CONFIGURATIONS Release)
+	
 	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc.exe" 
 		DESTINATION
-		${CMAKE_SOURCE_DIR}/bin/resources
+		${INSTALL_DIR}/resources
 	)
 ELSE()
 	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc" 
 		DESTINATION
-		${CMAKE_SOURCE_DIR}/bin/resources
+		${INSTALL_DIR}/resources
 	)
 ENDIF()
 
 FILE (GLOB_RECURSE SCHEMA "${CMAKE_SOURCE_DIR}/resources/xddschema/*.xsd")
 INSTALL(
-	FILES ${SCHEMA} DESTINATION ${CMAKE_SOURCE_DIR}/bin/resources/xddschema
+	FILES ${SCHEMA} DESTINATION ${INSTALL_DIR}/resources/xddschema
 )
 FILE (GLOB_RECURSE OCSCHEMA "${CMAKE_SOURCE_DIR}/resources/OC_ProjectFile/*.xsd")
 INSTALL(
-	FILES ${OCSCHEMA} DESTINATION ${CMAKE_SOURCE_DIR}/bin/resources/OC_ProjectFile
+	FILES ${OCSCHEMA} DESTINATION ${INSTALL_DIR}/resources/OC_ProjectFile
 )
 FILE (GLOB_RECURSE IOSCHEMA "${CMAKE_SOURCE_DIR}/resources/XDD_ImportExport_Config/*.xsd")
 INSTALL(
-	FILES ${IOSCHEMA} DESTINATION ${CMAKE_SOURCE_DIR}/bin/resources/XDD_ImportExport_Config
+	FILES ${IOSCHEMA} DESTINATION ${INSTALL_DIR}/resources/XDD_ImportExport_Config
 )
 FILE (GLOB_RECURSE XDDS "${CMAKE_SOURCE_DIR}/resources/*.xdd")
 INSTALL(
-	FILES ${XDDS} DESTINATION ${CMAKE_SOURCE_DIR}/bin/resources/
+	FILES ${XDDS} DESTINATION ${INSTALL_DIR}/resources/
 )
 INSTALL(
-	FILES "${CMAKE_SOURCE_DIR}/resources/od.xml" DESTINATION ${CMAKE_SOURCE_DIR}/bin/resources/
+	FILES "${CMAKE_SOURCE_DIR}/resources/od.xml" DESTINATION ${INSTALL_DIR}/resources/
+)
+INSTALL(
+	FILES "${CMAKE_SOURCE_DIR}/resources/boost_log_settings.ini" DESTINATION ${INSTALL_DIR}/resources/
 )
 INSTALL(
 	TARGETS openCONFIGURATOR 
-	RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/bin
-	LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/bin
+	RUNTIME DESTINATION ${INSTALL_DIR}
+	LIBRARY DESTINATION ${INSTALL_DIR}
 )

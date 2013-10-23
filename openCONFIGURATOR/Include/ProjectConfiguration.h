@@ -1,5 +1,15 @@
-#ifndef PROJECTCONFIGURATION_H
-#define PROJECTCONFIGURATION_H
+/************************************************************************
+\file	ProjectConfiguration.h
+\brief	Classes/Functions to read/provide openCONFIGURATOR project configuration.
+
+		Functionality: Reading project configuration from an XML file and providing
+		settings to the application.
+\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+\date	11.10.2013
+************************************************************************/
+
+#ifndef PROJECTCONFIGURATION_H_
+#define PROJECTCONFIGURATION_H_
 
 #include <string>
 #include <iostream>
@@ -13,87 +23,112 @@
 #include <libxml/encoding.h>
 #include <libxml/xmlreader.h>
 
-using namespace std;
+#include "BoostShared.h"
 
 class ProjectConfiguration
 {
 public:
-	static ProjectConfiguration* GetInstance(void);
+	static ProjectConfiguration& GetInstance(void);
 
-	const string& GetDefaultOutputPath(void);
-	void SetDefaultOutputPath(const string& defaultOutputPath);
+	const std::string& GetDefaultOutputPath(void) const;
+	void SetDefaultOutputPath(const std::string& defaultOutputPath);
 
-	const string& GetPathTxt2CdcExecutable(void);
-	void SetPathTxt2CdcExecutable(const string& pathTxt2CdcExecutable);
-
-	bool GetGenerateMNOBD(void);
+	bool GetGenerateMNOBD(void) const;
 	void SetGenerateMNOBD(bool generateMNOBD);
 
-	bool GetProjectLoaded(void);
-	void SetProjectLoaded(bool projectLoaded);
+	bool IsInitialized(void) const;
+	void SetInitialized(bool initialized);
 
-	const string& GetProjectFile(void);
-	void SetProjectFile(const string& projectFile);
+	const std::string& GetProjectFile(void) const;
+	void SetProjectFile(const std::string& projectFile);
 
-	const string& GetProjectPath(void);
-	void SetProjectPath(const string& projectPath);
+	const std::string& GetProjectPath(void) const;
+	void SetProjectPath(const std::string& projectPath);
 
-	UINT32 GetCycleTime(void);
+	const boost::optional<UINT32>& GetCycleTime(void) const;
 	void SetCycleTime(UINT32 cycleTime);
 
-	UINT32 GetAsyncMTU(void);
+	const boost::optional<UINT32>& GetAsyncMTU(void) const;
 	void SetAsyncMTU(UINT32 asyncMTU);
 
-	UINT32 GetMultiplexedCycleLength(void);
+	const boost::optional<UINT32>& GetMultiplexedCycleLength(void) const;
 	void SetMultiplexedCycleLength(UINT32 multiplexedCycleLength);
 
-	UINT32 GetPrescaler(void);
+	const boost::optional<UINT32>& GetPrescaler(void) const;
 	void SetPrescaler(UINT32 prescaler);
 
-	ocfmRetCode LoadProject(const string& projectFile);
-	void resetConfiguration(void);
+	ocfmRetCode LoadProject(const std::string& projectFile);
+	void ResetConfiguration(void);
 
 	~ProjectConfiguration(void);
 
 private:
-	static ProjectConfiguration* instance;
+	static ProjectConfiguration instance;
 	ProjectConfiguration(void);
 	ProjectConfiguration(const ProjectConfiguration&);
-	
+	void operator=(const ProjectConfiguration&);
 
-	void ProcessProjectElement(xmlTextReaderPtr xmlReader);
-	void ProcessProjectNode(xmlTextReaderPtr xmlReader);
+	void ProcessProject(xmlTextReaderPtr xmlReader);
+	void ProcessNode(xmlTextReaderPtr xmlReader);
 	void ProcessPath(xmlTextReaderPtr xmlReader);
 	void ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader);
 	void ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader);
 	void ProcessAutogenerationSetting(xmlTextReaderPtr xmlReader);
 
-	void SynchronizeMultiplexingCycleLength(void);
+	/*
+	void SynchronizeMultiplexedCycleLength(void);
 	void SynchronizeCycleTime(void);
 	void SynchronizeAsyncMtu(void);
 	void SynchronizePrescaler(void);
+	*/
+
+	/************************************************************************
+	\brief	Override project configuration values for the network (element "NetworkConfiguration").
+
+			Overrides the attributes "cycleTime", "multiplexedCycleLength", "asyncMTU" and "prescaler"
+			of the "NetworkConfiguration" element with corresponding values from the MN's OD, indices
+			0x1006, 0x1F98/7-9.
+	\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+	************************************************************************/
+	void OverrideNetworkConfiguration();
+
+	/************************************************************************
+	\brief	Override project configuration values for a Node with values from the Node's XDD.
+			
+			This method will:
+			1. If the given index/subIndex on the Node has an "actualValue" (!= NULL && len > 0), 
+			   read and write it to projectConfigValue (precedence of Nodes' OD over project configuration file).
+			2. If there is no "actualValue" and projectConfigValue is initialized (read: there is a value
+			   in the project configuration file), it will write projectConfigValue to "actualValue".
+
+	\param index 16bit index of the Index.
+	\param subIndex	8bit index of the SubIndex.
+	\param projectConfigValue Actual value from project configuration file.
+	\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+	************************************************************************/
+	template<typename T>
+	void OverrideNodeConfiguration(Node& node, 
+		const UINT32 index, 
+		const UINT32 subIndex, 
+		boost::optional<T>& projectConfigValue) const;
 	
 	//General attributes
-	bool projectLoaded;
+	bool initialized;
 
 	//Project related attributes
-	string projectFile;
-	string projectPath;
+	std::string projectFile;
+	std::string projectPath;
 	bool generateMNOBD;
-	string autogenerationSettingID;
+	std::string autogenerationSettingID;
 
 	//Project paths
-	string defaultOutputPath;
-	string pathTxt2CdcExecutable;
+	std::string defaultOutputPath;
 
 	//General network attributes
-	UINT32 cycleTime;
-	UINT32 asyncMTU;
-	UINT32 multiplexedCycleLength;
-	UINT32 prescaler;
-	
-	//temp variable
-	bool isChosenSetting;
+	boost::optional<UINT32> cycleTime;
+	boost::optional<UINT32> asyncMTU;
+	boost::optional<UINT32> multiplexedCycleLength;
+	boost::optional<UINT32> prescaler;
 };
 
-#endif
+#endif // PROJECTCONFIGURATION_H_
