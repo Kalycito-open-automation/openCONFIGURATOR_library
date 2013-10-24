@@ -1229,7 +1229,7 @@ bool IsCNNodeAssignmentValid(Node* nodeObj);
  \retval		FALSE			if not copied
  */
 /******************************************************************************************/
-bool CopyMNSubindexToCN(Node* nodeObj, char* indexId, char* subIndexId);
+bool CopyMNSubindexToCN(Node* nodeObj, const char* indexId, const char* subIndexId);
 /*****************************************************************************************/
 /**
  \brief		This function shall calculate the PReq and PRes payload value for the nodes

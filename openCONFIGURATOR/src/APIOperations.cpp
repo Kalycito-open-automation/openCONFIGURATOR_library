@@ -2511,7 +2511,7 @@ bool IsCNNodeAssignmentValid(Node* nodeObj)
 
 void UpdateCNMultipleCycleAssign(Node* nodeObj)
 {
-	ocfmRetCode exceptionObj;
+	/*ocfmRetCode exceptionObj;
 	IndexCollection* indexCollObjCN = NULL;
 	Index* indexObjCN = NULL;
 	Index* indexObjMN = NULL;
@@ -2578,6 +2578,36 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj)
 			sindexObjCN->SetActualValue((char*) "");
 		}
 		sindexObjCN->SetFlagIfIncludedCdc(true);
+	}*/
+	
+	LOG_DEBUG() << "Updating multiplexed-cycle assignment (0x1F9B) on node " << nodeObj->GetNodeId() << " with MN-Configuration.";
+	//Check if index 1F9B exists on MN (is optional)
+	assert(NodeCollection::GetNodeColObjectPointer());
+	Node& managingNode = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
+	assert(managingNode.GetIndexCollection());
+	if (!managingNode.GetIndexCollection()->ContainsIndex(0x1F9B, 0))
+	{
+		LOG_WARN() << "Multiplexed-cycle assignment cannot be updated because index 0x1F9B/0x0 is missing on MN.";
+		return;
+	}	
+	//Check if index 1F9B exists on CN (is optional)
+	assert(nodeObj->GetIndexCollection());
+	if (!nodeObj->GetIndexCollection()->ContainsIndex(0x1F9B, 0))
+	{
+		LOG_WARN() << "Multiplexed-cycle assignment cannot be updated because index 0x1F9B/0x0 is missing on CN.";
+		return;
+	}
+	Index& NMT_MultiplCycleAssign = managingNode.GetIndexCollection()->GetIndexRef(0x1F9B);
+	for (int subIndex = 0; subIndex < NMT_MultiplCycleAssign.GetNumberofSubIndexes(); subIndex++)
+	{
+		SubIndex* subIndexPtr = NMT_MultiplCycleAssign.GetSubIndexByPosition(subIndex);
+		if (subIndexPtr->GetActualValue())
+		{
+			LOG_DEBUG() << "Assigning multiplexed cycle " 
+				<< subIndexPtr->GetActualValue()
+				<< " to node " << subIndexPtr->GetIndexValue() << ".";
+			CopyMNSubindexToCN(nodeObj, NMT_MultiplCycleAssign.GetIndexValue(), subIndexPtr->GetIndexValue());
+		}
 	}
 }
 
@@ -3091,7 +3121,7 @@ void UpdateCNVisibleNode(Node* nodeObj)
 
 }
 
-bool CopyMNSubindexToCN(Node* nodeObj, char* indexId, char* subIndexId)
+bool CopyMNSubindexToCN(Node* nodeObj, const char* indexId, const char* subIndexId)
 {
 	bool sidxCopied = false;
 	ocfmRetCode exceptionObj;
