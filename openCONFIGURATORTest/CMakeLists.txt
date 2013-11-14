@@ -69,6 +69,13 @@ ENDIF()
 	
 FIND_LIBRARY(LIBXML2 NAMES libxml2.lib PATHS ${CMAKE_SOURCE_DIR}/libxml2/lib)
 
+### Find Boost Libraries BEGIN ###
+SET(Boost_DEBUG TRUE)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+FIND_PACKAGE(Boost 1.54.0 COMPONENTS log date_time filesystem system thread REQUIRED)
+# Necessary for Auto-Linking under VS, ignored under Unix
+ADD_DEFINITIONS(/DBOOST_ALL_DYN_LINK)
+### Find Boost Libraries END ###
 
 ###############################################################################
 # Set general sources and header of openCONF library
@@ -86,6 +93,7 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_SOURCE_DIR}/libxml2/include 
 	${CMAKE_SOURCE_DIR}/libxml2/iconv/include
 	${CMAKE_SOURCE_DIR}/openCONFIGURATOR/Include
+	${Boost_INCLUDE_DIRS}
 )
 
 ###############################################################################
@@ -94,6 +102,7 @@ INCLUDE_DIRECTORIES(
 LINK_DIRECTORIES(
 ${CMAKE_SOURCE_DIR}/cppunit/lib
 ${CMAKE_SOURCE_DIR}/libxml2/lib
+${Boost_LIBRARY_DIRS}
 )
 
 ###############################################################################
@@ -110,6 +119,13 @@ TARGET_LINK_LIBRARIES(openCONFIGURATORTest optimized ${CPPUNIT} ${LIBXML2})
 ###############################################################################
 # Copy unit test dependency and execute the tests
 ###############################################################################
+
+ADD_CUSTOM_COMMAND(TARGET openCONFIGURATORTest POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${Boost_LIBRARY_DIRS}"
+        "${PROJECT_BINARY_DIR}/$<CONFIGURATION>")
+
+
 ADD_CUSTOM_COMMAND(TARGET openCONFIGURATORTest POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/resources/"

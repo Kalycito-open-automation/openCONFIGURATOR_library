@@ -53,6 +53,8 @@
 #include "../include/XddApiTest.h"
 #include "Exception.h"
 
+using namespace openCONFIGURATOR::Library::API;
+
 CPPUNIT_TEST_SUITE_REGISTRATION( XddApiTest );
 
 XddApiTest::XddApiTest(void)

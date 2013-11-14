@@ -56,6 +56,8 @@
 #include <libxml/parser.h>
 #include <libxml/xmlschemas.h>
 
+using namespace openCONFIGURATOR::Library::API;
+
 
 CPPUNIT_TEST_SUITE_REGISTRATION( OdApiTest );
 

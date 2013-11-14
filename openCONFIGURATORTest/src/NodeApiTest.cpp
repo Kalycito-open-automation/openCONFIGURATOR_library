@@ -51,6 +51,7 @@
 
 *******************************************************************************/
 #include "..\Include\NodeApiTest.h"
+using namespace openCONFIGURATOR::Library::API;
 
 CPPUNIT_TEST_SUITE_REGISTRATION( NodeApiTest );
 
