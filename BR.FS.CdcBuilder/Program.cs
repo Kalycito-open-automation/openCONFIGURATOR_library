@@ -234,6 +234,8 @@ namespace BR.FS.CdcBuilder
                         "CloseProject : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
                     return (int)ReturnCode.FATAL_ERROR;
                 }
+                //AS output when build finished successful
+                Console.WriteLine("Generating POWERLINK stack-configuration to: " + outputPath.FullName + Path.DirectorySeparatorChar + " ...");
                 return (int)ReturnCode.SUCCESS;
             }
             else
