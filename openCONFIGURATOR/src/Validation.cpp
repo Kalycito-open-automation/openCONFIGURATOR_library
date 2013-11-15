@@ -538,9 +538,13 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	if (NULL == subIndexObj)
 	{
 		//Throw exception as Target node id sidx not found in a CN TPDO comm param object
-		exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-		errorString<<"In CN: "<<nodeObj->GetNodeId()<<". SubObject PDO_Target_Node_Id(0x01) in Object 0x"<<commIndexObj->GetIndexValue()<<" not found.";
-		LOG_FATAL() << exceptionObj.getErrorString();
+		boost::format formatter(kMsgNonExistingSubIndex);
+		formatter % commIndexObj->GetIndex() 
+			% 1 
+			% nodeObj->GetNodeId();
+		exceptionObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		throw exceptionObj;
 	}
 

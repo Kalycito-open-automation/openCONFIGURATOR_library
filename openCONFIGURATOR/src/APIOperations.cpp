@@ -5548,11 +5548,15 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 						SubIndex *sidxObjB4Sort = NULL;
 						sidxObjB4Sort = indexObjB4Sort->GetSubIndexbyIndexValue((char *) "00");
 						if (NULL == sidxObjB4Sort)
-						{							
-							errorString << "Index 0x" << indexObjB4Sort->GetIndexValue() << "/0x0 does not exist for node " << nodeObj->GetNodeId() << ".";
-							exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-							exceptionObj.setErrorString(errorString.str());
-							LOG_FATAL() << errorString.str();
+						{				
+							boost::format formatter(kMsgNonExistingSubIndex);
+							formatter % indexObjB4Sort->GetIndex()
+								% 0 
+								% nodeObj->GetNodeId();
+							exceptionObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
+							exceptionObj.setErrorString(formatter.str());
+							LOG_FATAL() << formatter.str();
+
 							throw exceptionObj;
 							//continue;
 						}
@@ -5796,15 +5800,21 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 											moduleIndexObj->GetSubIndexbyIndexValue(
 													varSubIndex);
 									if (moduleSidxObj == NULL)
-									{										
-										errorString<<"In node id: "<<nodeObj->GetNodeId()<<", Index: "<<moduleIndexObj->GetIndexValue()<<" with SubIndex: "<<varSubIndex<<" which is mapped as a PDO module does not exist";
+									{									
+										boost::format formatter(kMsgNonExistingMappedSubIndex);
+										formatter % indexObj.GetIndex()
+											% sidxObj->GetIndex()
+											% moduleIndexObj->GetIndex()
+											% moduleSidxObj->GetIndex()
+											% nodeObj->GetNodeId();
 										exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
-										exceptionObj.setErrorString(errorString.str());
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
+		
 										if (moduleName != NULL)
 										{
 											delete[] moduleName;
 										}
-										LOG_FATAL() << errorString.str();
 										throw exceptionObj;
 									}
 									else
