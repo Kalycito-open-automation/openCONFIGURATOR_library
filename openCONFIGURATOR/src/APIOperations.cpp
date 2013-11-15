@@ -5697,11 +5697,16 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								moduleIndexObj = indexCollObj->GetIndexbyIndexValue(moduleIndex);
 
 								if (moduleIndexObj == NULL)
-								{									
-									errorString<<"In node id: "<<nodeObj->GetNodeId()<<", Index: "<<moduleIndex<<" which is mapped as a PDO module does not exist";
+								{						
+									boost::format formatter(kMsgNonExistingMappedIndex);
+									string strModuleIndex(moduleIndex);
+									formatter % indexObj.GetIndex()
+										% sidxObj->GetIndex() 
+										% HexToInt<UINT32>(strModuleIndex) 
+										% nodeObj->GetNodeId();
 									exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-									exceptionObj.setErrorString(errorString.str());
-									LOG_FATAL() << errorString.str();
+									exceptionObj.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
 									delete[] moduleIndex;
 									throw exceptionObj;
 								}
@@ -6313,11 +6318,15 @@ Do not sort pdo subindexes by offset. The Sidx should start from 00 to FE. also 
 					//Check isiTotal value is valid
 					if (sidxTot
 							>= (indexObjB4Sort->GetNumberofSubIndexes()))
-					{						
-						errorString<<"Mapping objects not found in index: "<<indexObjB4Sort->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
-						exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-						exceptionObj.setErrorString(errorString.str());
-						LOG_FATAL() << errorString.str();
+					{		
+						boost::format formatter(kMsgInsufficientMappingObjects);
+						formatter % indexObjB4Sort->GetIndex()
+							% nodeObj->GetNodeId() 
+							% sidxTot 
+							% (indexObjB4Sort->GetNumberofSubIndexes() - 1);
+						exceptionObj.setErrorCode(OCFM_ERR_INSUFFICIENT_MAPPING_OBJECTS);
+						exceptionObj.setErrorString(formatter.str());
+						LOG_FATAL() << formatter.str();
 						throw exceptionObj;
 					}
 

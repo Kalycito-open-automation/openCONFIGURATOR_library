@@ -522,10 +522,12 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	if (NULL == commIndexObj)
 	{
 		//throw exception as matching communication index not found for a CN		
-		errorString<<"Communication Param object 0x"<<varCommIdx<<" not found in the node "<<nodeObj->GetNodeName()<<"( "<<nodeObj->GetNodeId()<<" )";
-		exceptionObj.setErrorCode(OCFM_ERR_MODULE_INDEX_NOT_FOUND);
-		exceptionObj.setErrorString(errorString.str());
-		LOG_FATAL() << exceptionObj.getErrorString();
+		boost::format formatter(kMsgNonExistingIndex);
+		formatter % commIndexObj->GetIndex()
+			% nodeObj->GetNodeId();
+		exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		delete[] varCommIdx;
 		throw exceptionObj;
 	}

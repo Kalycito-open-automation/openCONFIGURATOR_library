@@ -88,6 +88,11 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(NODE_CONFIGURATION_ERROR, errorString);
 		
 		case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
+			return Result(MAPPED_INDEX_DOES_NOT_EXIST, errorString);
+		
+		case OCFM_ERR_INSUFFICIENT_MAPPING_OBJECTS:
+			return Result(INSUFFICIENT_MAPPING_OBJECTS, errorString);
+
 		case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
 		case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
 		case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:

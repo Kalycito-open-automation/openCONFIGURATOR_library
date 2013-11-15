@@ -47,6 +47,9 @@ namespace openCONFIGURATOR
 			const std::string kMsgAttributeValueNotInRange = "Value '%d' invalid for attribute type '%d' of index %#x/%#x, node %d. Expected value in range: [%d-%d].";
 			const std::string kMsgExternalSystemCallFailed = "External system call '%s' failed with returncode %d";
 			const std::string kMsgTPDOChannelCountExceeded = "No. of TPDO-Channels on node %d exceeded. Allowed: %d, existing: %d.";
+			const std::string kMsgNonExistingMappedIndex = "Mapping-Object %#x/%#x: Mapped index %#x does not exist on node %d.";
+			const std::string kMsgNonExistingMappedSubIndex = "Mapping-Object %#x/%#x: Mapped subIndex %#x/%#x does not exist on node %d.";
+			const std::string kMsgInsufficientMappingObjects = "Insufficient number of mapping objects within index %#x on node %d. Expected: %d, existing %d";
 
 			enum ErrorCode 
 			{ 
@@ -73,7 +76,11 @@ namespace openCONFIGURATOR
 				SUBINDEX_EXISTS,
 				EXTERNAL_SYSTEM_CALL_FAILED,
 				TPDO_CHANNEL_COUNT_EXCEEDED,
-				NODE_CONFIGURATION_ERROR
+				NODE_CONFIGURATION_ERROR,
+				MAPPED_INDEX_DOES_NOT_EXIST,
+				MAPPED_SUBINDEX_DOES_NOT_EXIST,
+				INSUFFICIENT_MAPPING_OBJECTS
+
 			};		
 
 			class Result
