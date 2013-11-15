@@ -644,11 +644,15 @@ template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned long>(co
 template <typename T>
 T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
 {
+	// Strip prefix if necessary
+	string valueStr = (hexString.substr(0, 2) == "0x")
+		? hexString.substr(2)
+		: hexString;
 	stringstream stream;
-	T number = 0;
-	stream << std::hex << hexString;
-	stream >> number;
-	return number;
+	T value = 0;
+	stream << std::hex << valueStr;
+	stream >> value;
+	return value;
 }
 
 // Explicit instantiation of the template for required types
