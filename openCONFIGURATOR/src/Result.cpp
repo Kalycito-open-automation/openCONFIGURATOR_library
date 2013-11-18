@@ -96,8 +96,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(PARAMETER_NOT_FOUND, errorString);
 		case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
 			return Result(STRUCT_DATATYPE_NOT_FOUND, errorString);
-
 		case OCFM_ERR_DATATYPE_NOT_FOUND:
+			return Result(SIMPLE_DATATYPE_NOT_FOUND, errorString);
+
 		case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
 		case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
 		case OCFM_ERR_MAX_PI_SIZE:

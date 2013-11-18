@@ -1122,9 +1122,17 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, const char* indexId)
 			}
 			else
 			{
-				delete[] dtName;
+				boost::format formatter(kMsgSimpleDatatypeNotFound);
+				formatter 
+					% dtName
+					% indexObj->GetIndex()
+					% sidxObj->GetIndexValue()
+					% nodeId;
 				errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-				LOG_FATAL() << errCodeObj.getErrorString();
+				errCodeObj.setErrorString(formatter.str());
+				LOG_FATAL() << formatter.str();
+
+				delete[] dtName;
 				throw errCodeObj;
 			}
 			delete[] dtName;
@@ -1634,8 +1642,15 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 				}
 				else
 				{
+					boost::format formatter(kMsgSimpleDatatypeNotFound);
+					formatter
+						% dataTypeName
+						% indexObj->GetIndex()
+						% "-"
+						% nodeId;
 					errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-					LOG_FATAL() << errCodeObj.getErrorString();
+					errCodeObj.setErrorString(formatter.str());
+					LOG_FATAL() << formatter.str();
 					throw errCodeObj;
 				}
 			}
@@ -1816,8 +1831,16 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 				}
 				else
 				{
+					boost::format formatter(kMsgSimpleDatatypeNotFound);
+					formatter
+						% dataTypeName
+						% indexObj->GetIndex()
+						% subIndexObj->GetIndexValue()
+						% nodeId;
 					errCodeObj.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-					LOG_FATAL() << errCodeObj.getErrorString();
+					errCodeObj.setErrorString(formatter.str());
+					LOG_FATAL() << formatter.str();
+
 					throw errCodeObj;
 				}
 			}

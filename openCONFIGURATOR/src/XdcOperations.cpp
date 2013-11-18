@@ -226,7 +226,15 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 		}
 		else
 		{
+			boost::format formatter(kMsgSimpleDatatypeNotFound);
+			formatter
+				% (char*) value
+				% indexObj->GetIndex()
+				% "-"
+				% indexObj->GetNodeID();
 			objException.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
+			objException.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 		}
 	}
 	else if (!strcmp(ConvertToUpper((char*) name), "UNIQUEIDREF"))
