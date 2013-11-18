@@ -51,6 +51,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgNonExistingMappedSubIndex = "Mapping-Object %#x/%#x: Mapped subIndex %#x/%#x does not exist on node %d.";
 			const std::string kMsgInsufficientMappingObjects = "Insufficient number of mapping objects within index %#x on node %d. Expected: %d, existing %d";
 			const std::string kMsgParameterNotFound = "Parameter with uniqueID '%s' not found in node %d referenced by (Sub)Index %#x/0x%s.";
+			const std::string kMsgStructDatatypeNotFound = "Struct with uniqueID '%s' referenced by Parameter with uniqueID '%s' in node %d not found.";
 
 			enum ErrorCode 
 			{ 
@@ -82,6 +83,7 @@ namespace openCONFIGURATOR
 				MAPPED_SUBINDEX_DOES_NOT_EXIST,
 				INSUFFICIENT_MAPPING_OBJECTS,
 				PARAMETER_NOT_FOUND,
+				STRUCT_DATATYPE_NOT_FOUND
 			};		
 
 			class Result

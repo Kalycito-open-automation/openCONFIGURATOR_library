@@ -5320,11 +5320,14 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				{
 					cdtObj = appProcessObj->GetCDTbyUniqueID(parameterObj->nameIdDtAttr->GetDtUniqueRefId());
 					if (cdtObj == NULL)
-					{		
-						errorString << "In node id: "<<nodeObj->GetNodeId()<<" object "<<moduleIndexObj->GetName()<<" with unique id: "<<uniqueidRefId<<", reference to dataTypeUniqueIDRef: "<<parameterObj->nameIdDtAttr->GetDtUniqueRefId()<<" not found";
+					{
+						boost::format formatter(kMsgStructDatatypeNotFound);
+						formatter % parameterObj->nameIdDtAttr->GetDtUniqueRefId()
+							% uniqueidRefId
+							% nodeObj->GetNodeId();
 						exceptionObj.setErrorCode(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
-						exceptionObj.setErrorString(errorString.str());
-						LOG_FATAL() << errorString;
+						exceptionObj.setErrorString(formatter.str());
+						LOG_FATAL() << formatter.str();
 						throw exceptionObj;
 					}
 					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, indexObj.GetPDOType(), (char*)moduleIndexObj->GetName(), (char*) moduleIndexObj->GetIndexValue());
