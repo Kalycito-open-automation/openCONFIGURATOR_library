@@ -92,8 +92,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(INSUFFICIENT_MAPPING_OBJECTS, errorString);
 		case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
 			return Result(MAPPED_SUBINDEX_DOES_NOT_EXIST, errorString);
-
 		case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
+			return Result(PARAMETER_NOT_FOUND, errorString);
+
 		case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
 		case OCFM_ERR_DATATYPE_NOT_FOUND:
 		case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:

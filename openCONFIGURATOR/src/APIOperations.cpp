@@ -5260,11 +5260,26 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 			{
 				parameterObj = appProcessObj->GetParameterbyUniqueIDRef(uniqueidRefId);
 				if (parameterObj == NULL)
-				{					
-					errorString << "Parameter with UniqueIdRef=" << uniqueidRefId <<" not found\n In " << nodeObj->GetNodeName() <<"("<<nodeObj->GetNodeId()<<") which is mapped via the module "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")";
+				{
+					boost::format formatter(kMsgParameterNotFound);
+					if (moduleSidxObj == NULL)
+					{
+						formatter % uniqueidRefId 
+							% nodeObj->GetNodeId()
+							% moduleIndexObj->GetIndex()
+							% "-";
+					}
+					else
+					{
+						formatter % uniqueidRefId 
+							% nodeObj->GetNodeId()
+							% moduleIndexObj->GetIndex()
+							% moduleSidxObj->GetIndexValue();
+					}
+
 					exceptionObj.setErrorCode(OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND);
-					exceptionObj.setErrorString(errorString.str());
-					LOG_FATAL() << errorString;
+					exceptionObj.setErrorString(formatter.str());
+					LOG_FATAL() << formatter.str();
 					throw exceptionObj;
 				}
 				if (parameterObj->accessStr == NULL)
@@ -5305,7 +5320,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 				{
 					cdtObj = appProcessObj->GetCDTbyUniqueID(parameterObj->nameIdDtAttr->GetDtUniqueRefId());
 					if (cdtObj == NULL)
-					{						
+					{		
 						errorString << "In node id: "<<nodeObj->GetNodeId()<<" object "<<moduleIndexObj->GetName()<<" with unique id: "<<uniqueidRefId<<", reference to dataTypeUniqueIDRef: "<<parameterObj->nameIdDtAttr->GetDtUniqueRefId()<<" not found";
 						exceptionObj.setErrorCode(OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND);
 						exceptionObj.setErrorString(errorString.str());
