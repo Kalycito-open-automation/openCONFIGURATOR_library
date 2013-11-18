@@ -91,8 +91,9 @@ namespace openCONFIGURATOR
 							case ACTUALVALUE:
 								if (indexPtr->IsIndexValueValid(attributeValue.c_str()))
 									indexPtr->SetActualValue(attributeValue.c_str());
-								else
-									throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+								// FIXME: Dead code - IsIndexValueValid() always returns true
+								//else
+								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
 							case FLAGIFINCDC:
 							{
@@ -197,8 +198,9 @@ namespace openCONFIGURATOR
 							case ACTUALVALUE:
 								if (subIndexPtr->IsIndexValueValid(attributeValue.c_str()))
 									subIndexPtr->SetActualValue(attributeValue.c_str());
-								else
-									throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+								// FIXME: Dead code - IsIndexValueValid() always returns true
+								//else
+								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
 							case FLAGIFINCDC:
 							{

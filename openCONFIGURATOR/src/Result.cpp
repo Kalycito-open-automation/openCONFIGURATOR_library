@@ -98,8 +98,14 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(STRUCT_DATATYPE_NOT_FOUND, errorString);
 		case OCFM_ERR_DATATYPE_NOT_FOUND:
 			return Result(SIMPLE_DATATYPE_NOT_FOUND, errorString);
-
 		case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
+			return Result(VALUE_NOT_WITHIN_RANGE, errorString);
+		case OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED:
+			return Result(CHANNEL_PAYLOAD_LIMIT_EXCEEDED, errorString);
+		case OCFM_ERR_CHANNEL_OBJECT_LIMIT_EXCEEDED:
+			return Result(CHANNEL_OBJECT_LIMIT_EXCEEDED, errorString);
+
+
 		case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
 		case OCFM_ERR_MAX_PI_SIZE:
 		case OCFM_ERR_UNKNOWN:

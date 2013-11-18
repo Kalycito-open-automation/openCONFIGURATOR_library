@@ -1367,12 +1367,13 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 				indexObj->SetActualValue(indexValue);
 				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 			}
-			else
-			{
-				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				LOG_FATAL() << errCodeObj.getErrorString();
-				throw errCodeObj;
-			}
+			// FIXME: Dead code - IsIndexValueValid() always returns true
+			//else
+			//{
+			//	errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			//	LOG_FATAL() << errCodeObj.getErrorString();
+			//	throw errCodeObj;
+			//}
 		}
 
 	} catch (ocfmRetCode& ex)
@@ -1483,12 +1484,13 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 			sidxObj->SetActualValue(indexValue);
 			errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 		}
-		else
-		{
-			errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-			LOG_FATAL() << errCodeObj.getErrorString();
-			throw errCodeObj;
-		}
+		// FIXME: Dead code - IsIndexValueValid() always returns true
+		//else
+		//{
+		//	errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+		//	LOG_FATAL() << errCodeObj.getErrorString();
+		//	throw errCodeObj;
+		//}
 
 		if ((MN_NODEID == nodeId) && (MN == nodeType)
 				&& (0 == strcmp(indexId, (const char*) "1F98"))
@@ -1661,13 +1663,15 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 			{
 				indexObj->SetActualValue(actualValue);
 				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
+
 			}
-			else
-			{
-				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				LOG_FATAL() << errCodeObj.getErrorString();
-				throw errCodeObj;
-			}
+			// FIXME: Dead code - IsIndexValueValid() always returns true
+			//else
+			//{
+			//	errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			//	LOG_FATAL() << errCodeObj.getErrorString();
+			//	throw errCodeObj;
+			//}
 		}
 
 	} catch (ocfmRetCode& ex)
@@ -1812,12 +1816,13 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 				subIndexObj->SetActualValue(actualValue);
 				errCodeObj.setErrorCode(OCFM_ERR_SUCCESS);
 			}
-			else
-			{
-				errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				LOG_FATAL() << errCodeObj.getErrorString();
-				throw errCodeObj;
-			}
+			// FIXME: Dead code - IsIndexValueValid() always returns true
+			//else
+			//{
+			//	errCodeObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+			//	LOG_FATAL() << errCodeObj.getErrorString();
+			//	throw errCodeObj;
+			//}
 		}
 		if (NULL != dataTypeName)
 		{
@@ -5961,8 +5966,12 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									piObj.Initialize();
 									if (dtObj.GetName() == NULL)
 									{
-										exceptionObj.setErrorCode(OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
-										LOG_FATAL() << exceptionObj.getErrorString();
+										boost::format formatter(kMsgNullArgument);
+										formatter 
+											% "'dtObj.GetName()'";
+										exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
 										throw exceptionObj;
 									}
 									else if (!CheckAllowedDTForMapping(
@@ -6132,11 +6141,15 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								
 								LOG_INFO() << "Checking for MaxPayload: " << nodeMappedTotalBytes + mappedLength << " with 11920";
 								if ((nodeMappedTotalBytes + mappedLength) > (atoi((const char*)abC_DLL_ISOCHR_MAX_PAYL) * 8))
-								{									
-									errorString<<"Maximum payload limit exceeded for the Channel "<<indexObj.GetIndexValue()<<" in CN "<<nodeObj->GetNodeId()<<".";
-									exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-									exceptionObj.setErrorString(errorString.str());
-									LOG_FATAL() << errorString.str();
+								{
+									boost::format formatter(kMsgChannelPayloadLimitExceeded);
+									formatter 
+										% nodeObj->GetNodeId()
+										% indexObj.GetIndex()
+										% (nodeMappedTotalBytes + mappedLength);
+									exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
+									exceptionObj.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
 									throw exceptionObj;
 								}
 
@@ -6171,10 +6184,15 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										//Updating the total chained bits mapped.
 										totalChainedBytesMapped = totalChainedBytesMapped + mappedLength;
 										if ((totalChainedBytesMapped) > (atoi((const char*)abC_DLL_ISOCHR_MAX_PAYL) * 8))
-										{											
-											errorString<<"The total payload for the chained stations exceeds the maximum Pres payload limit(1490 bytes) ";
-											exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-											exceptionObj.setErrorString(errorString.str());
+										{							
+											boost::format formatter(kMsgChannelPayloadLimitExceeded);
+											formatter 
+												% nodeObj->GetNodeId()
+												% indexObj.GetIndex()
+												% totalChainedBytesMapped;
+											exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
+											exceptionObj.setErrorString(formatter.str());
+											LOG_FATAL() << formatter.str();
 											delete[] modOffset;
 											throw exceptionObj;
 										}
@@ -8620,20 +8638,28 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						mnPDOObj = nodeObj.MNPDOOUTVarCollection[pdoOutLC];
 						indexObj = indexCollObj->GetIndexbyIndexValue(indexIdMN);
 						if(prevSubIndex >= 254)
-						{							
-							errorString<<"Maximum limit for the payload frame exceeded while mapping to MN's "<<indexObj->GetIndexValue()<<" channel. Check in CN "<<nodeObj.GetNodeId()<<"'s, RPDO channel's mapped number of subobjects ";
-							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							exceptionObj.setErrorString(errorString.str());
-							LOG_FATAL() << errorString;
+						{						
+							boost::format formatter(kMsgChannelObjectLimitExceeded);
+							formatter 
+								% nodeObj.GetNodeId()
+								% indexObj->GetIndex()
+								% 255;
+							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_OBJECT_LIMIT_EXCEEDED);
+							exceptionObj.setErrorString(formatter.str());
+							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
 						}
 	
 						if((outPrevSize + mnPDOObj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{							
-							errorString<<"Maximum payload limit exceeded for the TPDO Channel "<<indexObj->GetIndexValue()<<" in MN ";
-							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							exceptionObj.setErrorString(errorString.str());
-							LOG_FATAL() << errorString;
+							boost::format formatter(kMsgIsochronousMaxPayloadExceeded);
+							formatter 
+								% nodeObj.GetNodeId()
+								% "TPDO"
+								% (outPrevSize + mnPDOObj.dataSize);
+							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
+							exceptionObj.setErrorString(formatter.str());
+							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
 						}
 
@@ -8730,20 +8756,28 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						indexObjTemp->SetFlagIfIncludedCdc(true);
 
 						if (inPrevSubIndex >= 254)
-						{							
-							errorString<<"Maximum limit for the payload frame exceeded while mapping to MN's "<<indexObjTemp->GetIndexValue()<<" channel. Check in CN "<<nodeObj.GetNodeId()<<"'s, TPDO channel's mapped number of subobjects ";
-							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							exceptionObj.setErrorString(errorString.str());
-							LOG_FATAL() << errorString;
+						{	
+							boost::format formatter(kMsgChannelObjectLimitExceeded);
+							formatter 
+								% nodeObj.GetNodeId()
+								% indexObjTemp->GetIndex()
+								% 255;
+							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_OBJECT_LIMIT_EXCEEDED);
+							exceptionObj.setErrorString(formatter.str());
+							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
 						}
 
 						if ((inPrevSize + mnPDOobj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{							
-							errorString << "Maximum payload limit exceeded for the RPDO Channel " << indexObjTemp->GetIndexValue() << " in MN.";
-							exceptionObj.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-							exceptionObj.setErrorString(errorString.str());
-							LOG_FATAL() << errorString;
+							boost::format formatter(kMsgIsochronousMaxPayloadExceeded);
+							formatter 
+								% nodeObj.GetNodeId()
+								% "RPDO"
+								% (inPrevSize + mnPDOobj.dataSize);
+							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
+							exceptionObj.setErrorString(formatter.str());
+							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
 						}
 

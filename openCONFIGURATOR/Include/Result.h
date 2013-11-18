@@ -53,6 +53,10 @@ namespace openCONFIGURATOR
 			const std::string kMsgParameterNotFound = "Parameter with uniqueID '%s' not found in node %d referenced by (Sub)Index %#x/0x%s.";
 			const std::string kMsgStructDatatypeNotFound = "Struct with uniqueID '%s' referenced by Parameter with uniqueID '%s' in node %d not found.";
 			const std::string kMsgSimpleDatatypeNotFound = "Simple datatype '%s' referenced by (Sub)Index %#x/0x%s in node %d not found in DatatypeList of node.";
+			const std::string kMsgValueNotWithinRange = "Value %d of object '%s' on node %d out of range (%d - %d).";
+			const std::string kMsgChannelPayloadLimitExceeded = "Node %d, channel %#x: No. of bytes mapped (%d) exceeds limit (1490, C_DLL_ISOCHR_MAX_PAYL)";
+			const std::string kMsgChannelObjectLimitExceeded = "Node %d, channel %#x: No. of channel objects (%d) exceeds limit (254).";
+			const std::string kMsgIsochronousMaxPayloadExceeded = "Node %d: No. of %s-bytes mapped (%d) exceeds limit (1490, C_DLL_ISOCHR_MAX_PAYL).";
 
 			enum ErrorCode 
 			{ 
@@ -85,7 +89,10 @@ namespace openCONFIGURATOR
 				INSUFFICIENT_MAPPING_OBJECTS,
 				PARAMETER_NOT_FOUND,
 				STRUCT_DATATYPE_NOT_FOUND,
-				SIMPLE_DATATYPE_NOT_FOUND
+				SIMPLE_DATATYPE_NOT_FOUND,
+				VALUE_NOT_WITHIN_RANGE,
+				CHANNEL_PAYLOAD_LIMIT_EXCEEDED,
+				CHANNEL_OBJECT_LIMIT_EXCEEDED
 			};		
 
 			class Result

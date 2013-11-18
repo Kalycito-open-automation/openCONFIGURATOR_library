@@ -62,11 +62,14 @@
 #include "../Include/Exception.h"
 #include "../Include/Logging.h"
 #include "../Include/BoostShared.h"
+#include "../Include/Result.h"
 
 #include <sstream>
 
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::Library::Utilities;
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
@@ -460,9 +463,28 @@ void BaseIndex::SaveChanges(char* idxIdStr, char* nameStr)
 // FIXME:
 // 1. This method will never return false (fix all calls)
 // 2. This method should return ocfmRetCode (or a refactored version)
+// 3. This method should check ranges also for non-hex Index values
 bool BaseIndex::IsIndexValueValid(const char* hexValue)
 {
 	ULONG value;
+	//Determine limits for error message
+	ULONG uhighLimit = 0;
+	ULONG ulowLimit = 0;
+	if (highLimit != NULL)
+	{
+		if (CheckIfHex(this->highLimit))
+			uhighLimit = HexToInt<ULONG>(string(this->highLimit));
+		else
+			uhighLimit = boost::lexical_cast<ULONG>(string(this->highLimit));
+	}
+	if (lowLimit != NULL)
+	{
+		if (CheckIfHex(this->lowLimit))
+			ulowLimit = HexToInt<ULONG>(string(this->lowLimit));
+		else
+			ulowLimit = boost::lexical_cast<ULONG>(string(this->lowLimit));
+	}
+
 	bool retFlag = true;
 	ostringstream errorString;
 	ocfmRetCode objException;
@@ -506,10 +528,16 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 			}
 			else
 			{
-				errorString << "The entered value("<<hexValue<<") is less than the lower limit("<<this->lowLimit<<")";
+				boost::format formatter(kMsgValueNotWithinRange);
+				formatter 
+					% value
+					% this->GetName()
+					% nodeId
+					% ulowLimit
+					% uhighLimit;
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				objException.setErrorString(errorString.str());
-				LOG_FATAL() << errorString.str();
+				objException.setErrorString(formatter.str());
+				LOG_FATAL() << formatter.str();
 				throw objException;
 				//bFlag = false;
 				//return bFlag;
@@ -539,10 +567,16 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 			}
 			else
 			{				
-				errorString<<"The entered value("<<hexValue<<") is greater than the upper limit("<<this->highLimit<<")";
+				boost::format formatter(kMsgValueNotWithinRange);
+				formatter 
+					% value
+					% this->GetName()
+					% nodeId
+					% ulowLimit
+					% uhighLimit;
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				objException.setErrorString(errorString.str());
-				LOG_FATAL() << errorString.str();
+				objException.setErrorString(formatter.str());
+				LOG_FATAL() << formatter.str();
 				throw objException;
 				//bFlag = false;
 			}
