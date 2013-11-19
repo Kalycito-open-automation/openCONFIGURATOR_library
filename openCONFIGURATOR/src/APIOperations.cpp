@@ -5976,9 +5976,16 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									}
 									else if (!CheckAllowedDTForMapping(
 											dtObj.GetName()))
-									{
+									{//"Node %d, (Sub)Index %#x/0x%s: Mapping of datatype '%s' not supported. Supported data types: Integer8(16/32/64), Unsigned8(16/32/64)."
+										boost::format formatter(kMsgPdoDatatypeInvalid);
+										formatter 
+											% nodeObj->GetNodeId()
+											% indexObj.GetIndex()
+											% sidxObj->GetIndexValue()
+											% dtObj.GetName();
 										exceptionObj.setErrorCode(OCFM_ERR_INVALID_DATATYPE_FOR_PDO);
-										LOG_FATAL() << exceptionObj.getErrorString();
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
 										throw exceptionObj;
 									}
 
