@@ -58,6 +58,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgChannelObjectLimitExceeded = "Node %d, channel %#x: No. of channel objects (%d) exceeds limit (254).";
 			const std::string kMsgIsochronousMaxPayloadExceeded = "Node %d: No. of %s-bytes mapped (%d) exceeds limit (1490, C_DLL_ISOCHR_MAX_PAYL).";
 			const std::string kMsgPdoDatatypeInvalid = "Node %d, (Sub)Index %#x/0x%s: Mapping of datatype '%s' not supported. Supported data types: Integer8(16/32/64), Unsigned8(16/32/64).";
+			const std::string kMsgMaxPiSizeExceeded = "Max. process image size exceeded: Actual: %d bytes, expected: max. %d bytes.";
 
 			enum ErrorCode 
 			{ 
@@ -94,7 +95,8 @@ namespace openCONFIGURATOR
 				VALUE_NOT_WITHIN_RANGE,
 				CHANNEL_PAYLOAD_LIMIT_EXCEEDED,
 				CHANNEL_OBJECT_LIMIT_EXCEEDED,
-				PDO_DATATYPE_INVALID
+				PDO_DATATYPE_INVALID,
+				MAX_PI_SIZE_EXCEEDED
 			};		
 
 			class Result

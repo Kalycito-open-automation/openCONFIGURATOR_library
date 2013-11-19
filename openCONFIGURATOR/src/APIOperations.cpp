@@ -5195,9 +5195,13 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 				LOG_DEBUG() << "Total bytes mapped: " << totalBytesMapped;
 				if (totalBytesMapped > MAX_PI_SIZE)
 				{
-					ocfmRetCode exceptionObj;
+					boost::format formatter(kMsgMaxPiSizeExceeded);
+					formatter 
+						% totalBytesMapped
+						% MAX_PI_SIZE;
 					exceptionObj.setErrorCode(OCFM_ERR_MAX_PI_SIZE);
-					LOG_FATAL() << exceptionObj.getErrorString();
+					exceptionObj.setErrorString(formatter.str());
+					LOG_FATAL() << formatter.str();
 					throw exceptionObj;
 				}
 				CreateMNPDOVar(offsetVal, dataSize, piObj.dataInfo.iecDtVar,
@@ -6106,7 +6110,14 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 											+ dtObj.dataSize;
 									if (totalBytesMapped > MAX_PI_SIZE)
 									{
+										boost::format formatter(kMsgMaxPiSizeExceeded);
+										formatter
+											% totalBytesMapped
+											% MAX_PI_SIZE;
 										exceptionObj.setErrorCode(OCFM_ERR_MAX_PI_SIZE);
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
+
 										delete[] sidxName;
 										delete[] accessStr;
 										delete[] moduleName;

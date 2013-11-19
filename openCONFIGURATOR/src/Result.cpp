@@ -106,8 +106,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(CHANNEL_OBJECT_LIMIT_EXCEEDED, errorString);
 		case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
 			return Result(PDO_DATATYPE_INVALID, errorString);
-
 		case OCFM_ERR_MAX_PI_SIZE:
+			return Result(MAX_PI_SIZE_EXCEEDED, errorString);
+
 		case OCFM_ERR_UNKNOWN:
 		case OCFM_ERR_MULTIPLEX_ASSIGN_ERROR:
 		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
