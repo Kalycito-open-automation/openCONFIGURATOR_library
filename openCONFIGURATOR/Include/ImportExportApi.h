@@ -14,6 +14,7 @@
 
 #include "Exports.h"
 #include "Exception.h"
+#include "Result.h"
 
 namespace openCONFIGURATOR 
 {
@@ -22,8 +23,8 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 
-			DLLEXPORT ocfmRetCode GenerateProcessImageDescription(const OutputLanguage lang, const std::string outputPath, const std::string fileName);
-			DLLEXPORT ocfmRetCode GenerateStackConfiguration(const std::string outputPath, const std::string fileName);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateProcessImageDescription(const OutputLanguage lang, const std::string outputPath, const std::string fileName);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string outputPath, const std::string fileName);
 
 		}
 	}

@@ -29,7 +29,7 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 
-			DLLEXPORT ocfmRetCode AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
+			DLLEXPORT Result AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -40,19 +40,19 @@ namespace openCONFIGURATOR
 						? MN
 						: CN;
 
-					ocfmRetCode result = AddIndex(nodeId, nodeType, indexString.c_str());
-					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+					Result result = Translate(AddIndex(nodeId, nodeType, indexString.c_str()));
+					if (!result.IsSuccessful())
 						return result;
-					result = SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false);
-					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+					result = Translate(SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false));
+					if (!result.IsSuccessful())
 						return result;
 
 					return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
+			DLLEXPORT Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -68,9 +68,7 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingNode);
 							formatter % nodeId;
-							ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 
 						IndexCollection* indexCollectionPtr = node->GetIndexCollection();
@@ -81,9 +79,7 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingIndex);
 							formatter % index % nodeId;
-							ocfmRetCode result(OCFM_ERR_INDEXID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
 						}
 
 						switch (attributeType)
@@ -113,10 +109,7 @@ namespace openCONFIGURATOR
 										% 0
 										% nodeId
 										% "true or false";
-									ocfmRetCode result(OCFM_ERR_INVALID_VALUE);
-									result.setErrorString(formatter.str());
-									LOG_FATAL() << formatter.str();
-									throw result;
+									return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
 								}								
 							}
 							case NAME:
@@ -130,24 +123,22 @@ namespace openCONFIGURATOR
 							default:
 							{
 								boost::format formatter(kMsgUnsupportedAttributeType);
-								formatter % ((int) attributeType);
-								ocfmRetCode result(OCFM_ERR_INVALID_ATTRIBUTETYPE);
-								result.setErrorString(formatter.str());					
-								throw result;
+								formatter % attributeType;		
+								return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
 							}
 						}
-						return ocfmRetCode(OCFM_ERR_SUCCESS);
+						return Result();
 					}
 					catch (ocfmRetCode& ex)
 					{
 						LOG_FATAL() << ex.getErrorString();
-						return ex;
+						return Translate(ex);
 					}
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			ocfmRetCode SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const string attributeValue)
+			Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const string attributeValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -164,9 +155,7 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingNode);
 							formatter % nodeId;
-							ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 
 						IndexCollection* indexCollectionPtr = node->GetIndexCollection();
@@ -177,9 +166,7 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingIndex);
 							formatter % index % nodeId;
-							ocfmRetCode result(OCFM_ERR_INDEXID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
 						}
 
 						SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(subIndex);
@@ -187,9 +174,7 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingSubIndex);
 							formatter % index % subIndex % nodeId;
-							ocfmRetCode result(OCFM_ERR_SUBINDEXID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(SUBINDEX_DOES_NOT_EXIST, formatter.str());
 						}
 
 						switch (attributeType)
@@ -220,10 +205,7 @@ namespace openCONFIGURATOR
 										% subIndex
 										% nodeId
 										% "true or false";
-									ocfmRetCode result(OCFM_ERR_INVALID_VALUE);
-									result.setErrorString(formatter.str());
-									LOG_FATAL() << formatter.str();
-									throw result;
+									return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
 								}
 								break;
 							}
@@ -238,31 +220,29 @@ namespace openCONFIGURATOR
 							default:
 							{
 								boost::format formatter(kMsgUnsupportedAttributeType);
-								formatter % ((int) attributeType);
-								ocfmRetCode result(OCFM_ERR_INVALID_ATTRIBUTETYPE);
-								result.setErrorString(formatter.str());
-								throw result;
+								formatter % attributeType;
+								return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
 							}	
 						}
-						return ocfmRetCode(OCFM_ERR_SUCCESS);
+						return Result();
 					}
 					catch (ocfmRetCode& ex)
 					{
 						LOG_FATAL() << ex.getErrorString();
-						return ex;
+						return Translate(ex);
 					}
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const string actualValue)
+			DLLEXPORT Result SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const string actualValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 					return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, string& attributeValue)
+			DLLEXPORT Result GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, string& attributeValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -272,8 +252,8 @@ namespace openCONFIGURATOR
 						? MN
 						: CN;
 
-					ocfmRetCode result = GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp);
-					if (result.getErrorCode() == OCFM_ERR_SUCCESS)
+					Result result = Translate(GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp));
+					if (result.IsSuccessful())
 					{
 						attributeValue.clear();
 						attributeValue.append(attributeValueTemp);
@@ -281,10 +261,10 @@ namespace openCONFIGURATOR
 					delete[] attributeValueTemp;
 					return result;
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
+			DLLEXPORT Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -294,23 +274,23 @@ namespace openCONFIGURATOR
 						? MN
 						: CN;
 
-					ocfmRetCode result = AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
-					if (result.getErrorCode() != OCFM_ERR_SUCCESS)
+					Result result = Translate(AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
+					if (!result.IsSuccessful())
 						return result;
 
-					return SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false);
+					return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue)
+			DLLEXPORT Result SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 					return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, string& attributeValue)
+			DLLEXPORT Result GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, string& attributeValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -321,8 +301,8 @@ namespace openCONFIGURATOR
 						: CN;
 					char* attributeValueTemp = new char [50];
 
-					ocfmRetCode result = GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp);
-					if (result.getErrorCode() == OCFM_ERR_SUCCESS)
+					Result result = Translate(GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp));
+					if (result.IsSuccessful())
 					{
 						attributeValue.clear();
 						attributeValue.append(attributeValueTemp);
@@ -330,7 +310,7 @@ namespace openCONFIGURATOR
 					delete[] attributeValueTemp;
 					return result;
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
@@ -420,7 +400,7 @@ namespace openCONFIGURATOR
 				return 0;
 			}
 
-			DLLEXPORT ocfmRetCode DeleteIndex(const UINT32 nodeId, const UINT32 index)
+			DLLEXPORT Result DeleteIndex(const UINT32 nodeId, const UINT32 index)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -429,12 +409,12 @@ namespace openCONFIGURATOR
 						? MN
 						: CN;
 
-					return DeleteIndex(nodeId, nodeType, indexString.c_str());
+					return Translate(DeleteIndex(nodeId, nodeType, indexString.c_str()));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
+			DLLEXPORT Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -444,9 +424,9 @@ namespace openCONFIGURATOR
 						? MN
 						: CN;
 
-					return DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str());
+					return Translate(DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 		}

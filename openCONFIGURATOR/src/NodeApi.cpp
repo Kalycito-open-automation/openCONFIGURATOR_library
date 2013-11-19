@@ -22,7 +22,7 @@ namespace openCONFIGURATOR
 		{
 
 			/*DLLEXPORT ocfmRetCode AddNode(Node const& node, const string path, const string xddFile);*/
-			DLLEXPORT ocfmRetCode AddNode(const UINT32 nodeId, const NodeType nodeType, const string nodeName, const string xddFile)
+			DLLEXPORT Result AddNode(const UINT32 nodeId, const NodeType nodeType, const string nodeName, const string xddFile)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -30,37 +30,34 @@ namespace openCONFIGURATOR
 					{
 						boost::format formatter(kMsgExistingNode);
 						formatter % nodeId;
-						ocfmRetCode result(OCFM_ERR_NODE_ALREADY_EXISTS);
-						result.setErrorString(formatter.str());
-						LOG_FATAL() << formatter.str();
-						return result;
+						return Result (NODE_EXISTS, formatter.str());
 					}
-					return NewProjectNode(nodeId,
+					return Translate(NewProjectNode(nodeId,
 						nodeType,
 						nodeName.c_str(),
 						(xddFile.empty())
 							? NULL
-							: xddFile.c_str());
+							: xddFile.c_str()));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 
-			DLLEXPORT ocfmRetCode DeleteNode(const UINT32 nodeId)
+			DLLEXPORT Result DeleteNode(const UINT32 nodeId)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					NodeType type = (nodeId == MN_NODEID)
 						? MN
 						: CN;
-					return DeleteNode(nodeId, type);
+					return Translate(DeleteNode(nodeId, type));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 			/*DLLEXPORT ocfmRetCode GetNode(const unsigned int nodeId, Node& node);*/
 
-			DLLEXPORT ocfmRetCode ReplaceXdd(const UINT32 nodeId, const string path, const string xddFile)
+			DLLEXPORT Result ReplaceXdd(const UINT32 nodeId, const string path, const string xddFile)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -68,11 +65,13 @@ namespace openCONFIGURATOR
 					boost::filesystem::path fullPath(path);
 					fullPath.append(xddFile.begin(), xddFile.end());
 
-					ocfmRetCode retValue = ValidateXDDFile(fullPath.generic_string().c_str());
-					if (retValue.getErrorCode() == OCFM_ERR_SUCCESS)
-						return ImportXML(fullPath.generic_string().c_str(), nodeId, type);
+					Result retValue = Translate(ValidateXDDFile(fullPath.generic_string().c_str()));
+					if (retValue.IsSuccessful())
+						return Translate(ImportXML(fullPath.generic_string().c_str(), nodeId, type));
+					else
+						return retValue;
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 			DLLEXPORT bool IsExistingNode(const UINT32 nodeId)

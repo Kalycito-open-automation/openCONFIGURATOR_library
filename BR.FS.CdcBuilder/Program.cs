@@ -157,15 +157,15 @@ namespace BR.FS.CdcBuilder
                     }
                 }
 
-                ocfmRetCode retCode = openCONFIGURATORcsharpWRAPPER.OpenProject(projectFile.ToString());
+                Result retCode = openCONFIGURATORcsharpWRAPPER.OpenProject(projectFile.ToString());
 
 #if DEBUG
                 Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                    "Open project : " + projectFile.ToString() + " : " + retCode.getErrorString() + " : " +
-                    retCode.getErrorCode()));
+                    "Open project : " + projectFile.ToString() + " : " + retCode.GetErrorString() + " : " +
+                    retCode.GetErrorCode()));
 #endif
 
-                if (retCode.getErrorCode() == ConfiguratorError.OCFM_ERR_SUCCESS)
+                if (retCode.IsSuccessful())
                 {
                     retCode =
                         openCONFIGURATORcsharpWRAPPER.GenerateStackConfiguration(
@@ -174,12 +174,12 @@ namespace BR.FS.CdcBuilder
 #if DEBUG
                     Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                         "Generate stack configuration : " + outputPath.ToString() + Path.DirectorySeparatorChar +
-                        Program.CDC_FILENAME + " : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
+                        Program.CDC_FILENAME + " : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
 #endif
-                    if (retCode.getErrorCode() != ConfiguratorError.OCFM_ERR_SUCCESS)
+                    if (!retCode.IsSuccessful())
                     {
                         Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                            "Generate stack configuration failed : " + retCode.getErrorString()));
+                            "Generate stack configuration failed : " + retCode.GetErrorString()));
                         return (int)ReturnCode.FATAL_ERROR;
                     }
                     else
@@ -191,12 +191,12 @@ namespace BR.FS.CdcBuilder
                         Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                             "GenerateProcessImageDescription for C# : " + outputPath.ToString() +
                             Path.DirectorySeparatorChar +
-                            Program.PI_CSHARP_FILENAME + " : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
+                            Program.PI_CSHARP_FILENAME + " : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
 #endif
-                        if (retCode.getErrorCode() != ConfiguratorError.OCFM_ERR_SUCCESS)
+                        if (!retCode.IsSuccessful())
                         {
                             Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                                "Generate C# process image failed: " + retCode.getErrorString()));
+                                "Generate C# process image failed: " + retCode.GetErrorString()));
                             return (int)ReturnCode.FATAL_ERROR;
                         }
                         retCode =
@@ -206,12 +206,12 @@ namespace BR.FS.CdcBuilder
                         Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                             "GenerateProcessImageDescription for C : " + outputPath.ToString() +
                             Path.DirectorySeparatorChar +
-                            PI_XML_FILENAME + " : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
+                            PI_XML_FILENAME + " : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
 #endif
-                        if (retCode.getErrorCode() != ConfiguratorError.OCFM_ERR_SUCCESS)
+                        if (!retCode.IsSuccessful())
                         {
                             Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                                "Generate C process image failed: " + retCode.getErrorString()));
+                                "Generate C process image failed: " + retCode.GetErrorString()));
                             return (int)ReturnCode.FATAL_ERROR;
                         }
                     }
@@ -219,19 +219,19 @@ namespace BR.FS.CdcBuilder
                 else
                 {
                     Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                        "Open Project failed: " + retCode.getErrorString()));
+                        "Open Project failed: " + retCode.GetErrorString()));
                     return (int)ReturnCode.FATAL_ERROR;
                 }
 
                 retCode = openCONFIGURATORcsharpWRAPPER.CloseProject();
 #if DEBUG
                 Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                    "Close Project : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
+                    "Close Project : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
 #endif
-                if (retCode.getErrorCode() != ConfiguratorError.OCFM_ERR_SUCCESS)
+                if (!retCode.IsSuccessful())
                 {
                     Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                        "CloseProject : " + retCode.getErrorString() + " : " + retCode.getErrorCode()));
+                        "CloseProject : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
                     return (int)ReturnCode.FATAL_ERROR;
                 }
                 //AS output when build finished successful

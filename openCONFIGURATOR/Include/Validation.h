@@ -115,7 +115,7 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
  \retval	FALSE		if retrieved tool version does not match with the tool version
  */
 /*****************************************************************************/
-bool IfVersionNumberMatches(xmlTextReaderPtr reader);
+//bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
 bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj);
 /**

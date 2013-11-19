@@ -816,12 +816,10 @@ ocfmRetCode ValidateXDDFile(const char *fileName)
 	return exceptionObject;
 }
 
-ocfmRetCode ValidateProjectFile(const string& fileName)
+Result ValidateProjectFile(const string& fileName)
 {
 	ocfmRetCode exceptionObject;
-
-	//File name must not be null
-	if(fileName.c_str() != NULL)
+	if(!fileName.empty())
 	{
 		//Parse XML
 		xmlDocPtr xdd_file_ptr = xmlParseFile(fileName.c_str());
@@ -848,7 +846,7 @@ ocfmRetCode ValidateProjectFile(const string& fileName)
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
 	}
-	return exceptionObject;
+	return Translate(exceptionObject);
 }
 
 ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType)

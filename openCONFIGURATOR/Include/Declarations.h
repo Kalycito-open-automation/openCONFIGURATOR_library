@@ -491,7 +491,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode					ConfiguratorErrors
  */
- ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus, ViewMode *viewMode, bool* isExpertViewAlreadySet);
+//ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus, ViewMode *viewMode, bool* isExpertViewAlreadySet);
 
 /**
  \brief		This API shall be used to set the Project settings information [auto save, auto generate] for the active project
@@ -503,7 +503,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode					ConfiguratorErrors
  */
- ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
+ //ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
 
 /**
  \brief		This API shall be used to set all the attributes of an Index for a node

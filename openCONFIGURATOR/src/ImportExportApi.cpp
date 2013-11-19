@@ -11,6 +11,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 namespace openCONFIGURATOR 
 {
@@ -40,13 +41,13 @@ namespace openCONFIGURATOR
 				return absOutputPath;
 			}
 
-			DLLEXPORT ocfmRetCode GenerateProcessImageDescription(const OutputLanguage lang, const string outputPath, const string fileName)
+			DLLEXPORT Result GenerateProcessImageDescription(const OutputLanguage lang, const string outputPath, const string fileName)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
 					if (absOutputPath.empty())		
-						return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
+						return Translate(ocfmRetCode(OCFM_ERR_EMPTY_PATH));
 
 					string fallbackFileName = (fileName.empty())
 						? kDefaultProcessImageFileName
@@ -56,34 +57,35 @@ namespace openCONFIGURATOR
 					switch (lang)
 					{
 						case C:
-							return GenerateXAP(absOutputPath.generic_string().c_str());
+							return Translate(GenerateXAP(absOutputPath.generic_string().c_str()));
 						case CSHARP:
-							return GenerateNET(absOutputPath.generic_string().c_str());
+							return Translate(GenerateNET(absOutputPath.generic_string().c_str()));
 						case XML:
-							return GenerateXAP(absOutputPath.generic_string().c_str());
+							return Translate(GenerateXAP(absOutputPath.generic_string().c_str()));
 						default:
-							return ocfmRetCode(OCFM_ERR_UNKNOWN);
-							break;
+							boost::format formatter(kMsgUnsupportedPiLanguage);
+							formatter % lang;
+							return Result(UNSUPPORTED_PI_GEN_LANGUAGE, formatter.str());
 					}
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
-			DLLEXPORT ocfmRetCode GenerateStackConfiguration(const string outputPath, const string fileName)
+			DLLEXPORT Result GenerateStackConfiguration(const string outputPath, const string fileName)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
 					if (absOutputPath.empty())		
-						return ocfmRetCode(OCFM_ERR_EMPTY_PATH);
+						return Translate(ocfmRetCode(OCFM_ERR_EMPTY_PATH));
 
 					string fallbackFileName = (fileName.empty())
 						? kDefaultStackConfigFileName
 						: fileName.substr(0, fileName.find_last_of("."));
 					absOutputPath.append(fallbackFileName.begin(), fallbackFileName.end());
-					return GenerateCDC(absOutputPath.generic_string().c_str(), ProjectConfiguration::GetInstance());
+					return Translate(GenerateCDC(absOutputPath.generic_string().c_str(), ProjectConfiguration::GetInstance()));
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 
 		}

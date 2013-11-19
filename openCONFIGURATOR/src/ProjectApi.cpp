@@ -8,13 +8,14 @@
 #include "../Include/Internal.h"
 #include "../Include/Validation.h"
 #include "../Include/ProjectConfiguration.h"
+#include "../Include/Result.h"
 
 #include <libxml/xmlwriter.h>
 #include <libxml/encoding.h>
 #include <libxml/xmlreader.h>
-
 #include <string>
 
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace std;
 
 namespace openCONFIGURATOR 
@@ -27,77 +28,71 @@ namespace openCONFIGURATOR
 			const string kDefaultMNXDD = "./resources/openPOWERLINK_MN.xdd";
 			const string kDefaultMNName = "openPOWERLINK_MN(240)";
 
-			DLLEXPORT ocfmRetCode NewProject(const string projectName, const string projectPath, const string pathToMNXdd)
+			DLLEXPORT Result NewProject(const string projectName, const string projectPath, const string pathToMNXdd)
 			{
-				ocfmRetCode retCode(OCFM_ERR_SUCCESS);
+				Result result;
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					ProjectConfiguration::GetInstance().ResetConfiguration();
-					retCode = CloseProject();
+					result = CloseProject();
 				}
-				if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
+				if (result.IsSuccessful())
 				{
 					string fallbackPath = pathToMNXdd.empty() 
 						? kDefaultMNXDD 
 						: pathToMNXdd;
 
-					retCode = ValidateXDDFile(fallbackPath.c_str());
-					if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
+					result = Translate(ValidateXDDFile(fallbackPath.c_str()));
+					if (result.IsSuccessful())
 					{
-						retCode = NewProjectNode(MN_NODEID, MN, kDefaultMNName.c_str(), fallbackPath.c_str());
-						if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
+						result = Translate(NewProjectNode(MN_NODEID, MN, kDefaultMNName.c_str(), fallbackPath.c_str()));
+						if (result.IsSuccessful())
 						{
 							ProjectConfiguration::GetInstance().SetProjectFile(projectName + ".xml");
 							ProjectConfiguration::GetInstance().SetProjectPath(projectPath);
 							ProjectConfiguration::GetInstance().SetInitialized(true);
-							return ocfmRetCode(OCFM_ERR_SUCCESS);
+							return Result();
 						}
 					}
 				}
-				return retCode;
+				return result;
 			}
 
-			DLLEXPORT ocfmRetCode SaveProject(void)
+			DLLEXPORT Result SaveProject(void)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-					return ocfmRetCode(OCFM_ERR_UNKNOWN);
+					return Translate(ocfmRetCode(OCFM_ERR_UNKNOWN)); //FIXME: Change when correct new error code is implemented
 					//return SaveProject(path.c_str(), projectName.c_str());
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
 			}
 
-			DLLEXPORT ocfmRetCode CloseProject(void)
+			DLLEXPORT Result CloseProject(void)
 			{
-				return FreeProjectMemory();
+				return Translate(FreeProjectMemory());
 			}
 
-			DLLEXPORT ocfmRetCode OpenProject(const string projectFile)
+			DLLEXPORT Result OpenProject(const string projectFile)
 			{
-				ocfmRetCode retCode(OCFM_ERR_SUCCESS);
+				Result result;
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					ProjectConfiguration::GetInstance().ResetConfiguration();
-					retCode = CloseProject();
+					result = CloseProject();			
 				}
-				if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
+				if (result.IsSuccessful())
 				{
-					retCode = ValidateProjectFile(projectFile);
-					if (retCode.getErrorCode() == OCFM_ERR_SUCCESS)
+					result = ValidateProjectFile(projectFile);
+					if (result.IsSuccessful())
 					{
 						ProjectConfiguration::GetInstance().SetProjectFile(projectFile);
-						ProjectConfiguration::GetInstance().SetProjectPath(projectFile.substr(0, projectFile.find_last_of(PATH_SEPARATOR)).append(PATH_SEPARATOR));
-						return ProjectConfiguration::GetInstance().LoadProject(projectFile);
-					}
-					else
-					{
-						string errorString(retCode.getErrorString());
-						retCode.setErrorString(errorString + "Error occurred in file: " + projectFile);
+						ProjectConfiguration::GetInstance().SetProjectPath(projectFile.substr(0, projectFile.find_last_of(PATH_SEPARATOR) + 1));
+						return Translate(ProjectConfiguration::GetInstance().LoadProject(projectFile));
 					}
 				}
-				return retCode;
+				return result;
 			}
-
 		}
 	}
 }

@@ -70,7 +70,7 @@
 #include "IndexCollection.h"
 #include "NetworkManagement.h"
 #include "Exception.h"
-
+#include "Result.h"
 /*****************************************************************************/
 /* Defines */
 
@@ -466,7 +466,7 @@ void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName,
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath);
+//ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath);
 /*****************************************************************************/
 /**
  \brief		This function shall get the 'Auto' info from the Project xml and store it in the object
@@ -479,7 +479,7 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPat
  \retval	FALSE		if there is already a message pending
  */
 /*****************************************************************************/
-bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader);
+//bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader);
 /*****************************************************************************/
 /**
  \brief		This function shall get the communication info from the Project xml and store it in the object
@@ -492,7 +492,7 @@ bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader);
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader);
+//bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the number of days since Jan 1 1984
@@ -522,7 +522,7 @@ INT32 GetConfigTime();
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath);
+//bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath);
 /*****************************************************************************/
 /**
  \brief		This function shall save the project details into the project location
@@ -536,7 +536,7 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath);
  \retval	FALSE			if there is already a message pending
  */
 /*****************************************************************************/
-bool SaveProjectXML(const char* projectPath, const char* projectName);
+//bool SaveProjectXML(const char* projectPath, const char* projectName);
 /*****************************************************************************/
 /**
  \brief		This function shall set the actual value to the sub index in the index specified
@@ -1428,6 +1428,6 @@ namespace openCONFIGURATOR
 	}
 }
 
-ocfmRetCode ValidateProjectFile(const string& fileName);
+openCONFIGURATOR::Library::ErrorHandling::Result ValidateProjectFile(const string& fileName);
 
 #endif // internal_h

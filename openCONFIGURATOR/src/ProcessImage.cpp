@@ -902,6 +902,7 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 }
 
+//TODO: 'netHeader' : unreferenced formal parameter
 INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 		PIDirectionType dirType, FILE* netHeader)
 {

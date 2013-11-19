@@ -69,8 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeType.cs" />
-    <Compile Include="ConfiguratorError.cs" />
-    <Compile Include="ocfmRetCode.cs" />
+	<Compile Include="Result.cs" />
+	<Compile Include="ErrorCode.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPER.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPERPINVOKE.cs" />
     <Compile Include="OutputLanguage.cs" />

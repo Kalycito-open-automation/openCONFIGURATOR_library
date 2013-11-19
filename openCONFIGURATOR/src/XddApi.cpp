@@ -21,15 +21,15 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 
-			DLLEXPORT ocfmRetCode GetDataTypeSize(const string name, UINT32& size)
+			DLLEXPORT Result GetDataTypeSize(const string name, UINT32& size)
 			{
 				size = GetDataSize(name);
 				if (size == 0)
-					return ocfmRetCode(OCFM_ERR_DATATYPE_NOT_FOUND);
-				return ocfmRetCode(OCFM_ERR_SUCCESS);
+					return Translate(ocfmRetCode(OCFM_ERR_DATATYPE_NOT_FOUND));//FIXME: Change when correct new error code is implemented
+				return Result();
 			}
 
-			DLLEXPORT ocfmRetCode GetFeatureValue(const UINT32 nodeId, const FeatureType featureType, const string featureName, string& featureValue)
+			DLLEXPORT Result GetFeatureValue(const UINT32 nodeId, const FeatureType featureType, const string featureName, string& featureValue)
 			{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
@@ -43,21 +43,19 @@ namespace openCONFIGURATOR
 						{
 							boost::format formatter(kMsgNonExistingNode);
 							formatter % nodeId;
-							ocfmRetCode result(OCFM_ERR_NODEID_NOT_FOUND);
-							result.setErrorString(formatter.str());
-							throw result;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 
 						NetworkManagement* nmtPtr = node->GetNetworkManagement();
 						featureValue = nmtPtr->GetNwMgmtFeatureValue(featureType, featureName.c_str());
-						return ocfmRetCode(OCFM_ERR_SUCCESS);
+						return Result();
 					} catch (ocfmRetCode& ex)
 					{
 						LOG_FATAL() << ex.getErrorString();
-						return ex;
+						return Translate(ex);
 					}
 				}
-				return ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED);
+				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
 			}
 
 		}

@@ -9,7 +9,7 @@
 
 #include <string>
 #include "Exports.h"
-#include "Exception.h"
+#include "Result.h"
 
 namespace openCONFIGURATOR 
 {
@@ -18,10 +18,10 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 
-			DLLEXPORT ocfmRetCode NewProject(const std::string projectName, const std::string projectPath, const std::string pathToMNXdd = "");
-			DLLEXPORT ocfmRetCode SaveProject(void);
-			DLLEXPORT ocfmRetCode CloseProject(void);
-			DLLEXPORT ocfmRetCode OpenProject(const std::string projectFile);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result NewProject(const std::string projectName, const std::string projectPath, const std::string pathToMNXdd = "");
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject(void);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject(void);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string projectFile);
 
 		}
 	}

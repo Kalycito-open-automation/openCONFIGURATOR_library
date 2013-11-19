@@ -9342,10 +9342,10 @@ ocfmRetCode FreeProjectMemory()
 //	return exceptionObj;
 //}
 
-ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath)
-{
+//ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPath)
+//{
 //	const xmlChar *xmlName;
-	ocfmRetCode exceptionObj;
+//	ocfmRetCode exceptionObj;
 
 //	xmlName = xmlTextReaderConstName(xmlReader);
 //	if (xmlName == NULL)
@@ -9460,11 +9460,11 @@ ocfmRetCode ProcessProjectXML(xmlTextReaderPtr xmlReader, const char* projectPat
 //	}
 //
 //	exceptionObj.setErrorCode(OCFM_ERR_SUCCESS);
-	return exceptionObj;
-}
+//	return exceptionObj;
+//}
 
-bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader)
-{
+//bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader)
+//{
 //	PjtSettings* pjtSettingsObj;
 //	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
 //
@@ -9529,11 +9529,11 @@ bool SetProjectSettingsAuto(xmlTextReaderPtr xmlReader)
 //			return false;
 //		}
 //	}
-	return true;
-}
+//	return true;
+//}
 
-bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader)
-{
+//bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader)
+//{
 //
 //	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 //	{
@@ -9564,12 +9564,12 @@ bool SetProjectSettingsCommunication(xmlTextReaderPtr xmlReader)
 //			return false;
 //		}
 //	}
-	return true;
-}
+//	return true;
+//}
 
-bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath)
-{
-
+//bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath)
+//{
+//
 //	char* nodeName = NULL;
 //	char* octFilePath = NULL;
 //	char* fileName = NULL;
@@ -9738,11 +9738,11 @@ bool GetandCreateNode(xmlTextReaderPtr xmlReader, const char* projectPath)
 //	//    copyDefToAct(iNodeID, varNodeType);
 //	delete[] fileName;
 //	delete[] nodeName;
-	return true;
-}
+//	return true;
+//}
 
-bool SaveProjectXML(const char* projectPath, const char* projectName)
-{
+//bool SaveProjectXML(const char* projectPath, const char* projectName)
+//{
 //	PjtSettings* pjtSettingsObj;
 //	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
 //	ocfmRetCode exceptionObj;
@@ -10051,8 +10051,8 @@ bool SaveProjectXML(const char* projectPath, const char* projectName)
 //	xmlFreeDoc(xmlDocObj);
 //
 //	delete[] fileName;
-	return true;
-}
+//	return true;
+//}
 
 void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 		PDOType pdoType, Node *nodeObj)
@@ -10219,12 +10219,12 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 
 }
 
-ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
-		AutoSave *autoSaveStatus, ViewMode *viewMode,
-		bool* isExpertViewAlreadySet)
-{
-
-	ocfmRetCode exceptionObj;
+//ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
+//		AutoSave *autoSaveStatus, ViewMode *viewMode,
+//		bool* isExpertViewAlreadySet)
+//{
+//
+//	ocfmRetCode exceptionObj;
 //	if ((NULL == autoGenStatus) || (NULL == autoSaveStatus)
 //			|| (NULL == viewMode) || (NULL == isExpertViewAlreadySet))
 //	{
@@ -10255,13 +10255,13 @@ ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus,
 //	{
 //		return ex;
 //	}
-	return exceptionObj;
-}
+//	return exceptionObj;
+//}
 
-ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
-		AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet)
-{
-	ocfmRetCode exceptionObj;
+//ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
+//		AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet)
+//{
+//	ocfmRetCode exceptionObj;
 //	exceptionObj.setErrorCode(OCFM_ERR_UNKNOWN);
 //	PjtSettings* pjtSettingsObj;
 //	pjtSettingsObj = PjtSettings::GetPjtSettingsPtr();
@@ -10284,8 +10284,8 @@ ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus,
 //	{
 //		return exObj;
 //	}
-	return exceptionObj;
-}
+//	return exceptionObj;
+//}
 
 //TODO: nodeType is not used. To be removed.
 void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType)

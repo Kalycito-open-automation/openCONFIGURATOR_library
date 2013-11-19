@@ -14,7 +14,8 @@
 #define RESULT_H_
 
 #include <string>
-#include "../Include/Exception.h"
+#include "Exception.h"
+#include "Exports.h"
 
 namespace openCONFIGURATOR
 {
@@ -59,8 +60,9 @@ namespace openCONFIGURATOR
 			const std::string kMsgIsochronousMaxPayloadExceeded = "Node %d: No. of %s-bytes mapped (%d) exceeds limit (1490, C_DLL_ISOCHR_MAX_PAYL).";
 			const std::string kMsgPdoDatatypeInvalid = "Node %d, (Sub)Index %#x/0x%s: Mapping of datatype '%s' not supported. Supported data types: Integer8(16/32/64), Unsigned8(16/32/64).";
 			const std::string kMsgMaxPiSizeExceeded = "Max. process image size exceeded: Actual: %d bytes, expected: max. %d bytes.";
+			const std::string kMsgUnsupportedPiLanguage = "Process-Image generation for language %d not supported.";
 
-			enum ErrorCode 
+			DLLEXPORT enum ErrorCode 
 			{ 
 				SUCCESS = 0,
 				FILE_WRITE_FAILED,
@@ -96,10 +98,12 @@ namespace openCONFIGURATOR
 				CHANNEL_PAYLOAD_LIMIT_EXCEEDED,
 				CHANNEL_OBJECT_LIMIT_EXCEEDED,
 				PDO_DATATYPE_INVALID,
+				UNSUPPORTED_PI_GEN_LANGUAGE,
 				MAX_PI_SIZE_EXCEEDED
+				
 			};		
 
-			class Result
+			class DLLEXPORT Result
 			{
 
 			private:

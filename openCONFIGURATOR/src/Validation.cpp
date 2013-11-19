@@ -425,14 +425,14 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
 	}
 }
 
-bool IfVersionNumberMatches(xmlTextReaderPtr reader)
-{
+//bool IfVersionNumberMatches(xmlTextReaderPtr reader)
+//{
 //	const xmlChar* name = NULL;
 //	const xmlChar* value = NULL;
 //	//Retrieve the name and Value of an attribute
 //	value = xmlTextReaderConstValue(reader);
 //	name = xmlTextReaderConstName(reader);
-	bool retVal = false;
+//	bool retVal = false;
 //	if (NULL == value || NULL == name)
 //	{
 //		return retVal;
@@ -473,14 +473,14 @@ bool IfVersionNumberMatches(xmlTextReaderPtr reader)
 //#endif
 //		retVal = false;
 //	}
-	return retVal;
-}
+//	return retVal;
+//}
 
 bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj)
 {
 	ocfmRetCode exceptionObj;
 	char *varCommIdx = new char[INDEX_LEN];
-	char customError[200] = { 0 };
+	//char customError[200] = { 0 };
 	ostringstream errorString;
 
 	if (pdoTypeVar == PDO_TPDO)
