@@ -109,7 +109,6 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_MAX_PI_SIZE:
 			return Result(MAX_PI_SIZE_EXCEEDED, errorString);
 
-		case OCFM_ERR_UNKNOWN:
 		case OCFM_ERR_MULTIPLEX_ASSIGN_ERROR:
 		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
 		case OCFM_ERR_LOW_CNPRESTIMEOUT:
@@ -156,6 +155,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_XML_END_DOC_FAILED:
 		case OCFM_ERR_INVALID_PJTXML:
 		case OCFM_ERR_PROJECT_SETTINGS:
+		case OCFM_ERR_UNKNOWN:
 		default:
 		{
 			boost::format formatter(kMsgLegacyError);
