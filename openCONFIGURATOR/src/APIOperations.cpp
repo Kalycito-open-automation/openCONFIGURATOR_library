@@ -11594,6 +11594,8 @@ ocfmRetCode CheckMutliplexAssigned()
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	INT32 nodesCount = 0;
 	nodesCount = nodeCollObj->GetCNNodesCount();
+	INT32 assignedCycle = 0;
+	INT32 nodeId = 0;
 
 	try
 	{
@@ -11617,10 +11619,9 @@ ocfmRetCode CheckMutliplexAssigned()
 				(char*) "07", &subIndexPos, &indexPos);
 		if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		{
-			string errorString("Index 0x1F98/0x07 does not exist on MN. Multiplexing not supported.");
-			exceptionObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
-			exceptionObj.setErrorString(errorString);
-			LOG_ERROR() << errorString;
+			exceptionObj.setErrorCode(OCFM_ERR_MULTIPLEXING_NOT_SUPPORTED);
+			exceptionObj.setErrorString(kMsgMultiplexingNotSupported);
+			LOG_ERROR() << kMsgMultiplexingNotSupported;
 			delete[] actValue;
 			return exceptionObj;
 		}
@@ -11632,8 +11633,6 @@ ocfmRetCode CheckMutliplexAssigned()
 			return exceptionObj;
 		}
 
-		ostringstream errorString;
-		errorString << "CN ";
 		INT32 tempActualValue = 0;
 		if (strncmp(actValue, "0x", 2) == 0 || strncmp(actValue, "0X", 2) == 0)
 		{
@@ -11646,6 +11645,7 @@ ocfmRetCode CheckMutliplexAssigned()
 		else
 			tempActualValue = atoi(actValue);
 
+		
 		for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
 				nodeLC++)
 		{
@@ -11718,8 +11718,9 @@ ocfmRetCode CheckMutliplexAssigned()
 						}
 						else
 						{
-							errorString << nodeObj->GetNodeId();
 							setErrFlag = true;
+							assignedCycle = actualValueCN;
+							nodeId = nodeObj->GetNodeId();
 						}
 					}
 					delete[] tempValue;
@@ -11730,11 +11731,14 @@ ocfmRetCode CheckMutliplexAssigned()
 			} // end of if loop 1
 		} //end of for loop
 		if (setErrFlag == true)
-		{			
-			errorString << ": Assigned multiplexed cycle exceeds the multiplexed cycle length.";
+		{
+			boost::format formatter(kMsgMultiplexCycleAssignInvalid);
+			formatter % assignedCycle
+				% nodeId
+				% tempActualValue;
 			exceptionObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
-			exceptionObj.setErrorString(errorString.str());
-			LOG_ERROR() << errorString.str();
+			exceptionObj.setErrorString(formatter.str());
+			LOG_ERROR() << formatter.str();
 		}
 		delete[] actValue;
 	} //end of try

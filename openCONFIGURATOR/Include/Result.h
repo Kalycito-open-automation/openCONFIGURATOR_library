@@ -60,7 +60,9 @@ namespace openCONFIGURATOR
 			const std::string kMsgIsochronousMaxPayloadExceeded = "Node %d: No. of %s-bytes mapped (%d) exceeds limit (1490, C_DLL_ISOCHR_MAX_PAYL).";
 			const std::string kMsgPdoDatatypeInvalid = "Node %d, (Sub)Index %#x/0x%s: Mapping of datatype '%s' not supported. Supported data types: Integer8(16/32/64), Unsigned8(16/32/64).";
 			const std::string kMsgMaxPiSizeExceeded = "Max. process image size exceeded: Actual: %d bytes, expected: max. %d bytes.";
+			const std::string kMsgMultiplexingNotSupported = "Multiplexing is not supported by the managing node.";
 			const std::string kMsgUnsupportedPiLanguage = "Process-Image generation for language %d not supported.";
+			const std::string kMsgMultiplexCycleAssignInvalid = "Multiplexed cycle '%d' assigned to node %d exceeds multiplexed cycle length (%d).";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -99,7 +101,9 @@ namespace openCONFIGURATOR
 				CHANNEL_OBJECT_LIMIT_EXCEEDED,
 				PDO_DATATYPE_INVALID,
 				UNSUPPORTED_PI_GEN_LANGUAGE,
-				MAX_PI_SIZE_EXCEEDED
+				MAX_PI_SIZE_EXCEEDED,
+				MULTIPLEXING_NOT_SUPPORTED,
+				MULTIPLEX_CYCLE_ASSIGN_INVALID
 				
 			};		
 
