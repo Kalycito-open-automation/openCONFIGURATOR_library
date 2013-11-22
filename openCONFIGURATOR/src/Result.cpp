@@ -114,8 +114,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(MULTIPLEX_CYCLE_ASSIGN_INVALID, errorString);
 		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
 			return Result(OBJECT_LIMITS_INVALID, errorString);
-
 		case OCFM_ERR_LOW_CNPRESTIMEOUT:
+			return Result(LOW_CN_PRES_TIMEOUT, errorString);
+
 		case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
 		case OCFM_ERR_EXCESS_CHANNEL:
 		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:

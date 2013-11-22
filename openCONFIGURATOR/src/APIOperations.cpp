@@ -1427,8 +1427,13 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		{
 			if (false == ValidateCNPresTimeout(sidxId, indexValue))
 			{
+				boost::format formatter(kMsgLowCnPresTimeout);
+				formatter % HexToInt<UINT32>(string(indexValue))
+					% HexToInt<UINT32>(string(sidxId))
+					% HexToInt<UINT32>(string(sidxId));
 				errCodeObj.setErrorCode(OCFM_ERR_LOW_CNPRESTIMEOUT);
-				LOG_FATAL() << errCodeObj.getErrorString();
+				errCodeObj.setErrorString(formatter.str());
+				LOG_FATAL() << formatter.str();
 				throw errCodeObj;
 			}
 		}

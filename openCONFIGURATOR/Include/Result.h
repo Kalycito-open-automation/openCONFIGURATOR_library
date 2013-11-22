@@ -66,6 +66,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgObjectLimitsInvalid = "Invalid object limits (high limit '%d' < low limit '%d')";
 			const std::string kMsgNodeIndexDescription = "Node %d, Index %#x: ";
 			const std::string kMsgNodeSubIndexDescription = "Node %d, (Sub)Index %#x/%#x: ";
+			const std::string kMsgLowCnPresTimeout = "PResTimeout (%dns) (subIndex 0x1F92/0x%X on MN) of node %d is less than PresMaxLatency (subIndex 0x1F98/0x03 on CN).";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -107,7 +108,8 @@ namespace openCONFIGURATOR
 				MAX_PI_SIZE_EXCEEDED,
 				MULTIPLEXING_NOT_SUPPORTED,
 				MULTIPLEX_CYCLE_ASSIGN_INVALID,
-				OBJECT_LIMITS_INVALID
+				OBJECT_LIMITS_INVALID,
+				LOW_CN_PRES_TIMEOUT
 				
 			};		
 
