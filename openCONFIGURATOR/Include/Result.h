@@ -68,6 +68,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgNodeSubIndexDescription = "Node %d, (Sub)Index %#x/%#x: ";
 			const std::string kMsgLowCnPresTimeout = "PResTimeout (%dns) (subIndex 0x1F92/0x%X on MN) of node %d is less than PresMaxLatency (subIndex 0x1F98/0x03 on CN).";
 			const std::string kMsgCrossTrafficStationLimitExceeded = "Node %d: No. of cross traffic stations (%d) exceeds limit (%d).";
+			const std::string kMsgPDOTPDOChannelCountExceeded = "Node 240: No. of TPDO-Channels exceeded. Allowed: %d (MN-Feature D_PDO_TPDOChannels_U16), existing: %d.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 

@@ -8855,7 +8855,13 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 	if (txChannelCount > maxNoOfChannels)
 	{
+		boost::format formatter(kMsgPDOTPDOChannelCountExceeded);
+		formatter 
+			% maxNoOfChannels
+			% txChannelCount;
 		exceptionObj.setErrorCode(OCFM_ERR_EXCESS_CHANNEL);
+		exceptionObj.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 	}
 	else
 	{
