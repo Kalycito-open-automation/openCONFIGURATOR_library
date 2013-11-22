@@ -122,8 +122,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(TPDO_CHANNEL_COUNT_EXCEEDED, errorString);
 		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
 			return Result(SUBINDEX_DOES_NOT_EXIST, errorString);
-			
 		case OCFM_ERR_INVALID_PARAMETER:
+			return Result(PARAMETER_INVALID, errorString);
+			
 		case OCFM_ERR_INVALID_SIZE_MAPPED:
 		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
 		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
