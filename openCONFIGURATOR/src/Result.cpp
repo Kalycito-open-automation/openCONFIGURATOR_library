@@ -116,8 +116,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(OBJECT_LIMITS_INVALID, errorString);
 		case OCFM_ERR_LOW_CNPRESTIMEOUT:
 			return Result(LOW_CN_PRES_TIMEOUT, errorString);
-
 		case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
+			return Result(CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED, errorString);
+
 		case OCFM_ERR_EXCESS_CHANNEL:
 		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
 		case OCFM_ERR_INVALID_PARAMETER:

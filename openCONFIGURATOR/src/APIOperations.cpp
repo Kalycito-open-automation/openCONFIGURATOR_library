@@ -3016,12 +3016,16 @@ void UpdateCNVisibleNode(Node* nodeObj)
 											(char*) sidxObj2->GetActualValue())))
 							{
 								crossTxStnCnt++;
+								//FIXME: Check whether there are enough receive objects for the cross traffic
 								if (MAX_CN_CROSS_TRAFFIC_STN < crossTxStnCnt)
-								{									
-									ostringstream errorString;
-									errorString << "The CN node id: " << nodeObj->GetNodeId() << "has been configured with more than the permissible number of cross traffic stations. The maximum permitted is " << MAX_CN_CROSS_TRAFFIC_STN;
+								{
+									boost::format formatter(kMsgCrossTrafficStationLimitExceeded);
+									formatter % nodeObj->GetNodeId()
+										% crossTxStnCnt
+										% MAX_CN_CROSS_TRAFFIC_STN;
 									exceptionObj.setErrorCode(OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN);
-									exceptionObj.setErrorString(errorString.str());
+									exceptionObj.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
 									throw exceptionObj;
 								}
 
