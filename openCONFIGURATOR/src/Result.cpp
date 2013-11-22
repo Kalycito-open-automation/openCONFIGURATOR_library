@@ -112,8 +112,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(MULTIPLEXING_NOT_SUPPORTED, errorString);
 		case OCFM_ERR_MULTIPLEX_ASSIGN_ERROR:
 			return Result(MULTIPLEX_CYCLE_ASSIGN_INVALID, errorString);
-
 		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
+			return Result(OBJECT_LIMITS_INVALID, errorString);
+
 		case OCFM_ERR_LOW_CNPRESTIMEOUT:
 		case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
 		case OCFM_ERR_EXCESS_CHANNEL:

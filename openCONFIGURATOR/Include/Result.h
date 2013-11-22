@@ -63,6 +63,9 @@ namespace openCONFIGURATOR
 			const std::string kMsgMultiplexingNotSupported = "Multiplexing is not supported by the managing node.";
 			const std::string kMsgUnsupportedPiLanguage = "Process-Image generation for language %d not supported.";
 			const std::string kMsgMultiplexCycleAssignInvalid = "Multiplexed cycle '%d' assigned to node %d exceeds multiplexed cycle length (%d).";
+			const std::string kMsgObjectLimitsInvalid = "Invalid object limits (high limit '%d' < low limit '%d')";
+			const std::string kMsgNodeIndexDescription = "Node %d, Index %#x: ";
+			const std::string kMsgNodeSubIndexDescription = "Node %d, (Sub)Index %#x/%#x: ";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -103,7 +106,8 @@ namespace openCONFIGURATOR
 				UNSUPPORTED_PI_GEN_LANGUAGE,
 				MAX_PI_SIZE_EXCEEDED,
 				MULTIPLEXING_NOT_SUPPORTED,
-				MULTIPLEX_CYCLE_ASSIGN_INVALID
+				MULTIPLEX_CYCLE_ASSIGN_INVALID,
+				OBJECT_LIMITS_INVALID
 				
 			};		
 

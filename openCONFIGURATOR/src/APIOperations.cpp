@@ -1597,20 +1597,23 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 		{
 			indexObj->SetDefaultValue(defaultValue);
 		}
-
 		ocfmRetCode errorLimitInfo;
-		errorLimitInfo.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
 		if ((NULL != highLimitVal) && (NULL != lowLimitVal))
 		{
 			errorLimitInfo = CheckUpperAndLowerLimits(lowLimitVal,
 					highLimitVal);
 			if (OCFM_ERR_SUCCESS == errorLimitInfo.getErrorCode())
-			{
+			{				
 				indexObj->SetHighLimit(highLimitVal);
 				indexObj->SetLowLimit(lowLimitVal);
 			}
 			else
 			{
+				boost::format formatter(kMsgNodeIndexDescription);
+				formatter % nodeId
+					% indexObj->GetIndex();
+				errorLimitInfo.setErrorString(formatter.str() + errorLimitInfo.getErrorString());
+				LOG_FATAL() << errorLimitInfo.getErrorString();
 				return errorLimitInfo;
 			}
 		}
@@ -1796,9 +1799,7 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		{
 			subIndexObj->SetDefaultValue(defaultValue);
 		}
-
 		ocfmRetCode errLimitInfo;
-		errLimitInfo.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
 		if ((NULL != highLimitVal) && (NULL != lowLimitVal))
 		{
 			errLimitInfo = CheckUpperAndLowerLimits(lowLimitVal, highLimitVal);
@@ -1809,6 +1810,12 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 			}
 			else
 			{
+				boost::format formatter(kMsgNodeSubIndexDescription);
+				formatter % nodeId
+					% indexObj->GetIndex()
+					% subIndexObj->GetIndex();
+				errLimitInfo.setErrorString(formatter.str() + errLimitInfo.getErrorString());
+				LOG_FATAL() << errLimitInfo.getErrorString();
 				return errLimitInfo;
 			}
 		}
@@ -2040,10 +2047,11 @@ ocfmRetCode CheckUpperAndLowerLimits(const char* lowLimitVal, const char* highLi
 			}
 			else
 			{				
-				ostringstream errorString;
-				errorString << "The lower limit(" << lowLimitVal <<") is greater than upperlimit(" << highLimitVal << ").";
+				boost::format formatter(kMsgObjectLimitsInvalid);
+				formatter % tempHighLimit
+					% tempLowLimit;
 				errCodeObj.setErrorCode(OCFM_ERR_INVALID_UPPERLOWER_LIMITS);
-				errCodeObj.setErrorString(errorString.str());
+				errCodeObj.setErrorString(formatter.str());
 				return errCodeObj;
 			}
 		}
