@@ -2250,8 +2250,14 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 		}
 		else
 		{
+			boost::format formatter(kMsgNonExistingSubIndex);
+			formatter 
+				% indexObj->GetIndex()
+				% 0
+				% indexObj->GetNodeID();
 			exceptionObj.setErrorCode(OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND);
-			LOG_FATAL() << "SubIndex 0x0 not found for index 0x" << indexObj->GetIndexValue() << ".";
+			exceptionObj.setErrorString(formatter.str());
+			LOG_FATAL() << formatter.str();
 			throw exceptionObj;
 		}
 	}

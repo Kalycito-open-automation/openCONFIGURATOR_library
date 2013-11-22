@@ -120,8 +120,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED, errorString);
 		case OCFM_ERR_EXCESS_CHANNEL:
 			return Result(TPDO_CHANNEL_COUNT_EXCEEDED, errorString);
-
 		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
+			return Result(SUBINDEX_DOES_NOT_EXIST, errorString);
+			
 		case OCFM_ERR_INVALID_PARAMETER:
 		case OCFM_ERR_INVALID_SIZE_MAPPED:
 		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
