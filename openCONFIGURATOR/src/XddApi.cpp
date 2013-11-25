@@ -23,17 +23,28 @@ namespace openCONFIGURATOR
 
 			DLLEXPORT Result GetDataTypeSize(const string name, UINT32& size)
 			{
-				size = GetDataSize(name);
-				if (size == 0)
-					return Translate(ocfmRetCode(OCFM_ERR_DATATYPE_NOT_FOUND));//FIXME: Change when correct new error code is implemented
-				return Result();
+				try
+				{
+					size = GetDataSize(name);
+					if (size == 0)
+						return Translate(ocfmRetCode(OCFM_ERR_DATATYPE_NOT_FOUND));//FIXME: Change when correct new error code is implemented
+					return Result();
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			DLLEXPORT Result GetFeatureValue(const UINT32 nodeId, const FeatureType featureType, const string featureName, string& featureValue)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					try
+					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
 						assert(nodeCollectionPtr);
@@ -49,15 +60,19 @@ namespace openCONFIGURATOR
 						NetworkManagement* nmtPtr = node->GetNetworkManagement();
 						featureValue = nmtPtr->GetNwMgmtFeatureValue(featureType, featureName.c_str());
 						return Result();
-					} catch (ocfmRetCode& ex)
-					{
-						LOG_FATAL() << ex.getErrorString();
-						return Translate(ex);
-					}
-				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
-			}
 
+					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

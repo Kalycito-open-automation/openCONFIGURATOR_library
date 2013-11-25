@@ -31,6 +31,8 @@ namespace openCONFIGURATOR
 
 			DLLEXPORT Result AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					ostringstream objectTypeString;
@@ -51,13 +53,22 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			DLLEXPORT Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-					try
-					{
 						string indexStr = IntToHex(index, 4, "", "");
 
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
@@ -129,21 +140,24 @@ namespace openCONFIGURATOR
 						}
 						return Result();
 					}
-					catch (ocfmRetCode& ex)
-					{
-						LOG_FATAL() << ex.getErrorString();
-						return Translate(ex);
-					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				}				
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const string attributeValue)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-					try
-					{
 						string indexStr = IntToHex(index, 4, "", "");
 						string subIndexStr = IntToHex(subIndex, 2, "", "");
 
@@ -226,126 +240,212 @@ namespace openCONFIGURATOR
 						}
 						return Result();
 					}
-					catch (ocfmRetCode& ex)
-					{
-						LOG_FATAL() << ex.getErrorString();
-						return Translate(ex);
-					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				}				
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			DLLEXPORT Result SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const string actualValue)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 					return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			DLLEXPORT Result GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, string& attributeValue)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					string indexString = IntToHex(index, 4, "", "");
-					char* attributeValueTemp = new char[50];
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
-
-					Result result = Translate(GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp));
-					if (result.IsSuccessful())
+					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						attributeValue.clear();
-						attributeValue.append(attributeValueTemp);
+						string indexString = IntToHex(index, 4, "", "");
+						char* attributeValueTemp = new char[50];
+						NodeType nodeType = (nodeId == MN_NODEID)
+							? MN
+							: CN;
+
+						Result result = Translate(GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp));
+						if (result.IsSuccessful())
+						{
+							attributeValue.clear();
+							attributeValue.append(attributeValueTemp);
+						}
+						delete[] attributeValueTemp;
+						return result;
 					}
-					delete[] attributeValueTemp;
-					return result;
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			DLLEXPORT Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					string indexString = IntToHex(index, 4, "", "");
-					string subIndexString = IntToHex(subIndexId, 2, "", "");
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						string indexString = IntToHex(index, 4, "", "");
+						string subIndexString = IntToHex(subIndexId, 2, "", "");
+						NodeType nodeType = (nodeId == MN_NODEID)
+							? MN
+							: CN;
 
-					Result result = Translate(AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
-					if (!result.IsSuccessful())
-						return result;
+						Result result = Translate(AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
+						if (!result.IsSuccessful())
+							return result;
 
-					return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false));
+						return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false));
+					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			DLLEXPORT Result SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-					return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+						return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			DLLEXPORT Result GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, AttributeType attributeType, string& attributeValue)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					string indexString = IntToHex(index, 4, "", "");
-					string subIndexString = IntToHex(subIndexId, 2, "", "");
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
-					char* attributeValueTemp = new char [50];
-
-					Result result = Translate(GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp));
-					if (result.IsSuccessful())
+					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						attributeValue.clear();
-						attributeValue.append(attributeValueTemp);
+						string indexString = IntToHex(index, 4, "", "");
+						string subIndexString = IntToHex(subIndexId, 2, "", "");
+						NodeType nodeType = (nodeId == MN_NODEID)
+							? MN
+							: CN;
+						char* attributeValueTemp = new char [50];
+
+						Result result = Translate(GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp));
+						if (result.IsSuccessful())
+						{
+							attributeValue.clear();
+							attributeValue.append(attributeValueTemp);
+						}
+						delete[] attributeValueTemp;
+						return result;
 					}
-					delete[] attributeValueTemp;
-					return result;
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
 			DLLEXPORT bool IsExistingIndex(const UINT32 nodeId, const UINT32 index)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
-					if (!node)
-						return false;
-					else
-						return node->GetIndexCollection()->ContainsIndex(index, 0);
+				try
+				{	 
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						if (!node)
+							return false;
+						else
+							return node->GetIndexCollection()->ContainsIndex(index, 0);
+					}
+					return false;
 				}
-				return false;
+				catch (const ocfmRetCode& ex)
+				{
+					return false;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return false;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
 			DLLEXPORT bool IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
-					if (!node)
-						return false;
-					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
-					if (!indexPtr)
-						return false;
-					return indexPtr->ContainsSubIndex(subIndex);
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						if (!node)
+							return false;
+						Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+						if (!indexPtr)
+							return false;
+						return indexPtr->ContainsSubIndex(subIndex);
+					}
+					return false;
 				}
-				return false;
+				catch (const ocfmRetCode& ex)
+				{
+					return false;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return false;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
 			DLLEXPORT UINT32 GetIndexCount(const UINT32 nodeId)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
@@ -355,10 +455,23 @@ namespace openCONFIGURATOR
 				}
 				return 0;
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return 0;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return 0;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
 			DLLEXPORT UINT32 GetSubIndexCount(const UINT32 nodeId, const UINT32 index)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
@@ -371,10 +484,24 @@ namespace openCONFIGURATOR
 				}
 				return 0;
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return 0;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+
+					return 0;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
 			DLLEXPORT UINT32 GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
@@ -399,9 +526,21 @@ namespace openCONFIGURATOR
 				}
 				return 0;
 			}
-
+				catch (const ocfmRetCode& ex)
+				{
+					return 0;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return 0;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 			DLLEXPORT Result DeleteIndex(const UINT32 nodeId, const UINT32 index)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					string indexString = IntToHex(index, 4, "", "");
@@ -413,9 +552,20 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			DLLEXPORT Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					string indexString = IntToHex(index, 4, "", "");
@@ -428,7 +578,15 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
-
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

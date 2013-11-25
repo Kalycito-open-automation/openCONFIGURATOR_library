@@ -7,6 +7,7 @@
 #include "../Include/Internal.h"
 #include "../Include/ProjectConfiguration.h"
 #include "../Include/BoostShared.h"
+#include "../Include/Logging.h"
 
 #include <sstream>
 
@@ -43,6 +44,8 @@ namespace openCONFIGURATOR
 
 			DLLEXPORT Result GenerateProcessImageDescription(const OutputLanguage lang, const string outputPath, const string fileName)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
@@ -70,9 +73,20 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			DLLEXPORT Result GenerateStackConfiguration(const string outputPath, const string fileName)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					boost::filesystem::path absOutputPath = getAbsOutputPath(outputPath);
@@ -87,7 +101,15 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
-
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+			}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

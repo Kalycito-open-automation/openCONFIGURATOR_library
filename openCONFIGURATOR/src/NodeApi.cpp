@@ -24,41 +24,65 @@ namespace openCONFIGURATOR
 			/*DLLEXPORT ocfmRetCode AddNode(Node const& node, const string path, const string xddFile);*/
 			DLLEXPORT Result AddNode(const UINT32 nodeId, const NodeType nodeType, const string nodeName, const string xddFile)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					if (IsExistingNode(nodeId)) 
+					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						boost::format formatter(kMsgExistingNode);
-						formatter % nodeId;
-						return Result (NODE_EXISTS, formatter.str());
+						if (IsExistingNode(nodeId)) 
+						{
+							boost::format formatter(kMsgExistingNode);
+							formatter % nodeId;
+							return Result (NODE_EXISTS, formatter.str());
+						}
+						return Translate(NewProjectNode(nodeId,
+							nodeType,
+							nodeName.c_str(),
+							(xddFile.empty())
+								? NULL
+								: xddFile.c_str()));
 					}
-					return Translate(NewProjectNode(nodeId,
-						nodeType,
-						nodeName.c_str(),
-						(xddFile.empty())
-							? NULL
-							: xddFile.c_str()));
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 
 			DLLEXPORT Result DeleteNode(const UINT32 nodeId)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
+				try
 				{
-					NodeType type = (nodeId == MN_NODEID)
-						? MN
-						: CN;
-					return Translate(DeleteNode(nodeId, type));
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						NodeType type = (nodeId == MN_NODEID)
+							? MN
+							: CN;
+						return Translate(DeleteNode(nodeId, type));
+					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
 			}
 
 			/*DLLEXPORT ocfmRetCode GetNode(const unsigned int nodeId, Node& node);*/
 
 			DLLEXPORT Result ReplaceXdd(const UINT32 nodeId, const string path, const string xddFile)
 			{
+				try
+				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
 					NodeType type = (nodeId == MN_NODEID) ? MN : CN;
@@ -73,21 +97,53 @@ namespace openCONFIGURATOR
 				}
 				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 
 			DLLEXPORT bool IsExistingNode(const UINT32 nodeId)
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-					return NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId);
-				return false;
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+						return NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId);
+					return false;
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return false;
+				}
+				catch (const std::exception& ex)
+				{
+					return false;
+				}
 			}
-
+			//FIXME: Pass value by reference to handle occuring errors and return Result object 
 			DLLEXPORT UINT32 GetNodeCount()
 			{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-					return NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
-				return 0;
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+						return NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
+					return 0;
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return 0;
+					//return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return 0;
+					//return Result(UNHANDLED_EXCEPTION, ex.what());
+	}
 			}
-
 		}
 	}
 }
