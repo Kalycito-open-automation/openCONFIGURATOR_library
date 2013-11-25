@@ -57,20 +57,118 @@ namespace BR.FS.CdcBuilder
         private enum BuilderError
         {
             [Description("Invalid number of arguments. Expected: {0:d}, actual: {1:d}.")]
-            USAGE_INVALID_NO_OF_ARGUMENTS,
+            USAGE_INVALID_NO_OF_ARGUMENTS = 5400,
             [Description("Invalid option '{0}'.")]
-            USAGE_INVALID_OPTION,
+            USAGE_INVALID_OPTION = 5401,
             [Description("Project file '{0}' does not exist.")]
-            PROJECTFILE_NOT_EXISTING,
+            PROJECTFILE_NOT_EXISTING = 5402,
             [Description("Output path '{0}' does not exist.")]
-            OUTPUTPATH_NOT_EXISTING
+            OUTPUTPATH_NOT_EXISTING = 5403
         };
 
         private enum ReturnCode { SUCCESS = 0, WARNING = 1, ERROR = 2, FATAL_ERROR = 3 };
 
         private static string GetFormattedErrorMsg(ASErrorSeverity severity, BuilderError errorNo, string msg)
         {
-            return String.Format("{0} {1:d}: {2}", severity.ToString("G").ToLower(), errorNo, msg);
+            return String.Format("{0} {1:d}: {2}",  severity.ToString("G").ToLower(), errorNo, msg);
+        }
+
+        private static string GetFormattedErrorMsg(ASErrorSeverity severity, Result res)
+        {
+            return String.Format("{0} {1:d}: {2}", severity.ToString("G").ToLower(), GetASErrorNr(res.GetErrorCode()), res.GetErrorString());
+        }
+
+        private static int GetASErrorNr(ErrorCode code)
+        {
+            switch (code)
+            {
+                case ErrorCode.FILE_WRITE_FAILED:
+                    return 5410;
+                case ErrorCode.FILE_READ_FAILED:
+                    return 5411;
+                case ErrorCode.LEGACY_ERROR:
+                    return 5412;
+                case ErrorCode.SUBINDEX_INVALID:
+                    return 5413;
+                case ErrorCode.INDEX_INVALID:
+                    return 5414;
+                case ErrorCode.NODEID_INVALID:
+                    return 5415;
+                case ErrorCode.ATTRIBUTEVALUE_INVALID:
+                    return 5416;
+                case ErrorCode.ATTRIBUTEVALUE_NOT_IN_RANGE:
+                    return 5417;
+                case ErrorCode.UNSUPPORTED_ATTRIBUTETYPE:
+                    return 5418;
+                case ErrorCode.NO_NODES_CONFIGURED:
+                    return 5419;
+                case ErrorCode.NO_CONTROLLED_NODES_CONFIGURED:
+                    return 5420;
+                case ErrorCode.NO_MANAGING_NODE_CONFIGURED:
+                    return 5421;
+                case ErrorCode.OD_EMPTY:
+                    return 5422;
+                case ErrorCode.INDEX_CONTAINS_NO_SUBINDICES:
+                    return 5423;
+                case ErrorCode.NODE_DOES_NOT_EXIST:
+                    return 5424;
+                case ErrorCode.INDEX_DOES_NOT_EXIST:
+                    return 5425;
+                case ErrorCode.SUBINDEX_DOES_NOT_EXIST:
+                    return 5426;
+                case ErrorCode.NODE_EXISTS:
+                    return 5427;
+                case ErrorCode.INDEX_EXISTS:
+                    return 5428;
+                case ErrorCode.SUBINDEX_EXISTS:
+                    return 5429;
+                case ErrorCode.EXTERNAL_SYSTEM_CALL_FAILED:
+                    return 5430;
+                case ErrorCode.TPDO_CHANNEL_COUNT_EXCEEDED:
+                    return 5431;
+                case ErrorCode.NODE_CONFIGURATION_ERROR:
+                    return 5432;
+                case ErrorCode.MAPPED_INDEX_DOES_NOT_EXIST:
+                    return 5433;
+                case ErrorCode.MAPPED_SUBINDEX_DOES_NOT_EXIST:
+                    return 5434;
+                case ErrorCode.INSUFFICIENT_MAPPING_OBJECTS:
+                    return 5435;
+                case ErrorCode.PARAMETER_NOT_FOUND:
+                    return 5436;
+                case ErrorCode.STRUCT_DATATYPE_NOT_FOUND:
+                    return 5437;
+                case ErrorCode.SIMPLE_DATATYPE_NOT_FOUND:
+                    return 5438;
+                case ErrorCode.VALUE_NOT_WITHIN_RANGE:
+                    return 5439;
+                case ErrorCode.CHANNEL_PAYLOAD_LIMIT_EXCEEDED:
+                    return 5440;
+                case ErrorCode.CHANNEL_OBJECT_LIMIT_EXCEEDED:
+                    return 5441;
+                case ErrorCode.PDO_DATATYPE_INVALID:
+                    return 5442;
+                case ErrorCode.UNSUPPORTED_PI_GEN_LANGUAGE:
+                    return 5443;
+                case ErrorCode.MAX_PI_SIZE_EXCEEDED:
+                    return 5444;
+                case ErrorCode.MULTIPLEXING_NOT_SUPPORTED:
+                    return 5445;
+                case ErrorCode.MULTIPLEX_CYCLE_ASSIGN_INVALID:
+                    return 5446;
+                case ErrorCode.OBJECT_LIMITS_INVALID:
+                    return 5447;
+                case ErrorCode.LOW_CN_PRES_TIMEOUT:
+                    return 5448;
+                case ErrorCode.CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED:
+                    return 5449;
+                case ErrorCode.PARAMETER_INVALID:
+                    return 5450;
+                case ErrorCode.UNHANDLED_EXCEPTION:
+                    return 5451;
+                default:
+                    return 0;
+            }
         }
 
         private static void PrintUsageMessage()
@@ -109,7 +207,7 @@ namespace BR.FS.CdcBuilder
 #if DEBUG
                 Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                     "Attach debugger and press any key"));
-                Console.ReadLine();
+                //Console.ReadLine();
 #endif
                 FileInfo projectFile = new FileInfo(args[0]);
                 String outputOption = args[1];
@@ -159,7 +257,7 @@ namespace BR.FS.CdcBuilder
 
                 Result retCode = openCONFIGURATORcsharpWRAPPER.OpenProject(projectFile.ToString());
 
-#if DEBUG
+#if DEBUG               
                 Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                     "Open project : " + projectFile.ToString() + " : " + retCode.GetErrorString() + " : " +
                     retCode.GetErrorCode()));
@@ -173,13 +271,12 @@ namespace BR.FS.CdcBuilder
                             Program.CDC_FILENAME);
 #if DEBUG
                     Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                        "Generate stack configuration : " + outputPath.ToString() + Path.DirectorySeparatorChar +
-                        Program.CDC_FILENAME + " : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
+                       "Generate stack configuration : " + outputPath.ToString() + Path.DirectorySeparatorChar +
+                       Program.CDC_FILENAME + " : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
 #endif
                     if (!retCode.IsSuccessful())
                     {
-                        Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                            "Generate stack configuration failed : " + retCode.GetErrorString()));
+                        Console.WriteLine(GetFormattedErrorMsg(ASErrorSeverity.ERROR, retCode));
                         return (int)ReturnCode.FATAL_ERROR;
                     }
                     else
@@ -195,8 +292,7 @@ namespace BR.FS.CdcBuilder
 #endif
                         if (!retCode.IsSuccessful())
                         {
-                            Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                                "Generate C# process image failed: " + retCode.GetErrorString()));
+                            Console.WriteLine(GetFormattedErrorMsg(ASErrorSeverity.ERROR, retCode));
                             return (int)ReturnCode.FATAL_ERROR;
                         }
                         retCode =
@@ -210,16 +306,14 @@ namespace BR.FS.CdcBuilder
 #endif
                         if (!retCode.IsSuccessful())
                         {
-                            Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                                "Generate C process image failed: " + retCode.GetErrorString()));
+                            Console.WriteLine(GetFormattedErrorMsg(ASErrorSeverity.ERROR, retCode));
                             return (int)ReturnCode.FATAL_ERROR;
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                        "Open Project failed: " + retCode.GetErrorString()));
+                    Console.WriteLine(GetFormattedErrorMsg(ASErrorSeverity.ERROR, retCode));
                     return (int)ReturnCode.FATAL_ERROR;
                 }
 
@@ -230,8 +324,7 @@ namespace BR.FS.CdcBuilder
 #endif
                 if (!retCode.IsSuccessful())
                 {
-                    Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
-                        "CloseProject : " + retCode.GetErrorString() + " : " + retCode.GetErrorCode()));
+                    Console.WriteLine(GetFormattedErrorMsg(ASErrorSeverity.ERROR, retCode));
                     return (int)ReturnCode.FATAL_ERROR;
                 }
                 //AS output when build finished successful
