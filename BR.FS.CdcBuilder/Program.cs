@@ -176,6 +176,10 @@ namespace BR.FS.CdcBuilder
                     return 5455;
                 case ErrorCode.MAPPING_TYPE_FOR_PDO_INVALID:
                     return 5456;
+                case ErrorCode.ACCESS_TYPE_FOR_PARAMETER_INVALID:
+                    return 5457;
+                case ErrorCode.ACCESS_TYPE_FOR_PDO_INVALID:
+                    return 5458;
                     
                 default:
                     return 0;

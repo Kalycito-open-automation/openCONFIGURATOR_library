@@ -74,6 +74,8 @@ namespace openCONFIGURATOR
 			const std::string kMsgFeatureValueNotFound = "%s-Feature '%s' not defined in XDD of node %d.";
 			const std::string kMsgObjectSizeMappedInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapped data-length invalid. Actual: %d bits, expected %d bits.";
 			const std::string kMsgMappingTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Mismatching PDOMapping ('%s' Mapping-Object, mapped object '%s').";
+			const std::string kMsgAccessTypeForParameterInvalid = "Mapping-Object 0x%X/0x%X: Parameter with uniqueId '%s', referenced by mapped index 0x%X/0x%s on node %d, has invalid access type ('%s').";
+			const std::string kMsgAccessTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Invalid access type '%s' (RPDOs must be writeable, TPDOs readable).";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -124,7 +126,9 @@ namespace openCONFIGURATOR
 				FEATURE_VALUE_NOT_FOUND,
 				PLKDATATYPE_SIZE_UNDEFINED,
 				OBJECT_SIZE_MAPPED_INVALID,
-				MAPPING_TYPE_FOR_PDO_INVALID
+				MAPPING_TYPE_FOR_PDO_INVALID,
+				ACCESS_TYPE_FOR_PARAMETER_INVALID,
+				ACCESS_TYPE_FOR_PDO_INVALID
 				
 			};		
 

@@ -5357,10 +5357,30 @@ if ((uniqueidRefId == NULL) || (nodeObj == NULL) || (sidxObj == NULL) || (module
 				}
 				if (parameterObj->accessStr == NULL)
 				{					
-					errorString << "AccessType not found for the parameter with uniqueIdRef: "<< uniqueidRefId << "\n In " << nodeObj->GetNodeName() <<"("<< nodeObj->GetNodeId() <<") which is mapped via the module "<< moduleIndexObj->GetName() <<"("<< moduleIndexObj->GetName() <<")";
-					exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-					exceptionObj.setErrorString(errorString.str());
-					LOG_FATAL() << errorString;
+					boost::format formatter(kMsgAccessTypeForParameterInvalid);
+					if (moduleSidxObj == NULL)
+					{
+						formatter % indexObj.GetIndex()
+							% sidxObj->GetIndex()
+							% uniqueidRefId 
+							% moduleIndexObj->GetIndex()
+							% "-"
+							% nodeObj->GetNodeId()
+							% parameterObj->accessStr;
+					}
+					else
+					{
+						formatter % indexObj.GetIndex()
+							% sidxObj->GetIndex()
+							% uniqueidRefId 
+							% moduleIndexObj->GetIndex()
+							% moduleSidxObj->GetIndexValue()
+							% nodeObj->GetNodeId()
+							% parameterObj->accessStr;
+					}
+					exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PARAMETER);
+					exceptionObj.setErrorString(formatter.str());
+					LOG_FATAL() << formatter.str();
 					throw exceptionObj;
 				}
 
@@ -5861,21 +5881,18 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										{
 											accessStr = new char[strlen(moduleIndexObj->GetAccessType()) + ALLOC_BUFFER];
 											strcpy(accessStr, moduleIndexObj->GetAccessType());
-											if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleIndexObj->GetPDOMapping(), accessStr))
+											if (!IsValidAccessTypeForPdo(pdoType, (char*)moduleIndexObj->GetPDOMapping(), accessStr))
 											{
-												errorString<<"In "<<nodeObj->GetNodeName()<<""<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") with accessType='"<<moduleIndexObj->GetAccessType()<<"' cannot be mapped to a ";
-												if(pdoType == PDO_TPDO)
-												{
-													errorString<<"TPDO ";
-												}
-												else
-												{
-													 errorString<<"RPDO ";
-												}
-												errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+												boost::format formatter(kMsgAccessTypeForPdoInvalid);
+												formatter % indexObj.GetIndex()
+													% sidxObj->GetIndex()
+													% moduleIndexObj->GetIndex()
+													% "-"
+													% nodeObj->GetNodeId()
+													% accessStr;
 												exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-												exceptionObj.setErrorString(errorString.str());
-												LOG_FATAL() << errorString.str();
+												exceptionObj.setErrorString(formatter.str());
+												LOG_FATAL() << formatter.str();
 												throw exceptionObj;
 											}
 										}
@@ -5965,19 +5982,16 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 												if(!IsValidAccessTypeForPdo(pdoType, (char*)moduleSidxObj->GetPDOMapping(), accessStr))
 												{
-													errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") / "<<moduleSidxObj->GetName()<<"(0x"<<moduleSidxObj->GetIndexValue()<<") with accessType='"<<moduleSidxObj->GetAccessType()<<"' cannot be mapped to a ";
-													if(pdoType == PDO_TPDO)
-													{
-														errorString<<"TPDO ";
-													}
-													else
-													{
-														errorString<<"RPDO ";
-													}
-													errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+													boost::format formatter(kMsgAccessTypeForPdoInvalid);
+													formatter % indexObj.GetIndex()
+														% sidxObj->GetIndex()
+														% moduleIndexObj->GetIndex()
+														% moduleSidxObj->GetIndexValue()
+														% nodeObj->GetNodeId()
+														% accessStr;
 													exceptionObj.setErrorCode(OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO);
-													exceptionObj.setErrorString(errorString.str());
-													LOG_FATAL() << errorString.str();
+													exceptionObj.setErrorString(formatter.str());
+													LOG_FATAL() << formatter.str();
 													delete[] sidxName;
 													throw exceptionObj;
 												}

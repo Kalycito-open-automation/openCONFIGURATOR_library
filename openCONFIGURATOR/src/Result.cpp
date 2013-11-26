@@ -128,8 +128,11 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(OBJECT_SIZE_MAPPED_INVALID, errorString);
 		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
 			return Result(MAPPING_TYPE_FOR_PDO_INVALID, errorString);
-			
+		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PARAMETER:
+			return Result(ACCESS_TYPE_FOR_PARAMETER_INVALID, errorString);
 		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
+			return Result(ACCESS_TYPE_FOR_PDO_INVALID, errorString);
+			
 		case OCFM_ERR_INVALID_PDO_OFFSET:
 		case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
 		case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
