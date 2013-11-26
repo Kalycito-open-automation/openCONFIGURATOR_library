@@ -73,6 +73,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgPowerlinkDatatypeSizeNotDefined = "POWERLINK-Datatype '0x%X' has no defined size.";
 			const std::string kMsgFeatureValueNotFound = "%s-Feature '%s' not defined in XDD of node %d.";
 			const std::string kMsgObjectSizeMappedInvalid = "Mapping-Object %#x/%#x on node %d: Mapped data-length invalid. Actual: %d bits, expected %d bits.";
+			const std::string kMsgMappingTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Mismatching PDOMapping ('%s' Mapping-Object, mapped object '%s').";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -122,7 +123,8 @@ namespace openCONFIGURATOR
 				NO_DEFAULT_OR_ACTUAL_VALUE,
 				FEATURE_VALUE_NOT_FOUND,
 				PLKDATATYPE_SIZE_UNDEFINED,
-				OBJECT_SIZE_MAPPED_INVALID
+				OBJECT_SIZE_MAPPED_INVALID,
+				MAPPING_TYPE_FOR_PDO_INVALID
 				
 			};		
 

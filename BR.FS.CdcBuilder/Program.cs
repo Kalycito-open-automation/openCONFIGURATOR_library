@@ -174,6 +174,9 @@ namespace BR.FS.CdcBuilder
                     return 5454;
                 case ErrorCode.OBJECT_SIZE_MAPPED_INVALID:
                     return 5455;
+                case ErrorCode.MAPPING_TYPE_FOR_PDO_INVALID:
+                    return 5456;
+                    
                 default:
                     return 0;
             }

@@ -5822,19 +5822,22 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 									//Check if the object has correct PDOmapping attribute
 									if(!CheckForValidPDOMapping(pdoType, moduleIndexObj))
-									{
-										errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<") with pdoMapping="<<moduleIndexObj->GetPDOMapping()<<" cannot be mapped to a ";
-										if(pdoType == PDO_TPDO)
-										{
-											errorString<<"TPDO ";
-										}
-										else
-										{
-											errorString<<"RPDO ";
-										}
-										errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+									{//Mapping-Object 0x%X/0x%s: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Mismatching PDOMapping ('%s' Mapping-Object, mapped object '%s').
+										string pdoTypeString = pdoType == PDO_TPDO 
+											? "TPDO" : "RPDO";
+										boost::format formatter(kMsgMappingTypeForPdoInvalid);
+										formatter 
+											% indexObj.GetIndex()
+											% sidxObj->GetIndex()
+											% moduleIndexObj->GetIndex()
+											% "-"
+											% nodeObj->GetNodeId()
+											% pdoTypeString
+											% moduleIndexObj->GetPDOMapping();
 										exceptionObj.setErrorCode(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-										exceptionObj.setErrorString(errorString.str());
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
+
 										//Blocked thowing exception for objects with UniqueIdRef because the TCL/TK GUI has no support for UniqueIdRef.
 										if (moduleIndexObj->GetUniqueIDRef() == NULL)
 										{
@@ -5912,18 +5915,20 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										//Check if the subobject has correct PDOmapping attribute
 										if(!CheckForValidPDOMapping(pdoType, moduleIndexObj, moduleSidxObj))
 										{
-											errorString<<"In "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), "<<moduleIndexObj->GetName()<<"(0x"<<moduleIndexObj->GetIndexValue()<<")/"<<moduleSidxObj->GetName()<<"(0x"<<moduleSidxObj->GetIndexValue()<<") with pdoMapping="<<moduleSidxObj->GetPDOMapping()<<" cannot be mapped to a ";
-											if(pdoType == PDO_TPDO)
-											{
-												errorString<<"TPDO ";
-											}
-											else
-											{
-												errorString<<"RPDO ";
-											}
-											errorString<<indexObj.GetIndexValue()<<"/"<<sidxObj->GetIndexValue();
+											string pdoTypeString = pdoType == PDO_TPDO 
+												? "TPDO" : "RPDO";
+											boost::format formatter(kMsgMappingTypeForPdoInvalid);
+											formatter 
+												% indexObj.GetIndex()
+												% sidxObj->GetIndex()
+												% moduleIndexObj->GetIndex()
+												% moduleSidxObj->GetIndexValue()
+												% nodeObj->GetNodeId()
+												% pdoTypeString
+												% moduleSidxObj->GetPDOMapping();
 											exceptionObj.setErrorCode(OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO);
-											exceptionObj.setErrorString(errorString.str());
+											exceptionObj.setErrorString(formatter.str());
+											LOG_FATAL() << formatter.str();
 											//Blocked thowing exception for objects with UniqueIdRef because the TCL/TK GUI has no support for UniqueIdRef.
 											if (moduleSidxObj->GetUniqueIDRef() == NULL)
 											{
