@@ -21,6 +21,11 @@
 %include std_string_ref.i
 
 %apply unsigned int& OUTPUT { unsigned int& size };
+%apply unsigned int& OUTPUT { unsigned int& nodeCount };
+%apply unsigned int& OUTPUT { unsigned int& indexCount };
+%apply unsigned int& OUTPUT { unsigned int& subIndexCount };
+%apply unsigned int& OUTPUT { unsigned int& nrOfEntries };
+%apply bool& OUTPUT { bool& exists };
 
 %ignore MN_NODEID;
 %ignore BROADCAST_NODEID;
@@ -46,10 +51,8 @@
 %ignore AutoGenerate;
 %ignore AutoSave;
 %ignore DateTime;
-%ignore FeatureType;
 %ignore IEC_Datatype;
 %ignore NodeType;
-%ignore ObjectType;
 %ignore PDOMapping;
 %ignore PDOType;
 %ignore ParameterAccess;
@@ -114,7 +117,10 @@ namespace openCONFIGURATOR
 				LOW_CN_PRES_TIMEOUT,
 				CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED,
 				PARAMETER_INVALID,
-				UNHANDLED_EXCEPTION
+				UNHANDLED_EXCEPTION,
+				NO_DEFAULT_OR_ACTUAL_VALUE,
+				FEATURE_VALUE_NOT_FOUND,
+				PLKDATATYPE_SIZE_UNDEFINED
 			};		
 
 			class DLLEXPORT Result
@@ -149,13 +155,13 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject(void);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string projectFile);
 
-				/*DLLEXPORT Result AddNode(const Node& node, const std::string path, const std::string xddFile);*/
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddNode(const unsigned int nodeId, const NodeType nodeType, const std::string nodeName, const std::string xddFile = "");
+				/*DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddNode(const Node& node, const std::string path, const std::string xddFile);*/
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddNode(const unsigned int nodeId, const std::string nodeName, const std::string xddFile = "");
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteNode(const unsigned int nodeId);
 				/*DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNode(const unsigned int nodeId, Node& node);*/
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result ReplaceXdd(const unsigned int nodeId, const std::string path, const std::string xddFile);
-				DLLEXPORT bool IsExistingNode(const unsigned int nodeId);
-				DLLEXPORT unsigned int GetNodeCount(void);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingNode(const unsigned int nodeId, bool& exists);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int& nodeCount);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const unsigned int nodeId, const unsigned int index, const std::string actualValue, const std::string name, ObjectType objectType);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, const std::string attributeValue);
@@ -167,13 +173,13 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexActualValue(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, const std::string actualValue);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexAttribute(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, AttributeType attributeType, std::string& attributeValue);
 
-				DLLEXPORT bool IsExistingIndex(const unsigned int nodeId, const unsigned int index);
-				DLLEXPORT bool IsExistingSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingIndex(const unsigned int nodeId, const unsigned int index, bool& exists);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, bool& exists);
 
-				DLLEXPORT unsigned int GetIndexCount(const unsigned int nodeId);
-				DLLEXPORT unsigned int GetSubIndexCount(const unsigned int nodeId, const unsigned int index);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const unsigned int nodeId, unsigned int& indexCount);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const unsigned int nodeId, const unsigned int index, unsigned int& subIndexCount);
 
-				DLLEXPORT unsigned int GetNumberOfEntries(const unsigned int nodeId, const unsigned int index, const bool getDefault);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const unsigned int nodeId, const unsigned int index, const bool getDefault, unsigned int& nrOfEntries);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteIndex(const unsigned int nodeId, const unsigned int index);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex);
@@ -181,7 +187,7 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateProcessImageDescription(const OutputLanguage lang, const std::string outputPath, const std::string fileName);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string outputPath, const std::string fileName);
 
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const std::string name, unsigned int& size);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType type, unsigned int& size);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const unsigned int nodeId, const FeatureType featureType, const std::string featureName, std::string& featureValue);
 		}
 	}

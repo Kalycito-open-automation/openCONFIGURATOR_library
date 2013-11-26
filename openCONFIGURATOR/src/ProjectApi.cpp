@@ -95,7 +95,8 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				return Translate(FreeProjectMemory());
+					ProjectConfiguration::GetInstance().ResetConfiguration();
+					return Translate(FreeProjectMemory());
 				}
 				catch (const ocfmRetCode& ex)
 				{

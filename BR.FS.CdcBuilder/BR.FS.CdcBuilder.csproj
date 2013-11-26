@@ -70,7 +70,10 @@
   <ItemGroup>
     <Compile Include="AttributeType.cs" />
 	<Compile Include="Result.cs" />
+	<Compile Include="FeatureType.cs" />
+	<Compile Include="ObjectType.cs" />
 	<Compile Include="ErrorCode.cs" />
+	<Compile Include="PlkDataType.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPER.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPERPINVOKE.cs" />
     <Compile Include="OutputLanguage.cs" />

@@ -166,6 +166,12 @@ namespace BR.FS.CdcBuilder
                     return 5450;
                 case ErrorCode.UNHANDLED_EXCEPTION:
                     return 5451;
+                case ErrorCode.NO_DEFAULT_OR_ACTUAL_VALUE:
+                    return 5452;
+                case ErrorCode.FEATURE_VALUE_NOT_FOUND:
+                    return 5453;
+                case ErrorCode.PLKDATATYPE_SIZE_UNDEFINED:
+                    return 5454;
                 default:
                     return 0;
             }

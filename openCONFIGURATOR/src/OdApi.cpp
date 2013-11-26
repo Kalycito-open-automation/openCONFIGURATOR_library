@@ -385,64 +385,82 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
-			DLLEXPORT bool IsExistingIndex(const UINT32 nodeId, const UINT32 index)
+			DLLEXPORT Result IsExistingIndex(const UINT32 nodeId, const UINT32 index, bool& exists)
 			{
 				try
-				{	 
+				{
+					exists = false;
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
 						if (!node)
-							return false;
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter 
+								% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
+						}
 						else
-							return node->GetIndexCollection()->ContainsIndex(index, 0);
+						{
+							if (node->GetIndexCollection()->ContainsIndex(index, 0))
+								exists = true;
+							return Result();
+						}
 					}
-					return false;
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
 				catch (const ocfmRetCode& ex)
 				{
-					return false;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return false;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
 
-			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
-			DLLEXPORT bool IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
+			DLLEXPORT Result IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, bool& exists)
 			{
 				try
 				{
+					exists = false;
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
 						if (!node)
-							return false;
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter 
+								% nodeId;
+							return Result(NODE_DOES_NOT_EXIST,formatter.str());
+						}
 						Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
 						if (!indexPtr)
-							return false;
-						return indexPtr->ContainsSubIndex(subIndex);
+						{
+							boost::format formatter(kMsgExistingIndex);
+							formatter 
+								% index 
+								% nodeId;
+							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
+						}
+
+						if (indexPtr->ContainsSubIndex(subIndex))
+							exists = true;
+						return Result();
 					}
-					return false;
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
 				catch (const ocfmRetCode& ex)
 				{
-					return false;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return false;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
 
-			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
-			DLLEXPORT UINT32 GetIndexCount(const UINT32 nodeId)
+			DLLEXPORT Result GetIndexCount(const UINT32 nodeId, UINT32& indexCount)
 			{
 				try
 				{
@@ -450,25 +468,28 @@ namespace openCONFIGURATOR
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
 					if (!node)
-						return 0;
-					return node->GetIndexCollection()->Size();
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter 
+								% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 				}
-				return 0;
+						indexCount = node->GetIndexCollection()->Size();
+						return Result();
 			}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				}
 				catch (const ocfmRetCode& ex)
 				{
-					return 0;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return 0;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
 
-			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
-			DLLEXPORT UINT32 GetSubIndexCount(const UINT32 nodeId, const UINT32 index)
+			DLLEXPORT Result GetSubIndexCount(const UINT32 nodeId, const UINT32 index, UINT32& subIndexCount)
 			{
 				try
 				{
@@ -476,29 +497,38 @@ namespace openCONFIGURATOR
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
 					if (!node)
-						return 0;
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter 
+								% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
+						}
 					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
 					if (!indexPtr)
-						return 0;
-					return indexPtr->GetNumberofSubIndexes();
+						{
+							boost::format formatter(kMsgExistingIndex);
+							formatter 
+								% index 
+								% nodeId;
+							return Result(INDEX_DOES_NOT_EXIST,formatter.str());
 				}
-				return 0;
+						subIndexCount = indexPtr->GetNumberofSubIndexes();
+						return Result();
 			}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+				}
 				catch (const ocfmRetCode& ex)
 				{
-					return 0;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
 
-					return 0;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
 
-			// FIXME: Must handle non-existing nodeId and index -> must return ocfmRetcode!
-			DLLEXPORT UINT32 GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault)
+			DLLEXPORT Result GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault, UINT32& nrOfEntries)
 			{
 				try
 				{
@@ -506,35 +536,59 @@ namespace openCONFIGURATOR
 				{
 					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
 					if (!node)
-						return 0;
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter 
+								% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
+						}
 					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
 					if (!indexPtr)
-						return 0;
+						{
+							boost::format formatter(kMsgExistingIndex);
+							formatter 
+								% index 
+								% nodeId;
+							return Result(INDEX_DOES_NOT_EXIST,formatter.str());
+						}
 					SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(0);
 					if (!subIndexPtr)
-						return 0;
+						{
+							boost::format formatter(kMsgExistingSubIndex);
+							formatter 
+								% index 
+								% 0
+								% nodeId;
+							return Result(SUBINDEX_DOES_NOT_EXIST,formatter.str());
+						}
 					const char* value = (getDefault) 
 						? subIndexPtr->GetDefaultValue()
 						: subIndexPtr->GetActualValue();
 					if (!value)
-						return 0;
+						{
+							boost::format formatter(kMsgNoActualOrDefaultValue);
+							formatter 
+								% index 
+								% 0
+								% nodeId;
+							return Result(NO_DEFAULT_OR_ACTUAL_VALUE,formatter.str());
+						}
 					string valueStr = value;
 					if (valueStr.substr(0, 2) == "0x")
-						return HexToInt<UINT32>(valueStr);
+							nrOfEntries = HexToInt<UINT32>(valueStr);
 					else
-						return boost::lexical_cast<UINT32>(value);
+							nrOfEntries =  boost::lexical_cast<UINT32>(value);
+						return Result();
 				}
-				return 0;
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 			}
 				catch (const ocfmRetCode& ex)
 				{
-					return 0;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return 0;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
 			DLLEXPORT Result DeleteIndex(const UINT32 nodeId, const UINT32 index)

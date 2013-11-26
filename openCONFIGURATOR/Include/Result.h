@@ -69,6 +69,9 @@ namespace openCONFIGURATOR
 			const std::string kMsgLowCnPresTimeout = "PResTimeout (%dns) (subIndex 0x1F92/0x%X on MN) of node %d is less than PresMaxLatency (subIndex 0x1F98/0x03 on CN).";
 			const std::string kMsgCrossTrafficStationLimitExceeded = "Node %d: No. of cross traffic stations (%d) exceeds limit (%d).";
 			const std::string kMsgPDOTPDOChannelCountExceeded = "Node 240: No. of TPDO-Channels exceeded. Allowed: %d (MN-Feature D_PDO_TPDOChannels_U16), existing: %d.";
+			const std::string kMsgNoActualOrDefaultValue = "Object %#x/%#x on node %d has neither a default value nor an actual value.";
+			const std::string kMsgPowerlinkDatatypeSizeNotDefined = "POWERLINK-Datatype '0x%X' has no defined size.";
+			const std::string kMsgFeatureValueNotFound = "%s-Feature '%s' not defined in XDD of node %d.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -114,7 +117,10 @@ namespace openCONFIGURATOR
 				LOW_CN_PRES_TIMEOUT,
 				CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED,
 				PARAMETER_INVALID,
-				UNHANDLED_EXCEPTION
+				UNHANDLED_EXCEPTION,
+				NO_DEFAULT_OR_ACTUAL_VALUE,
+				FEATURE_VALUE_NOT_FOUND,
+				PLKDATATYPE_SIZE_UNDEFINED
 				
 			};		
 

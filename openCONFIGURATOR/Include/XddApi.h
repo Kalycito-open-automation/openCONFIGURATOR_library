@@ -18,8 +18,7 @@ namespace openCONFIGURATOR
 	{
 		namespace API
 		{
-
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const std::string name, UINT32& size);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType type, UINT32& size);
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const UINT32 nodeId, const FeatureType featureType, const std::string featureName, std::string& featureValue);
 
 		}

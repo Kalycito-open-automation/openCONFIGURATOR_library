@@ -62,7 +62,7 @@ using namespace std;
 \class			ocfmRetCode
 \brief			This function handles the exception error messages		
 ******************************************************************************************************/
-class DLLEXPORT ocfmRetCode : public exception
+class ocfmRetCode : public exception
 {
 public:
 	ocfmRetCode(void);

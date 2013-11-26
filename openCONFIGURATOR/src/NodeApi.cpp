@@ -20,25 +20,32 @@ namespace openCONFIGURATOR
 	{
 		namespace API
 		{
+			const string kDefaultCNXDD = "./resources/openPOWERLINK_CN.xdd";
 
-			/*DLLEXPORT ocfmRetCode AddNode(Node const& node, const string path, const string xddFile);*/
-			DLLEXPORT Result AddNode(const UINT32 nodeId, const NodeType nodeType, const string nodeName, const string xddFile)
+			DLLEXPORT Result AddNode(const UINT32 nodeId, const string nodeName, const string xddFile)
 			{
 				try
 				{
+					bool exists = false;
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						if (IsExistingNode(nodeId)) 
+						NodeType type = (nodeId == MN_NODEID)
+							? MN
+							: CN;
+						Result res = IsExistingNode(nodeId, exists);
+						if (!res.IsSuccessful())
+							return res;
+						if (exists) 
 						{
 							boost::format formatter(kMsgExistingNode);
 							formatter % nodeId;
-							return Result (NODE_EXISTS, formatter.str());
+							return Result(NODE_EXISTS, formatter.str());
 						}
 						return Translate(NewProjectNode(nodeId,
-							nodeType,
+							type,
 							nodeName.c_str(),
 							(xddFile.empty())
-								? NULL
+								? kDefaultCNXDD.c_str()
 								: xddFile.c_str()));
 					}
 					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
@@ -52,7 +59,6 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
-
 
 			DLLEXPORT Result DeleteNode(const UINT32 nodeId)
 			{
@@ -107,41 +113,46 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			DLLEXPORT bool IsExistingNode(const UINT32 nodeId)
+			DLLEXPORT Result IsExistingNode(const UINT32 nodeId, bool& exists)
 			{
 				try
 				{
+					exists = false;
 					if (ProjectConfiguration::GetInstance().IsInitialized())
-						return NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId);
-					return false;
+					{
+						exists = NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId); 
+						return Result();
+					}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
 				catch (const ocfmRetCode& ex)
 				{
-					return false;
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return false;
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
-			//FIXME: Pass value by reference to handle occuring errors and return Result object 
-			DLLEXPORT UINT32 GetNodeCount()
+
+			DLLEXPORT Result GetNodeCount(UINT32& nodeCount)
 			{
 				try
 				{
 					if (ProjectConfiguration::GetInstance().IsInitialized())
-						return NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
-					return 0;
+					{
+						nodeCount = NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
+						return Result();
+				}
+					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
 				}
 				catch (const ocfmRetCode& ex)
 				{
-					return 0;
-					//return Translate(ex);
+					return Translate(ex);
 				}
 				catch (const std::exception& ex)
 				{
-					return 0;
-					//return Result(UNHANDLED_EXCEPTION, ex.what());
+					return Result(UNHANDLED_EXCEPTION, ex.what());
 	}
 			}
 		}

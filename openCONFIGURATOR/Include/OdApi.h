@@ -26,17 +26,17 @@ namespace openCONFIGURATOR
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, std::string& attributeValue);
 
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue, const std::string name);
-			openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const std::string attributeValue);
+			/*openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const std::string attributeValue);*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue);
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, std::string& attributeValue);
 
-			DLLEXPORT bool IsExistingIndex(const UINT32 nodeId, const UINT32 index);
-			DLLEXPORT bool IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingIndex(const UINT32 nodeId, const UINT32 index);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
 
-			DLLEXPORT UINT32 GetIndexCount(const UINT32 nodeId);
-			DLLEXPORT UINT32 GetSubIndexCount(const UINT32 nodeId, const UINT32 index);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const UINT32 nodeId, UINT32& indexCount);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const UINT32 nodeId, const UINT32 index, UINT32& subIndexCount);
 
-			DLLEXPORT UINT32 GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault, UINT32& nrOfEntries);
 
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteIndex(const UINT32 nodeId, const UINT32 index);
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
