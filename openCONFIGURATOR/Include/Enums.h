@@ -136,24 +136,27 @@ typedef unsigned long int ULONG;
 /******************************************************************************
  Enumerations
  *****************************************************************************/
-
-/** An enum ObjectType.
- * ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
- */
+/** @addtogroup odapi
+*  @{
+*/
+/** 
+* ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
+*/
 enum ObjectType
 {
-	INVALID = 0,
-	DEFTYPE = 5,	/**< 5: Denotes a static data type definition */
-	DEFSTRUCT = 6,	/**< 6: Defines a record type */
-	VAR = 7,		/**< 7: Denotes a single value */
-	ARRAY = 8,		/**< 8: A multiple data field object where each data field is a simple variable of the SAME basic data type */
-	RECORD = 9		/**< 9: A multiple data field object where the data fields may be any combination of simple variables */
+	INVALID = 0,	/**< 0: Invalid object type. */
+	DEFTYPE = 5,	/**< 5: Denotes a static data type definition. */
+	DEFSTRUCT = 6,	/**< 6: Defines a record type. */
+	VAR = 7,		/**< 7: Denotes a single value. */
+	ARRAY = 8,		/**< 8: A multiple data field object where each data field is a simple variable of the SAME basic data type. */
+	RECORD = 9		/**< 9: A multiple data field object where the data fields may be any combination of simple variables. */
 };
+/** @} */
 
 /** An enum PDOMapping.
  * This enum holds the list of PDO mapping type for the Object and SubObject
  */
-DLLEXPORT enum PDOMapping
+enum PDOMapping
 {
 		NOT_DEFINED = -1, /**< Indicates the object has a default value set to not defined */
 		NO,			/**< Indicates the object must not be mapped into a Process Data Objects */
@@ -232,22 +235,26 @@ enum IEC_Datatype
 	WSTRING			/**< WSTRING to hold multi byte strings */
 };
 
-/** An enum AttributeType.
- * This enum holds the list of attributes for the object or subobject can hold
- */
+/** @addtogroup odapi
+*  @{
+*/
+/** 
+* List of available attributes for the index or subindex.
+*/
 enum AttributeType
 {
-	NAME = 0,		/**< Name attribute */
-	OBJECTTYPE,		/**< Object Type attribute */
-	DATATYPE,		/**< Data Type attribute */
-	ACCESSTYPE,		/**< Access Type attribute */
-	DEFAULTVALUE,	/**< Default value attribute */
-	ACTUALVALUE,	/**< Actual value attribute */
-	PDOMAPPING,		/**< PDO Mapping attribute */
-	LOWLIMIT,		/**< Low limit attribute */
-	HIGHLIMIT,		/**< High limit attribute */
-	FLAGIFINCDC,	/**< Include in CDC attribute */
+	NAME = 0,		/**< Name attribute. */
+	OBJECTTYPE,		/**< Object Type attribute. */
+	DATATYPE,		/**< Data Type attribute. */
+	ACCESSTYPE,		/**< Access Type attribute. */
+	DEFAULTVALUE,	/**< Default value attribute. */
+	ACTUALVALUE,	/**< Actual value attribute. */
+	PDOMAPPING,		/**< PDO Mapping attribute. */
+	LOWLIMIT,		/**< Low limit attribute. */
+	HIGHLIMIT,		/**< High limit attribute. */
+	FLAGIFINCDC,	/**< Include in CDC attribute <b>(DEPRECATED)</b>. */
 };
+/** @} */
 
 /** An enum DateTime.
  * This enum holds the date & time attribute
@@ -261,39 +268,39 @@ enum DateTime
 /** An enum AutoGenerate.
  * This enum lists of generate modes available for the generation of the MN object dictionary.
  */
-enum AutoGenerate
-{
-	NO_AG = 0,	/**< Specifies the option for no auto generate mode */
-	YES_AG = 1	/**< Specifies the option for auto generate mode */
-};
+//enum AutoGenerate
+//{
+//	NO_AG = 0,	/**< Specifies the option for no auto generate mode */
+//	YES_AG = 1	/**< Specifies the option for auto generate mode */
+//};
 
 /** An enum AutoSave.
  * This enum lists of save modes available for the values & objects in the project.
  */
-enum AutoSave
-{
-	YES_AS = 0,		/**< Saves the configuration automatically */
-	PROMPT_AS,		/**< Prompts the user to for saving the configuration */
-	DISCARD_AS		/**< Discards the configuration */
-};
+//enum AutoSave
+//{
+//	YES_AS = 0,		/**< Saves the configuration automatically */
+//	PROMPT_AS,		/**< Prompts the user to for saving the configuration */
+//	DISCARD_AS		/**< Discards the configuration */
+//};
 
 /** An enum ViewMode.
  * This enum lists of view modes available for the objects in the project.
  */
-enum ViewMode
-{
-	SIMPLE = 0,	/**< Simple tree mode */
-	EXPERT		/**<  Advanced tree mode */
-};
+//enum ViewMode
+//{
+//	SIMPLE = 0,	/**< Simple tree mode */
+//	EXPERT		/**<  Advanced tree mode */
+//};
 
 /** An enum ProjectSettings.
  * This enum lists of project settings attributes available for the project.
  */
-enum ProjectSettings
-{
-	AUTOGENERATE = 0,	/**< specifies the autogenerate attriubte */
-	AUTOSAVE			/**< Specifies the autosave attribute */
-};
+//enum ProjectSettings
+//{
+//	AUTOGENERATE = 0,	/**< specifies the autogenerate attriubte */
+//	AUTOSAVE			/**< Specifies the autosave attribute */
+//};
 
 /** An enum StationType.
  * This enum holds the list of available Controlled Node's station types
@@ -385,11 +392,18 @@ DLLEXPORT enum ConfiguratorError
 	OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PARAMETER
 };
 
+/** @addtogroup imexport @{ */
+/************************************************************************
+ \brief List of available process image representations.
+ \author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+************************************************************************/
 DLLEXPORT enum OutputLanguage {
-	C,
-	CSHARP,
-	XML
+	C, /**< ANSI C*/
+	CSHARP, /**< Microsoft C Sharp*/
+	/*JAVA,*/
+	XML /**< Generic XML representation (needed for ANSI C)*/
 };
+/** @} */
 
 namespace openCONFIGURATOR 
 {
@@ -399,6 +413,7 @@ namespace openCONFIGURATOR
 		{
 			namespace AccessType
 			{
+				/** @addtogroup xddapi @{ */
 				/************************************************************************
 				\brief	Accesstype for objects/subobjects of the ObjectDictionary.
 
@@ -409,20 +424,22 @@ namespace openCONFIGURATOR
 				{
 					INVALID,
 					RW,
-					WO, 
-					RO, 
-					CONST, 
+					WO,
+					RO,
+					CONST,
 					COND,
 					RWS,/**< From v1.2.0 upwards! */
 					WOS	/**< From v1.2.0 upwards! */
 				};
+				/** @} */
 			}
 
 			AccessType::AccessType GetAccessType(const std::string& accessType);
 			::ObjectType GetObjectType(const std::string& objectType);
-
+			
 			namespace PlkDataType
 			{
+				/** @addtogroup xddapi @{ */
 				/************************************************************************
 				\brief	Powerlink data types
 
@@ -445,7 +462,7 @@ namespace openCONFIGURATOR
 					TIME_OF_DAY = 0x000C,
 					TIME_DIFF = 0x000D,
 					Domain = 0x000F,
-					INTEGER24 = 0x0010,	
+					INTEGER24 = 0x0010,
 					REAL64 = 0x0011,
 					INTEGER40 = 0x0012,
 					INTEGER48 = 0x0013,
@@ -460,6 +477,7 @@ namespace openCONFIGURATOR
 					IP_ADDRESS = 0x0402,
 					NETTIME = 0x0403
 				};
+				/** @} */
 			}
 		}
 	}

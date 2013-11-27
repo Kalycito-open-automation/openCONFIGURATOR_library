@@ -72,10 +72,7 @@ class ProjectConfiguration;
  * Function Declarations
  *****************************************************************************/
 
- /** @defgroup API API Documentation
- *  These are the API functions
- *  @{
- */
+
   
 /**
  \brief		This API shall be usd to parse the XDC/XDD file and load the objects for given Node ID and Type parameters
@@ -604,7 +601,6 @@ UINT32 GetDataSize(const string dataTypeVal);
  \return	ocfmRetCode	 Error code
 */
 ocfmRetCode ValidateXDDFile(const char *fileName);
-/** @} */ // end of API
 
 #ifndef __GNUC__
 #pragma warning( disable: 4251 )

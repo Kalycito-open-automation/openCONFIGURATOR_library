@@ -153,7 +153,7 @@ namespace openCONFIGURATOR
 				catch (const std::exception& ex)
 				{
 					return Result(UNHANDLED_EXCEPTION, ex.what());
-	}
+				}
 			}
 		}
 	}
