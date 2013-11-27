@@ -282,10 +282,7 @@ void ocfmRetCode::setErrorCode(ConfiguratorError error)
 		break;
 	case OCFM_ERR_NO_PROJECT_LOADED:
 		this->errorString = "No project loaded in the library";
-		break;
-	case OCFM_ERR_EMPTY_PATH:
-		this->errorString = "Empty path string passed to the library";
-		break;
+		break;	
 	case OCFM_ERR_CHAINED_AND_MULTIPLEXED:
 		this->errorString = "A node can not be chained and multiplexed at the same time";
 		break;

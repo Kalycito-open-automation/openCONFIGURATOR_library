@@ -162,7 +162,7 @@ namespace BR.FS.CdcBuilder
                     return 5448;
                 case ErrorCode.CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED:
                     return 5449;
-                case ErrorCode.PARAMETER_INVALID:
+                case ErrorCode.ARGUMENT_INVALID_NULL:
                     return 5450;
                 case ErrorCode.UNHANDLED_EXCEPTION:
                     return 5451;
@@ -194,6 +194,8 @@ namespace BR.FS.CdcBuilder
                     return 5464;
                 case ErrorCode.NO_PROJECT_LOADED:
                     return 5465;
+                case ErrorCode.ARGUMENT_INVALID_EMPTY:
+                    return 5466;
                     
                 default:
                     return 0;

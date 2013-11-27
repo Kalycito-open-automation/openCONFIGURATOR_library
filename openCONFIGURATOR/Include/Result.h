@@ -82,6 +82,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgSchemaParserContextError = "LibXML2 cannot create a parser context for the XML schema file '%s'.";
 			const std::string kMsgSchemaValidationContextError = "LibXML2 cannot create a validation context for the XML schema file '%s'.";
 			const std::string kMsgNoProjectLoaded = "No openCONFIGURATOR project loaded in the library.";
+			const std::string kMsgEmptyArgument = "Argument(s) '%s' must not be empty.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -126,7 +127,7 @@ namespace openCONFIGURATOR
 				OBJECT_LIMITS_INVALID,
 				LOW_CN_PRES_TIMEOUT,
 				CROSS_TRAFFIC_STATION_LIMIT_EXCEEDED,
-				PARAMETER_INVALID,
+				ARGUMENT_INVALID_NULL,
 				UNHANDLED_EXCEPTION,
 				NO_DEFAULT_OR_ACTUAL_VALUE,
 				FEATURE_VALUE_NOT_FOUND,
@@ -141,7 +142,8 @@ namespace openCONFIGURATOR
 				SCHEMA_INVALID,
 				SCHEMA_PARSER_CONTEXT_ERROR,
 				SCHEMA_VALIDATION_CONTEXT_ERROR,
-				NO_PROJECT_LOADED
+				NO_PROJECT_LOADED,
+				ARGUMENT_INVALID_EMPTY
 				
 			};		
 

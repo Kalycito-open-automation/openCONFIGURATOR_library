@@ -123,7 +123,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
 			return Result(SUBINDEX_DOES_NOT_EXIST, errorString);
 		case OCFM_ERR_INVALID_PARAMETER:
-			return Result(PARAMETER_INVALID, errorString);
+			return Result(ARGUMENT_INVALID_NULL, errorString);
 		case OCFM_ERR_INVALID_SIZE_MAPPED:
 			return Result(OBJECT_SIZE_MAPPED_INVALID, errorString);
 		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
@@ -144,8 +144,6 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(SCHEMA_PARSER_CONTEXT_ERROR, errorString);
 		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
 			return Result(SCHEMA_VALIDATION_CONTEXT_ERROR, errorString);
-
-		case OCFM_ERR_EMPTY_PATH:
 
 		// Covered by XDD/XDC XML-Schema validation
 		case OCFM_ERR_XML_FILE_CORRUPTED:
