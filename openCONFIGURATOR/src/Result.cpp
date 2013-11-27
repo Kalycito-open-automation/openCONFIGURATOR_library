@@ -145,9 +145,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
 			return Result(SCHEMA_VALIDATION_CONTEXT_ERROR, errorString);
 
-		case OCFM_ERR_NO_PROJECT_LOADED:
 		case OCFM_ERR_EMPTY_PATH:
-		
 
 		// Covered by XDD/XDC XML-Schema validation
 		case OCFM_ERR_XML_FILE_CORRUPTED:
@@ -161,6 +159,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_XAP_FILE_NOT_WRITTEN:
 		case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
 		case OCFM_ERR_CANNOT_CREATE_DIR:
+		case OCFM_ERR_NO_PROJECT_LOADED:
 		// Will most likely never occur, unless a no-throw constructor is 
 		// explicitely called (which is not the case atm).
 		case OCFM_ERR_MEMORY_ALLOCATION_ERROR:

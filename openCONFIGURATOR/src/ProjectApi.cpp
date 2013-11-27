@@ -79,7 +79,7 @@ namespace openCONFIGURATOR
 						return Translate(ocfmRetCode(OCFM_ERR_UNKNOWN)); //FIXME: Change when correct new error code is implemented
 						//return SaveProject(path.c_str(), projectName.c_str());
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{

@@ -71,7 +71,7 @@ namespace openCONFIGURATOR
 							return Result(UNSUPPORTED_PI_GEN_LANGUAGE, formatter.str());
 					}
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -99,7 +99,7 @@ namespace openCONFIGURATOR
 					absOutputPath.append(fallbackFileName.begin(), fallbackFileName.end());
 					return Translate(GenerateCDC(absOutputPath.generic_string().c_str(), ProjectConfiguration::GetInstance()));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{

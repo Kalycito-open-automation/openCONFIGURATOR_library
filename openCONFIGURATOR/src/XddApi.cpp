@@ -118,7 +118,7 @@ namespace openCONFIGURATOR
 						return Result();
 
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED)); //FIXME: Change when correct new error code is implemented
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{

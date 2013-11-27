@@ -48,7 +48,7 @@ namespace openCONFIGURATOR
 								? kDefaultCNXDD.c_str()
 								: xddFile.c_str()));
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -71,7 +71,7 @@ namespace openCONFIGURATOR
 							: CN;
 						return Translate(DeleteNode(nodeId, type));
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -101,7 +101,7 @@ namespace openCONFIGURATOR
 					else
 						return retValue;
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -123,7 +123,7 @@ namespace openCONFIGURATOR
 						exists = NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId); 
 						return Result();
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -144,7 +144,7 @@ namespace openCONFIGURATOR
 						nodeCount = NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
 						return Result();
 				}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{

@@ -81,6 +81,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgSchemaInvalid = "XML schema file '%s' is not valid.";
 			const std::string kMsgSchemaParserContextError = "LibXML2 cannot create a parser context for the XML schema file '%s'.";
 			const std::string kMsgSchemaValidationContextError = "LibXML2 cannot create a validation context for the XML schema file '%s'.";
+			const std::string kMsgNoProjectLoaded = "No openCONFIGURATOR project loaded in the library.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -139,7 +140,8 @@ namespace openCONFIGURATOR
 				SCHEMA_NOT_FOUND_OR_WELL_FORMED,
 				SCHEMA_INVALID,
 				SCHEMA_PARSER_CONTEXT_ERROR,
-				SCHEMA_VALIDATION_CONTEXT_ERROR
+				SCHEMA_VALIDATION_CONTEXT_ERROR,
+				NO_PROJECT_LOADED
 				
 			};		
 

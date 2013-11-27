@@ -51,7 +51,7 @@ namespace openCONFIGURATOR
 
 					return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -140,7 +140,7 @@ namespace openCONFIGURATOR
 						}
 						return Result();
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}				
 				catch (const ocfmRetCode& ex)
 				{
@@ -240,7 +240,7 @@ namespace openCONFIGURATOR
 						}
 						return Result();
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}				
 				catch (const ocfmRetCode& ex)
 				{
@@ -258,7 +258,7 @@ namespace openCONFIGURATOR
 				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 					return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -291,7 +291,7 @@ namespace openCONFIGURATOR
 						delete[] attributeValueTemp;
 						return result;
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -321,7 +321,7 @@ namespace openCONFIGURATOR
 
 						return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false));
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -339,7 +339,7 @@ namespace openCONFIGURATOR
 				{
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 						return SetSubIndexAttribute(nodeId, index, subIndexId, ACTUALVALUE, actualValue);
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -373,7 +373,7 @@ namespace openCONFIGURATOR
 						delete[] attributeValueTemp;
 						return result;
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -407,7 +407,7 @@ namespace openCONFIGURATOR
 							return Result();
 						}
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -448,7 +448,7 @@ namespace openCONFIGURATOR
 							exists = true;
 						return Result();
 					}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -477,7 +477,7 @@ namespace openCONFIGURATOR
 						indexCount = node->GetIndexCollection()->Size();
 						return Result();
 			}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -515,7 +515,7 @@ namespace openCONFIGURATOR
 						subIndexCount = indexPtr->GetNumberofSubIndexes();
 						return Result();
 			}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
 				{
@@ -580,7 +580,7 @@ namespace openCONFIGURATOR
 							nrOfEntries =  boost::lexical_cast<UINT32>(value);
 						return Result();
 				}
-					return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -604,7 +604,7 @@ namespace openCONFIGURATOR
 
 					return Translate(DeleteIndex(nodeId, nodeType, indexString.c_str()));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{
@@ -630,7 +630,7 @@ namespace openCONFIGURATOR
 
 					return Translate(DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
 				}
-				return Translate(ocfmRetCode(OCFM_ERR_NO_PROJECT_LOADED));
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 			}
 				catch (const ocfmRetCode& ex)
 				{

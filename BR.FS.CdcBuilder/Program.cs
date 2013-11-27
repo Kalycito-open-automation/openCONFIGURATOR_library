@@ -192,6 +192,8 @@ namespace BR.FS.CdcBuilder
                     return 5463;
 				case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
                     return 5464;
+                case ErrorCode.NO_PROJECT_LOADED:
+                    return 5465;
                     
                 default:
                     return 0;
