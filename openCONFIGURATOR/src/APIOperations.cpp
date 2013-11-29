@@ -12747,6 +12747,12 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 				sidxObj->SetFlagIfIncludedCdc(true);
 				indexObj->SetFlagIfIncludedCdc(true);
 			}
+			else if (sidxObj->GetActualValue() != NULL
+				&& IsDefaultActualNotEqual(sidxObj))
+			{
+				sidxObj->SetFlagIfIncludedCdc(true);
+				indexObj->SetFlagIfIncludedCdc(true);
+			}
 		}
 	}
 
@@ -12764,6 +12770,12 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 				sidxObj->SetFlagIfIncludedCdc(true);
 				indexObj->SetFlagIfIncludedCdc(true);
 			}
+			else if(sidxObj->GetActualValue() != NULL
+				&& IsDefaultActualNotEqual(sidxObj))
+			{
+				sidxObj->SetFlagIfIncludedCdc(true);
+				indexObj->SetFlagIfIncludedCdc(true);
+			}
 		}
 	}
 
@@ -12778,6 +12790,12 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 					|| (strcmp(sidxObj->GetActualValue(), "") == 0))
 			{
 				sidxObj->SetActualValue((char*) "0x50");
+				sidxObj->SetFlagIfIncludedCdc(true);
+				indexObj->SetFlagIfIncludedCdc(true);
+			}
+			else if(sidxObj->GetActualValue() != NULL
+				&& IsDefaultActualNotEqual(sidxObj))
+			{
 				sidxObj->SetFlagIfIncludedCdc(true);
 				indexObj->SetFlagIfIncludedCdc(true);
 			}
