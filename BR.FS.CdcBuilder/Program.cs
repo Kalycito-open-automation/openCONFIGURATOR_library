@@ -240,10 +240,9 @@ namespace BR.FS.CdcBuilder
                     "Attach debugger and press any key"));
                 //Console.ReadLine();
 #endif
-                FileInfo projectFile = new FileInfo(args[0]);
+                FileInfo projectFile = new FileInfo(args[0].Replace("\\ ", " "));
                 String outputOption = args[1];
-                DirectoryInfo outputPath = new DirectoryInfo(args[2]);
-
+                DirectoryInfo outputPath = new DirectoryInfo(args[2].Replace("\\ ", " "));
                 if (!projectFile.Exists)
                 {
                     Console.WriteLine(GetFormattedErrorMsg(
