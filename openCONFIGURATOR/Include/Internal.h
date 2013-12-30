@@ -1416,10 +1416,13 @@ namespace openCONFIGURATOR
 			************************************************************************/
 			template <typename T>
 			T HexToInt(const string& hexString);
+			string url_encode(const string &value);
+
 		}
 	}
 }
 
 openCONFIGURATOR::Library::ErrorHandling::Result ValidateProjectFile(const string& fileName);
+const std::string GetCurrentDateTime(void);
 
 #endif // internal_h

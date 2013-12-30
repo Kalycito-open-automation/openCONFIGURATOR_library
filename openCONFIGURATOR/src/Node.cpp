@@ -96,6 +96,8 @@ Node::Node() :
 	presTimeOut(NULL),
 	stationType(NORMAL),
 	nodeType(),
+	xddPath(),
+	xdcPath(),
 	// MN
 	transmitsPRes(),
 	// CN
@@ -696,7 +698,7 @@ boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subInde
 	{
 		std::string oldActualValueStr = oldActualValuePtr;
 		LOG_DEBUG() << "Old actualValue: '" << oldActualValueStr << "'";
-		if (boost::algorithm::starts_with(oldActualValueStr, "0x"))
+		if (boost::algorithm::istarts_with(oldActualValueStr, "0x"))
 			convertFromString << std::hex << oldActualValueStr.substr(2);
 		else
 			convertFromString << std::boolalpha << oldActualValueStr;
@@ -726,10 +728,10 @@ boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subInde
 template<typename T>
 boost::optional<T> Node::GetActualValue(const UINT32 index, const UINT32 subIndex)
 {
-	Index& indexObj = this->indexCollObj->GetIndexRef(index);
 	std::stringstream convertFromString;
 	boost::optional<T> actualValue;
 	const char* actualValuePtr = NULL;
+	Index& indexObj = this->indexCollObj->GetIndexRef(index);
 
 	if (subIndex == 0 && !indexObj.HasSubIndices())
 	{
@@ -745,7 +747,7 @@ boost::optional<T> Node::GetActualValue(const UINT32 index, const UINT32 subInde
 	if (actualValuePtr != NULL && strlen(actualValuePtr) != 0)
 	{
 		std::string actualValueStr = actualValuePtr;
-		if (boost::algorithm::starts_with(actualValueStr, "0x"))
+		if (boost::algorithm::istarts_with(actualValueStr, "0x"))
 			convertFromString << std::hex << actualValueStr.substr(2);
 		else
 			convertFromString << std::boolalpha << actualValueStr;
@@ -763,6 +765,26 @@ template boost::optional<std::string> Node::SetActualValue<std::string>(const UI
 template boost::optional<UINT32> Node::GetActualValue<UINT32>(const UINT32 index, const UINT32 subIndex);
 template boost::optional<bool> Node::GetActualValue<bool>(const UINT32 index, const UINT32 subIndex);
 template boost::optional<std::string> Node::GetActualValue<std::string>(const UINT32 index, const UINT32 subIndex);
+
+
+const boost::filesystem::path& Node::GetXddPath(void) const
+{
+	return this->xddPath;
+}
+
+void Node::SetXddPath(const boost::filesystem::path& xddPath)
+{
+	this->xddPath = xddPath;
+}
+
+const boost::filesystem::path& Node::GetXdcPath(void) const
+{
+	return this->xdcPath;
+}
+void Node::SetXdcPath(const boost::filesystem::path& xdcPath)
+{
+	this->xdcPath = xdcPath;
+}
 
 #ifndef __GNUC__
 #pragma endregion Properties

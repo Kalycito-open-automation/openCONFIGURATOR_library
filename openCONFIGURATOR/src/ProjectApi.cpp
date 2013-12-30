@@ -11,9 +11,6 @@
 #include "../Include/Result.h"
 #include "../Include/Logging.h"
 
-#include <libxml/xmlwriter.h>
-#include <libxml/encoding.h>
-#include <libxml/xmlreader.h>
 #include <string>
 
 using namespace openCONFIGURATOR::Library::ErrorHandling;
@@ -25,7 +22,6 @@ namespace openCONFIGURATOR
 	{
 		namespace API
 		{
-
 			const string kDefaultMNXDD = "./resources/openPOWERLINK_MN.xdd";
 			const string kDefaultMNName = "openPOWERLINK_MN";
 
@@ -52,8 +48,16 @@ namespace openCONFIGURATOR
 							if (result.IsSuccessful())
 							{
 								ProjectConfiguration::GetInstance().SetProjectFile(projectName + ".xml");
-								ProjectConfiguration::GetInstance().SetProjectPath(projectPath);
+								ProjectConfiguration::GetInstance().SetProjectPath(boost::filesystem::path(projectPath));
+								ProjectConfiguration::GetInstance().SetDefaultOutputPath(boost::filesystem::path(projectPath + PATH_SEPARATOR + "output"));
+								ProjectConfiguration::GetInstance().AddPath("defaultOutputPath", ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string());
+
 								ProjectConfiguration::GetInstance().SetInitialized(true);
+
+								Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(MN_NODEID);
+								node->SetXddPath(fallbackPath);
+								node->SetXdcPath("");
+
 								return Result();
 							}
 						}
@@ -64,7 +68,7 @@ namespace openCONFIGURATOR
 				{
 					return Translate(ex);
 				}
-				catch (const std::exception& ex)
+				catch (const exception& ex)
 				{
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
@@ -76,8 +80,7 @@ namespace openCONFIGURATOR
 				{
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						return Translate(ocfmRetCode(OCFM_ERR_UNKNOWN)); //FIXME: Change when correct new error code is implemented
-						//return SaveProject(path.c_str(), projectName.c_str());
+						return ProjectConfiguration::GetInstance().SaveProject();
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
@@ -85,7 +88,44 @@ namespace openCONFIGURATOR
 				{
 					return Translate(ex);
 				}
-				catch (const std::exception& ex)
+				catch (const exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
+			DLLEXPORT Result SaveProjectAs(const string projectName , const string projectPath)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						ProjectConfiguration::GetInstance().SetProjectFile(projectName + ".xml");
+						ProjectConfiguration::GetInstance().SetProjectPath(boost::filesystem::path(projectPath));
+						ProjectConfiguration::GetInstance().SetCreationDate(GetCurrentDateTime());
+						//delete old output path
+						ProjectConfiguration::GetInstance().DeletePath("defaultOutputPath");
+						ProjectConfiguration::GetInstance().SetDefaultOutputPath(boost::filesystem::path(projectPath + PATH_SEPARATOR + "output"));
+						ProjectConfiguration::GetInstance().AddPath("defaultOutputPath", ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string());
+
+						ProjectConfiguration::GetInstance().SetAlreadySaved(false);
+
+						NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+						for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+						{
+							Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+							nodeObj->SetXdcPath(boost::filesystem::path(""));
+
+						}
+						return ProjectConfiguration::GetInstance().SaveProject();
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const exception& ex)
 				{
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
@@ -102,7 +142,7 @@ namespace openCONFIGURATOR
 				{
 					return Translate(ex);
 				}
-				catch (const std::exception& ex)
+				catch (const exception& ex)
 				{
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
@@ -123,8 +163,9 @@ namespace openCONFIGURATOR
 						result = ValidateProjectFile(projectFile);
 						if (result.IsSuccessful())
 						{
-							ProjectConfiguration::GetInstance().SetProjectFile(projectFile);
-							ProjectConfiguration::GetInstance().SetProjectPath(projectFile.substr(0, projectFile.find_last_of(PATH_SEPARATOR) + 1));
+							boost::filesystem::path pPath(projectFile);
+							ProjectConfiguration::GetInstance().SetProjectFile(pPath.filename().generic_string());
+							ProjectConfiguration::GetInstance().SetProjectPath(pPath.parent_path());
 							return Translate(ProjectConfiguration::GetInstance().LoadProject(projectFile));
 						}
 					}
@@ -134,7 +175,7 @@ namespace openCONFIGURATOR
 				{
 					return Translate(ex);
 				}
-				catch (const std::exception& ex)
+				catch (const exception& ex)
 				{
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}

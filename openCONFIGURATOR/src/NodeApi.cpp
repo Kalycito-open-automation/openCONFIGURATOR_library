@@ -7,6 +7,7 @@
 #include "../Include/ProjectConfiguration.h"
 #include "../Include/Result.h"
 #include "../Include/Logging.h"
+#include "../Include/ProjectApi.h"
 #include "../Include/BoostShared.h"
 #include "../Include/OdApi.h"
 
@@ -82,12 +83,22 @@ namespace openCONFIGURATOR
 							formatter % nodeId;
 							return Result(NODE_EXISTS, formatter.str());
 						}
-						return Translate(NewProjectNode(nodeId,
+						res = Translate(NewProjectNode(nodeId,
 						                                type,
 						                                nodeName.c_str(),
 						                                (xddFile.empty())
 						                                ? kDefaultCNXDD.c_str()
 						                                : xddFile.c_str()));
+
+						if (res.IsSuccessful())
+						{
+							Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+							node->SetXddPath((xddFile.empty()
+								? boost::filesystem::path(kDefaultCNXDD)
+								: boost::filesystem::path(xddFile)));
+							node->SetXdcPath("");
+					}
+						return res;
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
@@ -138,9 +149,12 @@ namespace openCONFIGURATOR
 
 						Result retValue = Translate(ValidateXDDFile(fullPath.generic_string().c_str()));
 						if (retValue.IsSuccessful())
-							return Translate(ReImportXML(fullPath.generic_string().c_str(), nodeId, type));
-						else
-							return retValue;
+							retValue = Translate(ReImportXML(fullPath.generic_string().c_str(), nodeId, type));
+
+						//Save to assure that the XDD file is copied into the project folder
+						if (retValue.IsSuccessful())
+							retValue = SaveProject();
+						return retValue;
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}

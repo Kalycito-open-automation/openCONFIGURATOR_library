@@ -8,6 +8,7 @@
 #include "../Include/ProjectConfiguration.h"
 #include "../Include/BoostShared.h"
 #include "../Include/Logging.h"
+#include "../Include/ProjectApi.h"
 
 #include <sstream>
 
@@ -27,15 +28,15 @@ namespace openCONFIGURATOR
 			static boost::filesystem::path getAbsOutputPath(string path)
 			{
 				boost::filesystem::path absOutputPath(path);
-				if (path.empty() && !ProjectConfiguration::GetInstance().GetDefaultOutputPath().empty())
+				if (path.empty() && !ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().empty())
 				{
-					boost::filesystem::path absDefaultOutputPath(ProjectConfiguration::GetInstance().GetDefaultOutputPath());
+					boost::filesystem::path absDefaultOutputPath = ProjectConfiguration::GetInstance().GetDefaultOutputPath();
 					if (absDefaultOutputPath.is_relative())
 					{
 						absDefaultOutputPath = ProjectConfiguration::GetInstance().GetProjectPath();
 						absDefaultOutputPath.append(
-						    ProjectConfiguration::GetInstance().GetDefaultOutputPath().begin(),
-						    ProjectConfiguration::GetInstance().GetDefaultOutputPath().end());
+							ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().begin(),
+							ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().end());
 					}
 					absOutputPath = absDefaultOutputPath;
 				}

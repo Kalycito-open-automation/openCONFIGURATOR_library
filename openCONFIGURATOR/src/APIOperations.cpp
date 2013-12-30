@@ -7578,6 +7578,7 @@ void LoadObjectDictionary(const char* xmlFilePath)
 			//continue with process
 		}
 	}
+	xmlTextReaderClose(xmlReader);
 	xmlCleanupParser();
 	/*
 	 * this is to debug memory for regression tests

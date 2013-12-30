@@ -8,12 +8,25 @@
 #include "../Include/Logging.h"
 #include "../Include/Result.h"
 #include "../Include/BoostShared.h"
+#include "../Include/NodeApi.h"
+
+#include <iostream>
+#include <map>
+#include <algorithm>
+#include <boost/algorithm/string/replace.hpp>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+#include <libxml/tree.h>
+#include <libxml/xpathInternals.h>
+#include <libxml/uri.h>
 
 using namespace std;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::Utilities;
 using namespace openCONFIGURATOR::GUI::ProjectFile::ViewType;
 using namespace openCONFIGURATOR::GUI::ProjectFile::Setting;
+
 
 const string PROJECT_XML_ROOT_ELEMENT = "openCONFIGURATORProject";
 const string PROJECT_XML_VERSION_ATTRIBUTE = "version";
@@ -23,10 +36,19 @@ const string PROJECT_XML_PATH_ID_ATTRIBUTE = "id";
 const string PROJECT_XML_PATH_PATH_ATTRIBUTE = "path";
 const string PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE = "defaultOutputPath";
 
+const string PROJECT_XML_GENERATOR_ELEMENT = "Generator";
+const string PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE = "vendor";
+const string PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE = "toolName";
+const string PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE = "toolVersion";
+const string PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE = "createdOn";
+const string PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE = "modifiedOn";
+const string PROJECT_XML_GENERATOR_MODIFIEDBY_ATTRIBUTE = "modifiedBy";
+
 const string PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT = "ProjectConfiguration";
 const string PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE = "activeAutoGenerationSetting";
 const string PROJECT_XML_PROJECT_CONFIGURATION_PROJECT_NAME_ATTRIBUTE = "name";
 
+const string PROJECT_XML_PROJECT_PATHSETTINGS_ELEMENT = "PathSettings";
 const string PROJECT_XML_IDECONFIGURATION_ELEMENT = "IDEConfiguration";
 const string PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT = "ViewSettings";
 const string PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE = "type";
@@ -37,8 +59,8 @@ const string PROJECT_XML_SETTING_NAME_ATTRIBUTE = "name";
 const string PROJECT_XML_SETTING_VALUE_ATTRIBUTE = "value";
 
 const string PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT = "AutoGenerationSettings";
-const string PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE = "id";
 const string PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT = "NetworkConfiguration";
+const string PROJECT_XML_NODE_COLLECTION_ELEMENT = "NodeCollection";
 const string PROJECT_XML_MANAGING_NODE_ELEMENT = "MN";
 const string PROJECT_XML_CONTROLLED_NODE_ELEMENT = "CN";
 
@@ -84,9 +106,11 @@ ProjectConfiguration ProjectConfiguration::instance;
 
 ProjectConfiguration::ProjectConfiguration() :
 	initialized(false),
+	alreadysaved(false),
 	projectFile(),
 	projectPath(),
 	generateMNOBD(true),
+	creationDate(GetCurrentDateTime()),
 	defaultOutputPath(),
 	cycleTime(),
 	asyncMTU(),
@@ -102,10 +126,12 @@ ProjectConfiguration::ProjectConfiguration() :
 void ProjectConfiguration::ResetConfiguration()
 {
 	initialized = false;
-
+	alreadysaved = false;
 	projectFile = "";
-	defaultOutputPath = "";
-	projectPath = "";
+	defaultOutputPath.clear();
+	projectPath.clear();
+	SetCreationDate(GetCurrentDateTime());
+
 	generateMNOBD = true;
 
 	cycleTime = boost::none;
@@ -132,12 +158,22 @@ ProjectConfiguration& ProjectConfiguration::GetInstance()
 	return ProjectConfiguration::instance;
 }
 
-const string& ProjectConfiguration::GetDefaultOutputPath() const
+const boost::filesystem::path& ProjectConfiguration::GetDefaultOutputPath() const
 {
 	return defaultOutputPath;
 }
 
-void ProjectConfiguration::SetDefaultOutputPath(const string& defaultOutputPath)
+const std::string& ProjectConfiguration::GetCreationDate(void) const
+{
+	return creationDate;
+}
+
+void ProjectConfiguration::SetCreationDate(const std::string& creationDate)
+{
+	this->creationDate = creationDate;
+}
+
+void ProjectConfiguration::SetDefaultOutputPath(const boost::filesystem::path& defaultOutputPath)
 {
 	this->defaultOutputPath = defaultOutputPath;
 }
@@ -152,7 +188,16 @@ void ProjectConfiguration::SetInitialized(bool initialized)
 	this->initialized = initialized;
 }
 
-bool ProjectConfiguration::GetGenerateMNOBD() const
+bool ProjectConfiguration::IsAlreadySaved(void) const
+{
+	return alreadysaved;
+}
+void ProjectConfiguration::SetAlreadySaved(bool saved)
+{
+	this->alreadysaved = saved;
+}
+
+bool ProjectConfiguration::GetGenerateMNOBD(void) const
 {
 	return generateMNOBD;
 }
@@ -162,22 +207,22 @@ void ProjectConfiguration::SetGenerateMNOBD(bool generateMNOBD)
 	this->generateMNOBD = generateMNOBD;
 }
 
-const string& ProjectConfiguration::GetProjectPath() const
+const boost::filesystem::path& ProjectConfiguration::GetProjectPath(void) const
 {
 	return projectPath;
 }
 
-void ProjectConfiguration::SetProjectPath(const string& projectPath)
+void ProjectConfiguration::SetProjectPath(const boost::filesystem::path& projectPath)
 {
 	this->projectPath = projectPath;
 }
 
-const string& ProjectConfiguration::GetProjectFile() const
+const std::string& ProjectConfiguration::GetProjectFile(void) const
 {
 	return projectFile;
 }
 
-void ProjectConfiguration::SetProjectFile(const string& projectFile)
+void ProjectConfiguration::SetProjectFile(const std::string& projectFile)
 {
 	this->projectFile = projectFile;
 }
@@ -239,6 +284,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 			}
 			if (retVal != 0)
 			{
+				xmlTextReaderClose(xmlReader);
 				xmlCleanupParser();
 				xmlMemoryDump();
 				throw ocfmRetCode(OCFM_ERR_PARSE_XML);
@@ -255,7 +301,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 			xmlMemoryDump();
 			throw result;
 		}
-
+		xmlTextReaderClose(xmlReader);
 		xmlCleanupParser();
 		xmlMemoryDump();
 
@@ -266,6 +312,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 		return exceptionThrown;
 	}
 	this->initialized = true;
+	this->alreadysaved = true;
 	LOG_INFO() << "Project-Load finished.";
 	return ocfmRetCode(OCFM_ERR_SUCCESS);
 }
@@ -318,6 +365,13 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 							SetGenerateMNOBD(true);
 					}
 				}
+			}
+		}
+		else if (xmlName == PROJECT_XML_GENERATOR_ELEMENT)
+		{
+			if (xmlTextReaderHasAttributes(xmlReader) == 1)
+			{
+				ProcessGenerator(xmlReader);
 			}
 		}
 		else if (xmlName == PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT)
@@ -375,7 +429,7 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
-				ProcessNode(xmlReader);
+				ProcessProjectNode(xmlReader);
 			}
 		}
 	}
@@ -394,7 +448,7 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 
 		if (!xmlAttributeName.empty()
 		        && !xmlAttributeValue.empty()
-		        && xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE)
+		        && xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT)
 		{
 			currentAutogenerationSetting = xmlAttributeValue;
 		}
@@ -467,7 +521,7 @@ void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 	{
 		string settingNameStr;
 		string settingValueStr;
-		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 0)
+		if (xmlStrEqual(node->name, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 1)
 		{
 			xmlAttr* attribute = node->properties;
 			while (attribute && attribute->name && attribute->children)
@@ -492,9 +546,41 @@ void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 	}
 }
 
+void ProjectConfiguration::ProcessGenerator(xmlTextReaderPtr xmlReader)
+{
+	while (xmlTextReaderMoveToNextAttribute(xmlReader))
+	{
+		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
+		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                                 : "";
 
-// TODO: ProcessProjectNode?
-void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
+		if (xmlAttributeName == PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE)
+{
+			//Process Generator attribute toolName
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE)
+		{
+			//Process Generator attribute toolVersion
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE)
+		{
+			SetCreationDate(xmlAttributeValue);
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_MODIFIEDBY_ATTRIBUTE)
+		{
+			//Process Generator attribute modifiedBy
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE)
+		{
+			//Process Generator attribute modifiedOn
+		}
+	}
+}
+
+void ProjectConfiguration::ProcessProjectNode(xmlTextReaderPtr xmlReader)
 {
 	// MN, CN properties
 	boost::optional<string> nodeName;
@@ -650,13 +736,17 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 		xdcPath = this->GetProjectPath(); // trailing (back)slash
 		xdcPath.append(pathToXDC.get().begin(), pathToXDC.get().end()); // might result in // or \\ which should be ignored by the OS
 	}
+	//Replace encoded whitespaces for XDC paths
+	string xdcPathString = xdcPath.generic_string();
+	boost::replace_all(xdcPathString, "%20", " ");
+	xdcPath = xdcPathString;
 	LOG_DEBUG() << "XDC-Path for node " << nodeId.get() << ": " << xdcPath.generic_string<string>();
 
 	// Set a default node name if it was omitted
 	if ((!nodeName || nodeName.get().empty()) && nodeId.get() == MN_NODEID)
 		nodeName = "MN";
 	else if ((!nodeName || nodeName.get().empty()) && nodeId.get() != MN_NODEID)
-		nodeName = "CN_" + boost::lexical_cast<std::string>(nodeId.get());
+		nodeName = "CN_" + boost::lexical_cast<string>(nodeId.get());
 
 	// Create node
 	exceptionObj = NewProjectNode(nodeId.get(),
@@ -666,9 +756,56 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		throw exceptionObj;
 
+	//Set XDD / XDC paths
+	Node& node = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(nodeId.get());
+	NodeType type = (nodeId.get() == MN_NODEID) ? MN : CN;
+
+	//Set the paths for the project nodes
+	node.SetXdcPath(xdcPath);
+	if (type == CN)
+	{
+		boost::filesystem::path path(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + xdcPath.filename().generic_string().substr(0, xdcPath.filename().generic_string().find_last_of("_")));
+		boost::filesystem::path xddPath = path.replace_extension("xdd");
+		boost::filesystem::path xdcPath = path.replace_extension("xdc");
+
+		if (boost::filesystem::exists(xddPath))
+		{
+			node.SetXddPath(xddPath);
+		}
+		else if (boost::filesystem::exists(xdcPath))
+		{
+			node.SetXddPath(xdcPath);
+		}
+		else
+		{
+			node.SetXddPath("");
+		}
+	}
+	else
+	{
+		boost::filesystem::path path(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + xdcPath.stem().generic_string());
+		boost::filesystem::path xddPath = path.replace_extension("xdd");
+		boost::filesystem::path xdcPath = path.replace_extension("xdc");
+
+		if (boost::filesystem::exists(xddPath))
+		{
+			node.SetXddPath(xddPath);
+		}
+		else if (boost::filesystem::exists(xdcPath))
+		{
+			node.SetXddPath(xdcPath);
+		}
+		else
+		{
+			node.SetXddPath("");
+		}
+	}
+
+
 	// Override node configuration for certain properties.
 	// Excluded: Bits in 0x1F81, NodeAssignment. Bits in 0x1F80, StartUp
 	Node& nodeObj = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(nodeId.get());
+
 	if (nodeId.get() == MN_NODEID)
 	{
 		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 2))
@@ -704,7 +841,7 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 		if (stationType == MULTIPLEXED)
 		{
 			nodeObj.SetForceCycleFlag(forcedMultiplexedCycle.get_value_or(0) != 0);
-			nodeObj.SetForcedCycle(boost::lexical_cast<std::string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
+			nodeObj.SetForcedCycle(boost::lexical_cast<string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
 		}
 		else
 		{
@@ -775,7 +912,7 @@ void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 		{
 			this->AddPath(pathId, string(xmlAttributeValue));
 			if(pathId == PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE)
-				this->SetDefaultOutputPath(string(xmlAttributeValue));
+				this->SetDefaultOutputPath(boost::filesystem::path(xmlAttributeValue));
 		}
 
 	}
@@ -1073,8 +1210,8 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
         boost::optional<T>& projectConfigValue) const
 {
 	LOG_DEBUG()
-	        << std::hex
-	        << std::showbase
+	        << hex
+	        << showbase
 	        << "Overriding configuration for node " << node.GetNodeId()
 	        << ", index " << index << "/" << subIndex << ".";
 	boost::optional<T> currActualValue = node.GetActualValue<T>(index, subIndex);
@@ -1082,12 +1219,12 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 	{
 		// There is an actualValue for the index/subIndex, it
 		// overrides the project-config
-		std::string projectConfigValueStr = projectConfigValue
-		                                    ? boost::lexical_cast<std::string>(projectConfigValue.get())
+		string projectConfigValueStr = projectConfigValue
+		                               ? boost::lexical_cast<string>(projectConfigValue.get())
 		                                    : "NULL";
 		LOG_DEBUG()
-		        << std::hex
-		        << std::showbase
+		        << hex
+		        << showbase
 		        << "Overwrote project-configuration value '"
 		        << projectConfigValueStr << "'"
 		        << " with actualValue '" << currActualValue.get() << "'.";
@@ -1100,12 +1237,12 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		if (projectConfigValue)
 		{
 			node.SetActualValue(index, subIndex, projectConfigValue.get());
-			std::string currActualValueStr = currActualValue
-			                                 ? boost::lexical_cast<std::string>(currActualValue.get())
+			string currActualValueStr = currActualValue
+			                            ? boost::lexical_cast<string>(currActualValue.get())
 			                                 : "NULL";
 			LOG_DEBUG()
-			        << std::hex
-			        << std::showbase
+			        << hex
+			        << showbase
 			        << "Overwrote actualValue '" << currActualValueStr
 			        << "' of node with project-configuration value '"
 			        << projectConfigValue.get() << "'.";
@@ -1116,22 +1253,22 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		}
 	}
 
-	/*
-	Index& indexRef = node.GetIndexCollection()->GetIndexRef(index);
+
+	/*	Index& indexRef = node.GetIndexCollection()->GetIndexRef(index);
 	SubIndex* subIndexPtr = indexRef.GetSubIndexPtr(subIndex);
 	const char* actualValue = (subIndexPtr == NULL)
 		? indexRef.GetActualValue()
 		: subIndexPtr->GetActualValue();
-	std::stringstream converter;
+		stringstream converter;
 	if (actualValue != NULL && strlen(actualValue) != 0)
 	{
 		// There is an actualValue for the index/subIndex, it
 		// overrides the project-config
 		string actualValueStr(actualValue);
 		if (boost::algorithm::starts_with(actualValueStr, "0x"))
-			converter << std::hex << actualValueStr.substr(2);
+				converter << hex << actualValueStr.substr(2);
 		else
-			converter << std::boolalpha << actualValueStr;
+				converter << boolalpha << actualValueStr;
 		T temporary;
 		converter >> temporary;
 		projectConfigValue = temporary;
@@ -1142,7 +1279,7 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		// as actual value if there is a valid one
 		if (projectConfigValue)
 		{
-			converter << std::boolalpha << projectConfigValue.get();
+				converter << boolalpha << projectConfigValue.get();
 			if (subIndexPtr != NULL)
 				subIndexPtr->SetActualValue(converter.str().c_str());
 			else
@@ -1151,6 +1288,680 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 	}
 	*/
 }
+
+openCONFIGURATOR::Library::ErrorHandling::Result ProjectConfiguration::SaveProject(void)
+{
+	try
+	{
+		if (!IsAlreadySaved())
+		{
+			//Create project folder structure if not existing
+			CreateProjectFolder();
+		}
+		//Write or Update MN XDD/XDC files if existing
+		WriteMNXDC();
+
+		//Write or Update CN XDD/XDC files if existing
+		WriteCNXDCs();
+
+
+		WriteProjectFile();
+
+		//	//Update existing valid project file
+		Result result = ValidateProjectFile(projectPath.generic_string() +  PATH_SEPARATOR + projectFile);
+		if (!result.IsSuccessful())
+			throw result;
+
+
+		//Update XDCs indices with actual values
+		UpdateNodeConfigurations();
+
+		SetAlreadySaved(true);
+
+		return Result();
+	}
+	catch (const Result& result)
+	{
+		return result;
+	}
+}
+
+void ProjectConfiguration::CreateProjectFolder(void)
+{
+	try
+	{
+		//Create project folder structure
+		boost::filesystem::path xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport");
+		boost::filesystem::path xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration");
+		if (ProjectConfiguration::GetInstance().GetDefaultOutputPath().empty())
+		{
+			ProjectConfiguration::GetInstance().SetDefaultOutputPath(boost::filesystem::path(GetProjectPath().generic_string() + PATH_SEPARATOR + "output"));
+		}
+		boost::filesystem::path output_dir(ProjectConfiguration::GetInstance().GetDefaultOutputPath());
+
+		boost::filesystem::create_directories(xdd_dir);
+		boost::filesystem::create_directories(xdc_dir);
+		boost::filesystem::create_directories(output_dir);
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteMNXDC(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		if (nodeCollection->GetNodeRef(240).GetXdcPath().empty())
+		{
+			boost::filesystem::path original_mn_xdd_path = nodeCollection->GetNodeRef(240).GetXddPath();
+			//Create project folder and copy MN XDD
+			boost::filesystem::path xdd_mn_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + original_mn_xdd_path.filename().string());
+			boost::filesystem::path xdc_mn_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration" + PATH_SEPARATOR + original_mn_xdd_path.stem().string() + ".xdc");
+
+			boost::filesystem::copy_file(original_mn_xdd_path, xdd_mn_dir, boost::filesystem::copy_option::overwrite_if_exists);
+			boost::filesystem::copy_file(original_mn_xdd_path, xdc_mn_dir, boost::filesystem::copy_option::overwrite_if_exists);
+
+			nodeCollection->GetNodeRef(240).SetXddPath(xdd_mn_dir);
+			nodeCollection->GetNodeRef(240).SetXdcPath(xdc_mn_dir);
+		}
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteCNXDCs(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		if (ProjectConfiguration::GetInstance().IsAlreadySaved())
+		{
+			boost::filesystem::path xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport");
+			boost::filesystem::path xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration");
+
+			boost::filesystem::directory_iterator end_iter;
+
+			list<boost::filesystem::path> xddPathVector;
+			list<boost::filesystem::path> xdcPathVector;
+
+			//list all existing files
+			if (exists(xdd_dir) && is_directory(xdd_dir))
+			{
+				for (boost::filesystem::directory_iterator dir_iter(xdd_dir) ; dir_iter != end_iter ; ++dir_iter)
+				{
+					if (boost::filesystem::is_regular_file(dir_iter->status()))
+					{
+						xddPathVector.push_back(*dir_iter);
+					}
+				}
+			}
+
+			if (exists(xdc_dir) && is_directory(xdc_dir))
+			{
+				for (boost::filesystem::directory_iterator dir_iter(xdc_dir) ; dir_iter != end_iter ; ++dir_iter)
+				{
+					if (boost::filesystem::is_regular_file(dir_iter->status()))
+					{
+						xdcPathVector.push_back(*dir_iter);
+					}
+				}
+			}
+
+			//Determine no longer needed files
+			for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+			{
+				Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+				bool deleteFlag = false;
+				list<boost::filesystem::path>::iterator toDelete;
+				//remove files needed from the list of all project files
+				for (toDelete = xddPathVector.begin() ; toDelete != xddPathVector.end(); ++toDelete)
+				{
+					if (boost::filesystem::equivalent(nodeObj->GetXddPath(), *toDelete))
+					{
+						deleteFlag = true;
+						break;
+					}
+				}
+				if (deleteFlag)
+					xddPathVector.erase(toDelete);
+
+				deleteFlag = false;
+				for (toDelete = xdcPathVector.begin() ; toDelete != xdcPathVector.end(); ++toDelete)
+				{
+					if (boost::filesystem::equivalent(nodeObj->GetXdcPath(), *toDelete))
+					{
+						deleteFlag = true;
+						break;
+					}
+				}
+				if (deleteFlag)
+					xdcPathVector.erase(toDelete);
+			}
+
+			//Delete no longer needed configuration files
+			for (list<boost::filesystem::path>::iterator it = xddPathVector.begin() ; it != xddPathVector.end(); ++it)
+			{
+				boost::filesystem::remove(*it);
+			}
+			for (list<boost::filesystem::path>::iterator it = xdcPathVector.begin() ; it != xdcPathVector.end(); ++it)
+			{
+				boost::filesystem::remove(*it);
+			}
+		}
+		//Copy CN xdc if not existing
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			if (nodeObj->GetNodeType() == CN && nodeObj->GetXdcPath().empty())
+			{
+				boost::filesystem::path original_xdd_file = nodeObj->GetXddPath();
+
+				boost::filesystem::path project_xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + original_xdd_file.filename().string());
+				boost::filesystem::copy_file(original_xdd_file, project_xdd_dir, boost::filesystem::copy_option::overwrite_if_exists);
+				nodeObj->SetXddPath(project_xdd_dir);
+
+				stringstream nodeIdStream;
+				nodeIdStream << nodeObj->GetNodeId();
+				boost::filesystem::path project_xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration" + PATH_SEPARATOR + original_xdd_file.stem().string() + "_" + nodeIdStream.str() + ".xdc");
+				boost::filesystem::copy_file(original_xdd_file, project_xdc_dir, boost::filesystem::copy_option::overwrite_if_exists);
+				nodeObj->SetXdcPath(project_xdc_dir);
+
+			}
+		}
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteProjectFile(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		string projectPathStr = ProjectConfiguration::GetInstance().GetProjectPath().generic_string();
+
+		boost::filesystem::path mnXdcPath = nodeCollection->GetNodeRef(240).GetXdcPath();
+		boost::filesystem::path projectFilePath(projectPathStr + PATH_SEPARATOR + GetProjectFile());
+
+		//Strip project path if necessary
+		string mnXdcPathString = mnXdcPath.generic_string();
+		if(boost::starts_with(mnXdcPath.generic_string(), projectPathStr))
+			mnXdcPathString  = mnXdcPath.generic_string().substr(projectPathStr.size() + 1, mnXdcPath.generic_string().size());
+
+		//write of project file
+		xmlTextWriterPtr writer = xmlNewTextWriterFilename(projectFilePath.generic_string().c_str(), 0);
+		xmlTextWriterSetIndent(writer, 1);
+		xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_ROOT_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns", BAD_CAST "http://sourceforge.net/projects/openconf/configuration");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns:oc", BAD_CAST "http://sourceforge.net/projects/openconf/configuration");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns:xsi", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xsi:schemaLocation", BAD_CAST "http://sourceforge.net/projects/openconf/configuration openCONFIGURATOR.xsd");
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_GENERATOR_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str(), BAD_CAST "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str(), BAD_CAST "openCONFIGURATOR");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str(), BAD_CAST "1.4.0");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
+		xmlTextWriterEndElement(writer);
+		if (!viewSettings.empty())
+		{
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_ELEMENT.c_str());
+			if (activeViewSettingType == BASIC)
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+			else
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE.c_str(), BAD_CAST "ADVANCED");
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == BASIC)
+				{
+					xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlTextWriterEndElement(writer);
+				}
+
+			}
+			xmlTextWriterEndElement(writer);
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "ADVANCED");
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == ADVANCED)
+				{
+					xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlTextWriterEndElement(writer);
+				}
+
+			}
+			xmlTextWriterEndElement(writer);
+			xmlTextWriterEndElement(writer);
+		}
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST activeAutogenerationSettingsID.c_str());
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PROJECT_PATHSETTINGS_ELEMENT.c_str());
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+
+		//Strip Project path
+		string strDefaultOutputPath = this->defaultOutputPath.generic_string();
+		if(boost::starts_with(this->defaultOutputPath.generic_string(), projectPathStr))
+			strDefaultOutputPath  = this->defaultOutputPath.generic_string().substr(projectPathStr.size() + 1, this->defaultOutputPath.generic_string().size());
+
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(strDefaultOutputPath).c_str());
+		xmlTextWriterEndElement(writer);
+
+		for (vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
+		{
+			if(it->GetName().compare("defaultOutputPath") != 0)
+			{
+				xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(it->GetValue()).c_str());
+				xmlTextWriterEndElement(writer);
+			}
+		}
+		xmlTextWriterEndElement(writer);
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "all");
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "none");
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterEndElement(writer);
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT.c_str());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0))
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1006, 0).get());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8))
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 8).get());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7))
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 7).get());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9))
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 9).get());
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NODE_COLLECTION_ELEMENT.c_str());
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_MANAGING_NODE_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST "240");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetNodeName());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(mnXdcPathString).c_str());
+
+		//if (nodeCollection->GetNodeRef(240).IsAsyncOnly())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsAsyncOnly().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).IsType1Router())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsType1Router().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).IsType2Router())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsType2Router().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).TransmitsPRes())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).TransmitsPRes().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2))
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 2).get().c_str());
+
+		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3))
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 3).get().c_str());
+
+
+		xmlTextWriterEndElement(writer);
+
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			stringstream nodeIdStream;
+			nodeIdStream << nodeObj->GetNodeId();
+
+			if (nodeObj->GetNodeType() == CN)
+			{
+				boost::filesystem::path cnXdcPath = nodeObj->GetXdcPath();
+				//Strip project path
+				string cnXdcPathString = cnXdcPath.generic_string();
+				if(boost::starts_with(cnXdcPath.generic_string(), projectPathStr))
+					cnXdcPathString  = cnXdcPath.generic_string().substr(projectPathStr.size() + 1, cnXdcPath.generic_string().size());
+
+				xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_CONTROLLED_NODE_ELEMENT.c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST  nodeIdStream.str().c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
+				if (nodeObj->GetStationType() == CHAINED)
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+				if (nodeObj->GetStationType() == MULTIPLEXED)
+				{
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+					if (nodeObj->GetForceCycleFlag())
+					{
+						string tempValue = nodeObj->GetForcedCycleValue();
+						std::stringstream sstm;
+
+						if(tempValue.substr(0, 2).compare("0x") == 0 || tempValue.substr(0, 2).compare("0X") == 0)
+							sstm << HexToInt<unsigned int>(tempValue);
+						else
+							sstm << tempValue;
+
+						xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST sstm.str().c_str());
+					}
+
+				}
+
+				//if (nodeObj->IsAsyncOnly())
+				//{
+				//	string value = nodeObj->IsAsyncOnly().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsType1Router())
+				//{
+				//	string value = nodeObj->IsType1Router().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsType2Router())
+				//{
+				//	string value = nodeObj->IsType2Router().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsMandatory())
+				//{
+				//	string value = nodeObj->IsMandatory().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetAutostartNode())
+				//{
+				//	string value = nodeObj->GetAutostartNode().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetResetInOperational())
+				//{
+				//	string value = nodeObj->GetResetInOperational().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyAppSwVersion())
+				//{
+				//	string value = nodeObj->GetVerifyAppSwVersion().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetAutoAppSwUpdateAllowed())
+				//{
+				//	string value = nodeObj->GetAutoAppSwUpdateAllowed().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyDeviceType())
+				//{
+				//	string value = nodeObj->GetVerifyDeviceType().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyVendorId())
+				//{
+				//	string value = nodeObj->GetVerifyVendorId().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyRevisionNumber())
+				//{
+				//	string value = nodeObj->GetVerifyRevisionNumber().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyProductCode())
+				//{
+				//	string value = nodeObj->GetVerifyProductCode().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifySerialNumber())
+				//{
+				//	string value = nodeObj->GetVerifySerialNumber().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				xmlTextWriterEndElement(writer);
+			}
+		}
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterEndDocument(writer);
+
+
+		//free memory used by libxml2
+		xmlFreeTextWriter(writer);
+		xmlCleanupParser();
+		xmlMemoryDump();
+	}
+	catch (ocfmRetCode& ex)
+	{
+		throw Translate(ex);
+	}
+}
+
+void ProjectConfiguration::UpdateNodeConfigurations(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			//Validate before updating the XDC
+ 			Result retValue = Translate(ValidateXDDFile(nodeObj->GetXdcPath().generic_string().c_str()));
+			if (!retValue.IsSuccessful())
+				throw retValue;
+
+			//Load the nodes XDC file
+			xmlDocPtr pDoc = xmlParseFile(nodeObj->GetXdcPath().generic_string().c_str());
+			if (pDoc == NULL)
+			{
+				boost::format formatter(kMsgFileReadFailed);
+				formatter % nodeObj->GetXdcPath().generic_string();
+				LOG_FATAL() << formatter.str();
+				xmlCleanupParser();
+				xmlMemoryDump();
+				throw Result(FILE_READ_FAILED, formatter.str());
+			}
+
+			//Delete all existing Object actual values
+			string xpathActual = "//plk:Object[@actualValue]";
+			xmlXPathObjectPtr pResultingXPathObjectActual(GetNodeSet(pDoc, xpathActual.c_str()));
+			if (pResultingXPathObjectActual)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectActual->nodesetval);
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pIndexNode(pNodeSet->nodeTab[i]);
+					xmlRemoveProp(xmlHasProp(pIndexNode, BAD_CAST "actualValue"));
+				}
+			}
+
+			xpathActual = "//plk:SubObject[@actualValue]";
+			xmlXPathObjectPtr pResultingXPathObjectActualSubIndex(GetNodeSet(pDoc, xpathActual.c_str()));
+			if (pResultingXPathObjectActualSubIndex)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectActualSubIndex->nodesetval);
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pIndexNode(pNodeSet->nodeTab[i]);
+					xmlRemoveProp(xmlHasProp(pIndexNode, BAD_CAST "actualValue"));
+				}
+			}
+
+			//Traverses all node indices
+			IndexCollection* indexColl = nodeObj->GetIndexCollection();
+			for (unsigned int i = 0; i < indexColl->Size(); i++)
+			{
+				Index* index = indexColl->GetIndexByPosition(i);
+				if (IsDefaultActualNotEqual(index) && index->GetActualValue() != NULL && strcmp(index->GetActualValue(), "") != 0)
+				{
+					//Select all the user nodes
+					string xpath = "//plk:Object[@index='";
+					xpath.append(index->GetIndexValue());
+					xpath.append("']");
+
+					xmlXPathObjectPtr pResultingXPathObject(GetNodeSet(pDoc, xpath.c_str()));
+					if (pResultingXPathObject)
+					{
+						xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+						for (int i = 0; i < pNodeSet->nodeNr; ++i)
+						{
+							xmlNodePtr pIndexNode(pNodeSet->nodeTab[i]);
+							xmlNewProp(pIndexNode, BAD_CAST "actualValue", BAD_CAST index->GetActualValue());
+							LOG_INFO() << "Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " ActualValue: " << index->GetActualValue() << endl;
+						}
+					}
+					else
+					{
+						cout << "WARNING: Object(0x" << index->GetIndexValue() << " (" << index->GetActualValue() << ")" << ") on Node(" << nodeObj->GetNodeId() << ")" << " was generated and cannot be stored in the node XDC file." << endl;
+					}
+					xmlXPathFreeObject(pResultingXPathObject);
+				}
+				if (index->HasSubIndices())
+				{
+					for (int j = 0; j < index->GetNumberofSubIndexes(); j++)
+					{
+						SubIndex* subIndex = index->GetSubIndexByPosition(j);
+						if (IsDefaultActualNotEqual(subIndex) && subIndex->GetActualValue() != NULL && strcmp(subIndex->GetActualValue(), "") != 0)
+						{
+							//alter subindex actual value in xdc
+							//Select all the user nodes
+							string xpath = "//plk:Object[@index='";
+							xpath.append(index->GetIndexValue());
+							xpath.append("']");
+							xpath.append("/plk:SubObject[@subIndex='");
+							xpath.append(subIndex->GetIndexValue());
+							xpath.append("']");
+
+							xmlXPathObjectPtr pResultingXPathObject(GetNodeSet(pDoc, xpath.c_str()));
+							if (pResultingXPathObject)
+							{
+								xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+								for (int i = 0; i < pNodeSet->nodeNr; ++i)
+								{
+									xmlNodePtr pSubIndexNode(pNodeSet->nodeTab[i]);
+									xmlNewProp(pSubIndexNode, BAD_CAST "actualValue", BAD_CAST subIndex->GetActualValue());
+									LOG_INFO() << " Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " Subindex: " << subIndex->GetIndexValue() << " ActualValue: " << subIndex->GetActualValue() << endl;
+								}
+							}
+							else
+							{
+								cout << "WARNING: Object(0x" << index->GetIndexValue() << "/0x" << subIndex->GetIndexValue() << " (" << subIndex->GetActualValue() << ")" << ") on Node(" << nodeObj->GetNodeId() << ")" << " was generated and cannot be stored in the node XDC file." << endl;
+							}
+							xmlXPathFreeObject(pResultingXPathObject);
+						}
+					}
+				}
+			}
+			//Save the nodes XDC file
+			xmlSaveFormatFileEnc(nodeObj->GetXdcPath().generic_string().c_str(), pDoc, "UTF-8", 1);
+			xmlFreeDoc(pDoc);
+			xmlCleanupParser();
+			xmlMemoryDump();
+		}
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+const xmlXPathObjectPtr ProjectConfiguration::GetNodeSet(const xmlDocPtr doc, const char* xpath)
+{
+	xmlXPathContextPtr context = xmlXPathNewContext(doc);
+	if (context == NULL)
+		return NULL;
+
+	//add namespaces to the xpath expression
+	if (xmlXPathRegisterNs(context,  BAD_CAST "plk", BAD_CAST "http://www.ethernet-powerlink.org") != 0)
+		return NULL;
+
+	if (xmlXPathRegisterNs(context,  BAD_CAST "co", BAD_CAST "http://sourceforge.net/projects/openconf/configuration") != 0)
+		return NULL;
+
+	//evaluate xpath expression
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST xpath, context);
+	xmlXPathFreeContext(context);
+	if (result == NULL)
+		return NULL;
+
+	//no nodes found by the xpath expression
+	if (xmlXPathNodeSetIsEmpty(result->nodesetval))
+	{
+		xmlXPathFreeObject(result);
+		return NULL;
+	}
+
+	return result;
+}
+
 //Path setting manipulation
 Result ProjectConfiguration::AddPath(const string& id, const string& path)
 {
@@ -1221,8 +2032,8 @@ Result ProjectConfiguration::AddViewSetting(const ViewType& viewType, const stri
 	this->viewSettings.push_back(ViewSetting(viewType, name, value));
 	return Result();
 }
-Result ProjectConfiguration::GetViewSetting(const ViewType& viewType, const string& name, string& value)
-{
+
+Result ProjectConfiguration::GetViewSetting(const ViewType& viewType, const string& name, string& value){
 	for (std::vector<ViewSetting>::iterator it = this->viewSettings.begin(); it != this->viewSettings.end(); ++it)
 	{
 		if (it->GetName() == name && it->GetViewType() == viewType)
@@ -1236,8 +2047,8 @@ Result ProjectConfiguration::GetViewSetting(const ViewType& viewType, const stri
 	formatter % viewType;
 	return Result(VIEW_SETTING_DOES_NOT_EXIST, formatter.str());
 }
-Result ProjectConfiguration::DeleteViewSetting(const ViewType& viewType, const std::string& name)
-{
+
+Result ProjectConfiguration::DeleteViewSetting(const ViewType& viewType, const std::string& name){
 	std::vector<ViewSetting>::iterator toDelete;
 	bool found = false;
 	for (toDelete = this->viewSettings.begin(); toDelete != this->viewSettings.end(); ++toDelete)
@@ -1259,8 +2070,8 @@ Result ProjectConfiguration::DeleteViewSetting(const ViewType& viewType, const s
 	this->viewSettings.erase(toDelete);
 	return Result();
 }
-Result ProjectConfiguration::SetActiveViewSettings(const ViewType& viewType)
-{
+
+Result ProjectConfiguration::SetActiveViewSettings(const ViewType& viewType){
 	for (std::vector<ViewSetting>::iterator it = this->viewSettings.begin(); it != this->viewSettings.end(); ++it)
 	{
 		if (it->GetViewType() == viewType)
@@ -1274,6 +2085,7 @@ Result ProjectConfiguration::SetActiveViewSettings(const ViewType& viewType)
 	formatter % viewType;
 	return Result(VIEW_SETTINGS_DOES_NOT_EXIST, formatter.str());
 }
+
 Result ProjectConfiguration::GetActiveViewSettings(ViewType& viewType)
 {
 	viewType = this->activeViewSettingType;
@@ -1296,8 +2108,7 @@ Result ProjectConfiguration::AddAutoGenerationSetting(const string& id, const st
 	this->autogenerationSettings.push_back(AutoGenSetting(id, name, value));
 	return Result();
 }
-Result ProjectConfiguration::GetAutoGenerationSetting(const string& id, const string& name, std::string& settingValue)
-{
+Result ProjectConfiguration::GetAutoGenerationSetting(const string& id, const string& name, std::string& settingValue){
 	for (std::vector<AutoGenSetting>::iterator it = this->autogenerationSettings.begin(); it != this->autogenerationSettings.end(); ++it)
 	{
 		if (it->GetName() == name && it->GetAutoGenId() == id)
@@ -1356,10 +2167,9 @@ Result ProjectConfiguration::SetActiveAutoGenerationSetting(const string& id)
 	//formatter % id;
 	//return Result(AUTO_GEN_SETTINGS_DOES_NOT_EXIST, formatter.str());
 }
+
 Result ProjectConfiguration::GetActiveAutoGenerationSetting(std::string& activeAutoGenSetting)
 {
 	activeAutoGenSetting = this->activeAutogenerationSettingsID;
 	return Result();
 }
-
-

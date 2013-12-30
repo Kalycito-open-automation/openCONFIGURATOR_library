@@ -799,6 +799,7 @@ ocfmRetCode ValidateXDDFile(const char* fileName)
 			exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
 		}
 
+		xmlFreeDoc(xdd_file_ptr);
 		//CleanUp XML Parser
 		xmlCleanupParser();
 		xmlMemoryDump();
@@ -836,8 +837,10 @@ Result ValidateProjectFile(const string& fileName)
 		else
 		{
 			exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
+			exceptionObject.setErrorString("Project file parsing failed due to wrong XML syntax.");
 		}
 
+		xmlFreeDoc(xdd_file_ptr);
 		//CleanUp XML Parser
 		xmlCleanupParser();
 		xmlMemoryDump();
@@ -1302,6 +1305,10 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 			}
 
 			objException.setErrorCode(OCFM_ERR_SUCCESS);
+
+			Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+			node->SetXddPath(boost::filesystem::path(fileName));
+			node->SetXdcPath("");
 		}
 		else
 		{

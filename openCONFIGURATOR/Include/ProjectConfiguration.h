@@ -14,6 +14,13 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <libxml/xmlwriter.h>
+#include <libxml/encoding.h>
+#include <libxml/xmlreader.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+
 #include "Exception.h"
 #include "NodeCollection.h"
 #include "Internal.h"
@@ -40,8 +47,11 @@ class ProjectConfiguration
 	public:
 		static ProjectConfiguration& GetInstance(void);
 
-		const std::string& GetDefaultOutputPath(void) const;
-		void SetDefaultOutputPath(const std::string& defaultOutputPath);
+		const boost::filesystem::path& GetDefaultOutputPath(void) const;
+		void SetDefaultOutputPath(const boost::filesystem::path& defaultOutputPath);
+
+		const std::string& GetCreationDate(void) const;
+		void SetCreationDate(const std::string& creationDate);
 
 		bool GetGenerateMNOBD(void) const;
 		void SetGenerateMNOBD(bool generateMNOBD);
@@ -49,11 +59,14 @@ class ProjectConfiguration
 		bool IsInitialized(void) const;
 		void SetInitialized(bool initialized);
 
+		bool IsAlreadySaved(void) const;
+		void SetAlreadySaved(bool saved);
+
 		const std::string& GetProjectFile(void) const;
 		void SetProjectFile(const std::string& projectFile);
 
-		const std::string& GetProjectPath(void) const;
-		void SetProjectPath(const std::string& projectPath);
+		const boost::filesystem::path& GetProjectPath(void) const;
+		void SetProjectPath(const boost::filesystem::path& projectPath);
 
 		const boost::optional<UINT32>& GetCycleTime(void) const;
 		void SetCycleTime(UINT32 cycleTime);
@@ -66,6 +79,8 @@ class ProjectConfiguration
 
 		const boost::optional<UINT32>& GetPrescaler(void) const;
 		void SetPrescaler(UINT32 prescaler);
+
+		Result SaveProject(void);
 
 		ocfmRetCode LoadProject(const std::string& projectFile);
 		void ResetConfiguration(void);
@@ -95,11 +110,19 @@ class ProjectConfiguration
 		void operator=(const ProjectConfiguration&);
 
 		void ProcessProject(xmlTextReaderPtr xmlReader);
-		void ProcessNode(xmlTextReaderPtr xmlReader);
+		void ProcessProjectNode(xmlTextReaderPtr xmlReader);
 		void ProcessPath(xmlTextReaderPtr xmlReader);
 		void ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader);
 		void ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader);
 		void ProcessViewSettings(xmlTextReaderPtr xmlReader);
+		void ProcessGenerator(xmlTextReaderPtr xmlReader);
+
+		void CreateProjectFolder(void);
+		void WriteProjectFile(void);
+		void WriteMNXDC(void);
+		void WriteCNXDCs(void);
+		void UpdateNodeConfigurations(void);
+		const xmlXPathObjectPtr GetNodeSet(const xmlDocPtr doc, const char* xpath);
 
 		/*
 		void SynchronizeMultiplexedCycleLength(void);
@@ -140,16 +163,19 @@ class ProjectConfiguration
 
 		//General attributes
 		bool initialized;
+		bool alreadysaved;
 
 		//Project related attributes
 		std::string projectFile;
-		std::string projectPath;
+		std::string creationDate;
+
 		bool generateMNOBD;
 
 		std::string currentAutogenerationSetting;
 
 		//Project paths
-		std::string defaultOutputPath;
+		boost::filesystem::path defaultOutputPath;
+		boost::filesystem::path projectPath;
 
 		//General network attributes
 		boost::optional<UINT32> cycleTime;

@@ -74,8 +74,8 @@
 class Node
 {
 	public:
-		Node(void);
-		~Node(void);
+		Node();
+		~Node();
 
 		/*****************************************************************************/
 		/**
@@ -426,48 +426,56 @@ class Node
 		INT32 GetPReqActPayloadValue();
 
 		//MN additional properties
-		boost::optional<bool> TransmitsPRes(void);
+		boost::optional<bool> TransmitsPRes();
 		void SetTransmitsPRes(bool transmitsPRes);
 
 		//CN additional properties
-		boost::optional<bool> GetAutostartNode(void);
+		boost::optional<bool> GetAutostartNode();
 		void SetAutostartNode(bool autostartNode);
 
-		boost::optional<bool> GetResetInOperational(void);
+		boost::optional<bool> GetResetInOperational();
 		void SetResetInOperational(bool resetInOperational);
 
-		boost::optional<bool> GetVerifyAppSwVersion(void);
+		boost::optional<bool> GetVerifyAppSwVersion();
 		void SetVerifyAppSwVersion(bool verifyAppSwVersion);
 
-		boost::optional<bool> GetAutoAppSwUpdateAllowed(void);
+		boost::optional<bool> GetAutoAppSwUpdateAllowed();
 		void SetAutoAppSwUpdateAllowed(bool autoAppSwUpdateAllowed);
 
-		boost::optional<bool> GetVerifyDeviceType(void);
+		boost::optional<bool> GetVerifyDeviceType();
 		void SetVerifyDeviceType(bool verifyDeviceType);
 
-		boost::optional<bool> GetVerifyVendorId(void);
+		boost::optional<bool> GetVerifyVendorId();
 		void SetVerifyVendorId(bool verifyVendorId);
 
-		boost::optional<bool> GetVerifyRevisionNumber(void);
+		boost::optional<bool> GetVerifyRevisionNumber();
 		void SetVerifyRevisionNumber(bool verifyRevisionNumber);
 
-		boost::optional<bool> GetVerifyProductCode(void);
+		boost::optional<bool> GetVerifyProductCode();
 		void SetVerifyProductCode(bool verifyProductCode);
 
-		boost::optional<bool> GetVerifySerialNumber(void);
+		boost::optional<bool> GetVerifySerialNumber();
 		void SetVerifySerialNumber(bool verifySerialNumber);
 
-		boost::optional<bool> IsMandatory(void);
+		boost::optional<bool> IsMandatory();
 		void SetIsMandatory(bool isMandatory);
 
-		boost::optional<bool> IsAsyncOnly(void);
+		boost::optional<bool> IsAsyncOnly();
 		void SetIsAsyncOnly(bool isAsyncOnly);
 
-		boost::optional<bool> IsType1Router(void);
+		boost::optional<bool> IsType1Router();
 		void SetIsType1Router(bool isType1Router);
 
-		boost::optional<bool> IsType2Router(void);
+		boost::optional<bool> IsType2Router();
 		void SetIsType2Router(bool isType2Router);
+
+		const boost::filesystem::path& GetXddPath() const;
+		void SetXddPath(const boost::filesystem::path& xddPath);
+
+		const boost::filesystem::path& GetXdcPath() const;
+		void SetXdcPath(const boost::filesystem::path& xdcPath);
+
+
 
 		/************************************************************************
 		\brief	Set the actualValue of an index/subIndex in this Nodes' OD to value.
@@ -511,7 +519,8 @@ class Node
 		char* presTimeOut;
 		StationType stationType;
 		NodeType nodeType;
-
+		boost::filesystem::path xddPath;
+		boost::filesystem::path xdcPath;
 		// MN
 		boost::optional<bool> transmitsPRes;
 

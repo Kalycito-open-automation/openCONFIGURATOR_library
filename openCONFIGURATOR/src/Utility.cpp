@@ -649,3 +649,30 @@ template unsigned short openCONFIGURATOR::Library::Utilities::HexToInt<unsigned 
 template unsigned int openCONFIGURATOR::Library::Utilities::HexToInt<unsigned int>(const string& hexString);
 template unsigned long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long>(const string& hexString);
 template unsigned long long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long long>(const string& hexString);
+const std::string GetCurrentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%dT%X", &tstruct);
+    return buf;
+}
+
+string openCONFIGURATOR::Library::Utilities::url_encode(const string &value) {
+    ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        string::value_type c = (*i);
+
+        if (c == ' ') {
+            escaped << '%' << setw(2) << int((unsigned char) c);
+            continue;
+        }
+
+        escaped << c;
+    }
+
+    return escaped.str();
+}
