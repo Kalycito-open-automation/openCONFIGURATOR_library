@@ -1302,6 +1302,10 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 			}
 
 			objException.setErrorCode(OCFM_ERR_SUCCESS);
+
+			Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+			node->SetXddPath(boost::filesystem::path(fileName));
+			node->SetXdcPath("");
 		}
 		else
 		{

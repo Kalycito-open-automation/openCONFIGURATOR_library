@@ -16,6 +16,7 @@ using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 namespace openCONFIGURATOR
 {
+
 	namespace Library
 	{
 		namespace API
@@ -41,12 +42,22 @@ namespace openCONFIGURATOR
 							formatter % nodeId;
 							return Result(NODE_EXISTS, formatter.str());
 						}
-						return Translate(NewProjectNode(nodeId,
+						res = Translate(NewProjectNode(nodeId,
 						                                type,
 						                                nodeName.c_str(),
 						                                (xddFile.empty())
 						                                ? kDefaultCNXDD.c_str()
 						                                : xddFile.c_str()));
+
+						if (res.IsSuccessful())
+						{
+							Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+							node->SetXddPath((xddFile.empty()
+								? boost::filesystem::path(kDefaultCNXDD)
+								: boost::filesystem::path(xddFile)));
+							node->SetXdcPath("");
+					}
+						return res;
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}

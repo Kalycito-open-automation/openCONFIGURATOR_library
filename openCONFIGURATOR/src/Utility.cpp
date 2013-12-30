@@ -659,3 +659,12 @@ T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
 template unsigned short openCONFIGURATOR::Library::Utilities::HexToInt<unsigned short>(const string& hexString);
 template unsigned int openCONFIGURATOR::Library::Utilities::HexToInt<unsigned int>(const string& hexString);
 template unsigned long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long>(const string& hexString);
+
+const std::string GetCurrentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%dT%X", &tstruct);
+    return buf;
+}

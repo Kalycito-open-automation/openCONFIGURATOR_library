@@ -34,24 +34,23 @@ namespace openCONFIGURATOR
 			/**
 			\brief	Save %openCONFIGURATOR project.
 
-					Updates the project file with the current configuration and saves all imported XDDs as XDCs.
+			Updates the project file with the current configuration and persists all imported XDDs as XDCs or alters all existing XDCs with the objects actual values.
 
-			\warning Not implemented.
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject(void);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject();
 
 			/**
 			\brief	Close project and free allocated resources.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject(void);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject();
 
 			/**
 			\brief	Open existing %openCONFIGURATOR project.
 
-			\param[in] projectFile Projekt to open.
+			\param[in] projectFile Full path to project file to open.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/

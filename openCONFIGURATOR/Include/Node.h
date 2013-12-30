@@ -469,6 +469,13 @@ class Node
 		boost::optional<bool> IsType2Router(void);
 		void SetIsType2Router(bool isType2Router);
 
+		const boost::filesystem::path& GetXddPath(void) const;
+		void SetXddPath(const boost::filesystem::path& xddPath);
+
+		const boost::filesystem::path& GetXdcPath(void) const;
+		void SetXdcPath(const boost::filesystem::path& xdcPath);
+
+
 		/************************************************************************
 		\brief	Set the actualValue of an index/subIndex in this Nodes' OD to value.
 		\param index 16bit index of the Index.
@@ -512,6 +519,8 @@ class Node
 		StationType stationType;
 		NodeType nodeType;
 
+		boost::filesystem::path xddPath;
+		boost::filesystem::path xdcPath;
 		// MN
 		boost::optional<bool> transmitsPRes;
 

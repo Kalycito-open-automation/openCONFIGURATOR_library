@@ -1422,5 +1422,6 @@ namespace openCONFIGURATOR
 }
 
 openCONFIGURATOR::Library::ErrorHandling::Result ValidateProjectFile(const string& fileName);
+const std::string GetCurrentDateTime(void);
 
 #endif // internal_h

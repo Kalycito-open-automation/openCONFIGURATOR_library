@@ -8,10 +8,23 @@
 #include "../Include/Logging.h"
 #include "../Include/Result.h"
 #include "../Include/BoostShared.h"
+#include "../Include/NodeApi.h"
+
+#include <iostream>
+#include <map>
+#include <algorithm>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+#include <libxml/tree.h>
+#include <libxml/xpathInternals.h>
+#include <libxml/uri.h>
 
 using namespace std;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::Library::API;
 using namespace openCONFIGURATOR::Library::Utilities;
+
 
 const string PROJECT_XML_ROOT_ELEMENT = "openCONFIGURATORProject";
 const string PROJECT_XML_VERSION_ATTRIBUTE = "version";
@@ -21,17 +34,26 @@ const string PROJECT_XML_PATH_ID_ATTRIBUTE = "id";
 const string PROJECT_XML_PATH_PATH_ATTRIBUTE = "path";
 const string PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE = "defaultOutputPath";
 
+const string PROJECT_XML_GENERATOR_ELEMENT = "Generator";
+const string PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE = "vendor";
+const string PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE = "toolName";
+const string PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE = "toolVersion";
+const string PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE = "createdOn";
+const string PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE = "modifiedOn";
+const string PROJECT_XML_GENERATOR_MODIFIEDBY_ATTRIBUTE = "modifiedBy";
+
 const string PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT = "ProjectConfiguration";
 const string PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE = "activeAutoGenerationSetting";
 const string PROJECT_XML_PROJECT_CONFIGURATION_PROJECT_NAME_ATTRIBUTE = "name";
 
+const string PROJECT_XML_PROJECT_PATHSETTINGS_ELEMENT = "PathSettings";
 const string PROJECT_XML_SETTING_ELEMENT = "Setting";
 const string PROJECT_XML_SETTING_NAME_ATTRIBUTE = "name";
 const string PROJECT_XML_SETTING_VALUE_ATTRIBUTE = "value";
 
 const string PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT = "AutoGenerationSettings";
-const string PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE = "id";
 const string PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT = "NetworkConfiguration";
+const string PROJECT_XML_NODE_COLLECTION_ELEMENT = "NodeCollection";
 const string PROJECT_XML_MANAGING_NODE_ELEMENT = "MN";
 const string PROJECT_XML_CONTROLLED_NODE_ELEMENT = "CN";
 
@@ -71,8 +93,10 @@ ProjectConfiguration ProjectConfiguration::instance;
 
 ProjectConfiguration::ProjectConfiguration(void) :
 	initialized(false),
+	alreadysaved(false),
 	projectFile(),
 	projectPath(),
+	creationDate(GetCurrentDateTime()),
 	generateMNOBD(true),
 	autogenerationSettingID(),
 	defaultOutputPath(),
@@ -85,10 +109,12 @@ ProjectConfiguration::ProjectConfiguration(void) :
 void ProjectConfiguration::ResetConfiguration(void)
 {
 	initialized = false;
-
+	alreadysaved = false;
 	projectFile = "";
 	defaultOutputPath = "";
 	projectPath = "";
+	SetCreationDate(GetCurrentDateTime());
+
 	generateMNOBD = true;
 
 	cycleTime = boost::none;
@@ -109,12 +135,22 @@ ProjectConfiguration& ProjectConfiguration::GetInstance(void)
 	return ProjectConfiguration::instance;
 }
 
-const string& ProjectConfiguration::GetDefaultOutputPath() const
+const boost::filesystem::path& ProjectConfiguration::GetDefaultOutputPath() const
 {
 	return defaultOutputPath;
 }
 
-void ProjectConfiguration::SetDefaultOutputPath(const string& defaultOutputPath)
+const std::string& ProjectConfiguration::GetCreationDate(void) const
+{
+	return creationDate;
+}
+
+void ProjectConfiguration::SetCreationDate(const std::string& creationDate)
+{
+	this->creationDate = creationDate;
+}
+
+void ProjectConfiguration::SetDefaultOutputPath(const boost::filesystem::path& defaultOutputPath)
 {
 	this->defaultOutputPath = defaultOutputPath;
 }
@@ -129,6 +165,15 @@ void ProjectConfiguration::SetInitialized(bool initialized)
 	this->initialized = initialized;
 }
 
+bool ProjectConfiguration::IsAlreadySaved(void) const
+{
+	return alreadysaved;
+}
+void ProjectConfiguration::SetAlreadySaved(bool saved)
+{
+	this->alreadysaved = saved;
+}
+
 bool ProjectConfiguration::GetGenerateMNOBD(void) const
 {
 	return generateMNOBD;
@@ -139,22 +184,22 @@ void ProjectConfiguration::SetGenerateMNOBD(bool generateMNOBD)
 	this->generateMNOBD = generateMNOBD;
 }
 
-const string& ProjectConfiguration::GetProjectPath(void) const
+const boost::filesystem::path& ProjectConfiguration::GetProjectPath(void) const
 {
 	return projectPath;
 }
 
-void ProjectConfiguration::SetProjectPath(const string& projectPath)
+void ProjectConfiguration::SetProjectPath(const boost::filesystem::path& projectPath)
 {
 	this->projectPath = projectPath;
 }
 
-const string& ProjectConfiguration::GetProjectFile(void) const
+const std::string& ProjectConfiguration::GetProjectFile(void) const
 {
 	return projectFile;
 }
 
-void ProjectConfiguration::SetProjectFile(const string& projectFile)
+void ProjectConfiguration::SetProjectFile(const std::string& projectFile)
 {
 	this->projectFile = projectFile;
 }
@@ -278,6 +323,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 		return exceptionThrown;
 	}
 	this->initialized = true;
+	this->alreadysaved = true;
 	LOG_INFO() << "Project-Load finished.";
 	return ocfmRetCode(OCFM_ERR_SUCCESS);
 }
@@ -330,6 +376,13 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 				}
 			}
 		}
+		else if (xmlName == PROJECT_XML_GENERATOR_ELEMENT)
+		{
+			if (xmlTextReaderHasAttributes(xmlReader) == 1)
+			{
+				ProcessGenerator(xmlReader);
+			}
+		}
 		else if (xmlName == PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
@@ -353,7 +406,7 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
-				ProcessNode(xmlReader);
+				ProcessProjectNode(xmlReader);
 			}
 		}
 	}
@@ -373,7 +426,7 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 
 		if (!xmlAttributeName.empty()
 		        && !xmlAttributeValue.empty()
-		        && xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE)
+		        && xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT)
 		{
 			currentAutogenerationSetting = xmlAttributeValue;
 		}
@@ -429,8 +482,41 @@ void ProjectConfiguration::ProcessAutogenerationSetting(xmlTextReaderPtr xmlRead
 	}
 }
 
-// TODO: ProcessProjectNode?
-void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
+void ProjectConfiguration::ProcessGenerator(xmlTextReaderPtr xmlReader)
+{
+	while (xmlTextReaderMoveToNextAttribute(xmlReader))
+	{
+		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
+		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                                 : "";
+
+		if (xmlAttributeName == PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE)
+		{
+			//Process Generator attribute toolName
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE)
+		{
+			//Process Generator attribute toolVersion
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE)
+		{
+			SetCreationDate(xmlAttributeValue);
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_MODIFIEDBY_ATTRIBUTE)
+		{
+			//Process Generator attribute modifiedBy
+		}
+		else if (xmlAttributeName == PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE)
+		{
+			//Process Generator attribute modifiedOn
+		}
+	}
+}
+
+void ProjectConfiguration::ProcessProjectNode(xmlTextReaderPtr xmlReader)
 {
 	// MN, CN properties
 	boost::optional<string> nodeName;
@@ -592,7 +678,7 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	if ((!nodeName || nodeName.get().empty()) && nodeId.get() == MN_NODEID)
 		nodeName = "MN";
 	else if ((!nodeName || nodeName.get().empty()) && nodeId.get() != MN_NODEID)
-		nodeName = "CN_" + boost::lexical_cast<std::string>(nodeId.get());
+		nodeName = "CN_" + boost::lexical_cast<string>(nodeId.get());
 
 	// Create node
 	exceptionObj = NewProjectNode(nodeId.get(),
@@ -602,9 +688,57 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		throw exceptionObj;
 
+	//Set XDD / XDC paths
+	Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId.get());
+	NodeType type = (nodeId.get() == MN_NODEID) ? MN : CN;
+
+	node->SetXdcPath(xdcPath);
+	if (type == CN)
+	{
+		boost::filesystem::path path(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + xdcPath.filename().generic_string().substr(0, xdcPath.filename().generic_string().find_last_of("_")));
+		boost::filesystem::path xddPath = path.replace_extension("xdd");
+		boost::filesystem::path xdcPath = path.replace_extension("xdc");
+
+		if (boost::filesystem::exists(xddPath))
+		{
+			node->SetXddPath(xddPath);
+		}
+		else if (boost::filesystem::exists(xdcPath))
+		{
+			node->SetXddPath(xdcPath);
+		}
+		else
+		{
+			node->SetXddPath("");
+		}
+	}
+
+
+	else
+	{
+		boost::filesystem::path path(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + xdcPath.stem().generic_string());
+		boost::filesystem::path xddPath = path.replace_extension("xdd");
+		boost::filesystem::path xdcPath = path.replace_extension("xdc");
+
+		if (boost::filesystem::exists(xddPath))
+		{
+			node->SetXddPath(xddPath);
+		}
+		else if (boost::filesystem::exists(xdcPath))
+		{
+			node->SetXddPath(xdcPath);
+		}
+		else
+		{
+			node->SetXddPath("");
+		}
+	}
+
+
 	// Override node configuration for certain properties.
 	// Excluded: Bits in 0x1F81, NodeAssignment. Bits in 0x1F80, StartUp
 	Node& nodeObj = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(nodeId.get());
+
 	if (nodeId.get() == MN_NODEID)
 	{
 		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 2))
@@ -640,7 +774,7 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 		if (stationType == MULTIPLEXED)
 		{
 			nodeObj.SetForceCycleFlag(forcedMultiplexedCycle.get_value_or(0) != 0);
-			nodeObj.SetForcedCycle(boost::lexical_cast<std::string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
+			nodeObj.SetForcedCycle(boost::lexical_cast<string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
 		}
 		else
 		{
@@ -709,7 +843,7 @@ void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 			        && !xmlAttributeValue.empty()
 			        && xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE)
 			{
-				this->SetDefaultOutputPath(xmlAttributeValue);
+				this->SetDefaultOutputPath(boost::filesystem::path(xmlAttributeValue));
 			}
 		}
 	}
@@ -1007,8 +1141,8 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
         boost::optional<T>& projectConfigValue) const
 {
 	LOG_DEBUG()
-	        << std::hex
-	        << std::showbase
+	        << hex
+	        << showbase
 	        << "Overriding configuration for node " << node.GetNodeId()
 	        << ", index " << index << "/" << subIndex << ".";
 	boost::optional<T> currActualValue = node.GetActualValue<T>(index, subIndex);
@@ -1016,12 +1150,12 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 	{
 		// There is an actualValue for the index/subIndex, it
 		// overrides the project-config
-		std::string projectConfigValueStr = projectConfigValue
-		                                    ? boost::lexical_cast<std::string>(projectConfigValue.get())
-		                                    : "NULL";
+		string projectConfigValueStr = projectConfigValue
+		                               ? boost::lexical_cast<string>(projectConfigValue.get())
+		                               : "NULL";
 		LOG_DEBUG()
-		        << std::hex
-		        << std::showbase
+		        << hex
+		        << showbase
 		        << "Overwrote project-configuration value '"
 		        << projectConfigValueStr << "'"
 		        << " with actualValue '" << currActualValue.get() << "'.";
@@ -1034,12 +1168,12 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		if (projectConfigValue)
 		{
 			node.SetActualValue(index, subIndex, projectConfigValue.get());
-			std::string currActualValueStr = currActualValue
-			                                 ? boost::lexical_cast<std::string>(currActualValue.get())
-			                                 : "NULL";
+			string currActualValueStr = currActualValue
+			                            ? boost::lexical_cast<string>(currActualValue.get())
+			                            : "NULL";
 			LOG_DEBUG()
-			        << std::hex
-			        << std::showbase
+			        << hex
+			        << showbase
 			        << "Overwrote actualValue '" << currActualValueStr
 			        << "' of node with project-configuration value '"
 			        << projectConfigValue.get() << "'.";
@@ -1050,38 +1184,1222 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		}
 	}
 
-	/*
-	Index& indexRef = node.GetIndexCollection()->GetIndexRef(index);
-	SubIndex* subIndexPtr = indexRef.GetSubIndexPtr(subIndex);
-	const char* actualValue = (subIndexPtr == NULL)
-		? indexRef.GetActualValue()
-		: subIndexPtr->GetActualValue();
-	std::stringstream converter;
-	if (actualValue != NULL && strlen(actualValue) != 0)
-	{
-		// There is an actualValue for the index/subIndex, it
-		// overrides the project-config
-		string actualValueStr(actualValue);
-		if (boost::algorithm::starts_with(actualValueStr, "0x"))
-			converter << std::hex << actualValueStr.substr(2);
-		else
-			converter << std::boolalpha << actualValueStr;
-		T temporary;
-		converter >> temporary;
-		projectConfigValue = temporary;
-	}
-	else
-	{
-		// There is no actualValue, set the project-config value
-		// as actual value if there is a valid one
-		if (projectConfigValue)
+
+	/*	Index& indexRef = node.GetIndexCollection()->GetIndexRef(index);
+		SubIndex* subIndexPtr = indexRef.GetSubIndexPtr(subIndex);
+		const char* actualValue = (subIndexPtr == NULL)
+			? indexRef.GetActualValue()
+			: subIndexPtr->GetActualValue();
+		stringstream converter;
+		if (actualValue != NULL && strlen(actualValue) != 0)
 		{
-			converter << std::boolalpha << projectConfigValue.get();
-			if (subIndexPtr != NULL)
-				subIndexPtr->SetActualValue(converter.str().c_str());
+			// There is an actualValue for the index/subIndex, it
+			// overrides the project-config
+			string actualValueStr(actualValue);
+			if (boost::algorithm::starts_with(actualValueStr, "0x"))
+				converter << hex << actualValueStr.substr(2);
 			else
-				indexRef.SetActualValue(converter.str().c_str());
+				converter << boolalpha << actualValueStr;
+			T temporary;
+			converter >> temporary;
+			projectConfigValue = temporary;
+		}
+		else
+		{
+			// There is no actualValue, set the project-config value
+			// as actual value if there is a valid one
+			if (projectConfigValue)
+			{
+				converter << boolalpha << projectConfigValue.get();
+				if (subIndexPtr != NULL)
+					subIndexPtr->SetActualValue(converter.str().c_str());
+				else
+					indexRef.SetActualValue(converter.str().c_str());
+			}
+		}
+		*/
+}
+
+openCONFIGURATOR::Library::ErrorHandling::Result ProjectConfiguration::SaveProject(void)
+{
+	try
+	{
+		if (!IsAlreadySaved())
+		{
+			//Create project folder structure if not existing
+			CreateProjectFolder();
+		}
+		//Write or Update MN XDD/XDC files if existing
+		WriteMNProjectFiles();
+
+		//Write or Update CN XDD/XDC files if existing
+		WriteCNProjectFiles();
+
+		//If no project file exists create one
+		if (!IsAlreadySaved())
+		{
+			WriteProjectFile();
+			SetAlreadySaved(true);
+		}
+		else
+		{
+			//Update existing project file
+			UpdateProjectFile();
+		}
+
+		//Update XDCs indices with actual values
+		UpdateNodeConfigurations();
+
+		return Result();
+	}
+	catch (const Result& result)
+	{
+		return result;
+	}
+}
+
+void ProjectConfiguration::CreateProjectFolder(void)
+{
+	try
+	{
+		//Create project folder structure
+		boost::filesystem::path xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport");
+		boost::filesystem::path xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration");
+		if (ProjectConfiguration::GetInstance().GetDefaultOutputPath().empty())
+		{
+			ProjectConfiguration::GetInstance().SetDefaultOutputPath(boost::filesystem::path(GetProjectPath().generic_string() + PATH_SEPARATOR + "output"));
+		}
+		boost::filesystem::path output_dir(ProjectConfiguration::GetInstance().GetDefaultOutputPath());
+
+		boost::filesystem::create_directories(xdd_dir);
+		boost::filesystem::create_directories(xdc_dir);
+		boost::filesystem::create_directories(output_dir);
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteMNProjectFiles(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		if (nodeCollection->GetNodeRef(240).GetXdcPath().empty())
+		{
+			boost::filesystem::path original_mn_xdd_path = nodeCollection->GetNodeRef(240).GetXddPath();
+			//Create project folder and copy MN XDD
+			boost::filesystem::path xdd_mn_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + original_mn_xdd_path.filename().string());
+			boost::filesystem::path xdc_mn_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration" + PATH_SEPARATOR + original_mn_xdd_path.stem().string() + ".xdc");
+
+			boost::filesystem::copy_file(original_mn_xdd_path, xdd_mn_dir, boost::filesystem::copy_option::overwrite_if_exists);
+			boost::filesystem::copy_file(original_mn_xdd_path, xdc_mn_dir, boost::filesystem::copy_option::overwrite_if_exists);
+
+			nodeCollection->GetNodeRef(240).SetXddPath(xdd_mn_dir);
+			nodeCollection->GetNodeRef(240).SetXdcPath(xdc_mn_dir);
 		}
 	}
-	*/
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteCNProjectFiles(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		if (ProjectConfiguration::GetInstance().IsAlreadySaved())
+		{
+			boost::filesystem::path xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport");
+			boost::filesystem::path xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration");
+
+			boost::filesystem::directory_iterator end_iter;
+
+			list<boost::filesystem::path> xddPathVector;
+			list<boost::filesystem::path> xdcPathVector;
+
+			//list all existing files
+			if (exists(xdd_dir) && is_directory(xdd_dir))
+			{
+				for (boost::filesystem::directory_iterator dir_iter(xdd_dir) ; dir_iter != end_iter ; ++dir_iter)
+				{
+					if (boost::filesystem::is_regular_file(dir_iter->status()))
+					{
+						xddPathVector.push_back(*dir_iter);
+					}
+				}
+			}
+
+			if (exists(xdc_dir) && is_directory(xdc_dir))
+			{
+				for (boost::filesystem::directory_iterator dir_iter(xdc_dir) ; dir_iter != end_iter ; ++dir_iter)
+				{
+					if (boost::filesystem::is_regular_file(dir_iter->status()))
+					{
+						xdcPathVector.push_back(*dir_iter);
+					}
+				}
+			}
+
+			//Determine no longer needed files
+			for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+			{
+				Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+				bool deleteFlag = false;
+				list<boost::filesystem::path>::iterator toDelete;
+				for (list<boost::filesystem::path>::iterator it = xddPathVector.begin() ; it != xddPathVector.end(); ++it)
+				{
+					if (boost::filesystem::equivalent(nodeObj->GetXddPath(), *it))
+					{
+						toDelete = it;
+						deleteFlag = true;
+					}
+				}
+				if (deleteFlag)
+					xddPathVector.erase(toDelete);
+
+				deleteFlag = false;
+				for (list<boost::filesystem::path>::iterator it = xdcPathVector.begin() ; it != xdcPathVector.end(); ++it)
+				{
+					if (boost::filesystem::equivalent(nodeObj->GetXdcPath(), *it))
+					{
+						toDelete = it;
+						deleteFlag = true;
+					}
+				}
+				if (deleteFlag)
+					xdcPathVector.erase(toDelete);
+			}
+
+			//Delete no longer needed configuration files
+			for (list<boost::filesystem::path>::iterator it = xddPathVector.begin() ; it != xddPathVector.end(); ++it)
+			{
+				remove(*it);
+			}
+			for (list<boost::filesystem::path>::iterator it = xdcPathVector.begin() ; it != xdcPathVector.end(); ++it)
+			{
+				remove(*it);
+			}
+		}
+		//Copy CN xdc if not existing
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			if (nodeObj->GetNodeType() == CN && nodeObj->GetXdcPath().empty())
+			{
+				boost::filesystem::path original_xdd_file = nodeObj->GetXddPath();
+
+				boost::filesystem::path project_xdd_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceImport" + PATH_SEPARATOR + original_xdd_file.filename().string());
+				boost::filesystem::copy_file(original_xdd_file, project_xdd_dir, boost::filesystem::copy_option::overwrite_if_exists);
+				nodeObj->SetXddPath(project_xdd_dir);
+
+				stringstream nodeIdStream;
+				nodeIdStream << nodeObj->GetNodeId();
+				boost::filesystem::path project_xdc_dir(GetProjectPath().generic_string() + PATH_SEPARATOR + "deviceConfiguration" + PATH_SEPARATOR + original_xdd_file.stem().string() + "_" + nodeIdStream.str() + ".xdc");
+				boost::filesystem::copy_file(original_xdd_file, project_xdc_dir, boost::filesystem::copy_option::overwrite_if_exists);
+				nodeObj->SetXdcPath(project_xdc_dir);
+
+			}
+		}
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::WriteProjectFile(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		string projectPathStr = ProjectConfiguration::GetInstance().GetProjectPath().generic_string();
+
+		boost::filesystem::path mnXdcPath = nodeCollection->GetNodeRef(240).GetXdcPath();
+		boost::filesystem::path projectFilePath(projectPathStr + PATH_SEPARATOR + GetProjectFile());
+		string mnXdcPathString = "";
+		if (mnXdcPath.is_relative())
+			mnXdcPathString  = mnXdcPath.generic_string().substr(projectPathStr.size() + 1, mnXdcPath.generic_string().size());
+		else
+			mnXdcPathString  = mnXdcPath.generic_string();
+
+		//write of project file
+		xmlTextWriterPtr writer = xmlNewTextWriterFilename(projectFilePath.generic_string().c_str(), 0);
+		xmlTextWriterSetIndent(writer, 1);
+		xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_ROOT_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns", BAD_CAST "http://sourceforge.net/projects/openconf/configuration");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns:oc", BAD_CAST "http://sourceforge.net/projects/openconf/configuration");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xmlns:xsi", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "xsi:schemaLocation", BAD_CAST "http://sourceforge.net/projects/openconf/configuration openCONFIGURATOR.xsd");
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_GENERATOR_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str(), BAD_CAST "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str(), BAD_CAST "openCONFIGURATOR");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str(), BAD_CAST "1.4.0");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
+		xmlTextWriterEndElement(writer);
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "all");
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PROJECT_PATHSETTINGS_ELEMENT.c_str());
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
+
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().c_str());
+		xmlTextWriterEndElement(writer);
+
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "all");
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "none");
+		xmlTextWriterEndElement(writer);
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT.c_str());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0))
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(1006, 0).get().c_str());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8))
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7))
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9))
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NODE_COLLECTION_ELEMENT.c_str());
+		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_MANAGING_NODE_ELEMENT.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST "240");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetNodeName());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+
+		//if (nodeCollection->GetNodeRef(240).IsAsyncOnly())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsAsyncOnly().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).IsType1Router())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsType1Router().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).IsType2Router())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).IsType2Router().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).TransmitsPRes())
+		//{
+		//	string value = nodeCollection->GetNodeRef(240).TransmitsPRes().get()
+		//		? "true"
+		//		: "false";
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+		//}
+
+		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2))
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+
+		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3))
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+
+
+		xmlTextWriterEndElement(writer);
+
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			stringstream nodeIdStream;
+			nodeIdStream << nodeObj->GetNodeId();
+
+			if (nodeObj->GetNodeType() == CN)
+			{
+				boost::filesystem::path cnXdcPath = nodeObj->GetXdcPath();
+				string cnXdcPathString = "";
+				if (cnXdcPath.is_relative())
+					cnXdcPathString  = cnXdcPath.generic_string().substr(projectPathStr.size() + 1, cnXdcPath.generic_string().size());
+				else
+					cnXdcPathString  = cnXdcPath.generic_string();
+
+				xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_CONTROLLED_NODE_ELEMENT.c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST  nodeIdStream.str().c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+				if (nodeObj->GetStationType() == CHAINED)
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+				if (nodeObj->GetStationType() == MULTIPLEXED)
+				{
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+					if (nodeObj->GetForceCycleFlag())
+						xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetForcedCycleValue());
+				}
+
+				//if (nodeObj->IsAsyncOnly())
+				//{
+				//	string value = nodeObj->IsAsyncOnly().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsType1Router())
+				//{
+				//	string value = nodeObj->IsType1Router().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsType2Router())
+				//{
+				//	string value = nodeObj->IsType2Router().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->IsMandatory())
+				//{
+				//	string value = nodeObj->IsMandatory().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetAutostartNode())
+				//{
+				//	string value = nodeObj->GetAutostartNode().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetResetInOperational())
+				//{
+				//	string value = nodeObj->GetResetInOperational().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyAppSwVersion())
+				//{
+				//	string value = nodeObj->GetVerifyAppSwVersion().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetAutoAppSwUpdateAllowed())
+				//{
+				//	string value = nodeObj->GetAutoAppSwUpdateAllowed().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyDeviceType())
+				//{
+				//	string value = nodeObj->GetVerifyDeviceType().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyVendorId())
+				//{
+				//	string value = nodeObj->GetVerifyVendorId().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyRevisionNumber())
+				//{
+				//	string value = nodeObj->GetVerifyRevisionNumber().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifyProductCode())
+				//{
+				//	string value = nodeObj->GetVerifyProductCode().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				//if (nodeObj->GetVerifySerialNumber())
+				//{
+				//	string value = nodeObj->GetVerifySerialNumber().get()
+				//		? "true"
+				//		: "false";
+				//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+				//}
+
+				xmlTextWriterEndElement(writer);
+			}
+		}
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterEndElement(writer);
+		xmlTextWriterEndDocument(writer);
+
+		//free memory used by libxml2
+		xmlFreeTextWriter(writer);
+		xmlCleanupParser();
+		xmlMemoryDump();
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::UpdateProjectFile(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		string projectPathStr = ProjectConfiguration::GetInstance().GetProjectPath().generic_string();
+		boost::filesystem::path projectFilePath(projectPathStr + PATH_SEPARATOR + GetProjectFile());
+		boost::filesystem::path mnXdcPath = nodeCollection->GetNodeRef(240).GetXdcPath();
+		string mnXdcPathString = "";
+		if (mnXdcPath.is_relative())
+			mnXdcPathString  = mnXdcPath.generic_string().substr(projectPathStr.size() + 1, mnXdcPath.generic_string().size());
+		else
+			mnXdcPathString  = mnXdcPath.generic_string();
+
+		xmlDocPtr pDoc = xmlParseFile(projectFilePath.generic_string().c_str());
+		if (pDoc == NULL)
+		{
+			boost::format formatter(kMsgFileReadFailed);
+			formatter % projectFilePath.generic_string();
+			LOG_FATAL() << formatter.str();
+			xmlCleanupParser();
+			xmlMemoryDump();
+			throw Result(FILE_READ_FAILED, formatter.str());
+		}
+		//update Generator section
+		string xpathGenerator = "//co:Generator";
+		xmlXPathObjectPtr pResultingXPathObject = GetNodeSet(pDoc, xpathGenerator.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+				xmlNodePtr pGeneratorNode(pNodeSet->nodeTab[i]);
+
+				//Update vendor attribute
+				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str(), BAD_CAST "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
+				}
+				else
+				{
+					xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str(), BAD_CAST "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
+				}
+
+				//Update toolName attribute
+				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str(), BAD_CAST "openCONFIGURATOR");
+				}
+				else
+				{
+					xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str(), BAD_CAST "openCONFIGURATOR");
+				}
+
+				//Update toolVersion attribute
+				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str(), BAD_CAST "1.4.0");
+				}
+				else
+				{
+					xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str(), BAD_CAST "1.4.0");
+				}
+
+				//Update createdOn attribute
+				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
+				}
+				else
+				{
+					xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
+				}
+
+				//Update modifiedOn attribute
+				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
+				}
+				else
+				{
+					xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
+				}
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+
+		string xpathPath = "//co:Path[@id='defaultOutputPath']";
+		pResultingXPathObject = GetNodeSet(pDoc, xpathPath.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+				xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+
+				//Update path attribute
+				if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				}
+				else
+				{
+					xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				}
+
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+
+		if (GetGenerateMNOBD())
+		{
+			string xpathPath = "//co:ProjectConfiguration";
+			pResultingXPathObject = GetNodeSet(pDoc, xpathPath.c_str());
+			if (pResultingXPathObject)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+
+					//Update path attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "all");
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "all");
+					}
+
+				}
+			}
+			xmlXPathFreeObject(pResultingXPathObject);
+		}
+		else
+		{
+			string xpathPath = "//co:ProjectConfiguration";
+			pResultingXPathObject = GetNodeSet(pDoc, xpathPath.c_str());
+			if (pResultingXPathObject)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+
+					//Update path attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "none");
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "none");
+					}
+
+				}
+			}
+			xmlXPathFreeObject(pResultingXPathObject);
+		}
+
+		string xpathNetworkConfiguration = "//co:NetworkConfiguration";
+		pResultingXPathObject = GetNodeSet(pDoc, xpathNetworkConfiguration.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+				xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+
+
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0))
+				{
+					//Update cycle time attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0).get().c_str());
+					}
+				}
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8))
+				{
+					//Update async mtu attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+					}
+				}
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7))
+				{
+					//Update multiplexed cycle length attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+					}
+				}
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9))
+				{
+					//Update prescaler attribute
+					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+					}
+				}
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+
+		string xpathMn = "//co:MN[@nodeID='240']";
+		pResultingXPathObject = GetNodeSet(pDoc, xpathMn.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+				xmlNodePtr pMNNode(pNodeSet->nodeTab[i]);
+
+				//Update name attribute
+				if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetNodeName());
+				}
+				else
+				{
+					xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetNodeName());
+				}
+
+				//Update pathToXDC attribute
+				if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str()))
+				{
+					xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+				}
+				else
+				{
+					xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+				}
+
+				/*if (nodeCollection->GetNodeRef(240).IsAsyncOnly())
+				{
+					string value = nodeCollection->GetNodeRef(240).IsAsyncOnly().get()
+						? "true"
+						: "false";
+					//Update isAsyncOnly attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+				}
+
+				if (nodeCollection->GetNodeRef(240).IsType1Router())
+				{
+					string value = nodeCollection->GetNodeRef(240).IsType1Router().get()
+						? "true"
+						: "false";
+
+					//Update isType1Router attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+				}
+
+				if (nodeCollection->GetNodeRef(240).IsType2Router())
+				{
+					string value = nodeCollection->GetNodeRef(240).IsType2Router().get()
+						? "true"
+						: "false";
+
+					//Update isType2Router attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+				}
+
+				if (nodeCollection->GetNodeRef(240).TransmitsPRes())
+				{
+					string value = nodeCollection->GetNodeRef(240).TransmitsPRes().get()
+						? "true"
+						: "false";
+					//Update transmitPRes attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE.c_str(), BAD_CAST value.c_str());
+					}
+				}
+
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2))
+				{
+					//Update asyncSlotTimeout attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+					}
+
+				}
+				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3))
+				{
+					//Update asndMaxNumber attribute
+					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str()))
+					{
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+					}
+					else
+					{
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+					}
+				}*/
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+		//Traverses all node indices
+
+		//delete no longer existing CNs
+		string xpathCnToDelete = "//co:CN";
+		pResultingXPathObject = GetNodeSet(pDoc, xpathCnToDelete.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+				xmlNodePtr pCNNode(pNodeSet->nodeTab[i]);
+				const xmlChar* nodeID = xmlGetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str());
+				INT32 existingNode = atoi((const char*) nodeID);
+				bool exists = false;
+				Result res = IsExistingNode(existingNode, exists);
+				if (res.IsSuccessful() && exists == false)
+				{
+					xmlUnlinkNode(pCNNode);
+					xmlFreeNode(pCNNode);
+				}
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+
+		//update CN configs
+		string xpathCn = "//co:CN";
+		pResultingXPathObject = GetNodeSet(pDoc, xpathCn.c_str());
+		if (pResultingXPathObject)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			for (INT32 j = 0; j < nodeCollection->GetNumberOfNodes(); j++)
+			{
+				Node* nodeObj = nodeCollection->GetNodebyColIndex(j);
+				if (nodeObj->GetNodeType() == CN)
+				{
+					boost::filesystem::path cnXdcPath = nodeObj->GetXdcPath();
+					string cnXdcPathString = "";
+					if (cnXdcPath.is_relative())
+						cnXdcPathString  = cnXdcPath.generic_string().substr(projectPathStr.size() + 1, cnXdcPath.generic_string().size());
+					else
+						cnXdcPathString  = cnXdcPath.generic_string();
+					bool exists = false;
+
+
+					for (int i = 0; i < pNodeSet->nodeNr; ++i)
+					{
+						xmlNodePtr pCNNode(pNodeSet->nodeTab[i]);
+						const xmlChar* nodeID = xmlGetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str());
+						INT32 existingNode = atoi((const char*) nodeID);
+
+						if (existingNode == nodeObj->GetNodeId())
+						{
+							//Update name attribute
+							if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str()))
+							{
+								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+							}
+							else
+							{
+								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+							}
+
+							//Update pathToXDC attribute
+							if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str()))
+							{
+								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+							}
+							else
+							{
+								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+							}
+
+							//TODO Add missing node parameter if used lateron
+							exists = true;
+						}
+					}
+					if (!exists)
+					{
+						stringstream nodeIdStream;
+						nodeIdStream << nodeObj->GetNodeId();
+
+						xmlNodePtr newNode = xmlNewNode(0, BAD_CAST "CN");
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST nodeIdStream.str().c_str());
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+						if (nodeObj->GetStationType() == CHAINED)
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+						if (nodeObj->GetStationType() == MULTIPLEXED)
+						{
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+							if (nodeObj->GetForceCycleFlag())
+								xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetForcedCycleValue());
+						}
+						/*if (nodeObj->IsAsyncOnly())
+						{
+							string value = nodeObj->IsAsyncOnly().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISASYNCONLY_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->IsType1Router())
+						{
+							string value = nodeObj->IsType1Router().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE1ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->IsType2Router())
+						{
+							string value = nodeObj->IsType2Router().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->IsMandatory())
+						{
+							string value = nodeObj->IsMandatory().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetAutostartNode())
+						{
+							string value = nodeObj->GetAutostartNode().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetResetInOperational())
+						{
+							string value = nodeObj->GetResetInOperational().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifyAppSwVersion())
+						{
+							string value = nodeObj->GetVerifyAppSwVersion().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetAutoAppSwUpdateAllowed())
+						{
+							string value = nodeObj->GetAutoAppSwUpdateAllowed().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifyDeviceType())
+						{
+							string value = nodeObj->GetVerifyDeviceType().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifyVendorId())
+						{
+							string value = nodeObj->GetVerifyVendorId().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifyRevisionNumber())
+						{
+							string value = nodeObj->GetVerifyRevisionNumber().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifyProductCode())
+						{
+							string value = nodeObj->GetVerifyProductCode().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}
+
+						if (nodeObj->GetVerifySerialNumber())
+						{
+							string value = nodeObj->GetVerifySerialNumber().get()
+								? "true"
+								: "false";
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISTYPE2ROUTER_ATTRIBUTE.c_str(), BAD_CASTBAD_CAST value.c_str());
+						}*/
+
+						xmlAddChild(pNodeSet->nodeTab[0]->parent, newNode);
+					}
+				}
+			}
+		}
+		xmlXPathFreeObject(pResultingXPathObject);
+
+		//Save the project file
+		xmlSaveFormatFileEnc(projectFilePath.generic_string().c_str(), pDoc, "UTF-8", 1);
+		xmlFreeDoc(pDoc);
+		xmlCleanupParser();
+		xmlMemoryDump();
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+void ProjectConfiguration::UpdateNodeConfigurations(void)
+{
+	try
+	{
+		NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+		{
+			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			//Load the nodes XDC file
+			xmlDocPtr pDoc = xmlParseFile(nodeObj->GetXdcPath().generic_string().c_str());
+			if (pDoc == NULL)
+			{
+				boost::format formatter(kMsgFileReadFailed);
+				formatter % nodeObj->GetXdcPath().generic_string();
+				LOG_FATAL() << formatter.str();
+				xmlCleanupParser();
+				xmlMemoryDump();
+				throw Result(FILE_READ_FAILED, formatter.str());
+			}
+			//Traverses all node indices
+			IndexCollection* indexColl = nodeObj->GetIndexCollection();
+			for (unsigned int i = 0; i < indexColl->Size(); i++)
+			{
+				Index* index = indexColl->GetIndexByPosition(i);
+				if (IsDefaultActualNotEqual(index) && index->GetActualValue() != NULL)
+				{
+					//Select all the user nodes
+					string xpath = "//plk:Object[@index='";
+					xpath.append(index->GetIndexValue());
+					xpath.append("']");
+
+					xmlXPathObjectPtr pResultingXPathObject(GetNodeSet(pDoc, xpath.c_str()));
+					if (pResultingXPathObject)
+					{
+						xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+						for (int i = 0; i < pNodeSet->nodeNr; ++i)
+						{
+							xmlNodePtr pIndexNode(pNodeSet->nodeTab[i]);
+
+							if (xmlHasProp(pIndexNode, BAD_CAST "actualValue"))
+							{
+								xmlChar* attribute = xmlGetProp(pIndexNode, BAD_CAST "actualValue");
+
+								if (xmlStrEqual(attribute, BAD_CAST index->GetActualValue()) == 0)
+								{
+									xmlSetProp(pIndexNode, BAD_CAST "actualValue", BAD_CAST index->GetActualValue());
+									LOG_INFO() << "Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " ActualValue: " << index->GetActualValue() << endl;
+								}
+							}
+							else
+							{
+								xmlNewProp(pIndexNode, BAD_CAST "actualValue", BAD_CAST index->GetActualValue());
+								LOG_INFO() << "Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " ActualValue: " << index->GetActualValue() << endl;
+							}
+						}
+					}
+					else
+					{
+						cout << "WARNING: Object(0x" << index->GetIndexValue() << " (" << index->GetActualValue() << ")" << ") on Node(" << nodeObj->GetNodeId() << ")" << " was generated and cannot be stored in the node XDC file." << endl;
+					}
+					xmlXPathFreeObject(pResultingXPathObject);
+				}
+				if (index->HasSubIndices())
+				{			
+					for (int j = 0; j < index->GetNumberofSubIndexes(); j++)
+					{
+						SubIndex* subIndex = index->GetSubIndexByPosition(j);
+						if (IsDefaultActualNotEqual(subIndex) && subIndex->GetActualValue() != NULL)
+						{
+							//Correct the number of entries if not sufficient indices available
+							if(j == 0)
+							{
+								//Get nr of subindices in the xdc file
+								string xpath = "//plk:Object[@index='";
+								xpath.append(index->GetIndexValue());
+								xpath.append("']");
+								xpath.append("/plk:SubObject");
+								xmlXPathObjectPtr pResultingXPathObject(GetNodeSet(pDoc, xpath.c_str()));
+								if (pResultingXPathObject)
+								{
+									xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+									if (pNodeSet->nodeNr < boost::lexical_cast<int>(subIndex->GetActualValue()) + 1)
+									{
+										string correctNrOfEntries = boost::lexical_cast<string>((pNodeSet->nodeNr) - 1);
+										subIndex->SetActualValue(correctNrOfEntries.c_str());
+									}
+								}
+								xmlXPathFreeObject(pResultingXPathObject);
+							}
+							//alter subindex actual value in xdc
+							//Select all the user nodes
+							string xpath = "//plk:Object[@index='";
+							xpath.append(index->GetIndexValue());
+							xpath.append("']");
+							xpath.append("/plk:SubObject[@subIndex='");
+							xpath.append(subIndex->GetIndexValue());
+							xpath.append("']");
+
+							xmlXPathObjectPtr pResultingXPathObject(GetNodeSet(pDoc, xpath.c_str()));
+							if (pResultingXPathObject)
+							{
+								xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+								for (int i = 0; i < pNodeSet->nodeNr; ++i)
+								{
+									xmlNodePtr pSubIndexNode(pNodeSet->nodeTab[i]);
+
+									if (xmlHasProp(pSubIndexNode, BAD_CAST "actualValue"))
+									{
+										xmlChar* attribute = xmlGetProp(pSubIndexNode, BAD_CAST "actualValue");
+
+										if (xmlStrEqual(attribute, BAD_CAST subIndex->GetActualValue()) == 0)
+										{
+											xmlSetProp(pSubIndexNode, BAD_CAST "actualValue", BAD_CAST subIndex->GetActualValue());
+											LOG_INFO() << "Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " Subindex: " << subIndex->GetIndexValue() << " ActualValue: " << subIndex->GetActualValue() << endl;
+										}
+									}
+									else
+									{
+										xmlNewProp(pSubIndexNode, BAD_CAST "actualValue", BAD_CAST subIndex->GetActualValue());
+										LOG_INFO() << " Save Node: " << nodeObj->GetNodeId() << " Index: " << index->GetIndexValue() << " Subindex: " << subIndex->GetIndexValue() << " ActualValue: " << subIndex->GetActualValue() << endl;
+									}
+								}
+							}
+							else
+							{
+								cout << "WARNING: Object(0x" << index->GetIndexValue() << "/0x" << subIndex->GetIndexValue() << " (" << subIndex->GetActualValue() << ")" << ") on Node(" << nodeObj->GetNodeId() << ")" << " was generated and cannot be stored in the node XDC file." << endl;
+							}
+							xmlXPathFreeObject(pResultingXPathObject);
+						}
+					}
+				}
+			}
+			//Save the nodes XDC file
+			xmlSaveFormatFileEnc(nodeObj->GetXdcPath().generic_string().c_str(), pDoc, "UTF-8", 1);
+			xmlFreeDoc(pDoc);
+			xmlCleanupParser();
+			xmlMemoryDump();
+		}
+	}
+	catch (exception& ex)
+	{
+		throw Result(UNHANDLED_EXCEPTION, ex.what());
+	}
+}
+
+const xmlXPathObjectPtr ProjectConfiguration::GetNodeSet(const xmlDocPtr doc, const char* xpath)
+{
+	xmlXPathContextPtr context = xmlXPathNewContext(doc);
+	if (context == NULL)
+		return NULL;
+
+	//add namespaces to the xpath expression
+	if (xmlXPathRegisterNs(context,  BAD_CAST "plk", BAD_CAST "http://www.ethernet-powerlink.org") != 0)
+		return NULL;
+
+	if (xmlXPathRegisterNs(context,  BAD_CAST "co", BAD_CAST "http://sourceforge.net/projects/openconf/configuration") != 0)
+		return NULL;
+
+	//evaluate xpath expression
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST xpath, context);
+	xmlXPathFreeContext(context);
+	if (result == NULL)
+		return NULL;
+
+	//no nodes found by the xpath expression
+	if (xmlXPathNodeSetIsEmpty(result->nodesetval))
+	{
+		xmlXPathFreeObject(result);
+		return NULL;
+	}
+
+	return result;
 }
