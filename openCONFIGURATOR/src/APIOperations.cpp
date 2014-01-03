@@ -1248,10 +1248,9 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, const char* indexId)
 						indexObj.AddSubIndex(*objSIdx);
 					}
 				}
-				char *newIndexName = new char[50];
 				char indexSubStr[INDEX_LEN];
 				SubString((char*) indexSubStr, (const char*) indexId, 2, 4);
-				newIndexName = dictObj->GetIndexName((char*)indexSubStr, (char*) indexObj.GetName());
+				char* newIndexName = dictObj->GetIndexName((char*)indexSubStr, (char*) indexObj.GetName());
 				if( newIndexName != NULL)
 				{
 					indexObj.SetName(newIndexName);
@@ -2650,9 +2649,6 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 		return;
 	}
 
-	char *subIndexId = new char[SUBINDEX_LEN];
-	strcpy(subIndexId, (char*) "F0");
-
 	indexCollObj = nodeObj->GetIndexCollection();
 	if (indexCollObj->GetNumberofIndexes() == 0)
 	{
@@ -2676,13 +2672,14 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 	}
 	else
 	{
-		SubIndex *sidxObj = indexObj->GetSubIndexbyIndexValue(subIndexId);
+		string subIndexId = "F0";
+		SubIndex *sidxObj = indexObj->GetSubIndexbyIndexValue(subIndexId.c_str());
 		if (!sidxObj)
 		{
 			boost::format formatter(kMsgNonExistingSubIndex);
 			formatter 
 				% indexObj->GetIndex()
-				% HexToInt<UINT32>(string(subIndexId)) 
+				% HexToInt<UINT32>(subIndexId) 
 				% nodeId;
 			exceptionObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 			exceptionObj.setErrorString(formatter.str());
@@ -2724,7 +2721,6 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 			}
 		}
 	}
-	delete[] subIndexId;
 }
 
 void UpdatePreqActLoad(Node* nodeObj)
@@ -11818,9 +11814,13 @@ ocfmRetCode CheckMutliplexAssigned()
 							SubString(tempForcedVal, (const char*) forcedCycleValue, 2, strlen(forcedCycleValue) - 2);
 							actualValueCN = (INT32) HexToInt(tempForcedVal);
 							delete[] tempForcedVal;
+							delete[] forcedCycleValue;
 						}
 						else
+						{
 							actualValueCN = atoi(forcedCycleValue);
+							delete[] forcedCycleValue;
+						}
 
 						if (actualValueCN <= tempActualValue)
 						{

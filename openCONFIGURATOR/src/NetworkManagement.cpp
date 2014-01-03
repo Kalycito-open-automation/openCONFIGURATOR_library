@@ -57,6 +57,11 @@
 #include "../Include/NetworkManagement.h"
 #include "../Include/Internal.h"
 #include "../Include/Logging.h"
+#include "../Include/BoostShared.h"
+
+#include <string>
+
+using namespace std;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -139,23 +144,25 @@ INT32 NetworkManagement::GetMaxPDOCount()
 
 void NetworkManagement::CalculateMaxPDOCount()
 {
-	char* tpdoChannelValue = new char[5];
-	char* featureName = new char[20];
-	maxPDOCount = 0;		
-	ocfmRetCode ex;
-
-	strcpy(featureName, "PDOTPDOChannels");
-	strcpy(tpdoChannelValue,
-		GetNwMgmtFeatureValue(MN_FEATURES, featureName));
-	maxPDOCount = atoi((char*) tpdoChannelValue);
+	string featureName = "PDOTPDOChannels";
+	string featureValue = GetNwMgmtFeatureValue(MN_FEATURES, featureName.c_str());
+	
+	// PDOTPDOChannels is optional in an XDD. If it does not exist, the above function
+	// will return an empty string.
+	// The previous version of this function used atoi() to convert featureValue into maxPDOCount,
+	// atoi() returns value 0 for empty strings.
+	// To avoid side-effects, this behaviour will be kept, although PDOTPDOChannels has a default value
+	// of 256 if it is not present in an XDD.
+	
+	this->maxPDOCount = (featureValue.empty())
+		? 0
+		: boost::lexical_cast<INT32>(featureValue);
 	//check is made for validating the value in MN xdd
 	//Min value = 0; Maxvalue = 256 (EPSG specification)
-	if (maxPDOCount > 256)
+	if (this->maxPDOCount > 256)
 	{
-		ex.setErrorCode(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
+		ocfmRetCode ex(OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS);
 		LOG_FATAL() << ex.getErrorString();
 		throw ex;
 	}
-	delete[] tpdoChannelValue;
-	delete[] featureName;
 }
