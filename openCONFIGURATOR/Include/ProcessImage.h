@@ -79,7 +79,8 @@ typedef enum PIDirectionType
  */
 typedef enum PDODataType
 {
-	UNSIGNED8 = 0,	/**< Unsigned8 */
+	UNDEF = -1,
+	UNSIGNED8,	/**< Unsigned8 */
 	INTEGER8,		/**< Integer8 */
 	UNSIGNED16,		/**< Unsigned16 */
 	INTEGER16,		/**< Integer16 */
@@ -276,19 +277,17 @@ PIDataInfo* GetIECDT(const char* iecDataType, INT32 dataSize);
  \brief		This function shall compute and return the INPUT offset for the process image variables
 
  \param		dataSize		Integer to hold the data size
- \param		pdoType		Enum of type PDOType to hold PDO type
  \return	INT32
  */
-INT32 ComputeINOffset(INT32 dataSize, PDOType pdoType);
+INT32 ComputeINOffset(INT32 dataSize);
 
 /**
  \brief		This function shall compute and return the OUTPUT offset for the process image variables
 
  \param		dataSize		Integer to hold the data size
- \param		pdoType		Enum of type PDOType to hold PDO type
  \return	INT32
  */
-INT32 ComputeOUTOffset(INT32 dataSize, PDOType pdoType);
+INT32 ComputeOUTOffset(INT32 dataSize);
 
 
 /**
@@ -428,10 +427,9 @@ void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char*
  \param		piObject		Class variable of ProcessImage
  \param		noOfVars        Integer to hold the value of number of variables to be written to header
  \param		dirType         Enum variable of PIDirectionType
- \param		netHeader       File pointer to the header
  \return	INT32	
  */
-INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader);
+INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType);
 
 /**
  \brief		This function shall be used to return the Datatype string corresponding to the given IEC_Dataype

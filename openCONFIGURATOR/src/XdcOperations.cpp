@@ -982,7 +982,7 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	return exceptionObject;
 }
 
-void HandleSchemaValidationError(void *ctx, const char *msg, ...)
+void HandleSchemaValidationError(void*, const char *msg, ...)
 {
 	va_list args;
 	va_start(args, msg);

@@ -459,7 +459,7 @@ void LoadObjectDictionary(const char* xmlFilePath);
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
-ocfmRetCode SaveProject(const char* projectPath, const char* projectName);
+//ocfmRetCode SaveProject(const char* projectPath, const char* projectName);
 
 /**
  \brief		This API shall be used to open a previously saved openCONFIGURATOR project

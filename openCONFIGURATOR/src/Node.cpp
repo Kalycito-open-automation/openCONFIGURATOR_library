@@ -408,7 +408,7 @@ ocfmRetCode Node::SetForcedCycle(const char* tempForcedCycleVal)
 	idxObj1 = GetMNIndexValues(indexId);
 	if (NULL != idxObj1)
 	{
-		//UpdateNumberOfEnteriesSIdx(objMN1F92Index, MN);
+		//UpdateNumberOfEnteriesSIdx(objMN1F92Index);
 		idxObj1->SetFlagIfIncludedCdc(true);
 		if (NULL != idxObj1->GetSubIndexbyIndexValue((char*) "00"))
 		{
@@ -499,7 +499,7 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 	idxObj = GetMNIndexValues(indexId);
 	if (NULL != idxObj)
 	{
-		UpdateNumberOfEnteriesSIdx(idxObj, MN);
+		UpdateNumberOfEnteriesSIdx(idxObj);
 		idxObj->SetFlagIfIncludedCdc(true);
 	}
 

@@ -481,7 +481,6 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	ocfmRetCode exceptionObj;
 	char *varCommIdx = new char[INDEX_LEN];
 	//char customError[200] = { 0 };
-	ostringstream errorString;
 
 	if (pdoTypeVar == PDO_TPDO)
 	{
@@ -742,8 +741,8 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj)
 	}
 	return retVal;
 }
-//TODO: Remove indexObj - unused
-bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidxObj)
+
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, SubIndex* sidxObj)
 {
 	bool retVal = false;
 	if (strcmp(sidxObj->GetPDOMapping(), "NO") == 0)

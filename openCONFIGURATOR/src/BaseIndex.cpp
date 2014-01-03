@@ -492,7 +492,6 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 	}
 
 	bool retFlag = true;
-	ostringstream errorString;
 	ocfmRetCode objException;
 
 	if (0 == strcmp(hexValue, ""))
