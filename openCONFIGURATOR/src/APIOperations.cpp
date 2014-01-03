@@ -5893,7 +5893,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										formatter % indexObj.GetIndex()
 											% sidxObj->GetIndex()
 											% moduleIndexObj->GetIndex()
-											% moduleSidxObj->GetIndex()
+											% HexToInt<UINT32>(string(varSubIndex))
 											% nodeObj->GetNodeId();
 										exceptionObj.setErrorCode(OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND);
 										exceptionObj.setErrorString(formatter.str());
