@@ -1643,7 +1643,7 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 				|| (RECORD == indexObj->GetEObjectType()))
 		{
 			//delete the subobject 00 and then add and updates the number of entries
-			errCodeObj = DeleteSubIndex(nodeId, nodeType, indexId, (char*)"00");
+			DeleteSubIndex(nodeId, nodeType, indexId, (char*)"00");
 			errCodeObj = AddSubobject(nodeId, nodeType, indexId);
 			UpdateNumberOfEnteriesSIdx(indexObj, nodeType);
 		}
@@ -2205,8 +2205,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					}
 					else
 					{
-						char actValue[64];
-						actValue[0] = '\0';
+						char actValue[64] = { 0 };
 
 						if (true == isStringDt)
 						{
@@ -2778,10 +2777,8 @@ void UpdatePreqActLoad(Node* nodeObj)
 		sidxObj = indexObj->GetSubIndexbyIndexValue(subIndexId);
 		if (NULL != sidxObj)
 		{
-			char conValue[20];
-			memset(conValue, 0, 20 * sizeof(char));
-			char actValue[22];
-			memset(actValue, 0, 22 * sizeof(char));
+			char conValue[20] = { 0 };
+			char actValue[22] = { 0 };
 
 			if (PREQ_DEFAULT_PAYLOAD > nodeObj->GetPReqActPayloadValue())
 			{
@@ -2850,8 +2847,8 @@ void UpdatePresActLoad(Node* nodeObj)
 	INT32 indexPos = 0;
 	INT32 subIndexPos = 0;
 	INT32 nodeId = 0;
-	char conValue[20];
-	char actValue[22];
+	char conValue[20] = { 0 };
+	char actValue[22] = { 0 };
 	char* subIndexId = NULL;
 	NodeType nodeType;
 
@@ -2865,8 +2862,6 @@ void UpdatePresActLoad(Node* nodeObj)
 		throw exceptionObj;
 	}
 
-	memset(conValue, 0, 20 * sizeof(char));
-	memset(actValue, 0, 22 * sizeof(char));
 	nodeId = nodeObj->GetNodeId();
 	nodeType = nodeObj->GetNodeType();
 	subIndexId = new char[SUBINDEX_LEN];
@@ -3354,8 +3349,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 
 				strcat(cdcBuffer, "\t");
 
-				char actValue[64];
-				actValue[0] = '\0';
+				char actValue[64] = { 0 };
 				if (isStringDT)
 				{
 					strcpy(actValue, (char*) indexObj->GetActualValue());
@@ -3402,10 +3396,9 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 		bool idxAdded = false;
 		bool resetValueAdded = false;
 		bool noOfEnteriesAdded = false;
-		bool mappingPDO = false;
 		SubIndex* sidxObj = NULL;
 
-		mappingPDO = CheckIfMappingPDO((char*) indexObj->GetIndexValue());
+		bool mappingPDO = CheckIfMappingPDO((char*) indexObj->GetIndexValue());
 		noOfTotalSubIndexes = indexObj->GetNumberofSubIndexes();
 		sidxObj = indexObj->GetSubIndexbyIndexValue((char*) "00");
 		if (sidxObj != NULL)
@@ -3454,11 +3447,9 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 		LOG_DEBUG() << "No. of subIndices " << noOfSubIndexes << ".";
 		for (INT32 sidxLC = 0; sidxLC < noOfSubIndexes; sidxLC++)
 		{
-			bool includeAccess = false;
-
 			sidxObj = indexObj->GetSubIndexByPosition(sidxLC);
 			LOG_DEBUG() << "Processing index 0x" << indexObj->GetIndexValue() << "/0x" << sidxObj->GetIndexValue() << ".";
-			includeAccess = CheckAccessTypeForInclude(
+			bool includeAccess = CheckAccessTypeForInclude(
 					(char*) sidxObj->GetAccessType());
 
 			if ((sidxObj->GetActualValue() != NULL)
@@ -3551,8 +3542,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 				}
 				else
 				{
-					char actValue[64];
-					actValue[0] = '\0';
+					char actValue[64] = { 0 };
 					if (isStringDT)
 					{
 						strcpy(actValue, (char*) sidxObj->GetActualValue());
@@ -3666,8 +3656,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 
 				strcat(cdcBuffer, "\t");
 
-				char actValue[64];
-				actValue[0] = '\0';
+				char actValue[64] = { 0 };
 				if (isStringDT)
 				{
 					strcpy(actValue, (char*) indexObj->GetActualValue());
@@ -3714,11 +3703,10 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 		bool idxAdded = false;
 		bool resetValueAdded = false;
 		bool noOfEnteriesAdded = false;
-		bool mappingPDO = false;
 		SubIndex* sidxObj = NULL;
 		char tempNodeid[10];
 
-		mappingPDO = CheckIfMappingPDO((char*) indexObj->GetIndexValue());
+		bool mappingPDO = CheckIfMappingPDO((char*) indexObj->GetIndexValue());
 		noOfTotalSubIndexes = indexObj->GetNumberofSubIndexes();
 		sidxObj = indexObj->GetSubIndexbyIndexValue((char*) "00");
 		if (sidxObj != NULL)
@@ -3773,10 +3761,9 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 		LOG_DEBUG() << "No. of subIndices: " << noOfTotalSubIndexes << ".";
 		for (INT32 sidxLC = 0; sidxLC < noOfTotalSubIndexes; sidxLC++)
 		{
-			bool includeAccess = false;
 			sidxObj = indexObj->GetSubIndexByPosition(sidxLC);
 			LOG_DEBUG() << "Processing index 0x" << indexObj->GetIndexValue() << "/0x" << sidxObj->GetIndexValue() << ".";
-			includeAccess = CheckAccessTypeForInclude(
+			bool includeAccess = CheckAccessTypeForInclude(
 					(char*) sidxObj->GetAccessType());
 
 			if ((sidxObj->GetActualValue() != NULL)
@@ -3883,8 +3870,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				}
 				else
 				{
-					char actValue[64];
-					actValue[0] = '\0';
+					char actValue[64] = { 0 };
 					if (isStringDT)
 					{
 						strcpy(actValue, (char*) sidxObj->GetActualValue());
@@ -4130,10 +4116,8 @@ void WriteCNsData(char* fileName)
 			UpdateCNVisibleNode(&nodeObj);
 			UpdateCNPresMNActLoad(&nodeObj);
 
-			cdcBuffer3 = new char[30000];
-			cdcBuffer2 = new char[60000];
-			strcpy(cdcBuffer2, "");
-			strcpy(cdcBuffer3, "");
+			cdcBuffer3 = new char[30000]();
+			cdcBuffer2 = new char[60000]();
 
 			char* noOfEnteries = new char[10];
 			//workaround for B&R Bus Controller stack
@@ -4656,9 +4640,7 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 		}
 		delete[] Buffer1;
 
-		Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())];
-		memset(Buffer1, 0, (((CDC_BUFFER * objNodeCollection->GetCNNodesCount())) * sizeof(char)));
-
+		Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())]();
 		GetAllNodeIdAssignment(Buffer1, false);
 		strcat(Buffer1, "\n");
 		//Write all 1F81 NodeId Assignment
@@ -4686,8 +4668,7 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 //cout<<"Write MN CDC"<<endl;
 
 		//Get all the MN's Default Data in Buffer1
-		Buffer1 = new char[(CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())];
-		memset(Buffer1, 0, (((CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())) * sizeof(char)));
+		Buffer1 = new char[(CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())]();
 		FormatCdc(indexCollObj, Buffer1, fileptr, MN);
 
 		len = strlen(Buffer1);
@@ -4715,9 +4696,7 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 				throw exceptionObj;
 			}
 
-			Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())];
-			memset(Buffer1, 0, (((CDC_BUFFER * objNodeCollection->GetCNNodesCount())) * sizeof(char)));
-			strcpy(Buffer1, "\n");
+			Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())]();
 			GetAllNodeIdAssignment(Buffer1, true);
 			len = strlen(Buffer1);
 			if ((len != (fwrite(Buffer1, sizeof(char), len, fileptr))))
@@ -5143,7 +5122,6 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 		{
 			// add rest of the contents
 			ProcessImage piObj;
-			piObj.Initialize();
 			piObj.bitOffset = -1;
 			piObj.byteOffset = 0;
 			if (parameterObj->accessStr != NULL)
@@ -5464,7 +5442,6 @@ if ((uniqueidRefId == NULL) || (nodeObj == NULL) || (sidxObj == NULL) || (module
 					//cout<<"Dt: "<<parameterObj->nameIdDtAttr.dataType<<" ModName:"<<moduleIndexObj->GetName()<<" moduleIndex:"<<moduleIndexObj->GetIndexValue()<<endl;
 					//pobjAppProc, nodeObj, parameterObj, pdoType, moduleName, moduleIndex
 					ProcessImage objProcessImage;
-					objProcessImage.Initialize();
 					objProcessImage.bitOffset = -1;
 					objProcessImage.byteOffset = 0;
 					if(parameterObj->accessStr != NULL)
@@ -5503,7 +5480,7 @@ if ((uniqueidRefId == NULL) || (nodeObj == NULL) || (sidxObj == NULL) || (module
 						//if(objProcessImage.dataInfo.iecDtVar == BITSTRING) 
 						//{
 							iStartBitOffset = 0;
-							iDataSize =  0;
+						//iDataSize =  0;
 						//}
 						//else
 						//{
@@ -5752,8 +5729,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							throw exceptionObj;
 						}
 
-						bool pdoResult = false;
-						pdoResult = CheckPdoCommParam(indexObj.GetPDOType(), isBuild, &indexObj, indexCollObj, nodeObj);
+						bool pdoResult = CheckPdoCommParam(indexObj.GetPDOType(), isBuild, &indexObj, indexCollObj, nodeObj);
 						if (pdoResult == false)
 						{
 							//Incorrect Target node id for a PDO(may be a cross Tx). So do not process.
@@ -6069,7 +6045,6 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								else
 								{
 									ProcessImage piObj;
-									piObj.Initialize();
 									if (dtObj.GetName() == NULL)
 									{
 										boost::format formatter(kMsgNullArgument);
@@ -6286,9 +6261,9 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 												|| (BROADCAST_NODEID
 														== rpdoMappedNodeID)))
 								{
-									char* modOffset = new char[strlen(actualVal) + 1];
+									char* modOffset = new char[strlen(actualVal) + 1]();
 									strcpy(modOffset, actualVal);
-									char* offsetStr = new char[5];
+									char* offsetStr = new char[5]();
 									//memset(offsetStr, 0, 5 * sizeof(char));
 									if (CHAINED == stnType)
 									{
@@ -7871,18 +7846,10 @@ ocfmRetCode GetNodeAttributesbyNodePos(UINT32 nodePos, INT32* outNodeId,
 		{
 			strcpy(outNodeName, nodeObj.GetNodeName());
 		}
-		else
-		{
-			outNodeName = NULL;
-		}
 
 		if (nodeObj.GetForcedCycleValue() != NULL)
 		{
 			strcpy(outForcedCycle, nodeObj.GetForcedCycleValue());
-		}
-		else
-		{
-			outForcedCycle = NULL;
 		}
 
 		*outStationType = nodeObj.GetStationType();
@@ -8636,8 +8603,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 			LOG_INFO() << "Autogenerated other indices in MN.";
 		}
 
-		bool isPresMnVal = false;
-		isPresMnVal = IsPresMN();
+		bool isPresMnVal = IsPresMN();
 
 		if (true == isPresMnVal)
 		{
@@ -10455,8 +10421,8 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 
 	indexCollObj = nodeObj->GetIndexCollection();
 	/* 1006*/
-	strcpy(indexId, "1006");
-	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
+	//strcpy(indexId, "1006");
+	//exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
 
 	/*  1300*/
 	strcpy(indexId, "1300");
@@ -11117,11 +11083,10 @@ void SetPresMNNodeAssigmentBits()
 		return;
 	}
 
-	bool isPresMn = false;
 	bool isMNBroadcastingPRes = false;
 
 	//check whether Pres activated in MN
-	isPresMn = IsPresMN();
+	bool isPresMn = IsPresMN();
 
 	NodeCollection* nodeCollObj = NULL;
 	Node nodeObj;

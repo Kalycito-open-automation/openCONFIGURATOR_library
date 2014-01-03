@@ -591,7 +591,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		INT32			Returns the data size for the given datatype
  */
-UINT32 GetDataSize(const string dataTypeVal);
+UINT32 GetDataSize(const string& dataTypeVal);
 
 /**
  \brief		Library function for validating imported XDDs/XDCs against the current schema

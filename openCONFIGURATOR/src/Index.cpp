@@ -74,10 +74,10 @@
 
  */
 
-Index::Index(void)
-{
-	pdoType = PDO_INVALID;
-}
+Index::Index(void) :
+	pdoType(PDO_INVALID),
+	subIndexCollection()
+{}
 
 /*************************************************************************/
 /* Destructor */

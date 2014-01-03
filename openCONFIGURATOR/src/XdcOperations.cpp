@@ -2076,7 +2076,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			nmtObj = NULL;
 			nmtObj = nodeObj.GetNetworkManagement();
 
 			for (UINT32 featureLC = 0;
@@ -2117,7 +2116,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			nmtObj = NULL;
 			nmtObj = nodeObj.GetNetworkManagement();
 
 			for (UINT32 featureLC = 0;
@@ -2348,7 +2346,7 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 	return objException;
 }
 
-UINT32 GetDataSize(const string dataTypeVal)
+UINT32 GetDataSize(const string& dataTypeVal)
 {
 	string workDataTypeVal(dataTypeVal);
 	transform(workDataTypeVal.begin(), workDataTypeVal.end(), workDataTypeVal.begin(), ::toupper);
@@ -2622,7 +2620,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 					// Allocate space for normalized hex-value: '0x' + hexValue + null-termination					
 					char* hexVal = new char[strlen(tmpValue) + 1];
 					// Reformat
-					sprintf(hexVal, "0x%X", number);
+					sprintf(hexVal, "0x%X", (unsigned int) number);
 					// Set
 					if (attrType == ACTUALVALUE)
 					{

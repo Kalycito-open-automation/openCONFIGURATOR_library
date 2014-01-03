@@ -252,7 +252,7 @@ enum AttributeType
 	PDOMAPPING,		/**< PDO Mapping attribute. */
 	LOWLIMIT,		/**< Low limit attribute. */
 	HIGHLIMIT,		/**< High limit attribute. */
-	FLAGIFINCDC,	/**< Include in CDC attribute <b>(DEPRECATED)</b>. */
+	FLAGIFINCDC	/**< Include in CDC attribute <b>(DEPRECATED)</b>. */
 };
 /** @} */
 

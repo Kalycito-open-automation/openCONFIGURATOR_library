@@ -74,7 +74,26 @@ using namespace std;
 
  */
 
-Node::Node(void) :
+Node::Node() :
+	PICollection(),
+	MNPDOINVarCollection(),
+	MNPDOOUTVarCollection(),
+	NETPIColl(),
+	dtCollObj(new DataTypeCollection()),
+	indexCollObj(new IndexCollection()),
+	appProcessObj(new ApplicationProcess()),
+	nmtObj(new NetworkManagement()),
+	nodeId(0),
+	nodePosition(0),
+	presActualPayload(0),
+	preqActualPayload(0),
+	hasPdoObjects(false),
+	isForcedCycle(false),
+	nodeName(NULL),
+	forcedCycle(NULL),
+	presTimeOut(NULL),
+	stationType(NORMAL),
+	nodeType(),
 	// MN
 	transmitsPRes(), 
 	// CN	
@@ -92,24 +111,7 @@ Node::Node(void) :
 	isAsyncOnly(),
 	isType1Router(),
 	isType2Router()
-{
-	dtCollObj = new DataTypeCollection();
-	indexCollObj = new IndexCollection();
-	appProcessObj = new ApplicationProcess();
-	nmtObj = new NetworkManagement();
-	nodeName = NULL;
-	hasPdoObjects = false;
-	stationType = NORMAL;
-	forcedCycle = NULL;
-	presTimeOut = NULL;
-	isForcedCycle = false;
-	nodeId = 0;
-	nodePosition = 0;
-	//VarNodeType = 0; //TODO: Review initialization
-	presActualPayload = 0;
-	preqActualPayload = 0;
-	//cout<<"NodeClass: Constructor Executed"<<endl;
-}
+{}
 
 /*************************************************************************/
 /* Destructor */

@@ -99,15 +99,12 @@ public:
 		IEC_Datatype iecDtVar;	/**< Value for the dataType */
 		INT32 dataSize;			/**< Size of the data */
 		char* dtName;			/**< Name of the dataType */
-		/**
-		\brief		This function is used to initialise the members to a default value.
-		\return		void
-		*/
-		void Intialize()
-		{
-			dtName = NULL;
-			dataSize = 0;
-		}
+
+		PIDataInfo() :
+			iecDtVar(),
+			dataSize(0),
+			dtName(NULL)
+		{}
 };
 
 /*****************************************************************************/
@@ -139,22 +136,22 @@ public:
 		\brief		This function is used to initialise the members to a default value.
 		\return		void
 		*/
-		void Initialize()
-		{
-			name = NULL;
-			dataInfo.Intialize();
-			byteOffset = 0;
-			value = NULL;
-			subindex = NULL;
-			index = NULL;
-			bitOffset = 0;
-			valueFrmPDO = NULL;
-			moduleName = NULL;
-			nodeId = 0;
-			varDeclName = NULL;
-			moduleIndex = NULL;
-			parameterPos = 0;
-		}
+		ProcessImage():
+			name(NULL),
+			dataInfo(),
+			byteOffset(0),
+			value(NULL),
+			subindex(NULL),
+			index(NULL),
+			bitOffset(0),
+			parameterPos(0),
+			valueFrmPDO(NULL),
+			moduleName(NULL),
+			nodeId(0),
+			varDeclName(NULL),
+			moduleIndex(NULL),
+			directionType()
+		{}
 };
 
 /** 
@@ -175,15 +172,17 @@ public:
 		\brief		This function is used to initialise the members to a default value.
 		\return		void
 		*/
-		void Initialize()
-		{
-			count = 0;
-			totalDataSize = 0;
-			name = NULL;
-			lastName = NULL;
-			moduleName = NULL;
-			dataInfo.Intialize();
-		}
+
+		NETProcessImage() :
+			name(NULL),
+			lastName(NULL),
+			moduleName(NULL),
+			nodeId(0),
+			totalDataSize(0),
+			count(0),
+			dataInfo(),
+			directionType()
+		{}
 };
 
 /** 
@@ -205,6 +204,11 @@ class Offsets
 public:
 		INT32 prevOffset;		/**< To represent the previous offset */
 		INT32 currOffset;		/**< To represent the current offset */
+
+		Offsets() : 
+			prevOffset(0),
+			currOffset(0)
+		{}
 };
 
 /** 
@@ -216,15 +220,10 @@ public:
 	char* indexId;		/**< PI variables IndexId */
 	char* sIdxId;		/**< PI variables SubIndexId */
 	
-	/**
-	\brief		This function is used to initialise the members to a default value.
-	\return		void
-	*/
-	void Initialize()
-	{
-		indexId = NULL;
-		sIdxId = NULL;
-	}
+	PIObject() :
+		indexId(NULL),
+		sIdxId(NULL)
+	{}
 };
 
 /** 
@@ -235,6 +234,11 @@ class ModuleCol
 public:
 	INT32 moduleNo;			/**< To denote the module number */
 	char moduleName[50];	/**< To denote the module name */
+
+	ModuleCol() 
+		: moduleNo(0),
+		  moduleName()
+	{}
 };
 
 /*****************************************************************************/

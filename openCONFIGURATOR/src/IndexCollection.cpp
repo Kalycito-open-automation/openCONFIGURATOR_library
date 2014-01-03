@@ -75,10 +75,9 @@
 
  */
 
-IndexCollection::IndexCollection(void)
-{
-
-}
+IndexCollection::IndexCollection(void) :
+	indexCollection()
+{}
 
 /*************************************************************************/
 /* Destructor */

@@ -80,11 +80,12 @@ ObjectDictionary* ObjectDictionary::objectDictionary = NULL;
 
  */
 
-ObjectDictionary::ObjectDictionary(void)
+ObjectDictionary::ObjectDictionary(void) :
+	varsattrIdxSIdx(0),
+	objDictNode(new Node()),
+	attribCollObj()
 {
-	objDictNode = new Node();
 	objDictNode->SetNodeId(-100);
-	varsattrIdxSIdx = attribCollObj.size();
 }
 
 /*************************************************************************/

@@ -75,10 +75,10 @@ using namespace std;
 
  */
 
-NetworkManagement::NetworkManagement(void)
-{
-	maxPDOCount = 0;
-}
+NetworkManagement::NetworkManagement(void) :
+	FeatureCollection(),
+	maxPDOCount(0)
+{}
 
 /*************************************************************************/
 /* Destructor */

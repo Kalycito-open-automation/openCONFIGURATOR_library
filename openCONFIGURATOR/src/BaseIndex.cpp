@@ -83,24 +83,23 @@ using namespace openCONFIGURATOR::Library::Utilities;
 
  */
 
-BaseIndex::BaseIndex(void)
-{
-	indexId = NULL;
-	name = NULL;
-	highLimit = NULL;
-	dataTypeValue = NULL;
-	defaultValue = NULL;
-	actualValue = NULL;
-	accessType = NULL;
-	lowLimit = NULL;
-	uniqueIdRef = NULL;
-	dataTypeValue = NULL;
-	nodeId = 0;
-	//objectType = 0; //TODO: Review initialisation
-	pdoMapping = NOT_DEFINED;
-	parameterIndex = -1;
-	includeInCDC = false;
-}
+BaseIndex::BaseIndex(void) :
+	name(NULL),
+	indexId(NULL),
+	lowLimit(NULL),
+	highLimit(NULL),
+	accessType(NULL),
+	defaultValue(NULL),
+	uniqueIdRef(NULL),
+	actualValue(NULL),
+	dataTypeValue(NULL),
+	objectType(),
+	dataType(),
+	pdoMapping(NOT_DEFINED),
+	nodeId(0),
+	parameterIndex(-1),
+	includeInCDC(false)
+{}
 
 /****************************************************************************************************/
 
@@ -114,6 +113,7 @@ BaseIndex::~BaseIndex(void)
 {
 	//Add destructor code here
 }
+
 #ifndef __GNUC__
 #pragma region Properties
 #endif

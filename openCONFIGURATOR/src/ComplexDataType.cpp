@@ -70,13 +70,12 @@
 
  */
 
-ComplexDataType::ComplexDataType(void)
-{
-	nameIdAttr = new AppProcessCommon();
-	//varIndex = -1;
-	prevUniqueId = NULL;
-	cDtObjPosition = -1;
-}
+ComplexDataType::ComplexDataType() :
+	cDtObjPosition(-1),
+	prevUniqueId(NULL),				
+	nameIdAttr(new AppProcessCommon()),
+	varDeclarationCollection()
+{}
 
 /*************************************************************************/
 /* Destructor */
