@@ -714,9 +714,10 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 				throw objException;
 			}
 		}
-		catch (ocfmRetCode& ex)
+		catch (const ocfmRetCode& ex)
 		{
-			throw ex;
+			LOG_FATAL() << ex.getErrorString();
+			throw;
 		}
 		name = xmlTextReaderConstName(reader);
 		value = xmlTextReaderConstValue(reader);
@@ -1171,9 +1172,10 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 			}
 		}
 	}
-	catch (ocfmRetCode& ex)
+	catch (const ocfmRetCode& ex)
 	{
-		throw ex;
+		LOG_FATAL() << ex.getErrorString();
+		throw;
 	}
 }
 
@@ -2190,8 +2192,9 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 
 		xmlFreeDoc(xdDoc);
 	}
-	catch (ocfmRetCode& ex)	{
-		throw ex;
+	catch (const ocfmRetCode& ex)	{
+		LOG_FATAL() << ex.getErrorString();
+		throw;
 	}
 
 	objException.setErrorCode(OCFM_ERR_SUCCESS);

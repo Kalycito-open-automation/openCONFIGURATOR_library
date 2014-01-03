@@ -242,10 +242,10 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 				idxObj->AddSubIndex(sidxObj);
 			}
 		}
-	} catch (ocfmRetCode& ex)
+	} catch (const ocfmRetCode& ex)
 	{
 		LOG_FATAL() << ex.getErrorString();
-		throw ex;
+		throw;
 	}
 }
 

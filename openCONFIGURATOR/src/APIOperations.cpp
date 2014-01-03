@@ -5490,10 +5490,10 @@ if ((uniqueidRefId == NULL) || (nodeObj == NULL) || (sidxObj == NULL) || (module
 			}
 		}
 
-	} catch (ocfmRetCode& ex)
+	} catch (const ocfmRetCode& ex)
 	{
 		LOG_FATAL() << ex.getErrorString();
-		throw ex;
+		throw;
 	}
 	return totalBytesMapped;
 }
@@ -12541,10 +12541,10 @@ void SortNodeID(INT32 *nodeIDColl, INT32 collectionSize)
 				}
 			}
 		}
-	} catch (ocfmRetCode& ex)
+	} catch (const ocfmRetCode& ex)
 	{
 		LOG_FATAL() << ex.getErrorCode();
-		throw ex;
+		throw;
 	}
 }
 
