@@ -4586,8 +4586,7 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 			throw exceptionObj;
 		}
 
-		//Buffer1 = (char*)malloc(CDC_BUFFER);
-		Buffer1 = new char[CDC_BUFFER];
+		Buffer1 = new char[CDC_BUFFER]();
 		char* noOfEntries = new char[10];
 		noOfEntries = IntToAscii(GetNodeTotalIndexSubIndex(MN_NODEID),
 				noOfEntries, 16);
@@ -5111,7 +5110,7 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 			}
 			if (varDeclObj.namIdDtAttr->GetName() != NULL)
 			{
-				piObj.name = (char*) malloc(strlen(varDeclObj.namIdDtAttr->GetName()) + strlen(moduleName) + 6 + ALLOC_BUFFER);
+				piObj.name = new char[strlen(varDeclObj.namIdDtAttr->GetName()) + strlen(moduleName) + 6 + ALLOC_BUFFER]();
 				strcpy(piObj.name, GetPIName(nodeObj->GetNodeId()));
 				strcat(piObj.name, moduleName);
 				strcat(piObj.name, ".");
@@ -6036,18 +6035,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 
 									piObj.nodeId = nodeObj->GetNodeId();
 									/* Name of the Process Image variable*/
-									piObj.name = (char*) malloc(
-											6 + ALLOC_BUFFER);
-									strcpy(piObj.name,
-											GetPIName(nodeObj->GetNodeId()));
+									piObj.name = new char[6 + ALLOC_BUFFER]();
+									strcpy(piObj.name, GetPIName(nodeObj->GetNodeId()));
 
 									if (moduleName != NULL)
 									{
-										piObj.name =
-												(char*) realloc(piObj.name,
-														strlen(
-																piObj.name)+ strlen(moduleName) + ALLOC_BUFFER);
+										const char* oldpiObjName = piObj.name;
+										piObj.name = new char[strlen(piObj.name) + strlen(moduleName) + ALLOC_BUFFER]();
+										strcpy(piObj.name, oldpiObjName);
 										strcat(piObj.name, moduleName);
+
+										delete[] oldpiObjName;
 
 										piObj.moduleName = new char[strlen(
 												moduleName) + STR_ALLOC_BUFFER];
@@ -6062,11 +6060,12 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										strcat(moduleName,
 												indexObj.GetIndexValue());
 
-										piObj.name =
-												(char*) realloc(piObj.name,
-														strlen(
-																piObj.name)+ strlen(moduleName) + ALLOC_BUFFER);
+										const char* oldpiObjName = piObj.name;
+										piObj.name = new char[strlen(piObj.name)+ strlen(moduleName) + ALLOC_BUFFER]();
+										strcpy(piObj.name, oldpiObjName);
 										strcat(piObj.name, moduleName);
+
+										delete[] oldpiObjName;
 
 										piObj.moduleName = new char[strlen(
 												moduleName) + STR_ALLOC_BUFFER];
@@ -6092,15 +6091,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 															+ STR_ALLOC_BUFFER];
 											strcpy(piObj.varDeclName, sidxName);
 
-											piObj.name =
-													(char*) realloc(piObj.name,
-															(strlen(piObj.name)
-																	+ strlen(
-																			sidxName)
-																	+ 1
-																	+ ALLOC_BUFFER));
+											const char* oldpiObjName = piObj.name;
+											piObj.name = new char[strlen(piObj.name)
+													+ strlen(
+													sidxName)
+													+ 1
+													+ ALLOC_BUFFER]();
+											strcpy(piObj.name, oldpiObjName);
 											strcat(piObj.name, ".");
 											strcat(piObj.name, sidxName);
+
+											delete[] oldpiObjName;
 										}
 										else
 										{
@@ -6119,15 +6120,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 															+ STR_ALLOC_BUFFER];
 											strcpy(piObj.varDeclName, sidxName);
 
-											piObj.name =
-													(char*) realloc(piObj.name,
-															(strlen(piObj.name)
-																	+ strlen(
-																			sidxName)
-																	+ 1
-																	+ ALLOC_BUFFER));
+											const char* oldpiObjName = piObj.name;
+											piObj.name = new char[strlen(piObj.name)
+													+ strlen(
+													sidxName)
+													+ 1
+													+ ALLOC_BUFFER]();
+											strcpy(piObj.name, oldpiObjName);
 											strcat(piObj.name, ".");
 											strcat(piObj.name, sidxName);
+
+											delete[] oldpiObjName;
 
 										}
 									}
