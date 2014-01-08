@@ -69,7 +69,7 @@ class BaseIndex
 {
 	public:
 		BaseIndex(void);
-		~BaseIndex(void);
+		virtual ~BaseIndex(void);
 
 		/*****************************************************************************/
 		/**

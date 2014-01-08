@@ -11,7 +11,7 @@
 #include "Exception.h"
 #include "Exports.h"
 #include "Node.h"
-#include "Result.h";
+#include "Result.h"
 
 namespace openCONFIGURATOR 
 {
