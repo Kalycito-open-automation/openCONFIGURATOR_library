@@ -172,6 +172,8 @@ namespace BR.FS.CdcBuilder
                     return 5453;
                 case ErrorCode.PLKDATATYPE_SIZE_UNDEFINED:
                     return 5454;
+                case ErrorCode.OBJECT_SIZE_MAPPED_INVALID:
+                    return 5455;
                 default:
                     return 0;
             }

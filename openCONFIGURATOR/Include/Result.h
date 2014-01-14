@@ -72,6 +72,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgNoActualOrDefaultValue = "Object %#x/%#x on node %d has neither a default value nor an actual value.";
 			const std::string kMsgPowerlinkDatatypeSizeNotDefined = "POWERLINK-Datatype '0x%X' has no defined size.";
 			const std::string kMsgFeatureValueNotFound = "%s-Feature '%s' not defined in XDD of node %d.";
+			const std::string kMsgObjectSizeMappedInvalid = "Mapping-Object %#x/%#x on node %d: Mapped data-length invalid. Actual: %d bits, expected %d bits.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -120,7 +121,8 @@ namespace openCONFIGURATOR
 				UNHANDLED_EXCEPTION,
 				NO_DEFAULT_OR_ACTUAL_VALUE,
 				FEATURE_VALUE_NOT_FOUND,
-				PLKDATATYPE_SIZE_UNDEFINED
+				PLKDATATYPE_SIZE_UNDEFINED,
+				OBJECT_SIZE_MAPPED_INVALID
 				
 			};		
 

@@ -5997,10 +5997,15 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									LOG_DEBUG() << "iMappedLength:" << mappedLength << " actualMappedBytes:" << actualMappedBytes;
 									if (mappedLength != (actualMappedBytes * 8))
 									{										
-										errorString<<"Invalid Length for the mapping object. Index: "<<indexObj.GetIndexValue()<<" SubIndex: "<<sidxObj->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
+										boost::format formatter(kMsgObjectSizeMappedInvalid);
+										formatter % indexObj.GetIndex()
+											% sidxObj->GetIndex() 
+											% nodeObj->GetNodeId()
+											% mappedLength
+											% (actualMappedBytes * 8);
 										exceptionObj.setErrorCode(OCFM_ERR_INVALID_SIZE_MAPPED);
-										exceptionObj.setErrorString(errorString.str());
-										LOG_FATAL() << errorString.str();
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
 										throw exceptionObj;
 									}
 								}
@@ -6019,8 +6024,8 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 										throw exceptionObj;
 									}
 									else if (!CheckAllowedDTForMapping(
-											dtObj.GetName()))
-									{//"Node %d, (Sub)Index %#x/0x%s: Mapping of datatype '%s' not supported. Supported data types: Integer8(16/32/64), Unsigned8(16/32/64)."
+										dtObj.GetName()))
+									{
 										boost::format formatter(kMsgPdoDatatypeInvalid);
 										formatter 
 											% nodeObj->GetNodeId()
@@ -6133,9 +6138,15 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									LOG_DEBUG() << "DataSize: " << dtObj.dataSize * 8 << " MappedLength: " << mappedLength;
 									if ((dtObj.dataSize * 8) != mappedLength)
 									{										
-										errorString<<"Invalid Length for the mapping object. Index: "<<indexObj.GetIndexValue()<<" SubIndex: "<<sidxObj->GetIndexValue()<<" in node: "<<nodeObj->GetNodeId();
+										boost::format formatter(kMsgObjectSizeMappedInvalid);
+										formatter % indexObj.GetIndex()
+											% sidxObj->GetIndex() 
+											% nodeObj->GetNodeId()
+											% mappedLength
+											% (dtObj.dataSize * 8);
 										exceptionObj.setErrorCode(OCFM_ERR_INVALID_SIZE_MAPPED);
-										exceptionObj.setErrorString(errorString.str());
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
 										delete[] sidxName;
 										delete[] moduleName;
 										delete[] accessStr;

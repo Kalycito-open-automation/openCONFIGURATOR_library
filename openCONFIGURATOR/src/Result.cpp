@@ -124,8 +124,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(SUBINDEX_DOES_NOT_EXIST, errorString);
 		case OCFM_ERR_INVALID_PARAMETER:
 			return Result(PARAMETER_INVALID, errorString);
-			
 		case OCFM_ERR_INVALID_SIZE_MAPPED:
+			return Result(OBJECT_SIZE_MAPPED_INVALID, errorString);
+			
 		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
 		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
 		case OCFM_ERR_INVALID_PDO_OFFSET:
