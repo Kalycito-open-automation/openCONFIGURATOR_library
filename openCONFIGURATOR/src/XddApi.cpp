@@ -5,6 +5,7 @@
 
 #include "../Include/XddApi.h"
 #include "../Include/Node.h"
+#include "../Include/NodeApi.h"
 #include "../Include/NodeCollection.h"
 #include "../Include/Enums.h"
 #include "../Include/ProjectConfiguration.h"
@@ -12,6 +13,7 @@
 #include "../Include/Logging.h"
 #include "../Include/BoostShared.h"
 
+using namespace openCONFIGURATOR::Library::API;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::ObjectDictionary;
 
@@ -86,32 +88,45 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			DLLEXPORT Result GetFeatureValue(const UINT32 nodeId, const FeatureType featureType, const string featureName, string& featureValue)
+			DLLEXPORT Result GetFeatureValue(const UINT32 nodeId, const PlkFeature::PlkFeature feature, string& featureValue)
 			{
 				try
 				{
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
-						assert(nodeCollectionPtr);
-						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);
-
-						if (!node)
+						bool nodeExists = false;
+						Result res = IsExistingNode(nodeId, nodeExists);
+						if (res.IsSuccessful() && !nodeExists)
 						{
 							boost::format formatter(kMsgNonExistingNode);
 							formatter % nodeId;
 							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 
-						featureValue = node->GetNetworkManagement()->GetNwMgmtFeatureValue(featureType, featureName.c_str());
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						FeatureType featureType = GENERAL_FEATURES;
+						if(feature >= 82)
+							featureType = CN_FEATURES;
+						else if(feature >= 64)
+							featureType = MN_FEATURES;
+
+						NetworkManagement* nmtPtr = node->GetNetworkManagement();
+						featureValue = nmtPtr->GetNwMgmtFeatureValue(featureType, GetPlkFeature(feature).c_str());
+
+						//use default value if existing
 						if (featureValue.empty())
 						{
+							featureValue.append(GetPlkFeatureDefaultValue(feature));
+						}
+
+						if (featureValue.empty())
+						{
+							boost::format formatter(kMsgFeatureValueNotFound);
 							string featureTypeStr = (featureType == MN_FEATURES)
 							                        ? "MN"
 							                        : ((featureType == CN_FEATURES) ? "CN" : "General");
-							boost::format formatter(kMsgFeatureValueNotFound);
-							formatter % featureType
-							% featureName
+							formatter % featureTypeStr
+							% GetPlkFeature(feature)
 							% nodeId;
 							return Result(FEATURE_VALUE_NOT_FOUND, formatter.str());
 						}

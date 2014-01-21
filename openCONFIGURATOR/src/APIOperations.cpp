@@ -91,6 +91,7 @@
 
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::Utilities;
+using namespace openCONFIGURATOR::Library::ObjectDictionary;
 
 /****************************************************************************/
 /* Defines */
@@ -2927,7 +2928,7 @@ void UpdateCNVisibleNode(Node* nodeObj)
 	Index* commIndexObj = NULL;
 	SubIndex* sidxObj1 = NULL;
 	SubIndex* sidxObj2 = NULL;
-	INT32 crossTxStnCnt = 0;
+	UINT32 crossTxStnCnt = 0;
 
 	//ResetAllSubIndexFlag(
 	//    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
@@ -2936,7 +2937,7 @@ void UpdateCNVisibleNode(Node* nodeObj)
 	//    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
 	//        (char*) "1F8D"));
 
-	int maxRPDOChannels = PDORPDOChannels;
+	UINT32 maxRPDOChannels = boost::lexical_cast<unsigned int>(GetPlkFeatureDefaultValue(PlkFeature::PDORPDOChannels));
 	char* maxRPDOChannelsFeature = nodeObj->GetNetworkManagement()->GetNwMgmtFeatureValue(GENERAL_FEATURES, "PDORPDOChannels");
 	if(maxRPDOChannelsFeature)
 		maxRPDOChannels = atoi(maxRPDOChannelsFeature);
@@ -4419,7 +4420,7 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 		//nodeObjMN = objNodeCollection->GetMNNode();
 		UpdateMNNodeAssignmentIndex(&nodeObjMN, (char*) "1F81",
 		                            true);
-		UpdateMNNodeAssignmentIndex(&nodeObjMN, (char*) "1F92", 
+		UpdateMNNodeAssignmentIndex(&nodeObjMN, (char*) "1F92",
 									true);
 		UpdateMNNodeAssignmentIndex(&nodeObjMN, (char*) "1F8D",
 		                            true);
