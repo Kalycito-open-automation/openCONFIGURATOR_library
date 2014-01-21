@@ -5679,10 +5679,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 						// Actual value checked for Null, Empty, non-zero
 						bool actualValueValid = true;
 						if ((sidxObjB4Sort->GetActualValue() != NULL)
-								&& (0
-										!= strcmp(
-												sidxObjB4Sort->GetActualValue(),
-												""))
+								&& (0 != strcmp(sidxObjB4Sort->GetActualValue(), ""))
 								&& !(CheckIfValueZero(
 										(char*) sidxObjB4Sort->GetActualValue())))
 						{
@@ -5708,9 +5705,7 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 							else // If the Actual values is Null or Empty, Default value is set for Total SIdx for mapping
 							{
 								//No need to check for value null or empty. GetDecimalValue returns zero or particular value.
-								sidxTotalCount =
-										GetDecimalValue(
-												(char*) sidxObjB4Sort->GetDefaultValue());
+								sidxTotalCount = GetDecimalValue((char*) sidxObjB4Sort->GetDefaultValue());
 								actualValueValid = false;
 							}
 						}
@@ -5774,6 +5769,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 								INT32 iLength = strlen(actualVal);
 								LOG_DEBUG() << "Length of the value: " << iLength << " Actual Value: " << actualVal;
 								//Actual pdo mapping value includes 16 hex characters of original payload mapping and two for "0x" prefix
+								if (CheckIfValueZero(actualVal))
+								{
+									boost::format formatter(kMsgMappingInvalid);
+									formatter % indexObjB4Sort->GetIndex()
+										% sidxCount
+										% nodeObj->GetNodeId();
+									exceptionObj.setErrorCode(OCFM_ERR_MAPPING_INVALID);
+									exceptionObj.setErrorString(formatter.str());
+									LOG_FATAL() << formatter.str();
+									throw exceptionObj;
+								}
 								if (iLength != (16 + 2))
 								{
 									boost::format formatter(kMsgAttributeValueInvalid);

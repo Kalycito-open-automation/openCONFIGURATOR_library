@@ -174,29 +174,30 @@ namespace BR.FS.CdcBuilder
                     return 5454;
                 case ErrorCode.OBJECT_SIZE_MAPPED_INVALID:
                     return 5455;
-                case ErrorCode.MAPPING_TYPE_FOR_PDO_INVALID:
-                    return 5456;
-                case ErrorCode.ACCESS_TYPE_FOR_PARAMETER_INVALID:
-                    return 5457;
-                case ErrorCode.ACCESS_TYPE_FOR_PDO_INVALID:
-                    return 5458;
-                case ErrorCode.PDO_OFFSET_INVALID:
-                    return 5459;
-                case ErrorCode.XML_INVALID:
-                    return 5460;
-                case ErrorCode.SCHEMA_NOT_FOUND_OR_WELL_FORMED:
-                    return 5461;
-                case ErrorCode.SCHEMA_INVALID:
-                    return 5462;
-				case ErrorCode.SCHEMA_PARSER_CONTEXT_ERROR:
-                    return 5463;
-				case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
-                    return 5464;
-                case ErrorCode.NO_PROJECT_LOADED:
-                    return 5465;
                 case ErrorCode.ARGUMENT_INVALID_EMPTY:
+                    return 5456;
+                case ErrorCode.MAPPING_TYPE_FOR_PDO_INVALID:
+                    return 5457;
+                case ErrorCode.ACCESS_TYPE_FOR_PARAMETER_INVALID:
+                    return 5458;
+                case ErrorCode.ACCESS_TYPE_FOR_PDO_INVALID:
+                    return 5459;
+                case ErrorCode.PDO_OFFSET_INVALID:
+                    return 5460;
+                case ErrorCode.XML_INVALID:
+                    return 5461;
+                case ErrorCode.SCHEMA_NOT_FOUND_OR_WELL_FORMED:
+                    return 5462;
+                case ErrorCode.SCHEMA_INVALID:
+                    return 5463;
+				case ErrorCode.SCHEMA_PARSER_CONTEXT_ERROR:
+                    return 5464;
+				case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
+                    return 5465;
+                case ErrorCode.NO_PROJECT_LOADED:
                     return 5466;
-                    
+                case ErrorCode.MAPPING_INVALID:
+                    return 5467;
                 default:
                     return 0;
             }

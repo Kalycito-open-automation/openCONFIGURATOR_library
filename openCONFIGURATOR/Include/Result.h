@@ -83,6 +83,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgSchemaValidationContextError = "LibXML2 cannot create a validation context for the XML schema file '%s'.";
 			const std::string kMsgNoProjectLoaded = "No openCONFIGURATOR project loaded in the library.";
 			const std::string kMsgEmptyArgument = "Argument(s) '%s' must not be empty.";
+			const std::string kMsgMappingInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping is enabled (NumberOfEntries != 0) but mapping entry is zero. Expected valid mapping entry.";
 
 			/** @addtogroup apireturn @{ */
 			/************************************************************************
@@ -147,7 +148,8 @@ namespace openCONFIGURATOR
 				SCHEMA_INVALID, /**< XML schema not valid. */
 				SCHEMA_PARSER_CONTEXT_ERROR, /**< XML parser context error. */
 				SCHEMA_VALIDATION_CONTEXT_ERROR, /**< XML schema validation context error. */
-				NO_PROJECT_LOADED, /**< No %openCONFIGURATOR project loaded. */				
+				NO_PROJECT_LOADED, /**< No project loaded. */
+				MAPPING_INVALID /**< An enabled mapping entry is empty. */
 			};
 
 			/************************************************************************

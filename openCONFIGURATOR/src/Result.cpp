@@ -144,6 +144,8 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(SCHEMA_PARSER_CONTEXT_ERROR, errorString);
 		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
 			return Result(SCHEMA_VALIDATION_CONTEXT_ERROR, errorString);
+		case OCFM_ERR_MAPPING_INVALID:
+			return Result(MAPPING_INVALID, errorString);
 
 		// Covered by XDD/XDC XML-Schema validation
 		case OCFM_ERR_XML_FILE_CORRUPTED:
