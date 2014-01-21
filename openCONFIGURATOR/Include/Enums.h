@@ -398,7 +398,7 @@ DLLEXPORT enum ConfiguratorError
  */
 /**
  \brief List of available process image representations.
- \author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+ \author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 */
 DLLEXPORT enum OutputLanguage
 {
@@ -452,7 +452,7 @@ namespace openCONFIGURATOR
 				\brief	Powerlink data types
 
 						See EPSG DS 301, v1.1.0, v1.2.0
-				\author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 				*/
 				enum PlkDataType
 				{
@@ -487,8 +487,200 @@ namespace openCONFIGURATOR
 				};
 				/** @} */
 			}
+			namespace PlkFeature
+			{
+				/** \addtogroup xddapi
+				 * @{
+				 */
+				/**
+				\brief	Powerlink features
+
+						See EPSG DS 301, v1.1.0, v1.2.0
+				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+				*/
+				enum PlkFeature
+				{
+					//POWERLINK general features
+					CFMConfigManager = 0,
+					DLLErrBadPhysMode,
+					DLLErrMacBuffer,
+					DLLFeatureCN,
+					DLLFeatureMN,
+					NMTBootTimeNotActive,
+					NMTCycleTimeGranularity,
+					NMTCycleTimeMax,
+					NMTCycleTimeMin,
+					NMTMinRedCycleTime,
+					NMTEmergencyQueueSize,
+					NMTErrorEntries,
+					NMTFlushArpEntry,
+					NMTNetHostNameSet,
+					NMTMaxCNNodeID,
+					NMTMaxCNNumber,
+					NMTMaxHeartbeats,
+					NMTNodeIDByHW,
+					NMTProductCode,
+					NMTPublishActiveNodes,
+					NMTPublishConfigNodes,
+					NMTPublishEmergencyNew,
+					NMTPublishNodeState,
+					NMTPublishOperational,
+					NMTPublishPreOp1,
+					NMTPublishPreOp2,
+					NMTPublishReadyToOp,
+					NMTPublishStopped,
+					NMTPublishTime,
+					NMTRevisionNo,
+					NWLForward,
+					NWLICMPSupport,
+					NWLIPSupport,
+					PDOGranularity,
+					PDOMaxDescrMem,
+					PDORPDOChannelObjects,
+					PDORPDOChannels,
+					PDORPDOCycleDataLim,
+					PDORPDOOverallObjects,
+					PDOSelfReceipt,
+					PDOTPDOChannelObjects,
+					PDOTPDOCycleDataLim,
+					PDOTPDOOverallObjects,
+					PHYExtEPLPorts,
+					PHYHubDelay,
+					PHYHubIntegrated,
+					PHYHubJitter,
+					RT1RT1SecuritySupport,
+					RT1RT1Support,
+					RT2RT2Support,
+					SDOClient,
+					SDOCmdFileRead,
+					SDOCmdFileWrite,
+					SDOCmdLinkName,
+					SDOCmdReadAllByIndex,
+					SDOCmdReadByName,
+					SDOCmdReadMultParam,
+					SDOCmdWriteAllByIndex,
+					SDOCmdWriteByName,
+					SDOCmdWriteMultParam,
+					SDOMaxConnections,
+					SDOMaxParallelConnections,
+					SDOSeqLayerTxHistorySize,
+					SDOServer,
+					//POWERLINK MN features >= 64
+					DLLErrMNMultipleMN,
+					DLLMNFeatureMultiplex,
+					DLLMNPResChaining,
+					DLLMNFeaturePResTx,
+					NMTMNASnd2SoC,
+					NMTMNBasicEthernet,
+					NMTMNMultiplCycMax,
+					NMTMNPRes2PReq,
+					NMTMNPRes2PRes,
+					NMTMNPResRx2SoA,
+					NMTMNPResTx2SoA,
+					NMTMNSoA2ASndTx,
+					NMTMNSoC2PReq,
+					NMTNetTime,
+					NMTNetTimeIsRealTime,
+					NMTRelativeTime,
+					NMTSimpleBoot,
+					PDOTPDOChannels,
+					//POWERLINK CN features >= 82
+					DLLCNFeatureMultiplex,
+					DLLCNPResChaining,
+					NMTCNSoC2PReq
+				};
+				/** @} */
+				static const std::string PlkFeatureStrings[] = {
+					"CFMConfigManager",
+					"DLLErrBadPhysMode",
+					"DLLErrMacBuffer",
+					"DLLFeatureCN",
+					"DLLFeatureMN",
+					"NMTBootTimeNotActive",
+					"NMTCycleTimeGranularity",
+					"NMTCycleTimeMax",
+					"NMTCycleTimeMin",
+					"NMTMinRedCycleTime",
+					"NMTEmergencyQueueSize",
+					"NMTErrorEntries",
+					"NMTFlushArpEntry",
+					"NMTNetHostNameSet",
+					"NMTMaxCNNodeID",
+					"NMTMaxCNNumber",
+					"NMTMaxHeartbeats",
+					"NMTNodeIDByHW",
+					"NMTProductCode",
+					"NMTPublishActiveNodes",
+					"NMTPublishConfigNodes",
+					"NMTPublishEmergencyNew",
+					"NMTPublishNodeState",
+					"NMTPublishOperational",
+					"NMTPublishPreOp1",
+					"NMTPublishPreOp2",
+					"NMTPublishReadyToOp",
+					"NMTPublishStopped",
+					"NMTPublishTime",
+					"NMTRevisionNo",
+					"NWLForward",
+					"NWLICMPSupport",
+					"NWLIPSupport",
+					"PDOGranularity",
+					"PDOMaxDescrMem",
+					"PDORPDOChannelObjects",
+					"PDORPDOChannels",
+					"PDORPDOCycleDataLim",
+					"PDORPDOOverallObjects",
+					"PDOSelfReceipt",
+					"PDOTPDOChannelObjects",
+					"PDOTPDOCycleDataLim",
+					"PDOTPDOOverallObjects",
+					"PHYExtEPLPorts",
+					"PHYHubDelay",
+					"PHYHubIntegrated",
+					"PHYHubJitter",
+					"RT1RT1SecuritySupport",
+					"RT1RT1Support",
+					"RT2RT2Support",
+					"SDOClient",
+					"SDOCmdFileRead",
+					"SDOCmdFileWrite",
+					"SDOCmdLinkName",
+					"SDOCmdReadAllByIndex",
+					"SDOCmdReadByName",
+					"SDOCmdReadMultParam",
+					"SDOCmdWriteAllByIndex",
+					"SDOCmdWriteByName",
+					"SDOCmdWriteMultParam",
+					"SDOMaxConnections",
+					"SDOMaxParallelConnections",
+					"SDOSeqLayerTxHistorySize",
+					"SDOServer",
+					"DLLErrMNMultipleMN",
+					"DLLMNFeatureMultiplex",
+					"DLLMNPResChaining",
+					"DLLMNFeaturePResTx",
+					"NMTMNASnd2SoC",
+					"NMTMNBasicEthernet",
+					"NMTMNMultiplCycMax",
+					"NMTMNPRes2PReq",
+					"NMTMNPRes2PRes",
+					"NMTMNPResRx2SoA",
+					"NMTMNPResTx2SoA",
+					"NMTMNSoA2ASndTx",
+					"NMTMNSoC2PReq",
+					"NMTNetTime",
+					"NMTNetTimeIsRealTime",
+					"NMTRelativeTime",
+					"NMTSimpleBoot",
+					"PDOTPDOChannels",
+					"DLLCNFeatureMultiplex",
+					"DLLCNPResChaining",
+					"NMTCNSoC2PReq"
+				};
+				const std::string GetPlkFeature(const int enumVal);
 		}
 	}
+}
 }
 
 #endif // ENUMS_H_

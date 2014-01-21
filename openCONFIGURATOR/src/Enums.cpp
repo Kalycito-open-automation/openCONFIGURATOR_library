@@ -52,3 +52,8 @@ AccessType::AccessType openCONFIGURATOR::Library::ObjectDictionary::GetAccessTyp
 	else
 		return ::INVALID;
 }
+
+const std::string openCONFIGURATOR::Library::ObjectDictionary::PlkFeature::GetPlkFeature(const int enumVal)
+{
+	return PlkFeatureStrings[enumVal];
+}

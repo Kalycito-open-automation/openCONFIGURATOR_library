@@ -64,8 +64,11 @@
 %ignore ViewMode;
 %ignore AccessType;
 %ignore ConfiguratorError;
+%ignore FeatureType;
 %ignore GetAccessType(const std::string& accessType);
 %ignore GetObjectType(const std::string& objectType);
+%ignore GetPlkFeature(const int enumVal);
+%ignore PlkFeatureStrings;
 
 %include "../openCONFIGURATOR/Include/Exports.h"
 %include "../openCONFIGURATOR/Include/Enums.h"	
@@ -208,7 +211,7 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string outputPath, const std::string fileName);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType type, unsigned int& size);
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const unsigned int nodeId, const FeatureType featureType, const std::string featureName, std::string& featureValue);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const unsigned int nodeId, const openCONFIGURATOR::Library::ObjectDictionary::PlkFeature::PlkFeature feature, std::string& featureValue);
 		}
 	}
 }

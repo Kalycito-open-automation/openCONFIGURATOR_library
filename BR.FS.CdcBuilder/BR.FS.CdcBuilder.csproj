@@ -70,7 +70,7 @@
   <ItemGroup>
     <Compile Include="AttributeType.cs" />
 	<Compile Include="Result.cs" />
-	<Compile Include="FeatureType.cs" />
+	<Compile Include="PlkFeature.cs" />
 	<Compile Include="ObjectType.cs" />
 	<Compile Include="ErrorCode.cs" />
 	<Compile Include="PlkDataType.cs" />
