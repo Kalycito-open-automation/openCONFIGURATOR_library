@@ -161,7 +161,7 @@ void Node::SetNodeIndex(INT32 nodePos)
 	nodePosition = nodePos;
 }
 
-char* Node::GetNodeName()
+const char* Node::GetNodeName()
 {
 	return nodeName;
 }

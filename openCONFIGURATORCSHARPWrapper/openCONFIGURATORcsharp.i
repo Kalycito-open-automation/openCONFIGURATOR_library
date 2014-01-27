@@ -139,7 +139,9 @@ namespace openCONFIGURATOR
 				SCHEMA_PARSER_CONTEXT_ERROR,
 				SCHEMA_VALIDATION_CONTEXT_ERROR,
 				NO_PROJECT_LOADED,
-				MAPPING_INVALID
+				MAPPING_INVALID,
+				PARAMETER_VALUE_NOT_SET,
+				PARAMETER_VALUE_INVALID 
 			};		
 
 			class DLLEXPORT Result
@@ -182,6 +184,10 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingNode(const unsigned int nodeId, bool& exists);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int& nodeCount);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds); 
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetNodeParameter(UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, const std::string value);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeParameter(UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, std::string& value);
+
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexActualValue(const unsigned int nodeId, const unsigned int index, const std::string actualValue);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, std::string& attributeValue);

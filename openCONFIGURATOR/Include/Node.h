@@ -159,7 +159,7 @@ class Node
 		 \return	char*		Node name as string
 		 */
 		/*****************************************************************************/
-		char* GetNodeName();
+		const char* GetNodeName();
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Name of the Node

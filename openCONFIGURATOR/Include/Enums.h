@@ -674,9 +674,46 @@ namespace openCONFIGURATOR
 					"NMTCNSoC2PReq"
 				};
 				const std::string GetPlkFeature(const int enumVal);
+			}
+		}
+		namespace NodeParameter
+		{
+			/** \addtogroup nodeapi
+			* @{
+			 */
+			/**
+			\brief	List of available node parameter
+
+				See EPSG DS 301, v1.1.0, v1.2.0
+			\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+			*/
+			enum NodeParameter
+			{
+				NODENAME = 0, /**< Name of the node */
+				NODEID, /**< Id of the node */
+				STATIONTYPE, /**< Station type of the node (Normal, Chained or Multiplexed)*/
+				FORCEDMULTIPLEXEDCYCLE, /**< Force a destinct cycle for a multiplexed node*/
+				TRANSMITSPRES, 
+				ASYNCSLOTTIMEOUT, 
+				ASNDMAXNUMBER,
+				ISASYNCONLY, 
+				ISTYPE1ROUTER,
+				ISTYPE2ROUTER,
+				ISMANDATORY,
+				AUTOSTARTNODE, 
+				RESETINOPERATIONAL,
+				VERIFYAPPSWVERSION,
+				AUTOAPPSWUPDATEALLOWED,
+				VERIFYDEVICETYPE,
+				VERIFYVENDORID,
+				VERIFYREVISIONNUMBER,
+				VERIFYPRODUCTCODE,
+				VERIFYSERIALNUMBER
+			};
+			/** @} */
 		}
 	}
 }
-}
+
 
 #endif // ENUMS_H_
