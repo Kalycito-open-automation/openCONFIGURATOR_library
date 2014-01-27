@@ -73,6 +73,7 @@
 	<Compile Include="FeatureType.cs" />
 	<Compile Include="ObjectType.cs" />
 	<Compile Include="ErrorCode.cs" />
+	<Compile Include="NodeParameter.cs" />
 	<Compile Include="PlkDataType.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPER.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPERPINVOKE.cs" />

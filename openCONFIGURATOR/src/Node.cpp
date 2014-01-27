@@ -148,7 +148,6 @@ INT32 Node::GetNodeId()
 void Node::SetNodeId(INT32 nodeID)
 {
 	nodeId = nodeID;
-
 }
 
 INT32 Node::GetNodeIndex()
@@ -470,7 +469,6 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 	{
 		delete[] presTimeOut;
 	}
-
 	string nodeIdStr = IntToHex<unsigned int>(nodeId, 2, "", "");
 	Node& mnNode = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
 	boost::optional<std::string> actualValuePollResponse = mnNode.GetActualValue<string>(0x1F92, this->GetNodeId());

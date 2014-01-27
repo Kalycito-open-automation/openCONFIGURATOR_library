@@ -16,7 +16,7 @@ namespace ExtensionMethods
         ///  Retrieve the value of the Description-Attribute assigned to an enum constant and format
         ///  it using the specified arguments.
         /// </summary>
-        /// <param name="value">enum constant to get description for.</param> 
+        /// <param name="value">enum constant to get description for.</param>
         /// <param name="args">Formatting objects to format description string.</param>
         /// <returns>A formatted description string or <code>null</code> if it does not have an assigned Description-Attribute.</returns>
         public static string GetDescription(this Enum value, params object[] args)
@@ -70,7 +70,7 @@ namespace BR.FS.CdcBuilder
 
         private static string GetFormattedErrorMsg(ASErrorSeverity severity, BuilderError errorNo, string msg)
         {
-            return String.Format("{0} {1:d}: {2}",  severity.ToString("G").ToLower(), errorNo, msg);
+            return String.Format("{0} {1:d}: {2}", severity.ToString("G").ToLower(), errorNo, msg);
         }
 
         private static string GetFormattedErrorMsg(ASErrorSeverity severity, Result res)
@@ -190,14 +190,18 @@ namespace BR.FS.CdcBuilder
                     return 5462;
                 case ErrorCode.SCHEMA_INVALID:
                     return 5463;
-				case ErrorCode.SCHEMA_PARSER_CONTEXT_ERROR:
+                case ErrorCode.SCHEMA_PARSER_CONTEXT_ERROR:
                     return 5464;
-				case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
+                case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
                     return 5465;
                 case ErrorCode.NO_PROJECT_LOADED:
                     return 5466;
                 case ErrorCode.MAPPING_INVALID:
                     return 5467;
+                case ErrorCode.PARAMETER_VALUE_NOT_SET:
+                    return 5468;
+                case ErrorCode.PARAMETER_VALUE_INVALID:
+                    return 5469;
                 default:
                     return 0;
             }
@@ -288,7 +292,7 @@ namespace BR.FS.CdcBuilder
 
                 Result retCode = openCONFIGURATORcsharpWRAPPER.OpenProject(projectFile.ToString());
 
-#if DEBUG               
+#if DEBUG
                 Console.WriteLine(String.Format("{0:G}: {1}.", DateTime.Now,
                     "Open project : " + projectFile.ToString() + " : " + retCode.GetErrorString() + " : " +
                     retCode.GetErrorCode()));

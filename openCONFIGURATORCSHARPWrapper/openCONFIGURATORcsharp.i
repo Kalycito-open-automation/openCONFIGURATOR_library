@@ -4,14 +4,14 @@
 #if defined(_WIN32) && defined(_MSC_VER)
 	 #undef DLLEXPORT
 	 #define DLLEXPORT  __declspec(dllexport)
-	 
+
 #endif
 
 %{
 	#include "../openCONFIGURATOR/Include/Exports.h"
-	#include "../openCONFIGURATOR/Include/Enums.h"	
-	#include "../openCONFIGURATOR/Include/Result.h"	
-	#include <vector>		
+	#include "../openCONFIGURATOR/Include/Enums.h"
+	#include "../openCONFIGURATOR/Include/Result.h"
+	#include <vector>
 %}
 
 /* Include all the required SWIG interfaces */
@@ -68,7 +68,7 @@
 %ignore GetObjectType(const std::string& objectType);
 
 %include "../openCONFIGURATOR/Include/Exports.h"
-%include "../openCONFIGURATOR/Include/Enums.h"	
+%include "../openCONFIGURATOR/Include/Enums.h"
 
 namespace openCONFIGURATOR
 {
@@ -76,8 +76,8 @@ namespace openCONFIGURATOR
 	{
 		namespace ErrorHandling
 		{
-			DLLEXPORT enum ErrorCode 
-			{ 
+			DLLEXPORT enum ErrorCode
+			{
 				SUCCESS = 0,
 				FILE_WRITE_FAILED,
 				FILE_READ_FAILED,
@@ -136,8 +136,10 @@ namespace openCONFIGURATOR
 				SCHEMA_PARSER_CONTEXT_ERROR,
 				SCHEMA_VALIDATION_CONTEXT_ERROR,
 				NO_PROJECT_LOADED,
-				MAPPING_INVALID
-			};		
+				MAPPING_INVALID,
+				PARAMETER_VALUE_NOT_SET,
+				PARAMETER_VALUE_INVALID
+			};
 
 			class DLLEXPORT Result
 			{
@@ -152,7 +154,7 @@ namespace openCONFIGURATOR
 
 				ErrorCode GetErrorCode() const;
 				const std::string& GetErrorString() const;
-				bool IsSuccessful() const;			
+				bool IsSuccessful() const;
 
 			};// Result
 
@@ -178,7 +180,10 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result ReplaceXdd(const unsigned int nodeId, const std::string path, const std::string xddFile);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingNode(const unsigned int nodeId, bool& exists);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int& nodeCount);
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds); 
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds);
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetNodeParameter(const UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, const std::string value);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeParameter(const UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, std::string& value);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const unsigned int nodeId, const unsigned int index, const std::string actualValue, const std::string name, ObjectType objectType);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, const std::string attributeValue);
@@ -193,8 +198,8 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingIndex(const unsigned int nodeId, const unsigned int index, bool& exists);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, bool& exists);
 
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndices(const unsigned int nodeId, std::vector<unsigned int>& indices); 
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const unsigned int nodeId, const unsigned int index, std::vector<unsigned int>& subIndices); 
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndices(const unsigned int nodeId, std::vector<unsigned int>& indices);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const unsigned int nodeId, const unsigned int index, std::vector<unsigned int>& subIndices);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const unsigned int nodeId, unsigned int& indexCount);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const unsigned int nodeId, const unsigned int index, unsigned int& subIndexCount);

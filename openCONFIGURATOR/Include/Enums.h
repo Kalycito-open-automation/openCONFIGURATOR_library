@@ -400,7 +400,7 @@ DLLEXPORT enum ConfiguratorError
  */
 /**
  \brief List of available process image representations.
- \author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+ \author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 */
 DLLEXPORT enum OutputLanguage
 {
@@ -454,7 +454,7 @@ namespace openCONFIGURATOR
 				\brief	Powerlink data types
 
 						See EPSG DS 301, v1.1.0, v1.2.0
-				\author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 				*/
 				enum PlkDataType
 				{
@@ -489,6 +489,43 @@ namespace openCONFIGURATOR
 				};
 				/** @} */
 			}
+		}
+
+		namespace NodeParameter
+		{
+			/** \addtogroup nodeapi
+			* @{
+			 */
+			/**
+			\brief	List of available node parameter
+
+				See EPSG DS 301, v1.1.0, v1.2.0
+			\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+			*/
+			enum NodeParameter
+			{
+				NODENAME = 0, /**< Name of the node */
+				NODEID, /**< Id of the node */
+				STATIONTYPE, /**< Station type of the node (Normal, Chained or Multiplexed)*/
+				FORCED_MULTIPLEXED_CYCLE, /**< Force a destinct cycle for a multiplexed node*/
+				TRANSMIT_SPRES,
+				ASYNC_SLOT_TIMEOUT,
+				ASND_MAX_NUMBER,
+				IS_ASYNC_ONLY,
+				IS_TYPE_1ROUTER,
+				IS_TYPE_2ROUTER,
+				IS_MANDATORY,
+				AUTOSTART_NODE,
+				RESET_IN_OPERATIONAL,
+				VERIFY_APP_SW_VERSION,
+				AUTO_APP_SW_UPDATE_ALLOWED,
+				VERIFY_DEVICETYPE,
+				VERIFY_VENDORID,
+				VERIFY_REVISIONNUMBER,
+				VERIFY_PRODUCTCODE,
+				VERIFY_SERIALNUMBER
+			};
+			/** @} */
 		}
 	}
 }

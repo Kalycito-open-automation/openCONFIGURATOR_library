@@ -26,8 +26,8 @@ namespace openCONFIGURATOR
 			\brief	Add a new node to the network.
 
 			\param[in] nodeId Supply 240 for an MN, 1..239 for CNs.
-			\param[in] nodeName	Name of the node.
-			\param[in] xddFile The node's XDD to import (default CN-XDD if empty).
+			\param[in] nodeName	Name of the node. Auto-generated as "MN" or "CN_<nodeId>" if empty.
+			\param[in] xddFile The node's XDD to import (default XDD if empty).
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
@@ -36,7 +36,7 @@ namespace openCONFIGURATOR
 			/**
 			\brief	Delete a node from the network.
 
-			\param[in] nodeId NodeID for the node to be deleted.
+			\param[in] nodeId NodeID of the node to be deleted.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
@@ -80,7 +80,29 @@ namespace openCONFIGURATOR
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<UINT32>& nodeIds); 
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<UINT32>& nodeIds);
+
+			/**
+			\brief	Set a POWERLINK parameter value of an existing node.
+
+			\param[in] nodeId NodeID of the node to set the parameter for.
+			\param[in] param openCONFIGURATOR::Library::NodeParameter::NodeParameter to set.
+			\param[in] value Parameter value to set.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetNodeParameter(const UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, const std::string value);
+
+			/**
+			\brief	Get a POWERLINK parameter value of an existing node.
+
+			\param[in] nodeId NodeID
+			\param[in] param openCONFIGURATOR::Library::NodeParameter::NodeParameter to be retrieved
+			\param[out] parameter value
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeParameter(const UINT32 nodeId, const openCONFIGURATOR::Library::NodeParameter::NodeParameter param, std::string& value);
+
 			/** @} */
 		}
 	}
