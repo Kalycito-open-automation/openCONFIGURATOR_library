@@ -180,6 +180,8 @@ namespace BR.FS.CdcBuilder
                     return 5457;
                 case ErrorCode.ACCESS_TYPE_FOR_PDO_INVALID:
                     return 5458;
+                case ErrorCode.PDO_OFFSET_INVALID:
+                    return 5459;
                     
                 default:
                     return 0;

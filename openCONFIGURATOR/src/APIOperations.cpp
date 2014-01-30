@@ -6302,11 +6302,17 @@ ocfmRetCode ProcessPDONodes(bool isBuild)
 									delete[] mappingOffset;
 									LOG_INFO() << "Validating offset(decimal): " << "mappedOffset" << mappedOffset << " ChannelMappedTotalBits" << nodeMappedTotalBytes << " Sidx: " << sidxObj->GetIndexValue();
 									if (mappedOffset != nodeMappedTotalBytes)
-									{										
-										errorString<<"Incorrect offset configured for the PDO\nIn the node "<<nodeObj->GetNodeName()<<"("<<nodeObj->GetNodeId()<<"), Index: "<<indexObj.GetName()<<"(0x"<<indexObj.GetIndexValue()<<") subIndex: "<<sidxObj->GetName()<<"(0x"<<sidxObj->GetIndexValue()<<")";
+									{	//Mapping-Object 0x%X/0x%X on node %d: PDO offset invalid. Actual: %d bits, expected %d bits."
+										boost::format formatter(kMsgPdoOffsetInvalid);
+										formatter 
+											% indexObj.GetIndex()
+											% sidxObj->GetIndex()
+											% nodeObj->GetNodeId()
+											% mappedOffset
+											% nodeMappedTotalBytes;
 										exceptionObj.setErrorCode(OCFM_ERR_INVALID_PDO_OFFSET);
-										exceptionObj.setErrorString(errorString.str());
-										LOG_FATAL() << errorString.str();
+										exceptionObj.setErrorString(formatter.str());
+										LOG_FATAL() << formatter.str();
 										throw exceptionObj;
 									}
 								}

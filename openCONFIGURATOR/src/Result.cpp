@@ -132,8 +132,9 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(ACCESS_TYPE_FOR_PARAMETER_INVALID, errorString);
 		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
 			return Result(ACCESS_TYPE_FOR_PDO_INVALID, errorString);
-			
 		case OCFM_ERR_INVALID_PDO_OFFSET:
+			return Result(PDO_OFFSET_INVALID, errorString);
+			
 		case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
 		case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
 		case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
