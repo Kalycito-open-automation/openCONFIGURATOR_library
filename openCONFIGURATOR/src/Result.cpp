@@ -134,13 +134,17 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 			return Result(ACCESS_TYPE_FOR_PDO_INVALID, errorString);
 		case OCFM_ERR_INVALID_PDO_OFFSET:
 			return Result(PDO_OFFSET_INVALID, errorString);
-			
 		case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
+			return Result(XML_INVALID, errorString);
 		case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
+			return Result(SCHEMA_NOT_FOUND_OR_WELL_FORMED, errorString);
 		case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
+			return Result(SCHEMA_INVALID, errorString);
 		case OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR:
+			return Result(SCHEMA_PARSER_CONTEXT_ERROR, errorString);
 		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
-		case OCFM_ERR_XML_PARSING_ERROR:
+			return Result(SCHEMA_VALIDATION_CONTEXT_ERROR, errorString);
+
 		case OCFM_ERR_NO_PROJECT_LOADED:
 		case OCFM_ERR_EMPTY_PATH:
 		
@@ -148,6 +152,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		// Covered by XDD/XDC XML-Schema validation
 		case OCFM_ERR_XML_FILE_CORRUPTED:
 		case OCFM_ERR_PARSE_XML:
+		case OCFM_ERR_XML_PARSING_ERROR:
 		// Unused throughout library codebase
 		case OCFM_ERR_FILE_NOT_PRESENT:
 		case OCFM_ERR_INVALID_NAME:

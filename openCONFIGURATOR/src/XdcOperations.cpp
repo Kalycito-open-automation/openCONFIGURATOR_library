@@ -809,8 +809,7 @@ ocfmRetCode ValidateXDDFile(const char *fileName)
 	if(exceptionObject.getErrorCode() == OCFM_ERR_SCHEMA_VALIDATION_FAILED)
 	{
 		string errorString(exceptionObject.getErrorString());
-		string fileNameString(fileName);
-		errorString.append("Error occured in file: " + fileNameString);
+		errorString.append(" Error occured in file: " + string(fileName));
 		exceptionObject.setErrorString(errorString);
 	}
 	return exceptionObject;
@@ -904,8 +903,12 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	if (schema_doc == NULL)
 	{
 		// the schema cannot be loaded or is not well-formed 
-
+		boost::format formatter(kMsgSchemaNotFoundOrWellFormed);
+		formatter 
+			% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_NOT_FOUND);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		return exceptionObject;
 	}
 	xmlSchemaParserCtxtPtr parser_ctxt = xmlSchemaNewDocParserCtxt(schema_doc);
@@ -913,8 +916,12 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	{
 		// unable to create a parser context for the schema 
 		xmlFreeDoc(schema_doc);
-
+		boost::format formatter(kMsgSchemaParserContextError);
+		formatter 
+			% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		return exceptionObject;
 	}
 
@@ -925,7 +932,12 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 		xmlSchemaFreeParserCtxt(parser_ctxt);
 		xmlFreeDoc(schema_doc);
 
+		boost::format formatter(kMsgSchemaInvalid);
+		formatter 
+			% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_NOT_VALID);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		return exceptionObject;
 	}
 
@@ -936,8 +948,12 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 		xmlSchemaFree(schema);
 		xmlSchemaFreeParserCtxt(parser_ctxt);
 		xmlFreeDoc(schema_doc);
-
+		boost::format formatter(kMsgSchemaValidationContextError);
+		formatter 
+			% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR);
+		exceptionObject.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
 		return exceptionObject;
 	}
 

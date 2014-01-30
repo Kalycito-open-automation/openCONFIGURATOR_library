@@ -478,6 +478,12 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName
 			LOG_FATAL() << formatter.str();
 			throw errCodeObj;
 		}
+		errCodeObj = ValidateXDDFile(importXmlFile);
+		if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
+		{
+			LOG_FATAL() << errCodeObj.getErrorString();
+			throw errCodeObj;
+		}
 		errCodeObj = ImportXML(importXmlFile, nodeId, nodeType);
 		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{

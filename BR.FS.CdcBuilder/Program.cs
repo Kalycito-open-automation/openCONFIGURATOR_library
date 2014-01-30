@@ -182,6 +182,16 @@ namespace BR.FS.CdcBuilder
                     return 5458;
                 case ErrorCode.PDO_OFFSET_INVALID:
                     return 5459;
+                case ErrorCode.XML_INVALID:
+                    return 5460;
+                case ErrorCode.SCHEMA_NOT_FOUND_OR_WELL_FORMED:
+                    return 5461;
+                case ErrorCode.SCHEMA_INVALID:
+                    return 5462;
+				case ErrorCode.SCHEMA_PARSER_CONTEXT_ERROR:
+                    return 5463;
+				case ErrorCode.SCHEMA_VALIDATION_CONTEXT_ERROR:
+                    return 5464;
                     
                 default:
                     return 0;

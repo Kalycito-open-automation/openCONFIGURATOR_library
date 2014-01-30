@@ -76,7 +76,11 @@ namespace openCONFIGURATOR
 			const std::string kMsgMappingTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Mismatching PDOMapping ('%s' Mapping-Object, mapped object '%s').";
 			const std::string kMsgAccessTypeForParameterInvalid = "Mapping-Object 0x%X/0x%X: Parameter with uniqueId '%s', referenced by mapped index 0x%X/0x%s on node %d, has invalid access type ('%s').";
 			const std::string kMsgAccessTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Invalid access type '%s' (RPDOs must be writeable, TPDOs readable).";
-			const std::string kMsgPdoOffsetInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping offset invalid. Actual: %d bits, expected %d bits.";
+			const std::string kMsgPdoOffsetInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping offset invalid. Actual: %d bits, expected %d bits.";			
+			const std::string kMsgSchemaNotFoundOrWellFormed = "XML schema file '%s' cannot be loaded or is not well-formed.";
+			const std::string kMsgSchemaInvalid = "XML schema file '%s' is not valid.";
+			const std::string kMsgSchemaParserContextError = "LibXML2 cannot create a parser context for the XML schema file '%s'.";
+			const std::string kMsgSchemaValidationContextError = "LibXML2 cannot create a validation context for the XML schema file '%s'.";
 
 			DLLEXPORT enum ErrorCode 
 			{ 
@@ -130,7 +134,12 @@ namespace openCONFIGURATOR
 				MAPPING_TYPE_FOR_PDO_INVALID,
 				ACCESS_TYPE_FOR_PARAMETER_INVALID,
 				ACCESS_TYPE_FOR_PDO_INVALID,
-				PDO_OFFSET_INVALID
+				PDO_OFFSET_INVALID,
+				XML_INVALID,
+				SCHEMA_NOT_FOUND_OR_WELL_FORMED,
+				SCHEMA_INVALID,
+				SCHEMA_PARSER_CONTEXT_ERROR,
+				SCHEMA_VALIDATION_CONTEXT_ERROR
 				
 			};		
 
