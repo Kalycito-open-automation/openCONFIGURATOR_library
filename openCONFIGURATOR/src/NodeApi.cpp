@@ -124,7 +124,7 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			/*DLLEXPORT ocfmRetCode GetNode(const unsigned int nodeId, Node& node);*/
+			/*DLLEXPORT ocfmRetCode GetNode(const UINT32 nodeId, Node& node);*/
 
 			DLLEXPORT Result ReplaceXdd(const UINT32 nodeId, const string path, const string xddFile)
 			{
@@ -216,6 +216,7 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
+
 			DLLEXPORT Result SetNodeParameter(const UINT32 nodeId, const ::NodeParameter param, const string value)
 			{
 				try
@@ -291,10 +292,10 @@ namespace openCONFIGURATOR
 								case ASYNC_SLOT_TIMEOUT:
 									{
 										UINT32 asyncSlotTimeOut = 0;
-										if(boost::istarts_with("0x", value))
-											asyncSlotTimeOut = HexToInt<unsigned int>(value);
+										if (boost::istarts_with("0x", value))
+											asyncSlotTimeOut = HexToInt<UINT32>(value);
 										else
-											asyncSlotTimeOut = boost::lexical_cast<unsigned int>(value);
+											asyncSlotTimeOut = boost::lexical_cast<UINT32>(value);
 										bool exists = false;
 										Result res = IsExistingSubIndex(nodeObj.GetNodeId(), 0x1F8A, 2, exists);
 										if (res.IsSuccessful() && exists)
@@ -305,10 +306,10 @@ namespace openCONFIGURATOR
 								case ASND_MAX_NUMBER:
 									{
 										UINT32 aSndMaxNumber = 0;
-										if(boost::istarts_with("0x", value))
-											aSndMaxNumber = HexToInt<unsigned int>(value);
+										if (boost::istarts_with("0x", value))
+											aSndMaxNumber = HexToInt<UINT32>(value);
 										else
-											aSndMaxNumber = boost::lexical_cast<unsigned int>(value);
+											aSndMaxNumber = boost::lexical_cast<UINT32>(value);
 
 										bool exists = false;
 										Result res = IsExistingSubIndex(nodeObj.GetNodeId(), 0x1F8A, 2, exists);
@@ -327,10 +328,10 @@ namespace openCONFIGURATOR
 								case NODEID:
 									{
 										UINT32 newNodeId = 0;
-										if(boost::istarts_with("0x", value))
-											newNodeId = HexToInt<unsigned int>(value);
+										if (boost::istarts_with("0x", value))
+											newNodeId = HexToInt<UINT32>(value);
 										else
-											newNodeId = boost::lexical_cast<unsigned int>(value);
+											newNodeId = boost::lexical_cast<UINT32>(value);
 
 										if (nodeId == newNodeId)
 											return Result();
@@ -350,12 +351,12 @@ namespace openCONFIGURATOR
 								case STATIONTYPE:
 									{
 										INT32 stationType = -1;
-										if(boost::istarts_with("0x", value))
-											stationType = HexToInt<unsigned int>(value);
+										if (boost::istarts_with("0x", value))
+											stationType = HexToInt<UINT32>(value);
 										else
-											stationType = boost::lexical_cast<unsigned int>(value);
+											stationType = boost::lexical_cast<UINT32>(value);
 
-										if(stationType < 0 || stationType > 2)
+										if (stationType < 0 || stationType > 2)
 										{
 											boost::format formatter(kMsgParameterValueInvalid);
 											formatter % nodeId
@@ -363,7 +364,7 @@ namespace openCONFIGURATOR
 											% value;
 											return Result(PARAMETER_VALUE_INVALID, formatter.str());
 										}
-										if(nodeObj.GetStationType() == stationType)
+										if (nodeObj.GetStationType() == stationType)
 											return Result();
 										StationType prevStationType = nodeObj.GetStationType();
 										nodeObj.SetStationType((StationType) stationType);
@@ -395,7 +396,7 @@ namespace openCONFIGURATOR
 									{
 										if (nodeObj.GetStationType() == MULTIPLEXED)
 										{
-											if(value == "0")
+											if (value == "0")
 												nodeObj.SetForceCycleFlag(false);
 											else
 												nodeObj.SetForceCycleFlag(true);

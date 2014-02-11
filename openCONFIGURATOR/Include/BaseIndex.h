@@ -231,7 +231,7 @@ class BaseIndex
 		 \return	void
 		 */
 		/*****************************************************************************/
-		void SetDataType(char* dataTypeName);
+		void SetDataType(const char* dataTypeName);
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the DataType name of the Index for a given Node ID
