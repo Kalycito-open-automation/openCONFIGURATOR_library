@@ -136,9 +136,6 @@ typedef unsigned long int ULONG;
 /******************************************************************************
  Enumerations
  *****************************************************************************/
-/** \addtogroup odapi
- * @{
- */
 /**
 * ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
 */
@@ -151,7 +148,6 @@ enum ObjectType
 	ARRAY = 8,		/**< 8: A multiple data field object where each data field is a simple variable of the SAME basic data type. */
 	RECORD = 9		/**< 9: A multiple data field object where the data fields may be any combination of simple variables. */
 };
-/** @} */
 
 /** An enum PDOMapping.
  * This enum holds the list of PDO mapping type for the Object and SubObject

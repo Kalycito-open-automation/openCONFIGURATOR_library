@@ -376,7 +376,7 @@ DataType BaseIndex::GetDataType()
 	return dataType;
 }
 
-void BaseIndex::SetDataType(char* dataTypeName)
+void BaseIndex::SetDataType(const char* dataTypeName)
 {
 	DataType* objDataType = NULL;
 	NodeCollection* objNodeCol = NULL;

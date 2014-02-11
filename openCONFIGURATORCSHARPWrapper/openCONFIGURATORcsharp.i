@@ -183,13 +183,9 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int& nodeCount);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds); 
 
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const unsigned int nodeId, const unsigned int index, const std::string actualValue, const std::string name, ObjectType objectType);
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, const std::string attributeValue);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexActualValue(const unsigned int nodeId, const unsigned int index, const std::string actualValue);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, std::string& attributeValue);
 
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, const std::string actualValue, const std::string name);
-				/*DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, AttributeType attributeType, const std::string attributeValue);*/
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexActualValue(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, const std::string actualValue);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexAttribute(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, AttributeType attributeType, std::string& attributeValue);
 
@@ -203,9 +199,6 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const unsigned int nodeId, const unsigned int index, unsigned int& subIndexCount);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const unsigned int nodeId, const unsigned int index, const bool getDefault, unsigned int& nrOfEntries);
-
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteIndex(const unsigned int nodeId, const unsigned int index);
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateProcessImageDescription(const OutputLanguage lang, const std::string outputPath, const std::string fileName);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string outputPath, const std::string fileName);

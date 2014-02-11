@@ -23,65 +23,15 @@ namespace openCONFIGURATOR
 			 * @{
 			 */
 			/**
-			\brief	Add an index to the object dictionary of a node.
-
-			\param[in] nodeId		Id of the %Node to add the index to.
-			\param[in] index		Index to add.
-			\param[in] actualValue	Actual value of the index.
-			\param[in] name			Name of the index.
-			\param[in] objectType	::ObjectType of the index.
-
-			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const UINT32 nodeId, const UINT32 index, const std::string actualValue, const std::string name, ObjectType objectType);
-
-			/**
-			\brief	Set an attribute of a node's %Index to the given value.
+			\brief	Set the actual value of an %Index of a %Node.
 
 			\param[in] nodeId			Id of the %Node.
 			\param[in] index			%Index to manipulate.
-			\param[in] attributeType	::AttributeType to set.
-			\param[in] attributeValue	Value to set.
-
-			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const std::string attributeValue);
-
-			/**
-			\brief	Set the actual value of an %Index of a %Node.
-
-			\param[in] nodeId		Id of the %Node.
-			\param[in] index		%Index to manipulate.
 			\param[in] actualValue	Actual value to set.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexActualValue(const UINT32 nodeId, const UINT32 index, const std::string actualValue);
-
-			/**
-			\brief	Return the value of an attribute of a node's index.
-
-			\param[in] nodeId			Id of the %Node.
-			\param[in] index			%Index to get attribute from.
-			\param[in] attributeType	::AttributeType to get.
-			\param[out] attributeValue	Attribute value.
-
-			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, std::string& attributeValue);
-
-			/**
-			\brief	Add a %SubIndex to an %Index of a %Node.
-
-			\param[in] nodeId		Id of the %Node.
-			\param[in] index		%Index to add the %SubIndex to.
-			\param[in] subIndex		%SubIndex to add.
-			\param[in] actualValue	Actual value of the %SubIndex.
-			\param[in] name			Name of the index.
-
-			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue, const std::string name);
 
 			/**
 			\brief	Set the actual value of a %SubIndex of an %Index.
@@ -94,6 +44,19 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexActualValue(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue);
+
+
+			/**
+			\brief	Return the value of an attribute of a node's index.
+
+			\param[in] nodeId			Id of the %Node.
+			\param[in] index			%Index to get attribute from.
+			\param[in] attributeType	::AttributeType to get.
+			\param[out] attributeValue	Attribute value.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, std::string& attributeValue);
 
 			/**
 			\brief	Get the attribute value of a %SubIndex of a %Node.
@@ -163,6 +126,33 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const UINT32 nodeId, const UINT32 index, const bool getDefault, UINT32& nrOfEntries);
+			/** @} */
+			/**
+			\brief	Add an index to the object dictionary of a node.
+
+			\param[in] nodeId		Id of the %Node to add the index to.
+			\param[in] index		Index to add.
+			\param[in] actualValue	Actual value of the index.
+			\param[in] name			Name of the index.
+			\param[in] objectType	::ObjectType of the index.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const UINT32 nodeId, const UINT32 index, const std::string actualValue, const std::string name, ObjectType objectType);
+
+			/**
+			\brief	Add a %SubIndex to an %Index of a %Node.
+
+			\param[in] nodeId		Id of the %Node.
+			\param[in] index		%Index to add the %SubIndex to.
+			\param[in] subIndex		%SubIndex to add.
+			\param[in] actualValue	Actual value of the %SubIndex.
+			\param[in] name			Name of the index.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			\deprecated Since 1.4.0
+			*/
+			openCONFIGURATOR::Library::ErrorHandling::Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue, const std::string name);
 
 			/**
 			\brief	Delete an %Index of the object dictionary of a %Node.
@@ -171,8 +161,9 @@ namespace openCONFIGURATOR
 			\param[in] index	%Index to delete.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			\deprecated Since 1.4.0
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteIndex(const UINT32 nodeId, const UINT32 index);
+			openCONFIGURATOR::Library::ErrorHandling::Result DeleteIndex(const UINT32 nodeId, const UINT32 index);
 
 			/**
 			\brief	Delete a %SubIndex of an %Index.
@@ -182,9 +173,35 @@ namespace openCONFIGURATOR
 			\param[in] subIndex	%SubIndex to delete.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			\deprecated Since 1.4.0
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
+			openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
+			/**
+			\brief	Set an attribute of a node's %Index to the given value.
 
+			\param[in] nodeId			Id of the %Node.
+			\param[in] index			%Index to manipulate.
+			\param[in] attributeType	::AttributeType to set.
+			\param[in] attributeValue	Value to set.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			\deprecated Since 1.4.0
+			*/
+			openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const std::string attributeValue);
+			
+			/**
+			\brief	Set an attribute of a node's %SubIndex to the given value.
+
+			\param[in] nodeId			Id of the %Node.
+			\param[in] index			%Index to manipulate.
+			\param[in] subindex			%SubIndex to manipulate.
+			\param[in] attributeType	::AttributeType to set.
+			\param[in] attributeValue	Value to set.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			\deprecated Since 1.4.0
+			*/
+			openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const std::string attributeValue);
 			
 			/**
 			\brief	Retrieve all existing indices of a node.
@@ -208,7 +225,6 @@ namespace openCONFIGURATOR
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const UINT32 nodeId, const UINT32 index, std::vector<UINT32>& subIndices); 
 
 			/** @} */
-			openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const std::string attributeValue);
 		}
 	}
 }

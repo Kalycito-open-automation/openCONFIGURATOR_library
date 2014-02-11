@@ -10353,7 +10353,7 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 //	return exceptionObj;
 //}
 
-void UpdateNumberOfEnteriesSIdx(Index* indexObj)
+void UpdateNumberOfEnteriesSIdx(Index *indexObj)
 {
 	ocfmRetCode exceptionObj;
 	if (!indexObj)

@@ -29,7 +29,7 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 
-			DLLEXPORT Result AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
+			Result AddIndex(const UINT32 nodeId, const UINT32 index, const string actualValue, const string name, ObjectType objectType)
 			{
 				try
 				{
@@ -63,7 +63,7 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			DLLEXPORT Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
+			Result SetIndexAttribute(const UINT32 nodeId, const UINT32 index, AttributeType attributeType, const string attributeValue)
 			{
 				try
 				{
@@ -89,6 +89,13 @@ namespace openCONFIGURATOR
 							boost::format formatter(kMsgNonExistingIndex);
 							formatter % index % nodeId;
 							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
+						}
+
+						if (attributeValue.empty())
+						{
+							boost::format formatter(kMsgEmptyArgument);
+							formatter % "attributeValue";
+							return Result(ARGUMENT_INVALID_EMPTY, formatter.str());
 						}
 
 						switch (attributeType)
@@ -124,12 +131,79 @@ namespace openCONFIGURATOR
 								indexPtr->SetObjectType(GetObjectType(attributeValue));
 								break;
 							case NAME:
+								indexPtr->SetName(attributeValue.c_str());
+								break;
 							case DATATYPE:
+								{
+									if ((CheckIfDataTypeByNameExists(attributeValue.c_str(),
+									                                 indexPtr->GetNodeID())) == true)
+									{
+										indexPtr->SetDataTypeName(attributeValue.c_str(), nodeId);
+										if (indexPtr->GetEObjectType() == ARRAY)
+										{
+											indexPtr->UpdateArraySubObjects();
+										}
+									}
+									else
+									{
+										boost::format formatter(kMsgSimpleDatatypeNotFound);
+										formatter
+										% attributeValue.c_str()
+										% indexPtr->GetIndex()
+										% "-"
+										% nodeId;
+										return Result(SIMPLE_DATATYPE_NOT_FOUND, formatter.str());
+									}
+									break;
+								}
 							case ACCESSTYPE:
+								{
+									indexPtr->SetAccessType(attributeValue.c_str());
+									break;
+								}
 							case DEFAULTVALUE:
+								{
+									indexPtr->SetDefaultValue(attributeValue.c_str());
+									break;
+								}
 							case PDOMAPPING:
+								{
+									indexPtr->SetPDOMapping(attributeValue.c_str());
+									break;
+								}
 							case LOWLIMIT:
+								{
+									ocfmRetCode errorLimitInfo = CheckUpperAndLowerLimits(attributeValue.c_str(),
+									                             indexPtr->GetHighLimit());
+									if (errorLimitInfo.getErrorCode() == OCFM_ERR_SUCCESS)
+									{
+										indexPtr->SetLowLimit(attributeValue.c_str());
+									}
+									else
+									{
+										boost::format formatter(kMsgNodeIndexDescription);
+										formatter % nodeId
+										% indexPtr->GetIndex();
+										return Result(OBJECT_LIMITS_INVALID, formatter.str() + errorLimitInfo.getErrorString());
+									}
+									break;
+								}
 							case HIGHLIMIT:
+								{
+									ocfmRetCode errorLimitInfo = CheckUpperAndLowerLimits(indexPtr->GetLowLimit(), attributeValue.c_str());
+									if (errorLimitInfo.getErrorCode() == OCFM_ERR_SUCCESS)
+									{
+										indexPtr->SetHighLimit(attributeValue.c_str());
+									}
+									else
+									{
+										boost::format formatter(kMsgNodeIndexDescription);
+										formatter % nodeId
+										% indexPtr->GetIndex();
+										return Result(OBJECT_LIMITS_INVALID, formatter.str() + errorLimitInfo.getErrorString());
+									}
+									break;
+								}
 							default:
 								{
 									boost::format formatter(kMsgUnsupportedAttributeType);
@@ -187,6 +261,13 @@ namespace openCONFIGURATOR
 							return Result(SUBINDEX_DOES_NOT_EXIST, formatter.str());
 						}
 
+						if (attributeValue.empty())
+						{
+							boost::format formatter(kMsgEmptyArgument);
+							formatter % "attributeValue";
+							return Result(ARGUMENT_INVALID_EMPTY, formatter.str());
+						}
+
 						switch (attributeType)
 						{
 
@@ -219,13 +300,83 @@ namespace openCONFIGURATOR
 									break;
 								}
 							case NAME:
+								{
+									subIndexPtr->SetName(attributeValue.c_str());
+									break;
+								}
 							case OBJECTTYPE:
+								{
+									subIndexPtr->SetObjectType(attributeValue.c_str());
+									break;
+								}
 							case DATATYPE:
+								{
+									if (true
+									        == (CheckIfDataTypeByNameExists(attributeValue.c_str(),
+									                                        subIndexPtr->GetNodeID())))
+									{
+										subIndexPtr->SetDataTypeName(attributeValue.c_str(), nodeId);
+									}
+									else
+									{
+										boost::format formatter(kMsgSimpleDatatypeNotFound);
+										formatter
+										% attributeValue.c_str()
+										% indexPtr->GetIndex()
+										% subIndexPtr->GetIndexValue()
+										% nodeId;
+										return Result(SIMPLE_DATATYPE_NOT_FOUND, formatter.str());
+									}
+									break;
+								}
 							case ACCESSTYPE:
+								{
+									subIndexPtr->SetAccessType(attributeValue.c_str());
+									break;
+								}
 							case DEFAULTVALUE:
+								{
+									subIndexPtr->SetDefaultValue(attributeValue.c_str());
+									break;
+								}
 							case PDOMAPPING:
+								{
+									subIndexPtr->SetPDOMapping(attributeValue.c_str());
+									break;
+								}
 							case LOWLIMIT:
+								{
+									ocfmRetCode errorLimitInfo = CheckUpperAndLowerLimits(attributeValue.c_str(),
+									                             subIndexPtr->GetHighLimit());
+									if (errorLimitInfo.getErrorCode() == OCFM_ERR_SUCCESS)
+									{
+										subIndexPtr->SetLowLimit(attributeValue.c_str());
+									}
+									else
+									{
+										boost::format formatter(kMsgNodeIndexDescription);
+										formatter % nodeId
+										% subIndexPtr->GetIndex();
+										return Result(OBJECT_LIMITS_INVALID, formatter.str() + errorLimitInfo.getErrorString());
+									}
+									break;
+								}
 							case HIGHLIMIT:
+								{
+									ocfmRetCode errorLimitInfo = CheckUpperAndLowerLimits(subIndexPtr->GetLowLimit(), attributeValue.c_str());
+									if (errorLimitInfo.getErrorCode() == OCFM_ERR_SUCCESS)
+									{
+										subIndexPtr->SetHighLimit(attributeValue.c_str());
+									}
+									else
+									{
+										boost::format formatter(kMsgNodeIndexDescription);
+										formatter % nodeId
+										% subIndexPtr->GetIndex();
+										return Result(OBJECT_LIMITS_INVALID, formatter.str() + errorLimitInfo.getErrorString());
+									}
+									break;
+								}
 							default:
 								{
 									boost::format formatter(kMsgUnsupportedAttributeType);
@@ -298,7 +449,7 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			DLLEXPORT Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
+			Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndexId, const string actualValue, const string name)
 			{
 				try
 				{
@@ -586,7 +737,7 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
-			DLLEXPORT Result DeleteIndex(const UINT32 nodeId, const UINT32 index)
+			Result DeleteIndex(const UINT32 nodeId, const UINT32 index)
 			{
 				try
 				{
@@ -611,7 +762,7 @@ namespace openCONFIGURATOR
 				}
 			}
 
-			DLLEXPORT Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
+			Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex)
 			{
 				try
 				{
