@@ -63,6 +63,7 @@
 #include "../Include/Logging.h"
 #include "../Include/BoostShared.h"
 #include "../Include/Result.h"
+#include "../Include/Enums.h"
 
 #include <sstream>
 
@@ -270,6 +271,11 @@ const char* BaseIndex::GetObjectType()
 ObjectType BaseIndex::GetEObjectType()
 {
 	return objectType;
+}
+
+void BaseIndex::SetObjectType(const ObjectType objectType) 
+{
+	this->objectType = objectType;
 }
 
 void BaseIndex::SetObjectType(const char* objTypeStr)

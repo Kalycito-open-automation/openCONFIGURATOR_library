@@ -290,6 +290,13 @@ class BaseIndex
 		/*****************************************************************************/
 		void SetObjectType(const char* objTypeStr);
 
+		/******************************************************************************
+		 \brief		Set the object type of this Index.
+		 
+		 \param		objectType ObjectType to set.
+		*****************************************************************************/
+		void SetObjectType(const ObjectType objectType);
+
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return the NodeID of the Index

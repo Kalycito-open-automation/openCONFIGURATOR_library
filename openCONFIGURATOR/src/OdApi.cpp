@@ -33,26 +33,26 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					ostringstream objectTypeString;
-					objectTypeString << objectType;
-					string indexString = IntToHex(index, 4, "", "");
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						ostringstream objectTypeString;
+						objectTypeString << objectType;
+						string indexString = IntToHex(index, 4, "", "");
+						NodeType nodeType = (nodeId == MN_NODEID)
+							? MN
+							: CN;
 
-					Result result = Translate(AddIndex(nodeId, nodeType, indexString.c_str()));
-					if (!result.IsSuccessful())
-						return result;
-					result = Translate(SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false));
-					if (!result.IsSuccessful())
-						return result;
+						Result result = Translate(AddIndex(nodeId, nodeType, indexString.c_str()));
+						if (!result.IsSuccessful())
+							return result;
+						result = Translate(SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false));
+						if (!result.IsSuccessful())
+							return result;
 
-					return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
-				}
+						return SetIndexAttribute(nodeId, index, OBJECTTYPE, objectTypeString.str());
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -67,8 +67,8 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
 						string indexStr = IntToHex(index, 4, "", "");
 
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
@@ -121,10 +121,12 @@ namespace openCONFIGURATOR
 										% nodeId
 										% "true or false";
 									return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
-								}								
+								}
 							}
-							case NAME:
 							case OBJECTTYPE:
+								indexPtr->SetObjectType(GetObjectType(attributeValue));
+								break;
+							case NAME:
 							case DATATYPE:
 							case ACCESSTYPE:
 							case DEFAULTVALUE:
