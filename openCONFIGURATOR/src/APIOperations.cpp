@@ -8763,7 +8763,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						MNPdoVariable mnPDOObj;
 						mnPDOObj = nodeObj.MNPDOOUTVarCollection[pdoOutLC];
 						indexObj = indexCollObj->GetIndexbyIndexValue(indexIdMN);
-						if(prevSubIndex >= 254)
+						if (prevSubIndex >= 252)
 						{						
 							boost::format formatter(kMsgChannelObjectLimitExceeded);
 							formatter 

@@ -1266,16 +1266,16 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 			// offsetVal (offset in the process image) divided by size in bytes equals
 			// expected subIndex. Since subIndex 0x00 (NrOfEntries) is reserved, increment by 1.
 			INT32 subIndex = (offsetVal / dataSizeBytes) + 1;
-			// If calculated subIndex > 254, calculate the correct next index
-			if (subIndex > 254)
+			// If calculated subIndex > 252, calculate the correct next index
+			if (subIndex > 252)
 			{
 				subIndex--;
-				// An index has 254 subIndices to use, div equals the no. of indices
+				// An index has 252 subIndices to use, div equals the no. of indices
 				// to increment.
-				INT32 div = subIndex / 254;
+				INT32 div = subIndex / 252;
 				// mod equals the subIndex-offset within the resulting index, again increment
 				// by 1 to skip subIndex 0x00
-				INT32 mod = (subIndex % 254) + 1;
+				INT32 mod = (subIndex % 252) + 1;
 
 				// Calc. the new index
 				INT32 addressVal = (INT32) HexToInt(piIndexTable[idx].addressStr);
