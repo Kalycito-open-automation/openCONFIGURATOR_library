@@ -1262,19 +1262,26 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 		if ((piIndexTable[idx].dtObj == dtType)
 				&& (piIndexTable[idx].direction == dirType))
 		{
-			INT32 subIndex;
 			INT32 dataSizeBytes = dataSizeBits / 8;
-			subIndex = (offsetVal / dataSizeBytes) + 1;
+			// offsetVal (offset in the process image) divided by size in bytes equals
+			// expected subIndex. Since subIndex 0x00 (NrOfEntries) is reserved, increment by 1.
+			INT32 subIndex = (offsetVal / dataSizeBytes) + 1;
+			// If calculated subIndex > 254, calculate the correct next index
 			if (subIndex > 254)
 			{
 				subIndex--;
+				// An index has 254 subIndices to use, div equals the no. of indices
+				// to increment.
 				INT32 div = subIndex / 254;
+				// mod equals the subIndex-offset within the resulting index, again increment
+				// by 1 to skip subIndex 0x00
 				INT32 mod = (subIndex % 254) + 1;
 
-				INT32 addressVal;
-				addressVal = (INT32) HexToInt(piIndexTable[idx].addressStr);
+				// Calc. the new index
+				INT32 addressVal = (INT32) HexToInt(piIndexTable[idx].addressStr);
 				addressVal = addressVal + div;
-				stPIObject.indexId = IntToAscii(addressVal, stPIObject.indexId, 16);
+				// Index is expected to be in hex-uppercase!
+				stPIObject.indexId = ConvertToUpper(IntToAscii(addressVal, stPIObject.indexId, 16));
 				stPIObject.sIdxId = IntToAscii(mod, stPIObject.sIdxId, 16);
 				stPIObject.sIdxId = PadLeft(stPIObject.sIdxId, '0', 2);
 			}
