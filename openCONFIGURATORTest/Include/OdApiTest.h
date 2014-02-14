@@ -2,13 +2,13 @@
 *
 * License Agreement
 *
-* Copyright © 2013 BERNECKER + RAINER, AUSTRIA, 5142 EGGELSBERG, B&R STRASSE 1  
+* Copyright © 2013 BERNECKER + RAINER, AUSTRIA, 5142 EGGELSBERG, B&R STRASSE 1
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms,
 * with or without modification,
 * are permitted provided that the following conditions are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright notice,
 *     this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -18,7 +18,7 @@
 *   * Neither the name of the B&R nor the names of its contributors
 *     may be used to endorse or promote products derived from this software
 *     without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -57,56 +57,59 @@
 #include "OpenConfiguratorApi.h"
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 class OdApiTest :
 	public CppUnit::TestFixture
 {
 
-	CPPUNIT_TEST_SUITE(OdApiTest);
-	CPPUNIT_TEST(testAddIndex);
-	CPPUNIT_TEST(testSetIndexAttribute);
-	CPPUNIT_TEST(testSetIndexActualValue);
-	//CPPUNIT_TEST(testGetIndexAttribute);
-	CPPUNIT_TEST(testAddSubIndex);
-	CPPUNIT_TEST(testSetSubIndexAttribute);
-	CPPUNIT_TEST(testSetSubIndexActualValue);
-	//CPPUNIT_TEST(testGetSubIndexAttribute);
-	CPPUNIT_TEST(testIsExistingIndex);
-	CPPUNIT_TEST(testIsExistingSubIndex);
-	CPPUNIT_TEST(testGetIndexCount);
-	CPPUNIT_TEST(testGetSubIndexCount);
-	CPPUNIT_TEST(testGetNumberOfEntries);
-	CPPUNIT_TEST(testDeleteIndex);
-	CPPUNIT_TEST(testDeleteSubIndex);
-	CPPUNIT_TEST_SUITE_END();
+		CPPUNIT_TEST_SUITE(OdApiTest);
+		CPPUNIT_TEST(testAddIndex);
+		CPPUNIT_TEST(testSetIndexAttribute);
+		CPPUNIT_TEST(testSetIndexActualValue);
+		CPPUNIT_TEST(testGetIndexAttribute);
+		CPPUNIT_TEST(testAddSubIndex);
+		CPPUNIT_TEST(testSetSubIndexAttribute);
+		CPPUNIT_TEST(testSetSubIndexActualValue);
+		CPPUNIT_TEST(testGetSubIndexAttribute);
+		CPPUNIT_TEST(testIsExistingIndex);
+		CPPUNIT_TEST(testIsExistingSubIndex);
+		CPPUNIT_TEST(testGetIndexCount);
+		CPPUNIT_TEST(testGetSubIndexCount);
+		CPPUNIT_TEST(testGetNumberOfEntries);
+		CPPUNIT_TEST(testDeleteIndex);
+		CPPUNIT_TEST(testDeleteSubIndex);
+		CPPUNIT_TEST_SUITE_END();
 
-public:
 	public:
-	OdApiTest(void);
-	~OdApiTest(void);
+		OdApiTest(void);
+		~OdApiTest(void);
 
-	void testAddIndex();
-	void testSetIndexAttribute();
-	void testSetIndexActualValue();
-	void testGetIndexAttribute();
+		void setUp();
+		void tearDown();
 
-	void testAddSubIndex();
-	void testSetSubIndexAttribute();
-	void testSetSubIndexActualValue();
+		void testAddIndex();
+		void testSetIndexAttribute();
+		void testSetIndexActualValue();
+		void testGetIndexAttribute();
 
-	void testGetSubIndexAttribute();
+		void testAddSubIndex();
+		void testSetSubIndexAttribute();
+		void testSetSubIndexActualValue();
 
-	void testIsExistingIndex();
-	void testIsExistingSubIndex();
+		void testGetSubIndexAttribute();
 
-	void testGetIndexCount();
-	void testGetSubIndexCount();
-	void testGetNumberOfEntries();
+		void testIsExistingIndex();
+		void testIsExistingSubIndex();
 
-	void testDeleteIndex();
-	void testDeleteSubIndex();
+		void testGetIndexCount();
+		void testGetSubIndexCount();
+		void testGetNumberOfEntries();
 
-private:
-	ocfmRetCode retCode;
+		void testDeleteIndex();
+		void testDeleteSubIndex();
+
+	private:
+		Result retCode;
 
 };

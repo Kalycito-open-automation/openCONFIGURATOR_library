@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openCONFIGURATORProject xmlns="http://sourceforge.net/projects/openconf/configuration" xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://sourceforge.net/projects/openconf/configuration openCONFIGURATOR.xsd" version="1.0.0">
+	<Generator vendor="Bernecker + Rainer Industrie Elektronik Ges.m.b.H." toolName="Automation Studio 4.0.0.15" toolVersion="1.4.0" createdOn="2013-09-16T01:01:01+01:00" modifiedBy="rueckerc" modifiedOn="2013-09-16T01:01:01+01:00"/>
+	<ProjectConfiguration activeAutoGenerationSetting="default">
+		<PathSettings>
+			<Path id="defaultOutputPath" path="./output"/>
+			<Path id="txt2CdcPath" path="./txt2cdc.exe"/>
+		</PathSettings>
+		<AutoGenerationSettings id="default"/>
+	</ProjectConfiguration>
+	<NetworkConfiguration asyncMTU="300" cycleTime="2000" multiplexedCycleLength="12" prescaler="0">
+		<NodeCollection>
+			<MN name="MasterOfDesaster" nodeID="240" pathToXDC="./xdc/MN.xdc" asyncSlotTimeout="100000"/>
+			<CN nodeID="1" name="CN1" pathToXDC="./xdc/CN.xdc" isMultiplexed="true" forcedMultiplexedCycle="1"/>
+			<CN nodeID="2" name="CN2" pathToXDC="./xdc/CN2.xdc" isChained="true" forcedMultiplexedCycle="2"/>
+			<CN nodeID="3" name="CN3" pathToXDC="./xdc/CN3.xdc" isMultiplexed="true" forcedMultiplexedCycle="3"/>
+			<CN nodeID="4" name="CN4" pathToXDC="./xdc/CN.xdc" isMultiplexed="true" forcedMultiplexedCycle="4"/>
+			<CN nodeID="5" name="CN5" pathToXDC="./xdc/CN2.xdc" isChained="true" forcedMultiplexedCycle="5"/>
+			<CN nodeID="6" name="CN6" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="6"/>
+			<CN nodeID="7" name="CN7" pathToXDC="./xdc/CN.xdc" isMultiplexed="true" forcedMultiplexedCycle="7"/>
+			<CN nodeID="8" name="CN8" pathToXDC="./xdc/CN2.xdc" isMultiplexed="true" forcedMultiplexedCycle="8"/>
+			<CN nodeID="9" name="CN9" pathToXDC="./xdc/CN3.xdc" isMultiplexed="true" forcedMultiplexedCycle="9"/>
+			<CN nodeID="10" name="CN10" pathToXDC="./xdc/CN.xdc" isMultiplexed="true" forcedMultiplexedCycle="10"/>
+			<CN nodeID="11" name="CN11" pathToXDC="./xdc/CN2.xdc" isMultiplexed="true" forcedMultiplexedCycle="11"/>
+			<CN nodeID="12" name="CN12" pathToXDC="./xdc/CN3.xdc" isMultiplexed="true" forcedMultiplexedCycle="12"/>
+			<CN nodeID="13" name="CN13" pathToXDC="./xdc/CN.xdc" isChained="true" forcedMultiplexedCycle="0"/>
+			<CN nodeID="14" name="CN14" pathToXDC="./xdc/CN2.xdc" isChained="true" forcedMultiplexedCycle="0"/>
+			<CN nodeID="15" name="CN15" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="16" name="CN16" pathToXDC="./xdc/CN.xdc" isChained="true" forcedMultiplexedCycle="0"/>
+			<CN nodeID="17" name="CN17" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="18" name="CN18" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="19" name="CN19" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<!--<CN nodeID="20" name="CN20" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="21" name="CN21" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="22" name="CN22" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="23" name="CN23" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="24" name="CN24" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="25" name="CN25" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="26" name="CN26" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="27" name="CN27" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="28" name="CN28" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="29" name="CN29" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="30" name="CN30" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="31" name="CN31" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="32" name="CN32" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="33" name="CN33" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="34" name="CN34" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="35" name="CN35" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="36" name="CN36" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="37" name="CN37" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="38" name="CN38" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="39" name="CN39" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="40" name="CN40" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="41" name="CN41" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="42" name="CN42" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="43" name="CN43" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="44" name="CN44" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="45" name="CN45" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="46" name="CN46" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="47" name="CN47" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="48" name="CN48" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="49" name="CN49" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="50" name="CN50" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="51" name="CN51" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="52" name="CN52" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="53" name="CN53" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="54" name="CN54" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="55" name="CN55" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="56" name="CN56" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="57" name="CN57" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="58" name="CN58" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="59" name="CN59" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="60" name="CN60" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="61" name="CN61" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="62" name="CN62" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="63" name="CN63" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="64" name="CN64" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="65" name="CN65" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="66" name="CN66" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="67" name="CN67" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="68" name="CN68" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="69" name="CN69" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="70" name="CN70" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="71" name="CN71" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="72" name="CN72" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="73" name="CN73" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="74" name="CN74" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="75" name="CN75" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="76" name="CN76" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="77" name="CN77" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="78" name="CN78" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="79" name="CN79" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="80" name="CN80" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="81" name="CN81" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="82" name="CN82" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="83" name="CN83" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="84" name="CN84" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="85" name="CN85" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="86" name="CN86" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="87" name="CN87" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="88" name="CN88" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="89" name="CN89" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="90" name="CN90" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="91" name="CN91" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="92" name="CN92" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="93" name="CN93" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="94" name="CN94" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="95" name="CN95" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="96" name="CN96" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="97" name="CN97" pathToXDC="./xdc/CN2.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="98" name="CN98" pathToXDC="./xdc/CN3.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="99" name="CN99" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>
+			<CN nodeID="100" name="CN100" pathToXDC="./xdc/CN.xdc" forcedMultiplexedCycle="0"/>!-->
+		</NodeCollection>
+	</NetworkConfiguration>
+</openCONFIGURATORProject>

@@ -2,13 +2,13 @@
 *
 * License Agreement
 *
-* Copyright © 2013 BERNECKER + RAINER, AUSTRIA, 5142 EGGELSBERG, B&R STRASSE 1  
+* Copyright © 2013 BERNECKER + RAINER, AUSTRIA, 5142 EGGELSBERG, B&R STRASSE 1
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms,
 * with or without modification,
 * are permitted provided that the following conditions are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright notice,
 *     this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -18,7 +18,7 @@
 *   * Neither the name of the B&R nor the names of its contributors
 *     may be used to endorse or promote products derived from this software
 *     without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -54,14 +54,14 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
- 
+
 using namespace std;
 
 int main()
 {
 	cout << "Execute openCONFIGURATOR unit tests - build on: " __DATE__ ", " __TIME__ << endl;
 	// get the top-level suite of tests (registry is not the Win32 registry)
-	CppUnit::Test * suite = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
+	CppUnit::Test* suite = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
 	// add the test to the list of tests to run
 	CppUnit::TextUi::TestRunner runner;
 	runner.addTest(suite);

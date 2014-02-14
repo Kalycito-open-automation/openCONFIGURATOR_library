@@ -142,7 +142,12 @@ ADD_CUSTOM_COMMAND(TARGET openCONFIGURATORTest POST_BUILD
         "${PROJECT_BINARY_DIR}/$<CONFIGURATION>")
 
 ADD_CUSTOM_COMMAND(TARGET openCONFIGURATORTest POST_BUILD
-                   COMMAND "$(TargetDir)$(TargetFileName)" 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/openCONFIGURATORTest/test_resources"
+        "${PROJECT_BINARY_DIR}/")
+
+ADD_CUSTOM_COMMAND(TARGET openCONFIGURATORTest POST_BUILD
+                   COMMAND "$(TargetDir)$(TargetFileName)" > openCONFIGURATOR_unit_test_output.txt
                    COMMENT "Running openCONFIGURATOR CPPUNIT tests")
 				   
 

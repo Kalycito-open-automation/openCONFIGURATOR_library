@@ -51,21 +51,41 @@
 
 *******************************************************************************/
 #include "..\Include\ImportExportApiTest.h"
+using namespace openCONFIGURATOR::Library::API;
 
-CPPUNIT_TEST_SUITE_REGISTRATION( ImportExportApiTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(ImportExportApiTest);
 
-ImportExportApiTest::ImportExportApiTest(void)
+ImportExportApiTest::ImportExportApiTest(void) {}
+
+ImportExportApiTest::~ImportExportApiTest(void) {}
+
+void ImportExportApiTest::setUp() {}
+
+void ImportExportApiTest::tearDown()
 {
-}
-
-ImportExportApiTest::~ImportExportApiTest(void)
-{
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 }
 
 void ImportExportApiTest::testGenerateProcessImageDescription()
 {
+	this->retCode = OpenProject(".\\testProject\\testProject.xml");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = GenerateStackConfiguration(".\\testProject\\output", "mnobd");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = GenerateProcessImageDescription(C, ".\\testProject\\output", "XAP");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = GenerateProcessImageDescription(CSHARP, ".\\testProject\\output", "PI");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 }
 
 void ImportExportApiTest::testGenerateStackConfiguration()
 {
+	//Test already conducted within testGenerateProcessImageDescription()
 }

@@ -53,42 +53,43 @@
 #include "..\Include\NodeApiTest.h"
 using namespace openCONFIGURATOR::Library::API;
 
-CPPUNIT_TEST_SUITE_REGISTRATION( NodeApiTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(NodeApiTest);
 
-NodeApiTest::NodeApiTest(void)
+NodeApiTest::NodeApiTest() {}
+
+NodeApiTest::~NodeApiTest() {}
+
+void NodeApiTest::setUp() {}
+
+void NodeApiTest::tearDown()
 {
-}
-
-
-NodeApiTest::~NodeApiTest(void)
-{
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 }
 
 void NodeApiTest::testAddNode()
 {
-	ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-	retCode = NewProject("TestProject",".");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(12,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(12,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_NODE_ALREADY_EXISTS);
+	this->retCode = NewProject("TestProject", ".", "./resources/openPOWERLINK_MN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(12, "Node", "");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(12, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.GetErrorCode() == NODE_EXISTS);
 	retCode = CloseProject();
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 }
 void NodeApiTest::testDeleteNode()
 {
-	ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-	retCode = NewProject("TestProject",".");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(12,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	Result retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(12, "Node");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	retCode = DeleteNode(12);
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	retCode = DeleteNode(12);
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_NODEID_NOT_FOUND);
+	CPPUNIT_ASSERT(retCode.GetErrorCode() == NODE_DOES_NOT_EXIST);
 	retCode = CloseProject();
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 }
 void NodeApiTest::testReplaceXdd()
 {
@@ -96,31 +97,31 @@ void NodeApiTest::testReplaceXdd()
 }
 void NodeApiTest::testIsExistingNode()
 {
-	ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-	retCode = NewProject("TestProject",".");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(14,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(14,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_NODE_ALREADY_EXISTS);
+	Result retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(12, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(12, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.GetErrorCode() == NODE_EXISTS);
 	retCode = CloseProject();
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 }
 void NodeApiTest::testGetNodeCount()
 {
-	ocfmRetCode retCode(OCFM_ERR_UNKNOWN);
-	retCode = NewProject("TestProject",".");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(1,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(2,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(3,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	retCode = AddNode(4,CN,"Node");
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
-	UINT32 nodeCount = GetNodeCount();
+	Result retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(1, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(2, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(3, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(4, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	UINT32 nodeCount = 0;
+	retCode = openCONFIGURATOR::Library::API::GetNodeCount(nodeCount);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	CPPUNIT_ASSERT(nodeCount == 5);
 	retCode = CloseProject();
-	CPPUNIT_ASSERT(retCode.getErrorCode() == OCFM_ERR_SUCCESS);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 }
