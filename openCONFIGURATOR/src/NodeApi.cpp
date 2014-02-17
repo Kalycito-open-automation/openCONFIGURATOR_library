@@ -97,7 +97,7 @@ namespace openCONFIGURATOR
 
 					Result retValue = Translate(ValidateXDDFile(fullPath.generic_string().c_str()));
 					if (retValue.IsSuccessful())
-						return Translate(ImportXML(fullPath.generic_string().c_str(), nodeId, type));
+						return Translate(ReImportXML(fullPath.generic_string().c_str(), nodeId, type));
 					else
 						return retValue;
 				}
