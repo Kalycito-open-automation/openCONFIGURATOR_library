@@ -774,14 +774,12 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 		PIDirectionType dirType, FILE* netHeader)
 {
-	char* mainBuffer = new char[HEADER_FILE_BUFFER];
-	mainBuffer[0] = 0;
+	char* mainBuffer = new char[HEADER_FILE_BUFFER]();
 
-	char offsetStr[10];
+	char offsetStr[10] = { 0 };
 	UINT32 offsetVal = 0;
 	NETProcessImage *objNetPiCol = NULL;
-	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType,
-			netHeader);
+	INT32 totalSizeVal = GroupNETHeaderContents(piObj, noOfVars, dirType);
 	NodeCollection* objNodeCol = NULL;
 	objNodeCol = NodeCollection::GetNodeColObjectPointer();
 
@@ -790,7 +788,6 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	for (INT32 loopCount = 0; loopCount < netPIVarsCount; loopCount++)
 	{
 		strcat(mainBuffer, "\t\t[FieldOffset(");
-		memset(offsetStr, 0, 10);
 		IntToAscii(offsetVal, offsetStr, 10);
 		strcat(mainBuffer, offsetStr);
 		strcat(mainBuffer, ")]\n");
@@ -902,9 +899,8 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 
 }
 
-//TODO: 'netHeader' : unreferenced formal parameter
 INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
-		PIDirectionType dirType, FILE* netHeader)
+		PIDirectionType dirType)
 {
 
 	INT32 totalSize = 0;
@@ -945,7 +941,6 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 						strcpy(holeid, "");
 						strcpy(filledBitsStr, "");
 						NETProcessImage objNETProcessImage;
-						objNETProcessImage.Initialize();
 						holeid = IntToAscii(holeFilledIdNo, holeid, 10);
 						objNETProcessImage.name = new char[strlen(holeid)
 								+ ALLOC_BUFFER];
@@ -1001,7 +996,6 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 						//create new
 						netPICreated = true;
 						NETProcessImage objNETProcessImage;
-						objNETProcessImage.Initialize();
 						CopyPItoNETPICollection(piObject[noVarsLC],
 								objNETProcessImage, varName);
 
@@ -1052,7 +1046,6 @@ INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,
 			{
 				//copy as it is
 				NETProcessImage objNETPI;
-				objNETPI.Initialize();
 				CopyPItoNETPICollection(piObject[noVarsLC], objNETPI, varName);
 			}
 
@@ -1245,7 +1238,7 @@ void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal)
 
 	if (NULL != objIndex)
 	{
-		UpdateNumberOfEnteriesSIdx(objIndex, MN);
+		UpdateNumberOfEnteriesSIdx(objIndex);
 	}
 }
 
@@ -1253,7 +1246,6 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 		INT32 offsetVal, INT32 dataSizeBits)
 {
 	PIObject stPIObject;
-	stPIObject.Initialize();
 	stPIObject.indexId = new char[INDEX_LEN];
 	stPIObject.sIdxId = new char[SUBINDEX_LEN];
 
@@ -1300,7 +1292,7 @@ PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType,
 char* GetPIDataTypeName(char* indexId)
 {
 	char *retDataType = NULL;
-	PDODataType tempDataType;
+	PDODataType tempDataType = UNDEF;
 	for (INT32 iLoopCount = 0; iLoopCount < NO_OF_PI_ENTERIES; iLoopCount++)
 	{
 		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))
@@ -1373,7 +1365,7 @@ char* GetPIDataTypeName(char* indexId)
 char* GetPIName(char* indexId)
 {
 	char *retPiName = NULL;
-	PDODataType tempDataType;
+	PDODataType tempDataType = UNDEF;
 	for (INT32 iLoopCount = 0; iLoopCount < NO_OF_PI_ENTERIES; iLoopCount++)
 	{
 		if (0 == strcmp(piIndexTable[iLoopCount].addressStr, indexId))

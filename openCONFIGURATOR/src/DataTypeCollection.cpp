@@ -69,10 +69,9 @@
 
  */
 
-DataTypeCollection::DataTypeCollection(void)
-{
-
-}
+DataTypeCollection::DataTypeCollection() :
+	dataTypeCollectionObj()
+{}
 
 /*************************************************************************/
 /* Destructor */

@@ -77,7 +77,8 @@ class ObjectDictionary
 	private:
 		ObjectDictionary(void);
 		~ObjectDictionary(void);
-		ObjectDictionary( const ObjectDictionary&);
+		ObjectDictionary(const ObjectDictionary&);
+		void operator=(const ObjectDictionary&);
 
 		INT32 varsattrIdxSIdx;
 		Node* objDictNode;

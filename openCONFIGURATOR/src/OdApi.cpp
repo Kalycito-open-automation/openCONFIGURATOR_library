@@ -69,8 +69,6 @@ namespace openCONFIGURATOR
 				{
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						string indexStr = IntToHex(index, 4, "", "");
-
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
 						assert(nodeCollectionPtr);
 						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);
@@ -160,9 +158,6 @@ namespace openCONFIGURATOR
 				{
 				if (ProjectConfiguration::GetInstance().IsInitialized())
 				{
-						string indexStr = IntToHex(index, 4, "", "");
-						string subIndexStr = IntToHex(subIndex, 2, "", "");
-
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
 						assert(nodeCollectionPtr);
 						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);

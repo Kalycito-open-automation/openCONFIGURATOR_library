@@ -126,7 +126,7 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
  \param[in]		sidxObj			Class pointer of SubIndex to get its properties
  \return		bool			Returns true if the PDOmapping property of the Object is valid
  */
-bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj, SubIndex* sidxObj);
+bool CheckForValidPDOMapping(PDOType pdoTypeVal, SubIndex* sidxObj);
 
 /**
  \brief		Checks if the Object has the property to be mapped as a PDO or not

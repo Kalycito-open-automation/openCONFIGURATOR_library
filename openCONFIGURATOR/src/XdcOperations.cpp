@@ -714,9 +714,10 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 				throw objException;
 			}
 		}
-		catch (ocfmRetCode& ex)
+		catch (const ocfmRetCode& ex)
 		{
-			throw ex;
+			LOG_FATAL() << ex.getErrorString();
+			throw;
 		}
 		name = xmlTextReaderConstName(reader);
 		value = xmlTextReaderConstValue(reader);
@@ -982,7 +983,7 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	return exceptionObject;
 }
 
-void HandleSchemaValidationError(void *ctx, const char *msg, ...)
+void HandleSchemaValidationError(void*, const char *msg, ...)
 {
 	va_list args;
 	va_start(args, msg);
@@ -1171,9 +1172,10 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 			}
 		}
 	}
-	catch (ocfmRetCode& ex)
+	catch (const ocfmRetCode& ex)
 	{
-		throw ex;
+		LOG_FATAL() << ex.getErrorString();
+		throw;
 	}
 }
 
@@ -2076,7 +2078,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			nmtObj = NULL;
 			nmtObj = nodeObj.GetNetworkManagement();
 
 			for (UINT32 featureLC = 0;
@@ -2117,7 +2118,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 				throw objException;
 			}
-			nmtObj = NULL;
 			nmtObj = nodeObj.GetNetworkManagement();
 
 			for (UINT32 featureLC = 0;
@@ -2192,8 +2192,9 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 
 		xmlFreeDoc(xdDoc);
 	}
-	catch (ocfmRetCode& ex)	{
-		throw ex;
+	catch (const ocfmRetCode& ex)	{
+		LOG_FATAL() << ex.getErrorString();
+		throw;
 	}
 
 	objException.setErrorCode(OCFM_ERR_SUCCESS);
@@ -2348,7 +2349,7 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 	return objException;
 }
 
-UINT32 GetDataSize(const string dataTypeVal)
+UINT32 GetDataSize(const string& dataTypeVal)
 {
 	string workDataTypeVal(dataTypeVal);
 	transform(workDataTypeVal.begin(), workDataTypeVal.end(), workDataTypeVal.begin(), ::toupper);
@@ -2622,7 +2623,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 					// Allocate space for normalized hex-value: '0x' + hexValue + null-termination					
 					char* hexVal = new char[strlen(tmpValue) + 1];
 					// Reformat
-					sprintf(hexVal, "0x%X", number);
+					sprintf(hexVal, "0x%X", (unsigned int) number);
 					// Set
 					if (attrType == ACTUALVALUE)
 					{

@@ -81,10 +81,9 @@ NodeCollection* NodeCollection::objNodeColl = NULL;
 
  */
 
-NodeCollection::NodeCollection(void)
-{
-
-}
+NodeCollection::NodeCollection(void) :
+	nodeCollObj()
+{}
 
 /*************************************************************************/
 /* Destructor */

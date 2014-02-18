@@ -165,4 +165,31 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
  */
 void GetAllNodeIdAssignment(char *Buffer, bool isReAssignment);
 
+/**
+\brief		Default attributes to an Index are set from the object dictionary
+
+\param		indexId				Character pointer to hold the IndexID
+\param		indexObj			Class pointer of Index to add the attributes
+\param		dictIndexObj		Class pointer of Index form object dictionary
+
+\return	void
+*/
+/****************************************************************************/
+void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
+									  Index* dictIndexObj);
+
+/*****************************************************************************/
+/**
+\brief		Default attributes to a SubIndex are set from the object dictionary
+
+\param		subIndexId		Character pointer to hold the IndexID
+\param		sidxObj			Class pointer of SubIndex to add the attributes
+\param		dictSidxObj		Class pointer of SubIndex from object dictionary
+
+\return	void
+*/
+/*****************************************************************************/
+void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
+										 SubIndex* dictSidxObj);
+
 #endif // APIOperations_h

@@ -616,12 +616,11 @@ void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue);
  \brief		Updates Sub Index "00"/NumberofEntries with the total number of Sub Indexes excluding Sub Index with id "00"
 
  \param		indexObj		Class pointer of the class Index
- \param		nodeType		Enum of type NodeType to hold node type
 
  \return	void
  */
 /*****************************************************************************/
-void UpdateNumberOfEnteriesSIdx(Index *indexObj, NodeType nodeType);
+void UpdateNumberOfEnteriesSIdx(Index *indexObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given data type is of string type
@@ -953,14 +952,13 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj);
  \brief		This function shall update the MN Indices & SubIndices with the values corresponding to the CN node id
 
  \param		nodeObj				Class pointer of the class Node
- \param		cnCount				Integer to hold the total no.of CN's count
  \param		indexId				Character pointer to the IndexID
  \param		allowMNSubindex		Boolean value to allow or disallow the subindex in MN
 
  \return	void
  */
 /*****************************************************************************/
-void UpdateMNNodeAssignmentIndex(Node *nodeObj, INT32 cnCount, char* indexId,
+void UpdateMNNodeAssignmentIndex(Node *nodeObj, char* indexId,
 		bool allowMNSubindex);
 /*****************************************************************************/
 /**
@@ -1035,14 +1033,13 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 
  \param		objIndexCollection		Class pointer of IndexCollection for node
  \param		Buffer1					Character pointer to the buffer data
- \param		fileptr
  \param		eNodeType				Enumeration flag for Node type (CN/MN)
 
  \return	void
  */
 /******************************************************************************************/
 void FormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
-		FILE* fileptr, NodeType eNodeType);
+		NodeType eNodeType);
 /*****************************************************************************/
 /**
  \brief		This function shall check if the default value is same as the actual value
@@ -1076,7 +1073,6 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj);
 
  \param		objIndexCollection		Class pointer of IndexCollection for node
  \param		Buffer1					Character pointer to the buffer data
- \param		fileptr
  \param		eNodeType				Enumeration flag for Node type (CN/MN)
  \param		iNodeId					Integer to hold the Node id to be written to the 1F81 index
 
@@ -1084,7 +1080,7 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj);
  */
 /******************************************************************************************/
 void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
-		FILE* fileptr, NodeType eNodeType, INT32 iNodeId);
+		NodeType eNodeType, INT32 iNodeId);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the buffer(char pointer) with the Index data(id value, datatype value, actual value) to be used for CDC generation in a BnR specific format
@@ -1392,7 +1388,7 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename);
  \return	char*	Return error message
  */
 /*****************************************************************************/
-void HandleSchemaValidationError(void *ctx, const char *msg, ...);
+void HandleSchemaValidationError(void*, const char *msg, ...);
 
 namespace openCONFIGURATOR
 {

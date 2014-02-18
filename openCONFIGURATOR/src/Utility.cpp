@@ -89,7 +89,7 @@ char* ConvertToUpper(char* str)
 
 	for (loopCount = 0; str[loopCount]; ++loopCount)
 	{
-		str[loopCount] = toupper(str[loopCount]);
+		str[loopCount] = (char) toupper(str[loopCount]);
 	}
 	return str;
 }

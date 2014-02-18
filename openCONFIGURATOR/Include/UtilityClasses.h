@@ -71,19 +71,16 @@ private:
 	char* dataTypeUniqueIDRef;	/**< Datatype Unique Id reference of the interface variable or structure component */
 
 public:
-	AppProcessCommon(void)
-	{
-		name = NULL;
-		uniqueId = NULL;
-		dataType = NULL;
-		dataTypeUniqueIDRef = NULL;
-	}
+	AppProcessCommon(void) : 
+		name(NULL),
+		uniqueId(NULL),
+		dataType(NULL),
+		dataTypeUniqueIDRef(NULL)
+	{}
 
 
 	~AppProcessCommon(void)
-	{
-
-	}
+	{}
 
 	/**
 	\brief		This function is used to get the uniqueId of the interface variable or structure component
@@ -197,19 +194,18 @@ public:
 	\return		void
 	*/
 
-	VarDeclaration(void)
+	VarDeclaration(void) :
+		namIdDtAttr(new AppProcessCommon()),
+		size(),
+		initialValue(NULL),
+		structUniqueId(NULL)
 	{
-		namIdDtAttr = new AppProcessCommon();
 		strcpy(size, "");
-		initialValue = NULL;
-		structUniqueId = NULL;
 	}
 
 
 	~VarDeclaration(void)
-	{
-
-	}
+	{}
 };
 
 /** 
@@ -224,18 +220,16 @@ public:
 	INT32 dataSize;				/**< DataSize for the dataType */
 	IEC_Datatype iecDataType;	/**< To represent the equivalent IEC datatype */
 
-	DataType(void)
-	{
-		dataTypeName = NULL;
-		dataTypeValue = NULL;
-		dataSize = 0;
-	}
+	DataType(void) : 
+		dataTypeName(NULL),
+		dataTypeValue(NULL),
+		dataSize(0),
+		iecDataType()
+	{}
 
 
 	~DataType(void)
-	{
-
-	}
+	{}
 	/**
 	\brief		This function is used to get the dataType
 	\return		char*
@@ -275,15 +269,14 @@ public:
 	\brief		This function is used to initialise the members to a default value.
 	\return		void
 	*/
-	Feature(void)
-	{
-		name = NULL;
-		value = NULL;
-	}
+	Feature() :
+		name(NULL),
+		value(NULL),
+		featureType()
+	{}
 
-	~Feature(void)
-	{
-	}
+	~Feature()
+	{}
 };
 
 /** 
@@ -305,19 +298,17 @@ public:
 	\brief		This function is used to initialise the members to a default value.
 	\return		void
 	*/
-	MNPdoVariable(void)
-	{
-		indexId = NULL;
-		subIndexId = NULL;
-		offsetVal = 0;
-		value = NULL;
-		dataSize = 0;
-	}
+	MNPdoVariable() :
+		indexId(NULL),
+		subIndexId(NULL),
+		offsetVal(0),
+		value(NULL),
+		dataSize(0),
+		pdoType()
+	{}
 
-	~MNPdoVariable(void)
-	{
-
-	}
+	~MNPdoVariable()
+	{}
 };
 
 /** 
@@ -338,17 +329,14 @@ public:
 	\brief		This function is used to initialise the members to a default value.
 	\return		void
 	*/
-	Parameter(void)
-	{
-		nameIdDtAttr = new AppProcessCommon();
-		accessStr = NULL;
-		size = 0;
-	}
+	Parameter() : 
+		nameIdDtAttr(new AppProcessCommon()),
+		size(0),
+		accessStr(NULL)	
+	{}
 
-	~Parameter(void)
-	{
-
-	}
+	~Parameter()
+	{}
 
 };
 

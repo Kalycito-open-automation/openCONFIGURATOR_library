@@ -100,7 +100,7 @@ class scope_formatter_factory : public logging::formatter_factory<char>
 		 * It effectively associates the attribute with the scope_list_formatter class
 		 */
 		formatter_type create_formatter(
-			logging::attribute_name const& attr_name, args_map const& args)
+			const logging::attribute_name& attr_name, const args_map& )
 		{
 			return formatter_type(scope_list_formatter(attr_name));
 		}
@@ -137,7 +137,7 @@ static HRESULT getAppDataDirectory(std::string& directory)
 \brief	DLL entry-point function.
 \note http://msdn.microsoft.com/en-us/library/windows/desktop/ms682583%28v=vs.85%29.aspx
 ************************************************************************/
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,	DWORD fdwReason, LPVOID lpReserved)
+BOOL WINAPI DllMain(HINSTANCE ,	DWORD fdwReason, LPVOID )
 {
 	switch (fdwReason)
 	{

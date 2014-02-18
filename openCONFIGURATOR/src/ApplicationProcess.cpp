@@ -70,11 +70,12 @@
 
  */
 
-ApplicationProcess::ApplicationProcess(void)
-{
-	xddFileName = NULL;
-	projectPath = NULL;
-}
+ApplicationProcess::ApplicationProcess() :
+	xddFileName(NULL),
+	projectPath(NULL),
+	CDTCollection(),
+	ParameterCollection()
+{}
 
 /*************************************************************************/
 /* Destructor */
