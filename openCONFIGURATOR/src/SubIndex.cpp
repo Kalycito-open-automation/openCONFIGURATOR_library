@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -64,7 +64,7 @@
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -78,7 +78,7 @@ SubIndex::SubIndex(void)
 /* Destructor */
 
 /**
- 
+
 
  */
 

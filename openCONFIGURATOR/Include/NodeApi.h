@@ -13,7 +13,7 @@
 #include "Node.h"
 #include "Result.h"
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{

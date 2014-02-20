@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -73,7 +73,7 @@ class ProjectConfiguration;
  *****************************************************************************/
 
 
-  
+
 /**
  \brief		This API shall be usd to parse the XDC/XDD file and load the objects for given Node ID and Type parameters
 
@@ -83,7 +83,7 @@ class ProjectConfiguration;
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
-ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType);
+ocfmRetCode ImportXML(const char* fileName, INT32 nodeId, NodeType nodeType);
 
 /**
  \brief		This API shall be used for parsing the XDC/XDD file and re-loading the objects for the given Node ID and Type. This API will not delete and create the node. Only the objects for the node are recreated
@@ -214,7 +214,7 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, const char* indexId, co
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId,const char* indexValue, const char* indexName, bool includeInCDC);
+ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId, const char* indexValue, const char* indexName, bool includeInCDC);
 
 /**
  \brief		This API shall be used to set the attributes [IndexValue, IndexName & flagIfInCdc] of a sub index for a node
@@ -241,7 +241,7 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, const ch
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32 *nodePos, bool& nodeExist);
+ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32* nodePos, bool& nodeExist);
 
 /**
  \brief		This API shall be used to check for the presence of Index of given node ID and type in the collection list. If the Index is present, the indexId and idxPos parameters are updated to reflect this in the calling function
@@ -254,7 +254,7 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, const ch
  \return		ocfmRetCode		ConfiguratorErrors
  \deprecated	Use IndexCollection::ContainsIndex(const UINT32 index) of the respective Node to query for Index-existence.
  */
-ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId, INT32 *idxPos);
+ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId, INT32* idxPos);
 
 /**
  \brief		This API shall be used to check for the presence of SubIndex in Index of given node ID and type in the collection list. If the SubIndex is present, the sidxPos and idxPos parameters are updated to reflect this in the calling function
@@ -306,7 +306,7 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, const char* i
  \return		ocfmRetCode		ConfiguratorErrors
  \deprecated	Use NodeCollection::GetNumberOfNodes() instead.
  */
- ocfmRetCode GetNodeCount(UINT32* outNodeCount);
+ocfmRetCode GetNodeCount(UINT32* outNodeCount);
 
 /**
  \brief		This API shall be used to get the number of Indexes under a node
@@ -317,7 +317,7 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, const char* i
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode GetIndexCount(UINT32 nodeId, NodeType nodeType, UINT32* outIndexCount);
+ocfmRetCode GetIndexCount(UINT32 nodeId, NodeType nodeType, UINT32* outIndexCount);
 
 /**
  \brief		This API shall be used to get the number of Sub Indexes under an Index
@@ -344,7 +344,7 @@ ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, const char* indexI
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode GetNodeAttributesbyNodePos(UINT32 nodePos, INT32* outNodeId, char* outNodeName, StationType* outStationType, char* outForcedCycle, bool* outIsForcedCycle);
+ocfmRetCode GetNodeAttributesbyNodePos(UINT32 nodePos, INT32* outNodeId, char* outNodeName, StationType* outStationType, char* outForcedCycle, bool* outIsForcedCycle);
 
 /**
  \brief		This API shall be used to get the Index ID of an Index, given the position of the Index under a node and the Node ID
@@ -357,7 +357,7 @@ ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, const char* indexI
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
+ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
 
 /**
  \brief		This API shall be used to get the Sub Index ID of a Sub Index
@@ -384,7 +384,7 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, const ch
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char* outIndexID);
+ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char* outIndexID);
 
 /**
  \brief		This API shall be used to get the Sub Index ID of a Sub Index
@@ -399,7 +399,7 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, const ch
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
+ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
 
 /**
  \brief		This API shall be used to get the attributes of an Index of a node given the Node and Index position
@@ -413,7 +413,7 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, const ch
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, AttributeType attributeType, char* outAttributeValue);
+ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, AttributeType attributeType, char* outAttributeValue);
 
 /**
  \brief		This API shall be used to get the attributes of an Sub Index of a Node given the Node, Index, Sub Index position
@@ -429,7 +429,7 @@ ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, const ch
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue);
+ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue);
 
 /**
  \brief		This API shall be used to load the predefined object dictionary xml and loads the objects that the tool will refer to when adding/editing an Index and/or a SubIndex
@@ -449,7 +449,7 @@ void LoadObjectDictionary(const char* xmlFilePath);
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType);
+ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType);
 
 /**
  \brief		This API shall be used to save the project
@@ -476,7 +476,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return	ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode FreeProjectMemory();
+ocfmRetCode FreeProjectMemory();
 
 /**
  \brief		This API shall be used to get the Project settings information [auto save, auto generate] for the active project
@@ -500,7 +500,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode					ConfiguratorErrors
  */
- //ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
+//ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
 
 /**
  \brief		This API shall be used to set all the attributes of an Index for a node
@@ -521,7 +521,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
+ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
 
 /**
  \brief		This API shall be used to set all the attributes of a Sub Index for a node
@@ -543,7 +543,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode			ConfigurationErrors
  */
- ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
+ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
 
 /**
  \brief		This API shall be used to update all the attributes of a node including the Node ID
@@ -559,7 +559,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode				ConfiguratorErrors
  */
- ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName, StationType stationType, char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal);
+ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName, StationType stationType, char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal);
 
 /**
  \brief		This API shall be used to get all the datatypes available for a node
@@ -570,7 +570,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
- ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
+ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
 
 /**
  \brief		This API shall be used to create a node [MN/CN] and to set the Index/SubIndexes from the XDD specified to the specified node ID, node type and node name
@@ -582,7 +582,7 @@ ocfmRetCode OpenProject(const char* projectPath, const char* projectFileName);
 
  \return		ocfmRetCode		ConfiguratorErrors
  */
- ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName, const char* importXmlFile);
+ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName, const char* importXmlFile);
 
 /**
  \brief		This function shall be used to return the data size of the given standard datatype
@@ -600,7 +600,7 @@ UINT32 GetDataSize(const string& dataTypeVal);
 
  \return	ocfmRetCode	 Error code
 */
-ocfmRetCode ValidateXDDFile(const char *fileName);
+ocfmRetCode ValidateXDDFile(const char* fileName);
 
 #ifndef __GNUC__
 #pragma warning( disable: 4251 )

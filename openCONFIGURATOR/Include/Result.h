@@ -4,7 +4,7 @@
 
 		This class is meant to be used as the return type of a function, if the function
 		needs to return error codes and error context information (like an error message).
-		Furthermore, this class shall be mandatory as return type for all API-Functions that 
+		Furthermore, this class shall be mandatory as return type for all API-Functions that
 		possibly return error codes.<br/>
 \author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 \date	31.10.2013
@@ -76,7 +76,7 @@ namespace openCONFIGURATOR
 			const std::string kMsgMappingTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Mismatching PDOMapping ('%s' Mapping-Object, mapped object '%s').";
 			const std::string kMsgAccessTypeForParameterInvalid = "Mapping-Object 0x%X/0x%X: Parameter with uniqueId '%s', referenced by mapped index 0x%X/0x%s on node %d, has invalid access type ('%s').";
 			const std::string kMsgAccessTypeForPdoInvalid = "Mapping-Object 0x%X/0x%X: (Sub)Index 0x%X/0x%s on node %d cannot be mapped. Invalid access type '%s' (RPDOs must be writeable, TPDOs readable).";
-			const std::string kMsgPdoOffsetInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping offset invalid. Actual: %d bits, expected %d bits.";			
+			const std::string kMsgPdoOffsetInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping offset invalid. Actual: %d bits, expected %d bits.";
 			const std::string kMsgSchemaNotFoundOrWellFormed = "XML schema file '%s' cannot be loaded or is not well-formed.";
 			const std::string kMsgSchemaInvalid = "XML schema file '%s' is not valid.";
 			const std::string kMsgSchemaParserContextError = "LibXML2 cannot create a parser context for the XML schema file '%s'.";
@@ -91,8 +91,8 @@ namespace openCONFIGURATOR
 			/**
 			\brief Error codes returned by the %openCONFIGURATOR API-Functions within Result.
 			*/
-			DLLEXPORT enum ErrorCode 
-			{ 
+			DLLEXPORT enum ErrorCode
+			{
 				SUCCESS = 0, /**< Operation completed successfully. */
 				FILE_WRITE_FAILED, /**< Cannot write to file. */
 				FILE_READ_FAILED, /**< Cannot read from file. */
@@ -156,27 +156,27 @@ namespace openCONFIGURATOR
 
 			/**
 			\brief	Result returned by all functions of the %openCONFIGURATOR API.
-			
+
 					Contains an ErrorCode and a descriptive error string.
 			*/
 			class DLLEXPORT Result
 			{
 
-			private:
-				ErrorCode errorCode;
-				std::string errorString;
+				private:
+					ErrorCode errorCode;
+					std::string errorString;
 
-			public:
-				Result(ErrorCode errorCode, std::string errorString);
-				explicit Result(ErrorCode errorCode = SUCCESS);
+				public:
+					Result(ErrorCode errorCode, std::string errorString);
+					explicit Result(ErrorCode errorCode = SUCCESS);
 
-				ErrorCode GetErrorCode() const;
-				const std::string& GetErrorString() const;
+					ErrorCode GetErrorCode() const;
+					const std::string& GetErrorString() const;
 
-				/**
-				\return <code>True</code> if operation was successful, <code>false</code> otherwise.
-				*/
-				bool IsSuccessful() const;
+					/**
+					\return <code>True</code> if operation was successful, <code>false</code> otherwise.
+					*/
+					bool IsSuccessful() const;
 
 			};// Result
 			/** @} */

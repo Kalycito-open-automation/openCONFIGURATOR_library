@@ -14,7 +14,7 @@
 using namespace std;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -30,23 +30,23 @@ namespace openCONFIGURATOR
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						NodeType type = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                ? MN
+						                : CN;
 						Result res = IsExistingNode(nodeId, exists);
 						if (!res.IsSuccessful())
 							return res;
-						if (exists) 
+						if (exists)
 						{
 							boost::format formatter(kMsgExistingNode);
 							formatter % nodeId;
 							return Result(NODE_EXISTS, formatter.str());
 						}
 						return Translate(NewProjectNode(nodeId,
-							type,
-							nodeName.c_str(),
-							(xddFile.empty())
-								? kDefaultCNXDD.c_str()
-								: xddFile.c_str()));
+						                                type,
+						                                nodeName.c_str(),
+						                                (xddFile.empty())
+						                                ? kDefaultCNXDD.c_str()
+						                                : xddFile.c_str()));
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
@@ -67,8 +67,8 @@ namespace openCONFIGURATOR
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						NodeType type = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                ? MN
+						                : CN;
 						return Translate(DeleteNode(nodeId, type));
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
@@ -89,20 +89,20 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					NodeType type = (nodeId == MN_NODEID) ? MN : CN;
-					boost::filesystem::path fullPath(path);
-					fullPath.append(xddFile.begin(), xddFile.end());
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						NodeType type = (nodeId == MN_NODEID) ? MN : CN;
+						boost::filesystem::path fullPath(path);
+						fullPath.append(xddFile.begin(), xddFile.end());
 
-					Result retValue = Translate(ValidateXDDFile(fullPath.generic_string().c_str()));
-					if (retValue.IsSuccessful())
-						return Translate(ReImportXML(fullPath.generic_string().c_str(), nodeId, type));
-					else
-						return retValue;
-				}
+						Result retValue = Translate(ValidateXDDFile(fullPath.generic_string().c_str()));
+						if (retValue.IsSuccessful())
+							return Translate(ReImportXML(fullPath.generic_string().c_str(), nodeId, type));
+						else
+							return retValue;
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -120,7 +120,7 @@ namespace openCONFIGURATOR
 					exists = false;
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
-						exists = NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId); 
+						exists = NodeCollection::GetNodeColObjectPointer()->ContainsNode(nodeId);
 						return Result();
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
@@ -143,7 +143,7 @@ namespace openCONFIGURATOR
 					{
 						nodeCount = NodeCollection::GetNodeColObjectPointer()->GetNumberOfNodes();
 						return Result();
-				}
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)

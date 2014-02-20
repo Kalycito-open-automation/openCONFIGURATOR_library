@@ -86,7 +86,7 @@ string* xddValidationError = NULL;
 char xddErrorBuf[1024];
 
 INT32 lastIndexParsed = 0;
-static const char *gpa2bSimple[][2] =
+static const char* gpa2bSimple[][2] =
 {
 	{ "BOOL", "1" },
 	{ "BITSTRING", "1" },
@@ -122,7 +122,7 @@ static const char *gpa2bSimple[][2] =
  \return	void
  */
 /*****************************************************************************/
-static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
+static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType* cdtObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the ComplexDataType object in the calling function
@@ -132,16 +132,16 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
  \return	void
  */
 /*****************************************************************************/
-static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj);
+static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType* cdtObj);
 
 //==========================================================================//
 // 					F U N C T I O N  D E F I N I T I O N S				    //
 //==========================================================================//
 
-void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
+void SetIndexAttributes(xmlTextReaderPtr reader, Index* indexObj, bool& hasPDO)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	ocfmRetCode objException;
 
 	if (!indexObj)
@@ -228,10 +228,10 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 		{
 			boost::format formatter(kMsgSimpleDatatypeNotFound);
 			formatter
-				% (char*) value
-				% indexObj->GetIndex()
-				% "-"
-				% indexObj->GetNodeID();
+			% (char*) value
+			% indexObj->GetIndex()
+			% "-"
+			% indexObj->GetNodeID();
 			objException.setErrorCode(OCFM_ERR_DATATYPE_NOT_FOUND);
 			objException.setErrorString(formatter.str());
 			LOG_FATAL() << formatter.str();
@@ -251,13 +251,13 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO)
 		{
 			indexObj->SetFlagIfIncludedCdc(true);
 		}
-		}
 	}
+}
 
-void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
+void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex* sidxObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	ocfmRetCode objException;
 
 	if (!sidxObj)
@@ -335,10 +335,10 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj)
 	}
 }
 
-void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
+void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType* dtObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *xcValue = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* xcValue = NULL;
 	ocfmRetCode objException;
 
 	if (!dtObj)
@@ -450,10 +450,10 @@ void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj)
 	}
 }
 
-void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
+void SetParameterAttributes(xmlTextReaderPtr reader, Parameter* parameterObj)
 {
-	const xmlChar *xcName = NULL;
-	const xmlChar *xcValue = NULL;
+	const xmlChar* xcName = NULL;
+	const xmlChar* xcValue = NULL;
 	ocfmRetCode objException;
 
 	if (!parameterObj)
@@ -488,10 +488,10 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj)
 	 <USINT/>*/
 }
 
-void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
+void SetParaDT(xmlTextReaderPtr reader, Parameter* parameterObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	INT32 iRetVal;
 	ocfmRetCode exceptionObj;
 
@@ -557,10 +557,10 @@ void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj)
 	}
 }
 
-static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
+static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType* cdtObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	ocfmRetCode objException;
 
 	if (!cdtObj)
@@ -586,12 +586,12 @@ static void SetCDTAttributes(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 		CheckAndCorrectName((char*) value);
 		cdtObj->nameIdAttr->SetName((char*) value);
 	}
-	}
+}
 
-bool CheckifSimpleDT(const char *datatypeName, char *dataSize)
+bool CheckifSimpleDT(const char* datatypeName, char* dataSize)
 {
 	INT32 arrSizeLC = 0;
-	char *simpleElement = NULL;
+	char* simpleElement = NULL;
 
 	while (arrSizeLC < gSimpleArrSize)
 	{
@@ -610,8 +610,8 @@ bool CheckifSimpleDT(const char *datatypeName, char *dataSize)
 
 void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 
 	//Retrieve the pxcName and Value of an attribute
 	value = xmlTextReaderConstValue(reader);
@@ -633,7 +633,7 @@ void SetVarDecAttributes(xmlTextReaderPtr reader, VarDeclaration& vdecl)
 	}
 }
 
-bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compareElement)
+bool CheckEndElement(INT32 elementId, const char* srcElement, const char* compareElement)
 {
 	if ((XML_READER_TYPE_END_ELEMENT == elementId)
 	        && (!strcmp(srcElement, compareElement)))
@@ -646,7 +646,7 @@ bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compar
 	}
 }
 
-bool CheckStartElement(INT32 elementId, const char *srcElement, const char *compareElement)
+bool CheckStartElement(INT32 elementId, const char* srcElement, const char* compareElement)
 {
 	if ((XML_READER_TYPE_ELEMENT == elementId)
 	        && (!strcmp(srcElement, compareElement)))
@@ -668,10 +668,10 @@ bool CheckStartElement(INT32 elementId, const char *srcElement, const char *comp
  \return	void
  */
 /*****************************************************************************/
-static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
+static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType* cdtObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	ocfmRetCode objException;
 
 	if (!cdtObj)
@@ -775,18 +775,18 @@ static void SetVarDeclaration(xmlTextReaderPtr reader, ComplexDataType *cdtObj)
 	}
 }
 
-ocfmRetCode ValidateXDDFile(const char *fileName)
+ocfmRetCode ValidateXDDFile(const char* fileName)
 {
 	ocfmRetCode exceptionObject;
 
 	//File name must not be null
-	if(fileName != NULL)
+	if (fileName != NULL)
 	{
 		//Parse XML
 		xmlDocPtr xdd_file_ptr = xmlParseFile(fileName);
 
-		if(xdd_file_ptr != NULL)
-		{	
+		if (xdd_file_ptr != NULL)
+		{
 			//Call Validation Function with the parse file
 			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetXddSchemaFilePath().c_str());
 		}
@@ -807,7 +807,7 @@ ocfmRetCode ValidateXDDFile(const char *fileName)
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
 	}
-	if(exceptionObject.getErrorCode() == OCFM_ERR_SCHEMA_VALIDATION_FAILED)
+	if (exceptionObject.getErrorCode() == OCFM_ERR_SCHEMA_VALIDATION_FAILED)
 	{
 		string errorString(exceptionObject.getErrorString());
 		errorString.append(" Error occured in file: " + string(fileName));
@@ -819,12 +819,12 @@ ocfmRetCode ValidateXDDFile(const char *fileName)
 Result ValidateProjectFile(const string& fileName)
 {
 	ocfmRetCode exceptionObject;
-	if(!fileName.empty())
+	if (!fileName.empty())
 	{
 		//Parse XML
 		xmlDocPtr xdd_file_ptr = xmlParseFile(fileName.c_str());
 
-		if(xdd_file_ptr != NULL)
+		if (xdd_file_ptr != NULL)
 		{
 			//Call Validation Function with the parse file
 			exceptionObject = ValidateXMLFile(xdd_file_ptr, LibraryConfiguration::GetProjectFileSchemaFilePath().c_str());
@@ -849,11 +849,12 @@ Result ValidateProjectFile(const string& fileName)
 	return Translate(exceptionObject);
 }
 
-ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType)
+ocfmRetCode ImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 {
 	ocfmRetCode exceptionObject;
 
-	try{
+	try
+	{
 
 		exceptionObject = ParseFile(fileName, nodeId, nodeType);
 
@@ -894,7 +895,7 @@ ocfmRetCode ImportXML(const char *fileName, INT32 nodeId, NodeType nodeType)
 	return exceptionObject;
 }
 
-ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
+ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char* schema_filename)
 {
 
 	ocfmRetCode exceptionObject;
@@ -903,10 +904,10 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	xmlDocPtr schema_doc = xmlReadFile(schema_filename, NULL, XML_PARSE_NONET);
 	if (schema_doc == NULL)
 	{
-		// the schema cannot be loaded or is not well-formed 
+		// the schema cannot be loaded or is not well-formed
 		boost::format formatter(kMsgSchemaNotFoundOrWellFormed);
-		formatter 
-			% schema_filename;
+		formatter
+		% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_NOT_FOUND);
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -915,11 +916,11 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	xmlSchemaParserCtxtPtr parser_ctxt = xmlSchemaNewDocParserCtxt(schema_doc);
 	if (parser_ctxt == NULL)
 	{
-		// unable to create a parser context for the schema 
+		// unable to create a parser context for the schema
 		xmlFreeDoc(schema_doc);
 		boost::format formatter(kMsgSchemaParserContextError);
-		formatter 
-			% schema_filename;
+		formatter
+		% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR);
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -934,8 +935,8 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 		xmlFreeDoc(schema_doc);
 
 		boost::format formatter(kMsgSchemaInvalid);
-		formatter 
-			% schema_filename;
+		formatter
+		% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_NOT_VALID);
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -950,8 +951,8 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 		xmlSchemaFreeParserCtxt(parser_ctxt);
 		xmlFreeDoc(schema_doc);
 		boost::format formatter(kMsgSchemaValidationContextError);
-		formatter 
-			% schema_filename;
+		formatter
+		% schema_filename;
 		exceptionObject.setErrorCode(OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR);
 		exceptionObject.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -960,12 +961,12 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 
 	//Set error handler for validation errors
 	xmlSchemaSetValidErrors(valid_ctxt,
-		(xmlSchemaValidityErrorFunc) HandleSchemaValidationError,
-		(xmlSchemaValidityWarningFunc) HandleSchemaValidationError,
-		stderr);
+	                        (xmlSchemaValidityErrorFunc) HandleSchemaValidationError,
+	                        (xmlSchemaValidityWarningFunc) HandleSchemaValidationError,
+	                        stderr);
 
 
-	if(xmlSchemaValidateDoc(valid_ctxt, doc) == 0)
+	if (xmlSchemaValidateDoc(valid_ctxt, doc) == 0)
 	{
 		exceptionObject.setErrorCode(OCFM_ERR_SUCCESS);
 	}
@@ -983,28 +984,28 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename)
 	return exceptionObject;
 }
 
-void HandleSchemaValidationError(void*, const char *msg, ...)
+void HandleSchemaValidationError(void*, const char* msg, ...)
 {
 	va_list args;
 	va_start(args, msg);
 	int len = vsprintf(xddErrorBuf, msg, args);
 	va_end(args);
 
-	if(len == 0)
+	if (len == 0)
 	{
 		xddValidationError = new string("Error could not be retrieved");
-}
+	}
 	else
 	{
 		xddValidationError = new string(xddErrorBuf);
-	}	
+	}
 }
 
 void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos)
 {
-	const xmlChar *name = NULL;
-	NodeCollection *nodeCollObj = NULL;
-	Node *nodeObj = NULL;
+	const xmlChar* name = NULL;
+	NodeCollection* nodeCollObj = NULL;
+	Node* nodeObj = NULL;
 
 	name = xmlTextReaderConstName(reader);
 
@@ -1224,8 +1225,8 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType)
 		if (MN == nodeType)
 		{
 			Node nodeObj;
-			NodeCollection *nodeCollObj = NULL;
-			NetworkManagement *nmtObj = NULL;
+			NodeCollection* nodeCollObj = NULL;
+			NetworkManagement* nmtObj = NULL;
 			nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 			assert(nodeCollObj);
 			nodeObj = nodeCollObj->GetNode(nodeType, nodePos);
@@ -1325,8 +1326,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 	try
 	{
 		Node nodeObj;
-		NodeCollection *nodeCollObj = NULL;
-		IndexCollection *idxCollObj = NULL;
+		NodeCollection* nodeCollObj = NULL;
+		IndexCollection* idxCollObj = NULL;
 		//Index idxObj1;
 		Index* idxObj = NULL;
 		ApplicationProcess* appProcessObj = NULL;
@@ -1438,10 +1439,10 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				               BAD_CAST objCDT->nameIdAttr->GetName());
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "uniqueID",
-					BAD_CAST objCDT->nameIdAttr->GetUniqueID());
+				               BAD_CAST objCDT->nameIdAttr->GetUniqueID());
 
 				for (UINT32 varDeclLC = 0;
-					varDeclLC < objCDT->varDeclarationCollection.size();
+				        varDeclLC < objCDT->varDeclarationCollection.size();
 				        varDeclLC++)
 				{
 					VarDeclaration vd;
@@ -1460,7 +1461,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					               BAD_CAST vd.namIdDtAttr->GetName());
 					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 					               BAD_CAST "uniqueID",
-						BAD_CAST vd.namIdDtAttr->GetUniqueID());
+					               BAD_CAST vd.namIdDtAttr->GetUniqueID());
 					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 					               BAD_CAST "size", BAD_CAST vd.size);
 
@@ -1554,7 +1555,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			appProcessObj = nodeObj.GetApplicationProcess();
 
 			for (UINT32 parameterLC = 0;
-				parameterLC < appProcessObj->GetParameterCollection().size();
+			        parameterLC < appProcessObj->GetParameterCollection().size();
 			        parameterLC++)
 			{
 				Parameter parameterObj;
@@ -1571,29 +1572,29 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 				}
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "uniqueID",
-					BAD_CAST parameterObj.nameIdDtAttr->GetUniqueID());
+				               BAD_CAST parameterObj.nameIdDtAttr->GetUniqueID());
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 				               BAD_CAST "access", BAD_CAST parameterObj.accessStr);
 
-				if(parameterObj.nameIdDtAttr->GetDataType() != NULL)
+				if (parameterObj.nameIdDtAttr->GetDataType() != NULL)
 				{
 					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST parameterObj.nameIdDtAttr->GetDataType());
 					if (bytesWritten < 0)
 					{
 						LOG_FATAL() << "Error starting XML-Element '" << parameterObj.nameIdDtAttr->GetDataType() << "'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
-						throw &objException;
+						throw& objException;
 					}
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
 					if (bytesWritten < 0)
 					{
 						LOG_FATAL() << "Error closing XML-Element '" << parameterObj.nameIdDtAttr->GetDataType() << "'.";
 						objException.setErrorCode(OCFM_ERR_XML_WRITER_END_ELT_FAILED);
-						throw &objException;
+						throw& objException;
 					}
 				}
 
-				if(parameterObj.nameIdDtAttr->GetDtUniqueRefId() != NULL)
+				if (parameterObj.nameIdDtAttr->GetDtUniqueRefId() != NULL)
 				{
 					// Start dataTypeIDRef Tag
 					bytesWritten = xmlTextWriterStartElement(xtwWriter, BAD_CAST "dataTypeIDRef");
@@ -1681,7 +1682,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			throw objException;
 		}
 
-		DataTypeCollection *dtCollObj = NULL;
+		DataTypeCollection* dtCollObj = NULL;
 
 		dtCollObj = nodeObj.GetDataTypeCollection();
 
@@ -1786,7 +1787,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			}
 			if (NULL != idxObj->GetObjectType())
 			{
-				char *strObjectType = new char[10];
+				char* strObjectType = new char[10];
 				strObjectType = IntToAscii(idxObj->GetEObjectType(),
 				                           strObjectType, 10);
 				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
@@ -1883,7 +1884,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						               BAD_CAST "name", BAD_CAST sidxObj->GetName());
 					if (sidxObj->GetObjectType() != NULL)
 					{
-						char *objectTypeStr = new char[10];
+						char* objectTypeStr = new char[10];
 						objectTypeStr = IntToAscii(sidxObj->GetEObjectType(),
 						                           objectTypeStr, 10);
 						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
@@ -1897,35 +1898,35 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						if (strlen(dtObject.dataTypeValue) != 0)
 						{
 							bytesWritten = xmlTextWriterWriteAttribute(
-								xtwWriter, BAD_CAST "dataType",
-								BAD_CAST dtObject.dataTypeValue);
+							                   xtwWriter, BAD_CAST "dataType",
+							                   BAD_CAST dtObject.dataTypeValue);
 						}
 					}
 					if (sidxObj->GetAccessType() != NULL)
 					{
 						if (strlen(sidxObj->GetAccessType()) != 0)
 						{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "accessType",
-						               BAD_CAST sidxObj->GetAccessType());
+							bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							               BAD_CAST "accessType",
+							               BAD_CAST sidxObj->GetAccessType());
 						}
 					}
 					if (sidxObj->GetDefaultValue() != NULL)
 					{
 						if (strlen(sidxObj->GetDefaultValue()) != 0)
 						{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "defaultValue",
-						               BAD_CAST sidxObj->GetDefaultValue());
+							bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							               BAD_CAST "defaultValue",
+							               BAD_CAST sidxObj->GetDefaultValue());
 						}
 					}
 					if (sidxObj->GetActualValue() != NULL)
 					{
 						if (strlen(sidxObj->GetActualValue()) != 0)
 						{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "actualValue",
-						               BAD_CAST sidxObj->GetActualValue());
+							bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							               BAD_CAST "actualValue",
+							               BAD_CAST sidxObj->GetActualValue());
 						}
 					}
 					if (sidxObj->GetLowLimit() != NULL)
@@ -1933,8 +1934,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						if (strlen(sidxObj->GetLowLimit()) != 0)
 						{
 							bytesWritten = xmlTextWriterWriteAttribute(
-								xtwWriter, BAD_CAST "lowLimit",
-								BAD_CAST sidxObj->GetLowLimit());
+							                   xtwWriter, BAD_CAST "lowLimit",
+							                   BAD_CAST sidxObj->GetLowLimit());
 						}
 					}
 
@@ -1943,30 +1944,30 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 						if (strlen(sidxObj->GetHighLimit()) != 0)
 						{
 							bytesWritten = xmlTextWriterWriteAttribute(
-								xtwWriter, BAD_CAST "highLimit",
-								BAD_CAST sidxObj->GetHighLimit());
+							                   xtwWriter, BAD_CAST "highLimit",
+							                   BAD_CAST sidxObj->GetHighLimit());
 						}
 					}
 
 					if (sidxObj->GetPDOMapping() != NULL)
 					{
 						if ((strlen(sidxObj->GetPDOMapping()) != 0)
-							&& (0 != strcmp(sidxObj->GetPDOMapping(), "NOT_DEFINED")))
+						        && (0 != strcmp(sidxObj->GetPDOMapping(), "NOT_DEFINED")))
 						{
-						bytesWritten = xmlTextWriterWriteAttribute(
-						                   xtwWriter, BAD_CAST "PDOmapping",
-						                   BAD_CAST sidxObj->GetPDOMapping());
-					}
+							bytesWritten = xmlTextWriterWriteAttribute(
+							                   xtwWriter, BAD_CAST "PDOmapping",
+							                   BAD_CAST sidxObj->GetPDOMapping());
+						}
 					}
 
 					if (sidxObj->GetUniqueIDRef() != NULL)
 					{
 						if ((strlen(sidxObj->GetUniqueIDRef()) != 0))
 						{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "uniqueIDRef",
-						               BAD_CAST sidxObj->GetUniqueIDRef());
-					}
+							bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
+							               BAD_CAST "uniqueIDRef",
+							               BAD_CAST sidxObj->GetUniqueIDRef());
+						}
 					}
 
 					if (sidxObj->GetFlagIfIncludedCdc() == 0)
@@ -2041,7 +2042,7 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 			objException.setErrorCode(OCFM_ERR_XML_WRITER_START_ELT_FAILED);
 			throw objException;
 		}
-		NetworkManagement *nmtObj = NULL;
+		NetworkManagement* nmtObj = NULL;
 		nmtObj = nodeObj.GetNetworkManagement();
 
 		for (UINT32 featureLC = 0; featureLC < nmtObj->GetNumberOfFeatures();
@@ -2192,7 +2193,8 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 
 		xmlFreeDoc(xdDoc);
 	}
-	catch (const ocfmRetCode& ex)	{
+	catch (const ocfmRetCode& ex)
+	{
 		LOG_FATAL() << ex.getErrorString();
 		throw;
 	}
@@ -2297,8 +2299,8 @@ void SetFlagForRequiredMNIndexes(INT32 nodeId)
 				}
 			}
 		}
-		}
 	}
+}
 
 //TODO: unused function
 ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
@@ -2320,7 +2322,7 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 		strcpy(mnIndex, "1020");
 		objException = AddIndex(nodeObj->GetNodeId(), CN, mnIndex);
 		if ((objException.getErrorCode() != 0)
-			&& (objException.getErrorCode() != OCFM_ERR_INDEX_ALREADY_EXISTS))
+		        && (objException.getErrorCode() != OCFM_ERR_INDEX_ALREADY_EXISTS))
 		{
 			return objException;
 		}
@@ -2341,7 +2343,8 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
 		             CN, false);
 
 		delete[] valueStr;
-	} catch (ocfmRetCode& ex)
+	}
+	catch (ocfmRetCode& ex)
 	{
 		return ex;
 	}
@@ -2356,46 +2359,46 @@ UINT32 GetDataSize(const string& dataTypeVal)
 	//Set default 0 for error case
 	UINT32 retSize = 0;
 
-	if( workDataTypeVal == "UNSIGNED8"
-		|| workDataTypeVal == "BOOLEAN"
-	    || workDataTypeVal == "INTEGER8")
+	if (workDataTypeVal == "UNSIGNED8"
+	        || workDataTypeVal == "BOOLEAN"
+	        || workDataTypeVal == "INTEGER8")
 	{
 		retSize = 1;
 	}
 	else if (workDataTypeVal == "UNSIGNED16"
-		|| workDataTypeVal == "INTEGER16")
+	         || workDataTypeVal == "INTEGER16")
 	{
 		retSize = 2;
 	}
 	else if (workDataTypeVal == "INTEGER24"
-		|| workDataTypeVal == "UNSIGNED24")
+	         || workDataTypeVal == "UNSIGNED24")
 	{
 		retSize = 3;
 	}
 	else if (workDataTypeVal == "UNSIGNED32"
-		|| workDataTypeVal == "INTEGER32"
-	    || workDataTypeVal == "REAL32")
+	         || workDataTypeVal == "INTEGER32"
+	         || workDataTypeVal == "REAL32")
 	{
 		retSize = 4;
 	}
 	else if (workDataTypeVal == "INTEGER40"
-		|| workDataTypeVal == "UNSIGNED40")
+	         || workDataTypeVal == "UNSIGNED40")
 	{
 		retSize = 5;
 	}
 	else if (workDataTypeVal == "INTEGER48"
-		|| workDataTypeVal == "UNSIGNED48")
+	         || workDataTypeVal == "UNSIGNED48")
 	{
 		retSize = 6;
 	}
 	else if (workDataTypeVal == "INTEGER56"
-	    || workDataTypeVal == "UNSIGNED56")
+	         || workDataTypeVal == "UNSIGNED56")
 	{
 		retSize = 7;
 	}
 	else if (workDataTypeVal == "UNSIGNED64"
-	    || workDataTypeVal == "INTEGER64"
-		|| workDataTypeVal == "REAL64")
+	         || workDataTypeVal == "INTEGER64"
+	         || workDataTypeVal == "REAL64")
 	{
 		retSize = 8;
 	}
@@ -2441,7 +2444,7 @@ bool CheckIfStringDatatypes(const char* dataTypeValue)
 	bool retVal = false;
 	if (NULL != dataTypeValue)
 	{
-		char *dataTypeUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
+		char* dataTypeUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
 		strcpy(dataTypeUpper, dataTypeValue);
 
 		dataTypeUpper = ConvertToUpper(dataTypeUpper);
@@ -2465,10 +2468,10 @@ bool CheckIfStringDatatypes(const char* dataTypeValue)
 	return retVal;
 }
 
-void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj)
+void SetFeatures(xmlTextReaderPtr reader, Feature* featureObj)
 {
-	const xmlChar *name = NULL;
-	const xmlChar *value = NULL;
+	const xmlChar* name = NULL;
+	const xmlChar* value = NULL;
 	if (!featureObj)
 	{
 		boost::format formatter(kMsgNullArgument);
@@ -2505,14 +2508,14 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 		        && (((idxObj->GetActualValue() != NULL) && (attrType == ACTUALVALUE))
 		            || ((idxObj->GetDefaultValue() != NULL) && (attrType == DEFAULTVALUE))))
 		{
-			//TODO: system specifif code needed to determine the size of datatypes. 
+			//TODO: system specifif code needed to determine the size of datatypes.
 			//To avoid issues with big data types only type with maximum of 2 bytes are converted.
 			if (CheckIfStandardDatatypes(dtObj.dataTypeName) && dtObj.dataSize <= 2)
 			{
 				LOG_DEBUG() << "Normalizing value for attribute type '" << "'" << attrType << ".";
-				LOG_DEBUG() << "Datatype size[bytes]: " << dtObj.dataSize;				
+				LOG_DEBUG() << "Datatype size[bytes]: " << dtObj.dataSize;
 				const char* tmpValue = NULL;
-				if(attrType == ACTUALVALUE)
+				if (attrType == ACTUALVALUE)
 				{
 					tmpValue = idxObj->GetActualValue();
 				}
@@ -2620,7 +2623,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 						throw limitError;
 					}
 					*/
-					// Allocate space for normalized hex-value: '0x' + hexValue + null-termination					
+					// Allocate space for normalized hex-value: '0x' + hexValue + null-termination
 					char* hexVal = new char[strlen(tmpValue) + 1];
 					// Reformat
 					sprintf(hexVal, "0x%X", (unsigned int) number);
@@ -2632,7 +2635,7 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 					else
 					{
 						idxObj->SetDefaultValue(hexVal);
-					}					
+					}
 					LOG_DEBUG() << "Value after normalization: " << hexVal;
 					delete[] hexVal;
 				}
@@ -2656,7 +2659,7 @@ bool CheckIfStandardDatatypes(const char* dataTypeValue)
 	bool retVal = false;
 	if (NULL != dataTypeValue)
 	{
-		char *dataTypeUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
+		char* dataTypeUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
 		strcpy(dataTypeUpper, dataTypeValue);
 
 		dataTypeUpper = ConvertToUpper(dataTypeUpper);

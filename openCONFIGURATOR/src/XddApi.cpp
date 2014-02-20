@@ -106,9 +106,9 @@ namespace openCONFIGURATOR
 						featureValue = node->GetNetworkManagement()->GetNwMgmtFeatureValue(featureType, featureName.c_str());
 						if (featureValue.empty())
 						{
-							string featureTypeStr = (featureType == MN_FEATURES) 
-								? "MN" 
-								: ((featureType == CN_FEATURES) ? "CN" : "General");
+							string featureTypeStr = (featureType == MN_FEATURES)
+							                        ? "MN"
+							                        : ((featureType == CN_FEATURES) ? "CN" : "General");
 							boost::format formatter(kMsgFeatureValueNotFound);
 							formatter % featureType
 							% featureName

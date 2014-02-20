@@ -22,7 +22,7 @@ using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::ObjectDictionary;
 using namespace openCONFIGURATOR::Library::Utilities;
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -39,8 +39,8 @@ namespace openCONFIGURATOR
 						objectTypeString << objectType;
 						string indexString = IntToHex(index, 4, "", "");
 						NodeType nodeType = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                    ? MN
+						                    : CN;
 
 						Result result = Translate(AddIndex(nodeId, nodeType, indexString.c_str()));
 						if (!result.IsSuccessful())
@@ -101,26 +101,26 @@ namespace openCONFIGURATOR
 								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
 							case FLAGIFINCDC:
-							{
-								// TODO: Remove as soon as flag is being removed
-								string attributeValueLowerCase(attributeValue);
-								transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
-								if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
-									indexPtr->SetFlagIfIncludedCdc(true);
-								else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
-									indexPtr->SetFlagIfIncludedCdc(false);
-								else
 								{
-									boost::format formatter(kMsgAttributeValueInvalid);
-									formatter % attributeValue
+									// TODO: Remove as soon as flag is being removed
+									string attributeValueLowerCase(attributeValue);
+									transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
+									if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
+										indexPtr->SetFlagIfIncludedCdc(true);
+									else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
+										indexPtr->SetFlagIfIncludedCdc(false);
+									else
+									{
+										boost::format formatter(kMsgAttributeValueInvalid);
+										formatter % attributeValue
 										% attributeType
 										% index
 										% 0
 										% nodeId
 										% "true or false";
-									return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
+										return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
+									}
 								}
-							}
 							case OBJECTTYPE:
 								indexPtr->SetObjectType(GetObjectType(attributeValue));
 								break;
@@ -132,16 +132,16 @@ namespace openCONFIGURATOR
 							case LOWLIMIT:
 							case HIGHLIMIT:
 							default:
-							{
-								boost::format formatter(kMsgUnsupportedAttributeType);
-								formatter % attributeType;		
-								return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
-							}
+								{
+									boost::format formatter(kMsgUnsupportedAttributeType);
+									formatter % attributeType;
+									return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
+								}
 						}
 						return Result();
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-				}				
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -156,8 +156,8 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
 						NodeCollection* nodeCollectionPtr = NodeCollection::GetNodeColObjectPointer();
 						assert(nodeCollectionPtr);
 						Node* node = nodeCollectionPtr->GetNodePtr(nodeId);
@@ -190,7 +190,7 @@ namespace openCONFIGURATOR
 
 						switch (attributeType)
 						{
-				
+
 							case ACTUALVALUE:
 								if (subIndexPtr->IsIndexValueValid(attributeValue.c_str()))
 									subIndexPtr->SetActualValue(attributeValue.c_str());
@@ -199,27 +199,27 @@ namespace openCONFIGURATOR
 								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
 							case FLAGIFINCDC:
-							{
-								// TODO: Remove as soon as flag is being removed
-								string attributeValueLowerCase(attributeValue);
-								transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
-								if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
-									subIndexPtr->SetFlagIfIncludedCdc(true);
-								else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
-									subIndexPtr->SetFlagIfIncludedCdc(false);
-								else
 								{
-									boost::format formatter(kMsgAttributeValueInvalid);
-									formatter % attributeValue
+									// TODO: Remove as soon as flag is being removed
+									string attributeValueLowerCase(attributeValue);
+									transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
+									if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
+										subIndexPtr->SetFlagIfIncludedCdc(true);
+									else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
+										subIndexPtr->SetFlagIfIncludedCdc(false);
+									else
+									{
+										boost::format formatter(kMsgAttributeValueInvalid);
+										formatter % attributeValue
 										% attributeType
 										% index
 										% subIndex
 										% nodeId
 										% "true or false";
-									return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
+										return Result(ATTRIBUTEVALUE_INVALID, formatter.str());
+									}
+									break;
 								}
-								break;
-							}
 							case NAME:
 							case OBJECTTYPE:
 							case DATATYPE:
@@ -229,16 +229,16 @@ namespace openCONFIGURATOR
 							case LOWLIMIT:
 							case HIGHLIMIT:
 							default:
-							{
-								boost::format formatter(kMsgUnsupportedAttributeType);
-								formatter % attributeType;
-								return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
-							}	
+								{
+									boost::format formatter(kMsgUnsupportedAttributeType);
+									formatter % attributeType;
+									return Result(UNSUPPORTED_ATTRIBUTETYPE, formatter.str());
+								}
 						}
 						return Result();
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-				}				
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -253,10 +253,10 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-					return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+						return SetIndexAttribute(nodeId, index, ACTUALVALUE, actualValue);
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -276,8 +276,8 @@ namespace openCONFIGURATOR
 						string indexString = IntToHex(index, 4, "", "");
 						char* attributeValueTemp = new char[50];
 						NodeType nodeType = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                    ? MN
+						                    : CN;
 
 						Result result = Translate(GetIndexAttributes(nodeId, nodeType, indexString.c_str(), attributeType, attributeValueTemp));
 						if (result.IsSuccessful())
@@ -309,8 +309,8 @@ namespace openCONFIGURATOR
 						string indexString = IntToHex(index, 4, "", "");
 						string subIndexString = IntToHex(subIndexId, 2, "", "");
 						NodeType nodeType = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                    ? MN
+						                    : CN;
 
 						Result result = Translate(AddSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
 						if (!result.IsSuccessful())
@@ -357,8 +357,8 @@ namespace openCONFIGURATOR
 						string indexString = IntToHex(index, 4, "", "");
 						string subIndexString = IntToHex(subIndexId, 2, "", "");
 						NodeType nodeType = (nodeId == MN_NODEID)
-							? MN
-							: CN;
+						                    ? MN
+						                    : CN;
 						char* attributeValueTemp = new char [50];
 
 						Result result = Translate(GetSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), attributeType, attributeValueTemp));
@@ -393,8 +393,8 @@ namespace openCONFIGURATOR
 						if (!node)
 						{
 							boost::format formatter(kMsgNonExistingNode);
-							formatter 
-								% nodeId;
+							formatter
+							% nodeId;
 							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 						else
@@ -427,17 +427,17 @@ namespace openCONFIGURATOR
 						if (!node)
 						{
 							boost::format formatter(kMsgNonExistingNode);
-							formatter 
-								% nodeId;
-							return Result(NODE_DOES_NOT_EXIST,formatter.str());
+							formatter
+							% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
 						Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
 						if (!indexPtr)
 						{
 							boost::format formatter(kMsgExistingIndex);
-							formatter 
-								% index 
-								% nodeId;
+							formatter
+							% index
+							% nodeId;
 							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
 						}
 
@@ -461,19 +461,19 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
-					if (!node)
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						if (!node)
 						{
 							boost::format formatter(kMsgNonExistingNode);
-							formatter 
-								% nodeId;
+							formatter
+							% nodeId;
 							return Result(NODE_DOES_NOT_EXIST, formatter.str());
-				}
+						}
 						indexCount = node->GetIndexCollection()->Size();
 						return Result();
-			}
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
@@ -490,28 +490,28 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
-					if (!node)
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						if (!node)
 						{
 							boost::format formatter(kMsgNonExistingNode);
-							formatter 
-								% nodeId;
+							formatter
+							% nodeId;
 							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
-					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
-					if (!indexPtr)
+						Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+						if (!indexPtr)
 						{
 							boost::format formatter(kMsgExistingIndex);
-							formatter 
-								% index 
-								% nodeId;
-							return Result(INDEX_DOES_NOT_EXIST,formatter.str());
-				}
+							formatter
+							% index
+							% nodeId;
+							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
+						}
 						subIndexCount = indexPtr->GetNumberofSubIndexes();
 						return Result();
-			}
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
 				catch (const ocfmRetCode& ex)
@@ -529,56 +529,56 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
-					if (!node)
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						Node* node = NodeCollection::GetNodeColObjectPointer()->GetNodePtr(nodeId);
+						if (!node)
 						{
 							boost::format formatter(kMsgNonExistingNode);
-							formatter 
-								% nodeId;
+							formatter
+							% nodeId;
 							return Result(NODE_DOES_NOT_EXIST, formatter.str());
 						}
-					Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
-					if (!indexPtr)
+						Index* indexPtr = node->GetIndexCollection()->GetIndexPtr(index);
+						if (!indexPtr)
 						{
 							boost::format formatter(kMsgExistingIndex);
-							formatter 
-								% index 
-								% nodeId;
-							return Result(INDEX_DOES_NOT_EXIST,formatter.str());
+							formatter
+							% index
+							% nodeId;
+							return Result(INDEX_DOES_NOT_EXIST, formatter.str());
 						}
-					SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(0);
-					if (!subIndexPtr)
+						SubIndex* subIndexPtr = indexPtr->GetSubIndexPtr(0);
+						if (!subIndexPtr)
 						{
 							boost::format formatter(kMsgExistingSubIndex);
-							formatter 
-								% index 
-								% 0
-								% nodeId;
-							return Result(SUBINDEX_DOES_NOT_EXIST,formatter.str());
+							formatter
+							% index
+							% 0
+							% nodeId;
+							return Result(SUBINDEX_DOES_NOT_EXIST, formatter.str());
 						}
-					const char* value = (getDefault) 
-						? subIndexPtr->GetDefaultValue()
-						: subIndexPtr->GetActualValue();
-					if (!value)
+						const char* value = (getDefault)
+						                    ? subIndexPtr->GetDefaultValue()
+						                    : subIndexPtr->GetActualValue();
+						if (!value)
 						{
 							boost::format formatter(kMsgNoActualOrDefaultValue);
-							formatter 
-								% index 
-								% 0
-								% nodeId;
-							return Result(NO_DEFAULT_OR_ACTUAL_VALUE,formatter.str());
+							formatter
+							% index
+							% 0
+							% nodeId;
+							return Result(NO_DEFAULT_OR_ACTUAL_VALUE, formatter.str());
 						}
-					string valueStr = value;
-					if (valueStr.substr(0, 2) == "0x")
+						string valueStr = value;
+						if (valueStr.substr(0, 2) == "0x")
 							nrOfEntries = HexToInt<UINT32>(valueStr);
-					else
+						else
 							nrOfEntries =  boost::lexical_cast<UINT32>(value);
 						return Result();
-				}
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -592,17 +592,17 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					string indexString = IntToHex(index, 4, "", "");
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						string indexString = IntToHex(index, 4, "", "");
+						NodeType nodeType = (nodeId == MN_NODEID)
+						                    ? MN
+						                    : CN;
 
-					return Translate(DeleteIndex(nodeId, nodeType, indexString.c_str()));
-				}
+						return Translate(DeleteIndex(nodeId, nodeType, indexString.c_str()));
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);
@@ -617,18 +617,18 @@ namespace openCONFIGURATOR
 			{
 				try
 				{
-				if (ProjectConfiguration::GetInstance().IsInitialized())
-				{
-					string indexString = IntToHex(index, 4, "", "");
-					string subIndexString = IntToHex(subIndex, 2, "", "");
-					NodeType nodeType = (nodeId == MN_NODEID)
-						? MN
-						: CN;
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						string indexString = IntToHex(index, 4, "", "");
+						string subIndexString = IntToHex(subIndex, 2, "", "");
+						NodeType nodeType = (nodeId == MN_NODEID)
+						                    ? MN
+						                    : CN;
 
-					return Translate(DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
-				}
+						return Translate(DeleteSubIndex(nodeId, nodeType, indexString.c_str(), subIndexString.c_str()));
+					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
-			}
+				}
 				catch (const ocfmRetCode& ex)
 				{
 					return Translate(ex);

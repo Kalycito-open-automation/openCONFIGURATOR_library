@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -65,7 +65,7 @@
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -77,7 +77,7 @@ DataTypeCollection::DataTypeCollection() :
 /* Destructor */
 
 /**
- 
+
 
  */
 
@@ -111,7 +111,7 @@ DataType* DataTypeCollection::GetDataType(const char* dataTypeValue)
 	DataType* objDataType = NULL;
 
 	for (INT32 loopCount = 0; loopCount < this->GetNumberOfDataTypes();
-			loopCount++)
+	        loopCount++)
 	{
 		objDataType = this->GetDataTypeElement(loopCount);
 
@@ -134,8 +134,8 @@ DataType* DataTypeCollection::GetDataTypeByName(const char* dataTypeValue)
 		{
 			objDataType = this->GetDataTypeElement(loopCount);
 
-			char *objDtNameUpper = new char[strlen(objDataType->GetName()) + STR_ALLOC_BUFFER];
-			char *dtValUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
+			char* objDtNameUpper = new char[strlen(objDataType->GetName()) + STR_ALLOC_BUFFER];
+			char* dtValUpper = new char[strlen(dataTypeValue) + STR_ALLOC_BUFFER];
 
 			strcpy(objDtNameUpper, objDataType->GetName());
 			objDtNameUpper = ConvertToUpper(objDtNameUpper);

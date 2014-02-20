@@ -15,7 +15,7 @@ class LibraryConfiguration
 		LibraryConfiguration(void);
 		LibraryConfiguration(const LibraryConfiguration&);
 		void operator=(const LibraryConfiguration&);
-		
+
 		static std::string libResourcePath;
 		static const std::string kDefaultLibResourcePath;
 		static const std::string kLibResourcePathEnvVar;
@@ -28,10 +28,10 @@ class LibraryConfiguration
 
 		/************************************************************************
 		\brief	Get library resource path.
-				
+
 				The library resource path will be lazily instantiated the first time
 				this method is called and will be determined as follows:<br/>
-				1. If environment variable OPENCONFIGURATOR_LIBRARY_RESOURCEPATH exists, 
+				1. If environment variable OPENCONFIGURATOR_LIBRARY_RESOURCEPATH exists,
 				   resource path will be set to its value and returned.
 				2. Otherwise "resources" will be set as resource path and returned.
 
@@ -60,7 +60,7 @@ class LibraryConfiguration
 		************************************************************************/
 		static const std::string GetTxt2CdcFilePath(void);
 
-		~LibraryConfiguration(void);		
+		~LibraryConfiguration(void);
 };
 
 #endif // LIBRARYCONFIGURATION_H_

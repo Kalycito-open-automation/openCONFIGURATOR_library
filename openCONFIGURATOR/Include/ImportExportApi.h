@@ -16,21 +16,21 @@ file formats.
 #include "Exception.h"
 #include "Result.h"
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
 		namespace API
-		{ 
+		{
 			/** \addtogroup imexport
 			 * @{
 			 */
 			/**
 			\brief	Generate the process image description for a POWERLINK network.
-					
-			Generate a process image description file in the programming language specified by the user. 
 
-			\param[in] lang	::OutputLanguage specified for the process image file. 
+			Generate a process image description file in the programming language specified by the user.
+
+			\param[in] lang	::OutputLanguage specified for the process image file.
 			\param[in] outputPath Output path for the process image file (default project output path if empty).
 			\param[in] fileName	File name for the process image code file (will default to "PI.*" if empty).
 

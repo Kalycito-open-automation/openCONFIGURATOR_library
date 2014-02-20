@@ -2,7 +2,7 @@
  ************************************************************************************************
  \file		BaseIndex.h
 
- \brief		This file contains the class declaration that is used for handling the attributes of an Index/SubIndex object 
+ \brief		This file contains the class declaration that is used for handling the attributes of an Index/SubIndex object
  ************************************************************************************************
  */
 
@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -74,7 +74,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the name of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -93,7 +93,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Index ID
-		 
+
 		 \return	const char*
 		 \deprecated Method will be removed. Use GetIndex() instead.
 		 */
@@ -102,9 +102,9 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Index ID
-		 
+
 		 \param		idxId	 Character pointer to the Index value
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -113,7 +113,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Default Value of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -121,9 +121,9 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Default Value of the Index
-		 
+
 		 \param		value		Character pointer to the Default value
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -132,7 +132,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Actual Value of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -140,7 +140,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Actual Value of the Index
-		 
+
 		 \param		value		Character pointer to the Actual value
 
 		 \return	void
@@ -151,7 +151,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Access Type of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -159,9 +159,9 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Access Type of the Index
-		 
+
 		 \param		accessStr 		Character pointer to the Access type of the Index
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -170,7 +170,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the LowLimit value of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -178,9 +178,9 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the LowLimit of the Index
-		 
+
 		 \param		lowLimitStr		Character pointer to LowLimit value
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -189,7 +189,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the HighLimit value of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -197,9 +197,9 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to set the HighLimit of the Index
-		 
+
 		 \param		highLimitStr		Character pointer to the HighLimit value
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -208,7 +208,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return the DataType of the Index
-		 
+
 		 \return	DataType
 		 */
 		/*****************************************************************************/
@@ -216,7 +216,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the datatype of the Index
-		 
+
 		 \param		dtObj		Class Variable of DataType to hold value of object datatype
 		 \return	void
 		 */
@@ -225,7 +225,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the DataType of the Index
-		 
+
 		 \param		dataTypeName	Character pointer to the datatype name
 
 		 \return	void
@@ -235,7 +235,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the DataType name of the Index for a given Node ID
-		 
+
 		 \param		dataTypeName 	Character pointer to the datatype name
 		 \param		nodeIdVal	 	Integer to hold Node ID of each node
 
@@ -247,7 +247,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return the PDOMapping of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -255,9 +255,9 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the PDOMapping of the Index
-		 
+
 		 \param		pdoMappingStr		Character pointer to the PDOMapping of the Index
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -266,7 +266,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Object Type of the Index
-		 
+
 		 \return	const char*
 		 */
 		/*****************************************************************************/
@@ -274,7 +274,7 @@ class BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Object Type of the Index
-		 
+
 		 \return	ObjectType
 		 */
 		/*****************************************************************************/
@@ -282,9 +282,9 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Object Type of the Index
-		 
+
 		 \param		objTypeStr		Character pointer to the object type
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -292,7 +292,7 @@ class BaseIndex
 
 		/******************************************************************************
 		 \brief		Set the object type of this Index.
-		 
+
 		 \param		objectType ObjectType to set.
 		*****************************************************************************/
 		void SetObjectType(const ObjectType objectType);
@@ -300,7 +300,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return the NodeID of the Index
-		 
+
 		 \return	INT32
 		 */
 		/*****************************************************************************/
@@ -308,7 +308,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Node ID of the Index
-		 
+
 		 \param		nodeIdVal		Integer to hold the Node ID of the objects
 
 		 \return	void
@@ -319,11 +319,11 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to check the validity of index value
-		 
+
 		 \param		hexValue	Character pointer to the hex value
-		 
+
 		 \return	BOOL
-		 
+
 		 \retval	TRUE		if index value is valid
 		 \retval	FALSE		if index value is invalid
 		 */
@@ -332,7 +332,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to save the changes of the Index properties
-		 
+
 		 \param		idxIdStr	Character pointer to the Index value
 		 \param		nameStr	 	Character pointer to the Index name
 
@@ -343,8 +343,8 @@ class BaseIndex
 
 		/******************************************************************************/
 		/**
-		 \brief		This function shall be used to return the Unique ID Reference of the Index 
-		 
+		 \brief		This function shall be used to return the Unique ID Reference of the Index
+
 		 \return	char*
 		 */
 		/*****************************************************************************/
@@ -352,9 +352,9 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the Unique ID Reference of the Index
-		 
+
 		 \param     uniqueIdStr  	Character pointer to the Unique ID of the objects
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -363,7 +363,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to return datatype of the Index
-		 
+
 		 \return	char*
 		 */
 		/*****************************************************************************/
@@ -371,7 +371,7 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to set the datatype value of the Index
-		 
+
 		 \param		dataTypeStr
 		 \return	void
 		 */
@@ -381,26 +381,26 @@ class BaseIndex
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to check if the Index's inclusion in CDC generation is enabled/disabled
-		 
-		 \return	Flag			
+
+		 \return	Flag
 		 */
 		/*****************************************************************************/
 		bool GetFlagIfIncludedCdc();
 		/******************************************************************************/
 		/**
 		 \brief		This function shall be used to enable/disable the Index's inclusion in CDC generation
-		 
+
 		 \param		flagVal  	Enum of type Flag to hold value of flagIfInCdc
-		 
-		 \return	void			
+
+		 \return	void
 		 */
 		/*****************************************************************************/
 		void SetFlagIfIncludedCdc(bool flagVal);
 
 		/**
 		 \brief		This function shall be used to delete the memory occupied by the members of the class
-		 
-		 \return	void			
+
+		 \return	void
 		 */
 		void DeleteAllMemberMemory();
 

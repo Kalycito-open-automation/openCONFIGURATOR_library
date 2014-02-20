@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -63,7 +63,7 @@
  *****************************************************************************
  \class		SubIndex
  \brief		Creates subindex for Baseindex
- 
+
  *****************************************************************************/
 
 class SubIndex: public BaseIndex
@@ -74,9 +74,9 @@ class SubIndex: public BaseIndex
 
 		/************************************************************************
 		\brief Equality operator.
-		
+
 		\param subIndex SubIndex for comparison
-		
+
 		\return true if this instances' index is numerically equal to the index of the argument.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 		************************************************************************/

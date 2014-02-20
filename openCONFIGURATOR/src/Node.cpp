@@ -95,11 +95,11 @@ Node::Node() :
 	stationType(NORMAL),
 	nodeType(),
 	// MN
-	transmitsPRes(), 
-	// CN	
+	transmitsPRes(),
+	// CN
 	isMandatory(),
 	autostartNode(),
-	resetInOperational(),	
+	resetInOperational(),
 	verifyAppSwVersion(),
 	autoAppSwUpdateAllowed(),
 	verifyDeviceType(),
@@ -243,7 +243,7 @@ IndexCollection* Node::GetPDOIndexCollection(PDOType pdotype)
 	return objPdoIndexCollection;
 }
 
-IndexCollection* Node::getPDOIndexCollection(INT32 *rpdoCount, INT32 *tpdoCount)
+IndexCollection* Node::getPDOIndexCollection(INT32* rpdoCount, INT32* tpdoCount)
 {
 	IndexCollection* pdoIndexCollObj = new IndexCollection();
 	Index* indexObj = NULL;
@@ -375,21 +375,21 @@ ocfmRetCode Node::SetForcedCycle(const char* tempForcedCycleVal)
 	{
 		if (OCFM_ERR_INDEXID_NOT_FOUND == indexMNstoreExObj.getErrorCode())
 		{
-			errorString<<"The Index 1F9B does not exist in MN.\n";
+			errorString << "The Index 1F9B does not exist in MN.\n";
 		}
 		if (OCFM_ERR_INDEXID_NOT_FOUND == indexNodeExObj.getErrorCode())
 		{
-			errorString<<"The Index 1F9B does not exist in CN node id:"<<this->GetNodeId()<<".\n";
+			errorString << "The Index 1F9B does not exist in CN node id:" << this->GetNodeId() << ".\n";
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == indexMNstoreExObj.getErrorCode())
 		{
-			errorString<<"The Subindex "<<sidxId<<" in Index 1F9B does not exist in MN.\n";
+			errorString << "The Subindex " << sidxId << " in Index 1F9B does not exist in MN.\n";
 		}
 		if (OCFM_ERR_SUBINDEXID_NOT_FOUND == indexNodeExObj.getErrorCode())
 		{
-			errorString<<"The Subindex "<<sidxId<<" in Index 1F9B does not exist in CN node id:"<<this->GetNodeId()<<".\n";
+			errorString << "The Subindex " << sidxId << " in Index 1F9B does not exist in CN node id:" << this->GetNodeId() << ".\n";
 		}
-		errorString<<"Unable to assign the multiplexing cycle.\n";
+		errorString << "Unable to assign the multiplexing cycle.\n";
 
 		exObj.setErrorCode(OCFM_ERR_MULTIPLEX_ASSIGN_ERROR);
 		exObj.setErrorString(errorString.str());
@@ -454,9 +454,9 @@ void Node::ResetForcedCycleValue()
 	sidxId = IntToAscii(nodeId, sidxId, 16);
 	sidxId = PadLeft(sidxId, '0', 2);
 
-	SetSubIndexAttribute(MN_NODEID, MN, (char *) MULTIPL_CYCLE_ASSIGN_OBJECT,
+	SetSubIndexAttribute(MN_NODEID, MN, (char*) MULTIPL_CYCLE_ASSIGN_OBJECT,
 	                     sidxId, ACTUALVALUE, forcedCycle);
-	SetSubIndexAttribute(nodeId, nodeType, (char *) MULTIPL_CYCLE_ASSIGN_OBJECT,
+	SetSubIndexAttribute(nodeId, nodeType, (char*) MULTIPL_CYCLE_ASSIGN_OBJECT,
 	                     sidxId, ACTUALVALUE, forcedCycle);
 
 	delete[] sidxId;
@@ -653,7 +653,7 @@ boost::optional<bool> Node::IsAsyncOnly(void)
 
 void Node::SetIsAsyncOnly(bool isAsyncOnly)
 {
-	this->isAsyncOnly =isAsyncOnly;
+	this->isAsyncOnly = isAsyncOnly;
 }
 
 boost::optional<bool> Node::IsType1Router(void)
@@ -673,19 +673,19 @@ boost::optional<bool> Node::IsType2Router(void)
 
 void Node::SetIsType2Router(bool isType2Router)
 {
-	this->isType2Router= isType2Router;
+	this->isType2Router = isType2Router;
 }
 
 template<typename T>
 boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subIndex, const T value)
 {
-	LOG_DEBUG() 
-		<< std::hex 
-		<< std::showbase
-		<< std::boolalpha
-		<< "Setting actualValue for " << index << "/" << subIndex
-		<< " on node " << this->nodeId
-		<< " to '" << value << "'.";
+	LOG_DEBUG()
+	        << std::hex
+	        << std::showbase
+	        << std::boolalpha
+	        << "Setting actualValue for " << index << "/" << subIndex
+	        << " on node " << this->nodeId
+	        << " to '" << value << "'.";
 	Index& indexObj = this->indexCollObj->GetIndexRef(index);
 	std::ostringstream convertToString;
 	convertToString << std::boolalpha << value;
@@ -696,9 +696,9 @@ boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subInde
 	// Retrieve old actual value and store it
 	if (subIndex == 0 && !indexObj.HasSubIndices())
 	{
-		// Client intends to write to Index		
+		// Client intends to write to Index
 		oldActualValuePtr = indexObj.GetActualValue();
-	} 
+	}
 	else
 	{
 		// Client intends to write to SubIndex
@@ -709,7 +709,7 @@ boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subInde
 	{
 		std::string oldActualValueStr = oldActualValuePtr;
 		LOG_DEBUG() << "Old actualValue: '" << oldActualValueStr << "'";
-		if (boost::algorithm::starts_with(oldActualValueStr, "0x")) 
+		if (boost::algorithm::starts_with(oldActualValueStr, "0x"))
 			convertFromString << std::hex << oldActualValueStr.substr(2);
 		else
 			convertFromString << std::boolalpha << oldActualValueStr;
@@ -726,7 +726,7 @@ boost::optional<T> Node::SetActualValue(const UINT32 index, const UINT32 subInde
 	if (subIndex == 0 && !indexObj.HasSubIndices())
 	{
 		indexObj.SetActualValue(convertToString.str().c_str());
-	} 
+	}
 	else
 	{
 		SubIndex& subIndexObj = indexObj.GetSubIndexRef(subIndex);
@@ -746,9 +746,9 @@ boost::optional<T> Node::GetActualValue(const UINT32 index, const UINT32 subInde
 
 	if (subIndex == 0 && !indexObj.HasSubIndices())
 	{
-		// Client intends to read to Index		
+		// Client intends to read to Index
 		actualValuePtr = indexObj.GetActualValue();
-	} 
+	}
 	else
 	{
 		// Client intends to read SubIndex
@@ -758,7 +758,7 @@ boost::optional<T> Node::GetActualValue(const UINT32 index, const UINT32 subInde
 	if (actualValuePtr != NULL && strlen(actualValuePtr) != 0)
 	{
 		std::string actualValueStr = actualValuePtr;
-		if (boost::algorithm::starts_with(actualValueStr, "0x")) 
+		if (boost::algorithm::starts_with(actualValueStr, "0x"))
 			convertFromString << std::hex << actualValueStr.substr(2);
 		else
 			convertFromString << std::boolalpha << actualValueStr;

@@ -11,7 +11,7 @@
 #include "Exports.h"
 #include "Result.h"
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -24,7 +24,7 @@ namespace openCONFIGURATOR
 			\brief	Create a new %openCONFIGURATOR project.
 
 			\param[in] projectName	Name of the new project.
-			\param[in] projectPath	Path of the new project.	
+			\param[in] projectPath	Path of the new project.
 			\param[in] pathToMNXdd	path to MN-XDD (if empty, a default MN-XDD will be used).
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result

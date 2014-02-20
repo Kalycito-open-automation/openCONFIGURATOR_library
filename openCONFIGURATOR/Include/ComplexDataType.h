@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -68,7 +68,7 @@ using namespace std;
  ******************************************************************************************************
  \class			ComplexDataType
  \brief			This class is to handle complex datatypes in xdd/xdc file
- 
+
  ******************************************************************************************************/
 class ComplexDataType
 {
@@ -78,16 +78,16 @@ class ComplexDataType
 
 		INT32 cDtObjPosition;			/**< Usage to be documented */
 		char* prevUniqueId;				/**< Usage to be documented */
-		AppProcessCommon *nameIdAttr;	/**< Usage to be documented */
+		AppProcessCommon* nameIdAttr;	/**< Usage to be documented */
 
 		vector<VarDeclaration> varDeclarationCollection;	/**< Variable collection */
-	
+
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to add an object of varDeclaration to a collection list and update the count
-		 
+
 		 \param			varDeclarationObject
-		 
+
 		 \return		void
 		 */
 		/*****************************************************************************/

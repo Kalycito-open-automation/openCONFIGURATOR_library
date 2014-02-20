@@ -229,8 +229,8 @@ Node* NodeCollection::GetNodePtr(const UINT32 nodeId)
 {
 	vector<Node>::iterator it = this->nodeCollObj.begin();
 	for (;
-		it != this->nodeCollObj.end() && (((UINT32)it->GetNodeId()) != nodeId);
-		++it)
+	        it != this->nodeCollObj.end() && (((UINT32)it->GetNodeId()) != nodeId);
+	        ++it)
 	{}
 	if (it == this->nodeCollObj.end())
 		return NULL;

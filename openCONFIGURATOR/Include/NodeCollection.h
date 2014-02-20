@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -66,7 +66,7 @@ using namespace std;
  *****************************************************************************
  \class		NodeCollection
  \brief		Handles collection of each node's information on id,name,type present inside the network
- 
+
  *****************************************************************************/
 class NodeCollection
 {
@@ -75,7 +75,7 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the count of Node objects in the collection list
-		 
+
 		 \return	INT32
 		 */
 		/*****************************************************************************/
@@ -83,9 +83,9 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to add a Node object to a collection list and update the count
-		 
+
 		 \param		nodeObj       Class Variable of Node to hold the Node object
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -93,9 +93,9 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the Node objects at given position in the collection list
-		 
+
 		 \param		nodePos    Integer to hold the position of Node object to be deleted
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -103,7 +103,7 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the pointer to NodeCollection object to be used as the collection list
-		 
+
 		 \return	NodeCollection*
 		 */
 		/*****************************************************************************/
@@ -111,10 +111,10 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Node object of given type and ID from the collection list
-		 
+
 		 \param		nodeType  	Enum variable of NodeType to hold the value of Node type
 		 \param		nodeId		Integer to hold the value of Node id
-		 
+
 		 \return	Node
 		 */
 		/*****************************************************************************/
@@ -122,9 +122,9 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Node object of ID from the collection list
-		 
+
 		 \param		nodeId		Integer to hold the value of Node ID
-		 
+
 		 \return	Node
 		 */
 		/*****************************************************************************/
@@ -132,9 +132,9 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Node object at the given position from the collection list
-		 
+
 		 \param		position    Integer to hold value of column index
-		 
+
 		 \return	Node
 		 */
 		/*****************************************************************************/
@@ -142,7 +142,7 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the MN Node object from the collection list
-		 
+
 		 \return	Node
 		 */
 		/*****************************************************************************/
@@ -163,9 +163,9 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return pointer to the Node object at the given position from the collection list
-		 
+
 		 \param		position   Integer to hold value of column index
-		 
+
 		 \return	Node*
 		 \note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
 		 \deprecated Use NodeCollection::GetNodePtr(const UINT32 nodeId) instead.
@@ -175,8 +175,8 @@ class NodeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the count of CN objects in the collection list
-		 
-		 This is a member function of CNodeCollection collects the CN node count 
+
+		 This is a member function of CNodeCollection collects the CN node count
 
 		 \return	INT32
 		 */
@@ -185,19 +185,19 @@ class NodeCollection
 
 		/************************************************************************
 		\brief Query if this collection contains a Node with the given nodeId.
-		
+
 		\param nodeId   POWERLINK-NodeId of the Node.
-		
+
 		\return true if Node exists, false otherwise.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 		************************************************************************/
 		bool ContainsNode(const UINT32 nodeId);
-		  
+
 		/************************************************************************
 		\brief Gets a pointer to a Node by its nodeId.
-		
+
 		\param nodeId POWERLINK-NodeId of the Node.
-		
+
 		\return Pointer to Node-Object or NULL if not found.
 		\note The returned pointer will possibly be invalidated by adding/removing Node-Objects after obtaining it.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
@@ -206,9 +206,9 @@ class NodeCollection
 
 		/************************************************************************
 		\brief Gets a reference to a Node by its nodeId.
-		
+
 		\param nodeId POWERLINK-NodeId of the Node.
-		
+
 		\return Reference to Node-Object.
 		\throws ocfmRetCode ConfiguratorError OCFM_ERR_NODEID_NOT_FOUND if nodeId is not in the collection.
 		\note The returned reference will possibly be invalidated by adding/removing Node-Objects after obtaining it.
@@ -220,7 +220,7 @@ class NodeCollection
 		NodeCollection(void);
 		NodeCollection(const NodeCollection&);
 
-		static NodeCollection *objNodeColl;
+		static NodeCollection* objNodeColl;
 		vector<Node> nodeCollObj;
 };
 #endif // NodeCollection_h

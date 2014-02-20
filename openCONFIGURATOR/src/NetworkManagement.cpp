@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -71,7 +71,7 @@ using namespace std;
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -84,7 +84,7 @@ NetworkManagement::NetworkManagement(void) :
 /* Destructor */
 
 /**
- 
+
 
  */
 
@@ -99,7 +99,7 @@ void NetworkManagement::AddFeature(Feature objFeature)
 }
 
 char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
-		const char* featureName)
+        const char* featureName)
 {
 	UINT32 loopCount = 0;
 	char* retString = NULL;
@@ -109,7 +109,7 @@ char* NetworkManagement::GetNwMgmtFeatureValue(FeatureType featureType,
 	{
 		objFeature = FeatureCollection[loopCount];
 		if (objFeature.featureType == featureType
-				&& (!strcmp(featureName, objFeature.name)))
+		        && (!strcmp(featureName, objFeature.name)))
 		{
 			retString = new char[strlen(objFeature.value) + STR_ALLOC_BUFFER];
 			strcpy(retString, objFeature.value);
@@ -146,17 +146,17 @@ void NetworkManagement::CalculateMaxPDOCount()
 {
 	string featureName = "PDOTPDOChannels";
 	string featureValue = GetNwMgmtFeatureValue(MN_FEATURES, featureName.c_str());
-	
+
 	// PDOTPDOChannels is optional in an XDD. If it does not exist, the above function
 	// will return an empty string.
 	// The previous version of this function used atoi() to convert featureValue into maxPDOCount,
 	// atoi() returns value 0 for empty strings.
 	// To avoid side-effects, this behaviour will be kept, although PDOTPDOChannels has a default value
 	// of 256 if it is not present in an XDD.
-	
+
 	this->maxPDOCount = (featureValue.empty())
-		? 0
-		: boost::lexical_cast<INT32>(featureValue);
+	                    ? 0
+	                    : boost::lexical_cast<INT32>(featureValue);
 	//check is made for validating the value in MN xdd
 	//Min value = 0; Maxvalue = 256 (EPSG specification)
 	if (this->maxPDOCount > 256)

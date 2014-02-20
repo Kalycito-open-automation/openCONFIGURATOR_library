@@ -47,7 +47,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_FILE_CANNOT_OPEN:
 			return Result(FILE_WRITE_FAILED, errorString);
 		case OCFM_ERR_INVALID_NODEID:
-			return Result(NODEID_INVALID, errorString);		
+			return Result(NODEID_INVALID, errorString);
 		case OCFM_ERR_INVALID_SUBINDEXID:
 			return Result(SUBINDEX_INVALID, errorString);
 		case OCFM_ERR_INVALID_INDEXID:
@@ -85,7 +85,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
 			return Result(TPDO_CHANNEL_COUNT_EXCEEDED, errorString);
 		case OCFM_ERR_CHAINED_AND_MULTIPLEXED:
-			return Result(NODE_CONFIGURATION_ERROR, errorString);	
+			return Result(NODE_CONFIGURATION_ERROR, errorString);
 		case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
 			return Result(MAPPED_INDEX_DOES_NOT_EXIST, errorString);
 		case OCFM_ERR_INSUFFICIENT_MAPPING_OBJECTS:
@@ -160,7 +160,7 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
 		case OCFM_ERR_CANNOT_CREATE_DIR:
 		case OCFM_ERR_NO_PROJECT_LOADED:
-		// Will most likely never occur, unless a no-throw constructor is 
+		// Will most likely never occur, unless a no-throw constructor is
 		// explicitely called (which is not the case atm).
 		case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
 		// Legacy
@@ -176,10 +176,10 @@ Result openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& le
 		case OCFM_ERR_PROJECT_SETTINGS:
 		case OCFM_ERR_UNKNOWN:
 		default:
-		{
-			boost::format formatter(kMsgLegacyError);
-			formatter % ((int) errorCode);
-			return Result(LEGACY_ERROR, formatter.str() + errorString);
-		}
+			{
+				boost::format formatter(kMsgLegacyError);
+				formatter % ((int) errorCode);
+				return Result(LEGACY_ERROR, formatter.str() + errorString);
+			}
 	}// switch
 }// Translate

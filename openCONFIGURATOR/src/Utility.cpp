@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -160,18 +160,18 @@ char* SubString(char* destStr, const char* srcStr, UINT32 startPos, UINT32 len)
 		}
 		else
 		{
-			strncpy(destStr, (const char*) (srcStr + startPos), len);
+			strncpy(destStr, (const char*)(srcStr + startPos), len);
 			destStr[len] = '\0';
 		}
 	}
 	return destStr;
 }
 
-char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
+char* UnsignedToAlphaNumeric(unsigned srcValue, char* destStr, INT32 baseValue)
 {
-	char *alphNum = NULL;
+	char* alphNum = NULL;
 
-	alphNum = (char *) "0123456789abcdefghijklmnopqrstuvwxyz";
+	alphNum = (char*) "0123456789abcdefghijklmnopqrstuvwxyz";
 	if (0 == baseValue)
 	{
 		baseValue = 10;
@@ -187,23 +187,23 @@ char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue)
 	}
 	else
 	{
-		char *tempBuffer = NULL;
+		char* tempBuffer = NULL;
 		for (tempBuffer = UnsignedToAlphaNumeric(
-				srcValue / ((unsigned) baseValue), destStr, baseValue);
-				*tempBuffer; tempBuffer++)
+		                      srcValue / ((unsigned) baseValue), destStr, baseValue);
+		        *tempBuffer; tempBuffer++)
 			;
 		{
 			UnsignedToAlphaNumeric(srcValue % ((unsigned) baseValue),
-					tempBuffer, baseValue);
+			                       tempBuffer, baseValue);
 		}
 	}
 	return destStr;
 
 }
 
-char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
+char* IntToAscii(LONG srcValue, char* destStr, INT32 baseValue)
 {
-	char *tempStr = NULL;
+	char* tempStr = NULL;
 	ULONG uiValue;
 
 	tempStr = destStr;
@@ -231,9 +231,9 @@ char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue)
 	return destStr;
 }
 
-ULONG HexToInt(const char *hexStr)
+ULONG HexToInt(const char* hexStr)
 {
-	ULONG retValue;   
+	ULONG retValue;
 	stringstream inputStream;
 	inputStream << hex << hexStr;
 	inputStream >> retValue;
@@ -243,9 +243,9 @@ ULONG HexToInt(const char *hexStr)
 bool CheckIfNotPDO(const char* indexId)
 {
 	if ((0 == strncmp(indexId, "14xx", 2)) || (0 == strncmp(indexId, "16xx", 2))
-			|| (0 == strncmp(indexId, "18xx", 2))
-			|| (0 == strncmp(indexId, "1Axx", 2))
-			|| (0 == strncmp(indexId, "1axx", 2)))
+	        || (0 == strncmp(indexId, "18xx", 2))
+	        || (0 == strncmp(indexId, "1Axx", 2))
+	        || (0 == strncmp(indexId, "1axx", 2)))
 	{
 		return false;
 	}
@@ -259,7 +259,7 @@ bool CheckIfManufactureSpecificObject(const char* indexId)
 {
 	UINT32 manufactureIndexid;
 
-	manufactureIndexid = HexToInt((char *) "2000");
+	manufactureIndexid = HexToInt((char*) "2000");
 	if (HexToInt(indexId) >= manufactureIndexid)
 	{
 		return true;
@@ -346,12 +346,12 @@ bool CheckIfHex(const char* srcStr)
 
 INT32 GetConfigDate(void)
 {
-//Time & date are calculated since 1984
+	//Time & date are calculated since 1984
 	INT32 daysCount = 0;
 	INT32 yearsSince = 0;
 
 	time_t rawTime;
-	struct tm *timeInfo;
+	struct tm* timeInfo;
 
 	time(&rawTime);
 	timeInfo = localtime(&rawTime);
@@ -365,7 +365,7 @@ INT32 GetConfigDate(void)
 		INT32 tempDays = 0;
 		tempYear = (1984 + loopCount);
 		if ((0 == tempYear % 4) && !(0 == tempYear % 100)
-				&& (0 != tempYear % 400))
+		        && (0 != tempYear % 400))
 		{
 			tempDays = 366;
 		}
@@ -383,7 +383,7 @@ INT32 GetConfigDate(void)
 INT32 GetConfigTime(void)
 {
 	time_t rawtime;
-	struct tm *timeInfo;
+	struct tm* timeInfo;
 	INT32 milliSeconds = 0;
 
 	time(&rawtime);
@@ -400,20 +400,20 @@ INT32 GetConfigTime(void)
 bool CheckAllowedDTForMapping(const char* dataTypeName)
 {
 	bool retVal = false;
-	if( NULL != dataTypeName)
+	if (NULL != dataTypeName)
 	{
-		char *dtNameUpper = new char[strlen(dataTypeName) + STR_ALLOC_BUFFER];
+		char* dtNameUpper = new char[strlen(dataTypeName) + STR_ALLOC_BUFFER];
 		strcpy(dtNameUpper, dataTypeName);
 		dtNameUpper = ConvertToUpper(dtNameUpper);
 
 		if (0 == strcmp(dtNameUpper, "INTEGER8")
-			|| 0 == strcmp(dtNameUpper, "INTEGER16")
-			|| 0 == strcmp(dtNameUpper, "INTEGER32")
-			|| 0 == strcmp(dtNameUpper, "INTEGER64")
-			|| 0 == strcmp(dtNameUpper, "UNSIGNED8")
-			|| 0 == strcmp(dtNameUpper, "UNSIGNED16")
-			|| 0 == strcmp(dtNameUpper, "UNSIGNED32")
-			|| 0 == strcmp(dtNameUpper, "UNSIGNED64"))
+		        || 0 == strcmp(dtNameUpper, "INTEGER16")
+		        || 0 == strcmp(dtNameUpper, "INTEGER32")
+		        || 0 == strcmp(dtNameUpper, "INTEGER64")
+		        || 0 == strcmp(dtNameUpper, "UNSIGNED8")
+		        || 0 == strcmp(dtNameUpper, "UNSIGNED16")
+		        || 0 == strcmp(dtNameUpper, "UNSIGNED32")
+		        || 0 == strcmp(dtNameUpper, "UNSIGNED64"))
 		{
 			retVal = true;
 		}
@@ -438,7 +438,7 @@ char* GetLastAvailableCycleNumber(void)
 	INT32 indexPos;
 	INT32 subIndexPos;
 	retCode = IfSubIndexExists(240, MN, (char*) "1F98", (char*) "07",
-			&subIndexPos, &indexPos);
+	                           &subIndexPos, &indexPos);
 	if (OCFM_ERR_SUCCESS != retCode.getErrorCode())
 	{
 		strcpy(retForcedCycleValue, "");
@@ -446,7 +446,7 @@ char* GetLastAvailableCycleNumber(void)
 	}
 	char* actValue = new char[20];
 	retCode = GetSubIndexAttributes(240, MN, (char*) "1F98", (char*) "07",
-			ACTUALVALUE, actValue);
+	                                ACTUALVALUE, actValue);
 	UINT32 tempCycleNumber = cycleNumberGlobal;
 	if (OCFM_ERR_SUCCESS != retCode.getErrorCode())
 	{
@@ -454,7 +454,7 @@ char* GetLastAvailableCycleNumber(void)
 		UINT32 cycleValue;
 		if (0 == strncmp(actValue, "0x", 2) || 0 == strncmp(actValue, "0X", 2))
 		{
-			char *tempCycleVal = new char[strlen(actValue)];
+			char* tempCycleVal = new char[strlen(actValue)];
 			SubString(tempCycleVal, (const char*)actValue, 2, strlen(actValue) - 2);
 			cycleValue = (UINT32) HexToInt(tempCycleVal);
 			delete[] tempCycleVal;
@@ -484,12 +484,12 @@ char* GetLastAvailableCycleNumber(void)
 	{
 		cycleNumberGlobal = tempCycleNumber;
 		retForcedCycleValue = IntToAscii(tempCycleNumber, retForcedCycleValue,
-				16);
+		                                 16);
 	}
 	else
 	{
 		retForcedCycleValue = IntToAscii(freeCycleNumber, retForcedCycleValue,
-				16);
+		                                 16);
 	}
 	return retForcedCycleValue;
 }
@@ -505,9 +505,9 @@ void CheckAndCorrectName(char* srcStr)
 	for (UINT32 loopCount = 0; loopCount < srcStrLen; loopCount++)
 	{
 		if ((48 <= srcStr[loopCount] && 57 >= srcStr[loopCount])
-				|| (65 <= srcStr[loopCount] && 90 >= srcStr[loopCount])
-				|| (97 <= srcStr[loopCount] && 122 >= srcStr[loopCount])
-				|| 95 == srcStr[loopCount])
+		        || (65 <= srcStr[loopCount] && 90 >= srcStr[loopCount])
+		        || (97 <= srcStr[loopCount] && 122 >= srcStr[loopCount])
+		        || 95 == srcStr[loopCount])
 		{
 		}
 		else
@@ -584,7 +584,7 @@ bool CheckAccessTypeForInclude(const char* accessType)
 		strcpy(tempAccesstype, accessType);
 		tempAccesstype = ConvertToUpper(tempAccesstype);
 		if ((0 == strcmp(tempAccesstype, "CONST"))
-			|| (0 == strcmp(tempAccesstype, "RO")))
+		        || (0 == strcmp(tempAccesstype, "RO")))
 		{
 			retInclude = false;
 		}
@@ -601,19 +601,19 @@ bool CheckToolVersion(char* currentToolVersion)
 {
 	char* tempToolVersion = ConvertToUpper(currentToolVersion);
 	if ((0 == strcmp(tempToolVersion, TOOL_VERSION))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_1))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_2))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_3))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
-			|| (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_7))
-			|| (0 == strcmp(tempToolVersion, LAST_TOOL_VERSION))
-			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
-			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))
-			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_3))
-			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_4))
-			|| (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_5)))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_1))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_2))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_3))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_4))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_5))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_6))
+	        || (0 == strcmp(tempToolVersion, PREV_TOOL_VERSION_7))
+	        || (0 == strcmp(tempToolVersion, LAST_TOOL_VERSION))
+	        || (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_1))
+	        || (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_2))
+	        || (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_3))
+	        || (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_4))
+	        || (0 == strcmp(tempToolVersion, TOOL_INTER_REL_VERSION_5)))
 	{
 		return true;
 	}
@@ -627,12 +627,12 @@ template <typename T>
 string openCONFIGURATOR::Library::Utilities::IntToHex(const T number, const unsigned int padLength, const string& prefix, const string& suffix)
 {
 	ostringstream hexStream;
-	hexStream << std::setfill ('0')
-		<< std::setw(padLength)
-		<< std::hex
-		<< std::uppercase
-		<< number
-		<< suffix;
+	hexStream << std::setfill('0')
+	          << std::setw(padLength)
+	          << std::hex
+	          << std::uppercase
+	          << number
+	          << suffix;
 	return (prefix + hexStream.str());
 }
 
@@ -646,8 +646,8 @@ T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
 {
 	// Strip prefix if necessary
 	string valueStr = (hexString.substr(0, 2) == "0x")
-		? hexString.substr(2)
-		: hexString;
+	                  ? hexString.substr(2)
+	                  : hexString;
 	stringstream stream;
 	T value = 0;
 	stream << std::hex << valueStr;

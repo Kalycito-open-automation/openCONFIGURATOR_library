@@ -20,7 +20,7 @@ notice, this list of conditions and the following disclaimer.
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
 
-3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+3. Neither the name of Kalycito Infotech Private Limited nor the names of
 its contributors may be used to endorse or promote products derived
 from this software without prior written permission. For written
 permission, please contact info@kalycito.com.
@@ -60,40 +60,40 @@ using namespace std;
 
 /******************************************************************************************************
 \class			ocfmRetCode
-\brief			This function handles the exception error messages		
+\brief			This function handles the exception error messages
 ******************************************************************************************************/
 class ocfmRetCode : public exception
 {
-public:
-	ocfmRetCode(void);
-	ocfmRetCode(ConfiguratorError errorCode);
-	~ocfmRetCode(void) throw ();
+	public:
+		ocfmRetCode(void);
+		ocfmRetCode(ConfiguratorError errorCode);
+		~ocfmRetCode(void) throw ();
 
-	/**
-	\param[in] error error code to set.
-	\return	void
-	*/
-	void setErrorCode(ConfiguratorError error);
-	
-	/**
-	\return	error code
-	*/
-	ConfiguratorError getErrorCode(void) const;
-	
-	/**
-	\param[in] errorString Error string (description) to set.
-	\return	void
-	*/
-	void setErrorString(const string& errorString);
+		/**
+		\param[in] error error code to set.
+		\return	void
+		*/
+		void setErrorCode(ConfiguratorError error);
 
-	/**
-	\return	error string
-	*/
-	const string& getErrorString(void) const;
+		/**
+		\return	error code
+		*/
+		ConfiguratorError getErrorCode(void) const;
 
-private:
-	string errorString; /**< Error string */
-	ConfiguratorError code;	/**< Error code from ConfiguratorError */
+		/**
+		\param[in] errorString Error string (description) to set.
+		\return	void
+		*/
+		void setErrorString(const string& errorString);
+
+		/**
+		\return	error string
+		*/
+		const string& getErrorString(void) const;
+
+	private:
+		string errorString; /**< Error string */
+		ConfiguratorError code;	/**< Error code from ConfiguratorError */
 };
 
 #endif // EXCEPTION_H_

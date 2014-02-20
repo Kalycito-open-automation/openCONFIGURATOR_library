@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -65,7 +65,7 @@ using namespace std;
  ****************************************************************************
  \class			DataTypeCollection
  \brief			This class is to handle complex datatype collection in xdd/xdc file
- 
+
  ****************************************************************************/
 class DataTypeCollection
 {
@@ -76,9 +76,9 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to add an object of DataType to a collection list and update the count
-		 
-		 \param			objDataType		Class variable of DataType to include in data type collection	
-		 
+
+		 \param			objDataType		Class variable of DataType to include in data type collection
+
 		 \return		void
 		 */
 		/*****************************************************************************/
@@ -86,7 +86,7 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to delete the objects of DataType collection list and update the count
-		 
+
 		 \return		void
 		 */
 		/*****************************************************************************/
@@ -94,7 +94,7 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return number of DataType objects in the DataType collection list
-		 
+
 		 \return		INT32
 		 */
 		/*****************************************************************************/
@@ -102,9 +102,9 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return the DataType object at the given position in the collection list
-		 
+
 		 \param			dataTypePosition	Integer to hold the datatype id
-		 
+
 		 \return		DataType
 		 */
 		/*****************************************************************************/
@@ -112,7 +112,7 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return the DataType object(whose dataTypeValue matches the given parameter) from the collection list
-		 
+
 		 \param			dataTypeValue		Character pointer to the datatype value
 
 		 \return		DataType*
@@ -122,9 +122,9 @@ class DataTypeCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the DataType object whose dataTypeValue matches the given parameter
-		 
+
 		 \param		dataTypeValue		Character pointer to the datatype value
-		 
+
 		 \return	DataType*
 		 */
 		/*****************************************************************************/

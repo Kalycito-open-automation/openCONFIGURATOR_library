@@ -9,9 +9,9 @@
 
 const char kPathSeparator =
 #ifdef _WIN32
-	'\\';
+    '\\';
 #else
-	'/';
+    '/';
 #endif
 
 #endif // CONSTANTS_H_

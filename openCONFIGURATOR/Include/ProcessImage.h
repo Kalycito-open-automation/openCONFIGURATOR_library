@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -96,7 +96,7 @@ typedef enum PDODataType
  */
 class PIDataInfo
 {
-public:
+	public:
 		IEC_Datatype iecDtVar;	/**< Value for the dataType */
 		INT32 dataSize;			/**< Size of the data */
 		char* dtName;			/**< Name of the dataType */
@@ -111,12 +111,12 @@ public:
 /*****************************************************************************/
 /* Structures */
 
-/** 
+/**
  * A struct to represent ProcessImage variables
  */
 class ProcessImage
 {
-public:
+	public:
 		char* name;							/**< Name of the process image variable */
 		char direction[5];					/**< Direction of the process image variable */
 		PIDataInfo dataInfo;				/**< Details about the data of the process image variable */
@@ -132,7 +132,7 @@ public:
 		char* varDeclName;					/**< ProcessImage variable Name */
 		char* moduleIndex;					/**< Module index Id */
 		PIDirectionType directionType;		/**< ProcessImage direction type(N/W point of view) */
-		
+
 		/**
 		\brief		This function is used to initialise the members to a default value.
 		\return		void
@@ -155,12 +155,12 @@ public:
 		{}
 };
 
-/** 
+/**
  * A struct to represent ProcessImage variables in a C# format
  */
 class NETProcessImage
 {
-public:
+	public:
 		char* name;						/**< ProcessImage name for the C# format */
 		char* lastName;					/**< Usage to be documented */
 		char* moduleName;				/**< Slave module name */
@@ -186,60 +186,60 @@ public:
 		{}
 };
 
-/** 
+/**
  * A struct to represent the ProcessImage indexes list & datatype and directions
  */
 class PIIndexTable
 {
-public:
+	public:
 		char addressStr[10];		/**< PI variable address Id */
 		PDODataType dtObj;			/**< DataType for the PI object */
 		PIDirectionType direction;	/**< Direction of the PI object */
 };
 
-/** 
+/**
  * A struct to represent ProcessImage offsets
  */
 class Offsets
 {
-public:
+	public:
 		INT32 prevOffset;		/**< To represent the previous offset */
 		INT32 currOffset;		/**< To represent the current offset */
 
-		Offsets() : 
+		Offsets() :
 			prevOffset(0),
 			currOffset(0)
 		{}
 };
 
-/** 
+/**
  * A struct to represent processimage objects
  */
 class PIObject
 {
-public:
-	char* indexId;		/**< PI variables IndexId */
-	char* sIdxId;		/**< PI variables SubIndexId */
-	
-	PIObject() :
-		indexId(NULL),
-		sIdxId(NULL)
-	{}
+	public:
+		char* indexId;		/**< PI variables IndexId */
+		char* sIdxId;		/**< PI variables SubIndexId */
+
+		PIObject() :
+			indexId(NULL),
+			sIdxId(NULL)
+		{}
 };
 
-/** 
+/**
  * A struct to represent Module Collection
  */
 class ModuleCol
 {
-public:
-	INT32 moduleNo;			/**< To denote the module number */
-	char moduleName[50];	/**< To denote the module name */
+	public:
+		INT32 moduleNo;			/**< To denote the module number */
+		char moduleName[50];	/**< To denote the module name */
 
-	ModuleCol() 
-		: moduleNo(0),
-		  moduleName()
-	{}
+		ModuleCol()
+			: moduleNo(0),
+			  moduleName()
+		{}
 };
 
 /*****************************************************************************/
@@ -257,7 +257,7 @@ static const int NO_OF_PI_ENTERIES = 18;
 
 /**
  \brief		This function shall be used to assign ProcessImage objects to the given piInCol and piOutCol arrays from the PICollection list based on their directionType
- 
+
  \param		piInCol       Class variable of ProcessImage to hold the IN ProcessImage
  \param		piOutCol      Class variable of ProcessImage to hold the OUT ProcessImage
   \return	void
@@ -266,7 +266,7 @@ void GroupInOutPIVariables(ProcessImage piInCol[], ProcessImage piOutCol[]);
 
 /**
  \brief		This function shall be used to return the pointer to structure variable of PIDataInfo whose datatype matches the given parameter
- 
+
  \param		iecDataType		Character pointer to the value of data
  \param		dataSize		Integer to hold the value of data size
  \return		PIDataInfo*
@@ -292,56 +292,56 @@ INT32 ComputeOUTOffset(INT32 dataSize);
 
 /**
  \brief		This function shall be used to generate the XAP header file
- 
+
  \param		fileName		Character pointer to the file name
  \param		piInCol			Class variable of ProcessImage to hold the IN ProcessImage
  \param		piOutCol		Class variable of ProcessImage to hold the OUT ProcessImage
  \param		inVar			Integer to hold the number of variables to be written in XAP header for the IN ProcessImage
  \param		outVar			Integer to hold the number of variables to be written in XAP header for the OUT ProcessImage
- \return	void	
+ \return	void
  */
 void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 inVar, INT32 outVar);
 
 /**
  \brief		This function shall be used to add PDO index to MN based on the given Index and SubIndex IDs
- 
- \param		indexId			Character pointer to the value of Index ID 
+
+ \param		indexId			Character pointer to the value of Index ID
  \param		sIdxId			Character pointer to the value of SubIndex ID
  \param		pdoTypeVal		Enum variable of PDOType
- \return	void	
+ \return	void
  */
 void AddPDOIndexsToMN(char* indexId, char* sIdxId, PDOType pdoTypeVal);
 
 /**
  \brief		This function shall be used to return an PIObject containing the address of the ProcessImage object of given PDODataType, PIDirectionType, offsetVal and dataSizeBits in the PI collection list
- 
+
  \param		dtType			Class variable of PDODataType to hold the datatype
  \param		dirType			Class variable of PIDirectionType to hold the value of direction type
  \param		offsetVal		Integer to hold value of offset
  \param		dataSizeBits	Integer to hold the value of datasizeBits
- \return	PIObject	
+ \return	PIObject
  */
 PIObject GetPIAddress(PDODataType dtType, PIDirectionType dirType, INT32 offsetVal, INT32 dataSizeBits);
 
 /**
  \brief		This function shall be used to return the DataType of the ProcessImage Index at given IndexID in the collection list
- 
+
  \param		indexId       Character pointer to the IndexID
- \return	char*	
+ \return	char*
  */
 char* GetPIDataTypeName(char* indexId);
 
 /**
  \brief		This function shall be used to return the DataType of the ProcessImage Index at given IndexID in the collection list
- 
+
  \param		indexId		Character pointer to the ProcessImage address
- \return	char*	
+ \return	char*
  */
 char* GetPIName(char* indexId);
 
 /**
  \brief		This function shall be used to check if the given IndexID belongs to the range allocated for ProcessImage
- 
+
  \param		idxId		Character Pointer Variable to hold the value of index
  \return	BOOL
  \retval	TRUE		if given IndexID belongs to the range allocated for ProcessImage
@@ -351,52 +351,52 @@ bool CheckIfProcessImageIdx(const char* idxId);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to XAP header file
- 
+
  \param		piObj				Class variable of ProcessImage to hold the process image value
  \param		noOfVars			Integer to hold the value of total number of variables to be written to XAP header file
  \param		directionType		Enum variable of  PIDirectionType
  \param		xapHeader			File pointer to the header file path
- \return	void	
+ \return	void
  */
 void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, FILE* xapHeader);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
- 
+
  \param		fileName         Character pointer to the file name path
  \param		piInCol          Class variable of IN ProcessImage
  \param		piOutCol         Class variable of OUT ProcessImage
- \param		iInVar           Integer to hold input value   
- \param		iOutVar          Integer to hold output value 
- \return	void	
+ \param		iInVar           Integer to hold input value
+ \param		iOutVar          Integer to hold output value
+ \return	void
  */
 void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[], ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
- 
+
  \param		piObj			Class variable of ProcessImage
  \param		noOfVars		Integer to hold the value of number of variables
  \param		dirType			Enum variable of PIDirectionType
  \param		netHeader		File pointer to the header file
- \return	void	
+ \return	void
  */
 void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader);
 
 /**
  \brief		This function shall be used to return the item number at which the NET ProcessImage object has the same module number as the given parameter in the Node collection list
- 
+
  \param		nodeId         	Integer to hold the node id
  \param		itemNo   		Integer to hold the value of loop count
  \param		moduleName    	Character pointer to the name of the module
- \return	INT32	
+ \return	INT32
  */
 
 INT32 SearchModuleNameNETProcessImageCollection(INT32 nodeId, INT32 itemNo, char* moduleName);
 
 /**
  \brief		This function shall be used to assign NETProcessImage objects to the given netPIObj array from the NETPICollection list based directionType matching the given parameter
- 
+
  \param		directionType   	Class variable of PIDirectionType to hold the direction type
  \param		netPIObj       		Class variable of NETProcessImage to hold the objects
  \return	void
@@ -413,60 +413,60 @@ void SetUniquePIVarName();
 
 /**
  \brief		This function shall be used to copy the ProcessImage object to NETProcessImage object and assign the given module name to it
- 
+
  \param		piObj			Class variable of ProcessImage
  \param		netPIObj        Class variable of NETProcessImage
  \param		moduleName      Character pointer to the module name
- \return	void	
+ \return	void
  */
 void CopyPItoNETPICollection(ProcessImage piObj, NETProcessImage netPIObj, char* moduleName);
 
 /**
  \brief		This function shall be used to group the contents of ProcessImage object for .NET header file generation
- 
+
  \param		piObject		Class variable of ProcessImage
  \param		noOfVars        Integer to hold the value of number of variables to be written to header
  \param		dirType         Enum variable of PIDirectionType
- \return	INT32	
+ \return	INT32
  */
 INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars, PIDirectionType dirType);
 
 /**
  \brief		This function shall be used to return the Datatype string corresponding to the given IEC_Dataype
- 
+
  \param		dtIEC       Enum variable of IEC_Datatype to hold the datatype of process image
- \return	char*	
+ \return	char*
  */
 char* GetDatatypeNETPI(IEC_Datatype dtIEC);
 
 /**
  \brief		This function shall be used to return the size of the Datatype corresponding to the given IEC_Dataype
- 
+
  \param		dtIEC		Enum variable of IEC_Datatype to hold the datatype of process image
- \return	INT32	
+ \return	INT32
  */
 INT32 GetDatasizeNETPI(IEC_Datatype dtIEC);
 
 /**
  \brief		This function shall be used to check if the given module name is present in the collection list. If available it updates the module number in the calling function
- 
+
  \param		moduleName       Character pointer to the value of Module Name
- \param		moduleNo         Integer to hold the value of Module number  
+ \param		moduleNo         Integer to hold the value of Module number
  \param		noOfModules      Integer to hold the value of Number of modules
  \param		modCollObj       Structure Class variable of ModuleCol
  \return	BOOL
  \retval	TRUE			if the module is present in the collection
- \retval	FALSE			if the module is not present in the collection	
+ \retval	FALSE			if the module is not present in the collection
  */
-bool CheckIfModuleExists(char* moduleName, INT32 &moduleNo, INT32 noOfModules, ModuleCol modCollObj[]);
+bool CheckIfModuleExists(char* moduleName, INT32& moduleNo, INT32 noOfModules, ModuleCol modCollObj[]);
 
 /**
  \brief		This function shall be used to set the DataType of a SubIndex belonging to the Index according to the given parameters
- 
+
  \param		objDataType	     Class pointer of DataType
  \param		idxId            Character pointer to the Index ID
  \param		sIdxId           Character pointer to the SubIndex ID
- \return	void	
+ \return	void
  */
-void SetSIdxDataType(DataType *objDataType, char* idxId, char* sIdxId);
+void SetSIdxDataType(DataType* objDataType, char* idxId, char* sIdxId);
 #endif // processImage_h

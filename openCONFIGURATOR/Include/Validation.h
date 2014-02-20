@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -103,7 +103,7 @@ bool CheckIfDataTypeByNameExists(const char* dtName, INT32 nodeId);
  */
 /*****************************************************************************/
 bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
-		const char* subIndexId);
+                           const char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to retrieve the version number of the tool that was used during generation from the XML file contents and checks if it matches with the tool version
@@ -117,7 +117,7 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
 /*****************************************************************************/
 //bool IfVersionNumberMatches(xmlTextReaderPtr reader);
 
-bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj);
+bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index* indexObj, IndexCollection* indexCollObj, Node* nodeObj);
 /**
  \brief		Checks if the SubObject has the property to be mapped as a PDO or not
 
@@ -153,7 +153,7 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
  \param[in,out]		idxObj		Class pointer of BaseIndex to get its properties
  \param[in]			attrType	Enum to hold the Attribute type of the index
  */
-void NormalizeAttributeValue(BaseIndex *idxObj, AttributeType attrType);
+void NormalizeAttributeValue(BaseIndex* idxObj, AttributeType attrType);
 
 /**
  \brief		Checks for the if the given datatype is standard datatype or not

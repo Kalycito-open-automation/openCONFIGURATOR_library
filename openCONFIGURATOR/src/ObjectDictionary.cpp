@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -76,7 +76,7 @@ ObjectDictionary* ObjectDictionary::objectDictionary = NULL;
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -92,13 +92,13 @@ ObjectDictionary::ObjectDictionary(void) :
 /* Destructor */
 
 /**
- 
+
 
  */
 
 ObjectDictionary::~ObjectDictionary(void)
 {
-	if( NULL != ObjectDictionary::objectDictionary)
+	if (NULL != ObjectDictionary::objectDictionary)
 	{
 		delete ObjectDictionary::objectDictionary;
 		delete this->objDictNode;
@@ -117,8 +117,8 @@ ObjectDictionary* ObjectDictionary::GetObjDictPtr()
 
 void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 {
-	const xmlChar *name;
-	const xmlChar *value;
+	const xmlChar* name;
+	const xmlChar* value;
 	name = xmlTextReaderConstName(reader);
 
 	value = xmlTextReaderConstValue(reader);
@@ -170,21 +170,21 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 						name = xmlTextReaderConstName(reader);
 
 						if (0
-								== strcmp(ConvertToUpper((char*) name),
-										"DATATYPE"))
+						        == strcmp(ConvertToUpper((char*) name),
+						                  "DATATYPE"))
 						{
-							DataType *dt = NULL;
+							DataType* dt = NULL;
 							dt =
-									objDictNode->GetDataTypeCollection()->GetDataType(
-											(char*) value);
+							    objDictNode->GetDataTypeCollection()->GetDataType(
+							        (char*) value);
 							idxObj.SetDataTypeST(*dt);
 						}
 						else if (0
-								== strcmp(ConvertToUpper((char*) name),
-										"RANGE"))
+						         == strcmp(ConvertToUpper((char*) name),
+						                   "RANGE"))
 						{
 							CreateSameattrObject((char*) value, INDEX,
-									(char*) idxObj.GetIndexValue());
+							                     (char*) idxObj.GetIndexValue());
 						}
 						else
 						{
@@ -217,21 +217,21 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 						value = xmlTextReaderConstValue(reader);
 						name = xmlTextReaderConstName(reader);
 						if (0
-								== strcmp(ConvertToUpper((char*) name),
-										"DATATYPE"))
+						        == strcmp(ConvertToUpper((char*) name),
+						                  "DATATYPE"))
 						{
-							DataType *dt = NULL;
+							DataType* dt = NULL;
 							dt =
-									objDictNode->GetDataTypeCollection()->GetDataType(
-											(char*) value);
+							    objDictNode->GetDataTypeCollection()->GetDataType(
+							        (char*) value);
 							sidxObj.SetDataTypeST(*dt);
 						}
 						else if (0
-								== strcmp(ConvertToUpper((char*) name),
-										"RANGE"))
+						         == strcmp(ConvertToUpper((char*) name),
+						                   "RANGE"))
 						{
 							CreateSameattrObject((char*) value, SUBINDEX,
-									(char*) idxObj->GetIndexValue());
+							                     (char*) idxObj->GetIndexValue());
 						}
 						else
 						{
@@ -242,7 +242,8 @@ void ObjectDictionary::ProcessObjectDictionary(xmlTextReaderPtr reader)
 				idxObj->AddSubIndex(sidxObj);
 			}
 		}
-	} catch (const ocfmRetCode& ex)
+	}
+	catch (const ocfmRetCode& ex)
 	{
 		LOG_FATAL() << ex.getErrorString();
 		throw;
@@ -255,7 +256,7 @@ void ObjectDictionary::AddSameAttributesObjects(sattrIdxSIdx attrIdxPos)
 }
 
 void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
-		char* idxId)
+        char* idxId)
 {
 	sattrIdxSIdx stAttrIdx;
 	char* idx = NULL;
@@ -296,7 +297,7 @@ void ObjectDictionary::CreateSameattrObject(char* value, ObjectType objType,
 		strcpy(stAttrIdx.Idx, idxId);
 		AddSameAttributesObjects(stAttrIdx);
 	}
-//cout<<__FUNCTION__<< " Ends"<<endl;
+	//cout<<__FUNCTION__<< " Ends"<<endl;
 }
 
 Index* ObjectDictionary::GetObjectDictIndex(const char* indexId)
@@ -315,7 +316,7 @@ Index* ObjectDictionary::GetObjectDictIndex(const char* indexId)
 	else
 	{
 		for (UINT32 iLoopCount = 0; iLoopCount < attribCollObj.size();
-				iLoopCount++)
+		        iLoopCount++)
 		{
 			sattrIdxSIdx stAttrIdx;
 			stAttrIdx = attribCollObj[iLoopCount];
@@ -323,10 +324,10 @@ Index* ObjectDictionary::GetObjectDictIndex(const char* indexId)
 			if (stAttrIdx.objectType == INDEX)
 			{
 				if (CheckInTheRange(indexId, stAttrIdx.startIndex,
-						stAttrIdx.endIndex))
+				                    stAttrIdx.endIndex))
 				{
 					idxObj = idxCollObj->GetIndexbyIndexValue(
-							stAttrIdx.startIndex);
+					             stAttrIdx.startIndex);
 					return idxObj;
 				}
 			}
@@ -372,13 +373,13 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(const char* idxId, const char*
 			attribObj = attribCollObj[attribLC];
 
 			if ((attribObj.objectType == SUBINDEX)
-					&& (strcmp(attribObj.Idx, idxId) == 0))
+			        && (strcmp(attribObj.Idx, idxId) == 0))
 			{
 				if (CheckInTheRange(sIdxId, attribObj.startIndex,
-						attribObj.endIndex))
+				                    attribObj.endIndex))
 				{
 					sidxObj = idxObj->GetSubIndexbyIndexValue(
-							attribObj.startIndex);
+					              attribObj.startIndex);
 					if (NULL != sidxObj)
 					{
 						return sidxObj;
@@ -390,10 +391,10 @@ SubIndex* ObjectDictionary::GetObjectDictSubIndex(const char* idxId, const char*
 	}
 }
 bool ObjectDictionary::CheckInTheRange(const char* idxId, const char* startIdx,
-		const char* endIdx)
+                                       const char* endIdx)
 {
 	if (HexToInt(idxId) >= HexToInt(startIdx)
-			&& (HexToInt(idxId) <= HexToInt(endIdx)))
+	        && (HexToInt(idxId) <= HexToInt(endIdx)))
 	{
 		return true;
 	}
@@ -405,7 +406,7 @@ bool ObjectDictionary::CheckInTheRange(const char* idxId, const char* startIdx,
 
 char* ObjectDictionary::GetIndexName(char* idxId, char* objectName)
 {
-//cout<<__FUNCTION__<< " Starts"<<endl;
+	//cout<<__FUNCTION__<< " Starts"<<endl;
 	char* tempObjName = NULL;
 
 	if (NULL == objectName)

@@ -69,7 +69,7 @@ const string PROJECT_XML_VALUE_FALSE = "false";
 
 ProjectConfiguration ProjectConfiguration::instance;
 
-ProjectConfiguration::ProjectConfiguration(void) : 
+ProjectConfiguration::ProjectConfiguration(void) :
 	initialized(false),
 	projectFile(),
 	projectPath(),
@@ -79,7 +79,7 @@ ProjectConfiguration::ProjectConfiguration(void) :
 	cycleTime(),
 	asyncMTU(),
 	multiplexedCycleLength(),
-	prescaler()	
+	prescaler()
 {}
 
 void ProjectConfiguration::ResetConfiguration(void)
@@ -236,7 +236,7 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 		xmlCleanupParser();
 		xmlMemoryDump();
 
-		// FIXME: What is this code block good for?? 
+		// FIXME: What is this code block good for??
 		NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 
 		char* presTimeoutVal = new char[50];
@@ -259,8 +259,8 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 				GetSubIndexAttributes(MN_NODEID, MN, "1f92", nodeIdHexStr, ACTUALVALUE, presTimeoutVal);
 				LOG_DEBUG() << "Actual Value for PollResponse-Timeout (0x1F92) for node " << nodeId << " set to: " << presTimeoutVal;
 				if (((presTimeoutVal == NULL)
-					|| (strlen(presTimeoutVal) == 0))
-					|| (!(ValidateCNPresTimeout(nodeIdHexStr, presTimeoutVal))))
+				        || (strlen(presTimeoutVal) == 0))
+				        || (!(ValidateCNPresTimeout(nodeIdHexStr, presTimeoutVal))))
 				{
 					CalculateCNPollResponse(nodeId, nodeType);
 				}
@@ -285,8 +285,8 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 {
 	const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
-		? (const char*) xmlTextReaderConstName(xmlReader)
-		: "";
+	                       ? (const char*) xmlTextReaderConstName(xmlReader)
+	                       : "";
 
 	if (xmlTextReaderNodeType(xmlReader) == 1)
 	{
@@ -315,15 +315,15 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 				while (xmlTextReaderMoveToNextAttribute(xmlReader))
 				{
 					const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-						? (const char*) xmlTextReaderConstName(xmlReader)
-						: "";
+					                                ? (const char*) xmlTextReaderConstName(xmlReader)
+					                                : "";
 					const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-						? (const char*) xmlTextReaderConstValue(xmlReader)
-						: "";
+					                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+					                                 : "";
 
 					if (!xmlAttributeName.empty()
-						&& !xmlAttributeValue.empty()
-						&& xmlAttributeValue == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
+					        && !xmlAttributeValue.empty()
+					        && xmlAttributeValue == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
 					{
 						autogenerationSettingID = xmlAttributeValue;
 					}
@@ -348,8 +348,8 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 			}
 
 		}
-		else if (xmlName == PROJECT_XML_MANAGING_NODE_ELEMENT 
-			|| xmlName == PROJECT_XML_CONTROLLED_NODE_ELEMENT)
+		else if (xmlName == PROJECT_XML_MANAGING_NODE_ELEMENT
+		         || xmlName == PROJECT_XML_CONTROLLED_NODE_ELEMENT)
 		{
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
@@ -365,15 +365,15 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
 		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-			? (const char*) xmlTextReaderConstName(xmlReader)
-			: "";
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
 		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-			? (const char*) xmlTextReaderConstValue(xmlReader)
-			: "";
+		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                                 : "";
 
 		if (!xmlAttributeName.empty()
-			&& !xmlAttributeValue.empty()
-			&& xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE)
+		        && !xmlAttributeValue.empty()
+		        && xmlAttributeName == PROJECT_XML_AUTOGENERATION_SETTINGS_ID_ATTRIBUTE)
 		{
 			currentAutogenerationSetting = xmlAttributeValue;
 		}
@@ -385,8 +385,8 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 		while (retVal == 1)
 		{
 			const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
-				? (const char*) xmlTextReaderConstName(xmlReader)
-				: "";
+			                       ? (const char*) xmlTextReaderConstName(xmlReader)
+			                       : "";
 			if (xmlName == PROJECT_XML_SETTING_ELEMENT)
 			{
 				if (xmlTextReaderHasAttributes(xmlReader) == 1)
@@ -414,8 +414,8 @@ void ProjectConfiguration::ProcessAutogenerationSetting(xmlTextReaderPtr xmlRead
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
 		const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
-			? (const char*) xmlTextReaderConstName(xmlReader)
-			: "";
+		                       ? (const char*) xmlTextReaderConstName(xmlReader)
+		                       : "";
 		//const xmlChar* xmlValue = xmlTextReaderConstValue(xmlReader);
 
 		if (xmlName == PROJECT_XML_SETTING_NAME_ATTRIBUTE)
@@ -431,7 +431,7 @@ void ProjectConfiguration::ProcessAutogenerationSetting(xmlTextReaderPtr xmlRead
 
 // TODO: ProcessProjectNode?
 void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
-{	
+{
 	// MN, CN properties
 	boost::optional<string> nodeName;
 	boost::optional<string> pathToXDC;
@@ -459,19 +459,19 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	boost::optional<bool> isMandatory;
 	boost::optional<bool> isChained;
 	boost::optional<bool> isMultiplexed;
-	
+
 	ocfmRetCode exceptionObj(OCFM_ERR_UNKNOWN);
 
 	// Extract all node attributes for CN- and MN-Elements
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
 		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-			? (const char*) xmlTextReaderConstName(xmlReader)
-			: "";
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
 		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-			? (const char*) xmlTextReaderConstValue(xmlReader)
-			: "";
-		
+		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                                 : "";
+
 		if (!xmlAttributeName.empty() && !xmlAttributeValue.empty())
 		{
 			if (xmlAttributeName == PROJECT_XML_NODE_NAME_ATTRIBUTE)
@@ -591,14 +591,14 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	// Set a default node name if it was omitted
 	if ((!nodeName || nodeName.get().empty()) && nodeId.get() == MN_NODEID)
 		nodeName = "MN";
-	else if ((!nodeName || nodeName.get().empty()) && nodeId.get() != MN_NODEID) 
+	else if ((!nodeName || nodeName.get().empty()) && nodeId.get() != MN_NODEID)
 		nodeName = "CN_" + boost::lexical_cast<std::string>(nodeId.get());
-	
+
 	// Create node
 	exceptionObj = NewProjectNode(nodeId.get(),
-		(nodeId.get() == MN_NODEID) ? MN : CN,
-		nodeName.get().c_str(), 
-		xdcPath.generic_string().c_str());
+	                              (nodeId.get() == MN_NODEID) ? MN : CN,
+	                              nodeName.get().c_str(),
+	                              xdcPath.generic_string().c_str());
 	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 		throw exceptionObj;
 
@@ -610,7 +610,7 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 2))
 			this->OverrideNodeConfiguration(nodeObj, 0x1F8A, 2, asyncSlotTimeout);
 		if (nodeObj.GetIndexCollection()->ContainsIndex(0x1F8A, 3))
-			this->OverrideNodeConfiguration(nodeObj, 0x1F8A, 3, aSndMaxNumber);		
+			this->OverrideNodeConfiguration(nodeObj, 0x1F8A, 3, aSndMaxNumber);
 	}
 	else
 	{
@@ -624,7 +624,7 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 				this->OverrideNodeConfiguration(managingNode, 0x1F9B, nodeId.get(), forcedMultiplexedCycle);
 		}
 	}
-	
+
 	StationType stationType = NORMAL;
 	if (isChained.get_value_or(false))
 		stationType = CHAINED;
@@ -638,12 +638,12 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 	{
 		// CN properties
 		if (stationType == MULTIPLEXED)
-		{		
+		{
 			nodeObj.SetForceCycleFlag(forcedMultiplexedCycle.get_value_or(0) != 0);
 			nodeObj.SetForcedCycle(boost::lexical_cast<std::string>(forcedMultiplexedCycle.get_value_or(0)).c_str());
 		}
 		else
-		{		
+		{
 			nodeObj.SetForceCycleFlag(false);
 			nodeObj.SetForcedCycle("0");
 		}
@@ -667,47 +667,47 @@ void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
 			nodeObj.SetVerifySerialNumber(verifySerialNumber.get());
 		if (verifyVendorId)
 			nodeObj.SetVerifyVendorId(verifyVendorId.get());
-	}	
+	}
 	else
 	{
 		// MN properties
 		if (transmitsPRes)
 			nodeObj.SetTransmitsPRes(transmitsPRes.get());
 	}
-	// Common properties	
+	// Common properties
 	if (isAsyncOnly)
 		nodeObj.SetIsAsyncOnly(isAsyncOnly.get());
 	if (isType1Router)
 		nodeObj.SetIsType1Router(isType1Router.get());
 	if (isType2Router)
-		nodeObj.SetIsType2Router(isType2Router.get());	
+		nodeObj.SetIsType2Router(isType2Router.get());
 }
 
 void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 {
 	string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-			? (const char*) xmlTextReaderConstName(xmlReader)
-			: "";
+	                          ? (const char*) xmlTextReaderConstName(xmlReader)
+	                          : "";
 	string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-			? (const char*) xmlTextReaderConstValue(xmlReader)
-			: "";
+	                           ? (const char*) xmlTextReaderConstValue(xmlReader)
+	                           : "";
 
 	if (!xmlAttributeName.empty()
-		&& !xmlAttributeValue.empty()
-		&& xmlAttributeName == PROJECT_XML_PATH_ID_ATTRIBUTE)
+	        && !xmlAttributeValue.empty()
+	        && xmlAttributeName == PROJECT_XML_PATH_ID_ATTRIBUTE)
 	{
 		if (xmlAttributeValue == PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE)
 		{
-			xmlTextReaderMoveToNextAttribute(xmlReader);			
+			xmlTextReaderMoveToNextAttribute(xmlReader);
 			xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-				? (const char*) xmlTextReaderConstName(xmlReader)
-				: "";
+			                   ? (const char*) xmlTextReaderConstName(xmlReader)
+			                   : "";
 			xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-				? (const char*) xmlTextReaderConstValue(xmlReader)
-				: "";
+			                    ? (const char*) xmlTextReaderConstValue(xmlReader)
+			                    : "";
 			if (!xmlAttributeName.empty()
-				&& !xmlAttributeValue.empty()
-				&& xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE)
+			        && !xmlAttributeValue.empty()
+			        && xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE)
 			{
 				this->SetDefaultOutputPath(xmlAttributeValue);
 			}
@@ -721,33 +721,33 @@ void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 void ProjectConfiguration::ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader)
 {
 	string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-		? (const char*) xmlTextReaderConstName(xmlReader)
-		: "";
+	                          ? (const char*) xmlTextReaderConstName(xmlReader)
+	                          : "";
 	string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-		? (const char*) xmlTextReaderConstValue(xmlReader)
-		: "";
+	                           ? (const char*) xmlTextReaderConstValue(xmlReader)
+	                           : "";
 
 	if (!xmlAttributeName.empty() && !xmlAttributeValue.empty())
 	{
 		if (xmlAttributeName == PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE)
 		{
 			//0x1006
-			this->SetCycleTime(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+			this->SetCycleTime(boost::lexical_cast<UINT32>(xmlAttributeValue));
 		}
 		else if (xmlAttributeName == PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE)
 		{
 			//0x1F98/0x8
-			this->SetAsyncMTU(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+			this->SetAsyncMTU(boost::lexical_cast<UINT32>(xmlAttributeValue));
 		}
 		else if (xmlAttributeName == PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE)
 		{
 			//0x1F98/0x7
-			this->SetMultiplexedCycleLength(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+			this->SetMultiplexedCycleLength(boost::lexical_cast<UINT32>(xmlAttributeValue));
 		}
 		else if (xmlAttributeName == PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE)
 		{
 			//0x1F98/0x9
-			this->SetPrescaler(boost::lexical_cast<UINT32>(xmlAttributeValue));		
+			this->SetPrescaler(boost::lexical_cast<UINT32>(xmlAttributeValue));
 		}
 	}
 }
@@ -995,36 +995,36 @@ void ProjectConfiguration::OverrideNetworkConfiguration()
 	Node& node = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
 	this->OverrideNodeConfiguration(node, 0x1006, 0, this->cycleTime);
 	this->OverrideNodeConfiguration(node, 0x1F98, 7, this->multiplexedCycleLength);
-	this->OverrideNodeConfiguration(node, 0x1F98, 8, this->asyncMTU);	
+	this->OverrideNodeConfiguration(node, 0x1F98, 8, this->asyncMTU);
 	this->OverrideNodeConfiguration(node, 0x1F98, 9, this->prescaler);
 	LOG_INFO() << "Overriding network-configuration done.";
 }
 
 template<typename T>
-void ProjectConfiguration::OverrideNodeConfiguration(Node& node, 
-	const UINT32 index, 
-	const UINT32 subIndex, 
-	boost::optional<T>& projectConfigValue) const
+void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
+        const UINT32 index,
+        const UINT32 subIndex,
+        boost::optional<T>& projectConfigValue) const
 {
-	LOG_DEBUG() 
-		<< std::hex
-		<< std::showbase
-		<< "Overriding configuration for node " << node.GetNodeId()
-		<< ", index " << index << "/" << subIndex << ".";
+	LOG_DEBUG()
+	        << std::hex
+	        << std::showbase
+	        << "Overriding configuration for node " << node.GetNodeId()
+	        << ", index " << index << "/" << subIndex << ".";
 	boost::optional<T> currActualValue = node.GetActualValue<T>(index, subIndex);
 	if (currActualValue)
 	{
 		// There is an actualValue for the index/subIndex, it
 		// overrides the project-config
 		std::string projectConfigValueStr = projectConfigValue
-			? boost::lexical_cast<std::string>(projectConfigValue.get())
-			: "NULL";
+		                                    ? boost::lexical_cast<std::string>(projectConfigValue.get())
+		                                    : "NULL";
 		LOG_DEBUG()
-			<< std::hex
-			<< std::showbase
-			<< "Overwrote project-configuration value '"
-			<< projectConfigValueStr << "'"
-			<< " with actualValue '" << currActualValue.get() << "'.";
+		        << std::hex
+		        << std::showbase
+		        << "Overwrote project-configuration value '"
+		        << projectConfigValueStr << "'"
+		        << " with actualValue '" << currActualValue.get() << "'.";
 		projectConfigValue = currActualValue;
 	}
 	else
@@ -1035,14 +1035,14 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		{
 			node.SetActualValue(index, subIndex, projectConfigValue.get());
 			std::string currActualValueStr = currActualValue
-				? boost::lexical_cast<std::string>(currActualValue.get())
-				: "NULL";
-			LOG_DEBUG() 
-				<< std::hex
-				<< std::showbase
-				<< "Overwrote actualValue '" << currActualValueStr
-				<< "' of node with project-configuration value '"
-				<< projectConfigValue.get() << "'.";
+			                                 ? boost::lexical_cast<std::string>(currActualValue.get())
+			                                 : "NULL";
+			LOG_DEBUG()
+			        << std::hex
+			        << std::showbase
+			        << "Overwrote actualValue '" << currActualValueStr
+			        << "' of node with project-configuration value '"
+			        << projectConfigValue.get() << "'.";
 		}
 		else
 		{
@@ -1062,7 +1062,7 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 		// There is an actualValue for the index/subIndex, it
 		// overrides the project-config
 		string actualValueStr(actualValue);
-		if (boost::algorithm::starts_with(actualValueStr, "0x")) 
+		if (boost::algorithm::starts_with(actualValueStr, "0x"))
 			converter << std::hex << actualValueStr.substr(2);
 		else
 			converter << std::boolalpha << actualValueStr;

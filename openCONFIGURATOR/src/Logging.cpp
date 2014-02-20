@@ -8,13 +8,13 @@
 
 #ifdef DEBUG
 
-std::ostream& Log(const char* file, const char* func, const int line, std::ostream& streamref) 
+std::ostream& Log(const char* file, const char* func, const int line, std::ostream& streamref)
 {
-	streamref 
-		<< file
-		<< "(Ln " << line << ")"
-		<< ":" 
-		<< func << "(): ";
+	streamref
+	        << file
+	        << "(Ln " << line << ")"
+	        << ":"
+	        << func << "(): ";
 	return streamref;
 }
 

@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -139,7 +139,7 @@ typedef unsigned long int ULONG;
 /** \addtogroup odapi
  * @{
  */
-/** 
+/**
 * ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
 */
 enum ObjectType
@@ -158,12 +158,12 @@ enum ObjectType
  */
 enum PDOMapping
 {
-		NOT_DEFINED = -1, /**< Indicates the object has a default value set to not defined */
-		NO,			/**< Indicates the object must not be mapped into a Process Data Objects */
-		DEFAULT,	/**< Indicates the object is part of the default mapping */
-		OPTIONAL,	/**< Indicates the object can be mapped into both Receive and Transmit Process Data Objects */
-		RPDO,		/**< Indicates the object shall be mapped into a Receive Process Data Objects */
-		TPDO		/**< Indicates the object shall be mapped into a Transmit Process Data Objects */
+	NOT_DEFINED = -1, /**< Indicates the object has a default value set to not defined */
+	NO,			/**< Indicates the object must not be mapped into a Process Data Objects */
+	DEFAULT,	/**< Indicates the object is part of the default mapping */
+	OPTIONAL,	/**< Indicates the object can be mapped into both Receive and Transmit Process Data Objects */
+	RPDO,		/**< Indicates the object shall be mapped into a Receive Process Data Objects */
+	TPDO		/**< Indicates the object shall be mapped into a Transmit Process Data Objects */
 };
 
 
@@ -238,7 +238,7 @@ enum IEC_Datatype
 /** \addtogroup odapi
  * @{
  */
-/** 
+/**
 * List of available attributes for the index or subindex.
 */
 enum AttributeType
@@ -383,7 +383,7 @@ DLLEXPORT enum ConfiguratorError
 	OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR, /**< 64*/
 	OCFM_ERR_XML_PARSING_ERROR, /**< 65*/
 	OCFM_ERR_CANNOT_CREATE_DIR, /**< 66*/
-	OCFM_ERR_NO_PROJECT_LOADED, /**< 67*/	
+	OCFM_ERR_NO_PROJECT_LOADED, /**< 67*/
 	OCFM_ERR_CHAINED_AND_MULTIPLEXED,
 	OCFM_ERR_INSUFFICIENT_MAPPING_OBJECTS,
 	OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED,
@@ -393,14 +393,15 @@ DLLEXPORT enum ConfiguratorError
 	OCFM_ERR_MAPPING_INVALID
 };
 
-/** \addtogroup imexport 
+/** \addtogroup imexport
  * @{
  */
 /**
  \brief List of available process image representations.
  \author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 */
-DLLEXPORT enum OutputLanguage {
+DLLEXPORT enum OutputLanguage
+{
 	C, /**< ANSI C*/
 	CSHARP, /**< Microsoft C Sharp*/
 	/*JAVA,*/
@@ -408,7 +409,7 @@ DLLEXPORT enum OutputLanguage {
 };
 /** @} */
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -416,7 +417,7 @@ namespace openCONFIGURATOR
 		{
 			namespace AccessType
 			{
-				/** \addtogroup xddapi 
+				/** \addtogroup xddapi
 				 * @{
 				 */
 				/**
@@ -425,7 +426,7 @@ namespace openCONFIGURATOR
 						See EPSG DS 301, v1.1.0, v1.2.0
 				\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 				*/
-				enum AccessType 
+				enum AccessType
 				{
 					INVALID,
 					RW,
@@ -441,7 +442,7 @@ namespace openCONFIGURATOR
 
 			AccessType::AccessType GetAccessType(const std::string& accessType);
 			::ObjectType GetObjectType(const std::string& objectType);
-			
+
 			namespace PlkDataType
 			{
 				/** \addtogroup xddapi

@@ -111,7 +111,7 @@ std::ostream& Log(const char* file, const char* func, const int line, std::ostre
 #else // RELEASE
 
 #define ELOG(streamref) if (true) {} else cerr
-#define LOG(message) ((void)0); 
+#define LOG(message) ((void)0);
 
 #endif // DEBUG
 /************************************************************************/

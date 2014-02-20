@@ -78,217 +78,217 @@ void ocfmRetCode::setErrorCode(ConfiguratorError error)
 	this->code = error;
 	switch (error)
 	{
-	case OCFM_ERR_SUCCESS:
-		this->errorString = "Success";
-		break;
-	case OCFM_ERR_FILE_NOT_PRESENT:
-		this->errorString = "File not present";
-		break;
-	case OCFM_ERR_FILE_CANNOT_OPEN:
-		this->errorString = "File cannot open";
-		break;
-	case OCFM_ERR_INVALID_NODEID:
-		this->errorString = "Invalid Node ID";
-		break;
-	case OCFM_ERR_INVALID_NODEPOS:
-		this->errorString = "Invalid Node position";
-		break;
-	case OCFM_ERR_INVALID_NODETYPE:
-		this->errorString = "Invalid Node type";
-		break;
-	case OCFM_ERR_DATATYPE_NOT_FOUND:
-		this->errorString = "DataType Not Found in the DataTypeList of XDC";
-		break;
-	case OCFM_ERR_INVALID_INDEXID:
-		this->errorString = "Invalid Index ID";
-		break;
-	case OCFM_ERR_INVALID_INDEXPOS:
-		this->errorString = "Invalid Index position";
-		break;
-	case OCFM_ERR_INVALID_SUBINDEXID:
-		this->errorString = "Invalid SubIndex ID";
-		break;
-	case OCFM_ERR_INVALID_SUBINDEXPOS:
-		this->errorString = "Invalid SubIndex position";
-		break;
-	case OCFM_ERR_INVALID_ATTRIBUTETYPE:
-		this->errorString = "Invalid Attribute type";
-		break;
-	case OCFM_ERR_NO_NODES_FOUND:
-		this->errorString = "There are no nodes configured. Node collection is NULL.";
-		break;
-	case OCFM_ERR_NO_INDEX_FOUND:
-		this->errorString = "No Indexes found";
-		break;
-	case OCFM_ERR_NO_SUBINDEXS_FOUND:
-		this->errorString = "No SubIndexes found";
-		break;
-	case OCFM_ERR_NODEID_NOT_FOUND:
-		this->errorString = "Node ID not found";
-		break;
-	case OCFM_ERR_INDEXID_NOT_FOUND:
-		this->errorString = "Index ID not found";
-		break;
-	case OCFM_ERR_SUBINDEXID_NOT_FOUND:
-		this->errorString = "SubIndex ID not found";
-		break;
-	case OCFM_ERR_NODE_ALREADY_EXISTS:
-		this->errorString = "Node Already Exists";
-		break;
-	case OCFM_ERR_INDEX_ALREADY_EXISTS:
-		this->errorString = "Index Already Exists";
-		break;
-	case OCFM_ERR_SUBINDEX_ALREADY_EXISTS:
-		this->errorString = "SubIndex Already Exists";
-		break;
-	case OCFM_ERR_INVALID_VALUE:
-		this->errorString = "Invalid value";
-		break;
-	case OCFM_ERR_INVALID_NAME:
-		this->errorString = "Invalid name";
-		break;
-	case OCFM_ERR_XML_FILE_CORRUPTED:
-		this->errorString = "XML file corrupted";
-		break;
-	case OCFM_ERR_CANNOT_OPEN_FILE:
-		this->errorString = "Cannot open file";
-		break;
-	case OCFM_ERR_PARSE_XML:
-		this->errorString = "Cannot parse XML";
-		break;
-	case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
-		this->errorString = "PDO Mapped Module Index Not Found";
-		break;
-	case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
-		this->errorString = "PDO Mapped Module SubIndex Not Found";
-		break;
-	case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
-		this->errorString = "Unique ID reference not found";
-		break;
-	case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
-		this->errorString = "Struct Datatype not found";
-		break;
-	case OCFM_ERR_NO_CN_NODES_FOUND:
-		this->errorString = "NO CN Nodes are found";
-		break;
-	case OCFM_ERR_UNKNOWN:
-		this->errorString = "Unknown error";
-		break;
-	case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
-		this->errorString = "Value out of range";
-		break;
-	case OCFM_ERR_MN_NODE_DOESNT_EXIST:
-		this->errorString = "MN Node doesnt exist";
-		break;
-	case OCFM_ERR_CREATE_XML_WRITER_FAILED:
-		this->errorString = "Error creating the xml writer";
-		break;
-	case OCFM_ERR_XML_WRITER_START_ELT_FAILED:
-		this->errorString = "Error at xmlTextWriterStartElement";
-		break;
-	case OCFM_ERR_XML_WRITER_END_ELT_FAILED:
-		this->errorString = "Error at xmlTextWriterEndElement";
-		break;
-	case OCFM_ERR_XML_START_DOC_FAILED:
-		this->errorString = "Error at xmlTextWriterStartDocument";
-		break;
-	case OCFM_ERR_XML_END_DOC_FAILED:
-		this->errorString = "Error at xmlTextWriterEndDocument";
-		break;
-	case OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH:
-		this->errorString = "Cannot open project: Tool-Project version mismatch";
-		break;
-	case OCFM_ERR_INVALID_PJTXML:
-		this->errorString = "Cannot open project: Invalid Project XML";
-		break;
-	case OCFM_ERR_PROJECT_SETTINGS:
-		this->errorString = "Project Settings are NULL";
-		break;
-	case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
-		this->errorString = "Invalid Datatype for Mapped Object";
-		break;
-	case OCFM_ERR_XAP_FILE_NOT_WRITTEN:
-		this->errorString = "XAP File Not Written";
-		break;
-	case OCFM_ERR_MAX_PI_SIZE:
-	{
-		ostringstream buffer;
-		buffer << "MAX PI Size (" << MAX_PI_SIZE << " bytes) exceeded";
-		this->errorString = buffer.str();
-		break;
-	}
-	case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
-		this->errorString = "Invalid upper and lower limits";
-		break;
-	case OCFM_ERR_LOW_CNPRESTIMEOUT:
-		this->errorString = "Value is less than minimum value of CN PresTimeout";
-		break;
-	case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
-		this->errorString = "CN Exceeds Cross Traffic Station";
-		break;
-	case OCFM_ERR_EXCESS_CHANNEL:
-		this->errorString = "The number of Channels has exceeded than the defined value for the MN";
-		break;
-	case OCFM_ERR_INVALID_TXT_FOR_CDC:
-		this->errorString = "The text file as the input for cdc, is incorrectly formatted";
-		break;
-	case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
-		this->errorString = "Memory allocation failed. Try restarting the application";
-		break;
-	case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
-		this->errorString = "Number of TPDO channels exceeded";
-		break;
-	case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
-		this->errorString = "NoOfEntries SubIndex not present";
-		break;
-	case OCFM_ERR_INVALID_PARAMETER:
-		this->errorString = "Invalid parameter: Internal Error. Try restarting the Application";
-		break;
-	case OCFM_ERR_INVALID_SIZE_MAPPED:
-		this->errorString = "Invalid Size mapped for the PDO. Check the length for the according datatype";
-		break;
-	case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
-		this->errorString = "Invalid mapping type for the PDO. Check the pdo mapping for the mapped object";
-		break;
-	case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
-		this->errorString = "Invalid access type for the PDO. Check the access type for the mapped object";
-		break;
-	case OCFM_ERR_INVALID_PDO_OFFSET:
-		this->errorString = "Invalid offset in the PDO object. Check the offset value in the mapping";
-		break;
-	case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
-		this->errorString = "It seems you have opened the project created with pre 1.3.0 version.\nErrors with respect to 'PDOMapping' and 'AccessType' can be expected during build process.";
-		break;
-	case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
-		this->errorString = "XDD schema validation failed";
-		break;
-	case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
-		this->errorString = "XDD schema file not found";
-		break;
-	case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
-		this->errorString = "XDD schema itself is not valid";
-		break;
-	case OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR:
-		this->errorString = "XDD schema parser context creation failed";
-		break;
-	case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
-		this->errorString = "XDD schema validation context creation failed";
-		break;
-	case OCFM_ERR_XML_PARSING_ERROR:
-		this->errorString = "XDD parsing failed due to wrong XML syntax";
-		break;
-	case OCFM_ERR_CANNOT_CREATE_DIR:
-		this->errorString = "Can not create project directory";
-		break;
-	case OCFM_ERR_NO_PROJECT_LOADED:
-		this->errorString = "No project loaded in the library";
-		break;	
-	case OCFM_ERR_CHAINED_AND_MULTIPLEXED:
-		this->errorString = "A node can not be chained and multiplexed at the same time";
-		break;
-	default:
-		this->errorString = "No error string specified";
-		break;
+		case OCFM_ERR_SUCCESS:
+			this->errorString = "Success";
+			break;
+		case OCFM_ERR_FILE_NOT_PRESENT:
+			this->errorString = "File not present";
+			break;
+		case OCFM_ERR_FILE_CANNOT_OPEN:
+			this->errorString = "File cannot open";
+			break;
+		case OCFM_ERR_INVALID_NODEID:
+			this->errorString = "Invalid Node ID";
+			break;
+		case OCFM_ERR_INVALID_NODEPOS:
+			this->errorString = "Invalid Node position";
+			break;
+		case OCFM_ERR_INVALID_NODETYPE:
+			this->errorString = "Invalid Node type";
+			break;
+		case OCFM_ERR_DATATYPE_NOT_FOUND:
+			this->errorString = "DataType Not Found in the DataTypeList of XDC";
+			break;
+		case OCFM_ERR_INVALID_INDEXID:
+			this->errorString = "Invalid Index ID";
+			break;
+		case OCFM_ERR_INVALID_INDEXPOS:
+			this->errorString = "Invalid Index position";
+			break;
+		case OCFM_ERR_INVALID_SUBINDEXID:
+			this->errorString = "Invalid SubIndex ID";
+			break;
+		case OCFM_ERR_INVALID_SUBINDEXPOS:
+			this->errorString = "Invalid SubIndex position";
+			break;
+		case OCFM_ERR_INVALID_ATTRIBUTETYPE:
+			this->errorString = "Invalid Attribute type";
+			break;
+		case OCFM_ERR_NO_NODES_FOUND:
+			this->errorString = "There are no nodes configured. Node collection is NULL.";
+			break;
+		case OCFM_ERR_NO_INDEX_FOUND:
+			this->errorString = "No Indexes found";
+			break;
+		case OCFM_ERR_NO_SUBINDEXS_FOUND:
+			this->errorString = "No SubIndexes found";
+			break;
+		case OCFM_ERR_NODEID_NOT_FOUND:
+			this->errorString = "Node ID not found";
+			break;
+		case OCFM_ERR_INDEXID_NOT_FOUND:
+			this->errorString = "Index ID not found";
+			break;
+		case OCFM_ERR_SUBINDEXID_NOT_FOUND:
+			this->errorString = "SubIndex ID not found";
+			break;
+		case OCFM_ERR_NODE_ALREADY_EXISTS:
+			this->errorString = "Node Already Exists";
+			break;
+		case OCFM_ERR_INDEX_ALREADY_EXISTS:
+			this->errorString = "Index Already Exists";
+			break;
+		case OCFM_ERR_SUBINDEX_ALREADY_EXISTS:
+			this->errorString = "SubIndex Already Exists";
+			break;
+		case OCFM_ERR_INVALID_VALUE:
+			this->errorString = "Invalid value";
+			break;
+		case OCFM_ERR_INVALID_NAME:
+			this->errorString = "Invalid name";
+			break;
+		case OCFM_ERR_XML_FILE_CORRUPTED:
+			this->errorString = "XML file corrupted";
+			break;
+		case OCFM_ERR_CANNOT_OPEN_FILE:
+			this->errorString = "Cannot open file";
+			break;
+		case OCFM_ERR_PARSE_XML:
+			this->errorString = "Cannot parse XML";
+			break;
+		case OCFM_ERR_MODULE_INDEX_NOT_FOUND:
+			this->errorString = "PDO Mapped Module Index Not Found";
+			break;
+		case OCFM_ERR_MODULE_SUBINDEX_NOT_FOUND:
+			this->errorString = "PDO Mapped Module SubIndex Not Found";
+			break;
+		case OCFM_ERR_UNIQUE_ID_REF_NOT_FOUND:
+			this->errorString = "Unique ID reference not found";
+			break;
+		case OCFM_ERR_STRUCT_DATATYPE_NOT_FOUND:
+			this->errorString = "Struct Datatype not found";
+			break;
+		case OCFM_ERR_NO_CN_NODES_FOUND:
+			this->errorString = "NO CN Nodes are found";
+			break;
+		case OCFM_ERR_UNKNOWN:
+			this->errorString = "Unknown error";
+			break;
+		case OCFM_ERR_VALUE_NOT_WITHIN_RANGE:
+			this->errorString = "Value out of range";
+			break;
+		case OCFM_ERR_MN_NODE_DOESNT_EXIST:
+			this->errorString = "MN Node doesnt exist";
+			break;
+		case OCFM_ERR_CREATE_XML_WRITER_FAILED:
+			this->errorString = "Error creating the xml writer";
+			break;
+		case OCFM_ERR_XML_WRITER_START_ELT_FAILED:
+			this->errorString = "Error at xmlTextWriterStartElement";
+			break;
+		case OCFM_ERR_XML_WRITER_END_ELT_FAILED:
+			this->errorString = "Error at xmlTextWriterEndElement";
+			break;
+		case OCFM_ERR_XML_START_DOC_FAILED:
+			this->errorString = "Error at xmlTextWriterStartDocument";
+			break;
+		case OCFM_ERR_XML_END_DOC_FAILED:
+			this->errorString = "Error at xmlTextWriterEndDocument";
+			break;
+		case OCFM_ERR_CANNOT_OPEN_PROJECT_VER_MISMATCH:
+			this->errorString = "Cannot open project: Tool-Project version mismatch";
+			break;
+		case OCFM_ERR_INVALID_PJTXML:
+			this->errorString = "Cannot open project: Invalid Project XML";
+			break;
+		case OCFM_ERR_PROJECT_SETTINGS:
+			this->errorString = "Project Settings are NULL";
+			break;
+		case OCFM_ERR_INVALID_DATATYPE_FOR_PDO:
+			this->errorString = "Invalid Datatype for Mapped Object";
+			break;
+		case OCFM_ERR_XAP_FILE_NOT_WRITTEN:
+			this->errorString = "XAP File Not Written";
+			break;
+		case OCFM_ERR_MAX_PI_SIZE:
+			{
+				ostringstream buffer;
+				buffer << "MAX PI Size (" << MAX_PI_SIZE << " bytes) exceeded";
+				this->errorString = buffer.str();
+				break;
+			}
+		case OCFM_ERR_INVALID_UPPERLOWER_LIMITS:
+			this->errorString = "Invalid upper and lower limits";
+			break;
+		case OCFM_ERR_LOW_CNPRESTIMEOUT:
+			this->errorString = "Value is less than minimum value of CN PresTimeout";
+			break;
+		case OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN:
+			this->errorString = "CN Exceeds Cross Traffic Station";
+			break;
+		case OCFM_ERR_EXCESS_CHANNEL:
+			this->errorString = "The number of Channels has exceeded than the defined value for the MN";
+			break;
+		case OCFM_ERR_INVALID_TXT_FOR_CDC:
+			this->errorString = "The text file as the input for cdc, is incorrectly formatted";
+			break;
+		case OCFM_ERR_MEMORY_ALLOCATION_ERROR:
+			this->errorString = "Memory allocation failed. Try restarting the application";
+			break;
+		case OCFM_ERR_EXCEEDS_MAX_TPDO_CHANNELS:
+			this->errorString = "Number of TPDO channels exceeded";
+			break;
+		case OCFM_ERR_NUMBER_OF_ENTRIES_SUBINDEX_NOT_FOUND:
+			this->errorString = "NoOfEntries SubIndex not present";
+			break;
+		case OCFM_ERR_INVALID_PARAMETER:
+			this->errorString = "Invalid parameter: Internal Error. Try restarting the Application";
+			break;
+		case OCFM_ERR_INVALID_SIZE_MAPPED:
+			this->errorString = "Invalid Size mapped for the PDO. Check the length for the according datatype";
+			break;
+		case OCFM_ERR_INVALID_MAPPING_TYPE_FOR_PDO:
+			this->errorString = "Invalid mapping type for the PDO. Check the pdo mapping for the mapped object";
+			break;
+		case OCFM_ERR_INVALID_ACCESS_TYPE_FOR_PDO:
+			this->errorString = "Invalid access type for the PDO. Check the access type for the mapped object";
+			break;
+		case OCFM_ERR_INVALID_PDO_OFFSET:
+			this->errorString = "Invalid offset in the PDO object. Check the offset value in the mapping";
+			break;
+		case COMPATIBILITY_INFO_PRE_130_PDOMAPPING:
+			this->errorString = "It seems you have opened the project created with pre 1.3.0 version.\nErrors with respect to 'PDOMapping' and 'AccessType' can be expected during build process.";
+			break;
+		case OCFM_ERR_SCHEMA_VALIDATION_FAILED:
+			this->errorString = "XDD schema validation failed";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_NOT_FOUND:
+			this->errorString = "XDD schema file not found";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_NOT_VALID:
+			this->errorString = "XDD schema itself is not valid";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_PARSER_CONTEXT_ERROR:
+			this->errorString = "XDD schema parser context creation failed";
+			break;
+		case OCFM_ERR_XDD_SCHEMA_VALIDATION_CONTEXT_ERROR:
+			this->errorString = "XDD schema validation context creation failed";
+			break;
+		case OCFM_ERR_XML_PARSING_ERROR:
+			this->errorString = "XDD parsing failed due to wrong XML syntax";
+			break;
+		case OCFM_ERR_CANNOT_CREATE_DIR:
+			this->errorString = "Can not create project directory";
+			break;
+		case OCFM_ERR_NO_PROJECT_LOADED:
+			this->errorString = "No project loaded in the library";
+			break;
+		case OCFM_ERR_CHAINED_AND_MULTIPLEXED:
+			this->errorString = "A node can not be chained and multiplexed at the same time";
+			break;
+		default:
+			this->errorString = "No error string specified";
+			break;
 	}
 }
 

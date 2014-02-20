@@ -13,7 +13,7 @@
 #include "Node.h"
 #include "Result.h"
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -82,7 +82,7 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, const std::string actualValue, const std::string name);
-			
+
 			/**
 			\brief	Set the actual value of a %SubIndex of an %Index.
 
@@ -112,7 +112,7 @@ namespace openCONFIGURATOR
 			\brief	Check if an %Index exists in the object dictionary of a %Node.
 
 			\param[in] nodeId	Id of the %Node.
-			\param[in] index	%Index to check for. 
+			\param[in] index	%Index to check for.
 			\param[out] exists	<code>True</code> if the %Index exists, <code>false</code> otherwise.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result

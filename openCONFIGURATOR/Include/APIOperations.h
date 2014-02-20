@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -108,8 +108,8 @@ void WriteCNsData(char* fileName);
  */
 /*****************************************************************************/
 INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
-		Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
-		char* moduleName, char* moduleIndexId);
+                 Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
+                 char* moduleName, char* moduleIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall decode the unique ID reference & generate the relevant MN PDO variable collection
@@ -139,7 +139,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
  */
 /*****************************************************************************/
 void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
-		Index* indexObj, char* indexId, INT32 prevSize);
+                      Index* indexObj, char* indexId, INT32 prevSize);
 /*****************************************************************************/
 /**
  \brief		This function shall add the specified attribute for each Sub Index
@@ -153,8 +153,8 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
  \return	void
  */
 /*****************************************************************************/
-void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
-		char *value, bool setDefaultValue);
+void AddForEachSIdx(char* indexId, IndexCollection* indexCollObj, INT32 nodeId,
+                    char* value, bool setDefaultValue);
 /*****************************************************************************/
 /**
  \brief		This function returns the node id assignment/reAssignment to be written in the CDC
@@ -163,7 +163,7 @@ void AddForEachSIdx(char *indexId, IndexCollection *indexCollObj, INT32 nodeId,
  \param[in]		isReAssignment		Boolean flag to specify node id assignment or re-assingnment
  \return		void
  */
-void GetAllNodeIdAssignment(char *Buffer, bool isReAssignment);
+void GetAllNodeIdAssignment(char* Buffer, bool isReAssignment);
 
 /**
 \brief		Default attributes to an Index are set from the object dictionary
@@ -176,7 +176,7 @@ void GetAllNodeIdAssignment(char *Buffer, bool isReAssignment);
 */
 /****************************************************************************/
 void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
-									  Index* dictIndexObj);
+                               Index* dictIndexObj);
 
 /*****************************************************************************/
 /**
@@ -190,6 +190,6 @@ void SetDefaultIndexAttributes(char* indexId, Index* indexObj,
 */
 /*****************************************************************************/
 void SetDefaultSubIndexAttributes(char* subIndexId, SubIndex* sidxObj,
-										 SubIndex* dictSidxObj);
+                                  SubIndex* dictSidxObj);
 
 #endif // APIOperations_h

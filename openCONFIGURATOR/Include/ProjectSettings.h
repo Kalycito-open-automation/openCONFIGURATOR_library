@@ -22,7 +22,7 @@
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
 //
-// 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+// 3. Neither the name of Kalycito Infotech Private Limited nor the names of
 // its contributors may be used to endorse or promote products derived
 // from this software without prior written permission. For written
 // permission, please contact info@kalycito.com.
@@ -62,7 +62,7 @@
 // ****************************************************************************
 // \class		PjtSettings
 // \brief		This handles Project settings details
-// 
+//
 // ****************************************************************************/
 //
 //class PjtSettings
@@ -74,7 +74,7 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to check for and return an existing PjtSettings object. If not available, it will return a new PjtSettings object
-//		 
+//
 //		 \return	PjtSettings*
 //		 */
 //		/*****************************************************************************/
@@ -82,9 +82,9 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to assign IP address for Powerlink MN
-//		 
+//
 //		 \param		ipAddr		Character pointer to the IPaddress string
-//		 
+//
 //		 \return	void
 //		 */
 //		/*****************************************************************************/
@@ -92,9 +92,9 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to set the saveMode attribute in the PjtSettings object
-//		 
+//
 //		 \param		autoSaveMode   	Enum variable of AutoSave to hold the saveMode attributes to be set
-//		 
+//
 //		 \return	void
 //		 */
 //		/*****************************************************************************/
@@ -102,9 +102,9 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to set the viewMode attribute in the PjtSettings object
-//		 
+//
 //		 \param		viewModeTemp		Enum variable of ViewMode to hold the viewMode attributes to be set
-//		 
+//
 //		 \return	void
 //		 */
 //		/*****************************************************************************/
@@ -112,19 +112,19 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to set the generateMode attribute in the PjtSettings object
-//		 
+//
 //		 \param		autoGenerateMode	 Enum variable of AutoGenerate to hold the generateMode attributes to be set
-//		 
+//
 //		 \return	void
 //		 */
 //		/*****************************************************************************/
 //		void SetGenerateAttr(AutoGenerate autoGenerateMode);
 //		/*****************************************************************************/
 //		/**
-//		 \brief		This function shall be used to set the expertView flag in the PjtSettings object	
-//		 
+//		 \brief		This function shall be used to set the expertView flag in the PjtSettings object
+//
 //		 \param		expertViewTemp	 	Boolean to hold the enable/disable value of expertView flag
-//		 
+//
 //		 \return	void
 //		 */
 //		/*****************************************************************************/
@@ -132,7 +132,7 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to return the IP address assigned for Powerlink MN
-//		 
+//
 //		 \return	const char* or NULL
 //		 */
 //		/*****************************************************************************/
@@ -140,7 +140,7 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to return the saveMode attribute in the PjtSettings object
-//		 
+//
 //		 \return	AutoSave
 //		 */
 //		/*****************************************************************************/
@@ -148,7 +148,7 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to return the viewMode attribute in the PjtSettings object
-//		 
+//
 //		 \return	ViewMode
 //		 */
 //		/*****************************************************************************/
@@ -156,7 +156,7 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to return the generateMode attribute in the PjtSettings project
-//		 
+//
 //		 \return	AutoGenerate
 //		 */
 //		/*****************************************************************************/
@@ -164,10 +164,10 @@
 //		/*****************************************************************************/
 //		/**
 //		 \brief		This function shall be used to return the expertView flag in the PjtSettings object
-//		 
+//
 //		 \return	BOOL
 //		 \retval	TRUE		if expertView is enabled
-//		 \retval	FALSE		if expertView is disabled	
+//		 \retval	FALSE		if expertView is disabled
 //		 */
 //		/*****************************************************************************/
 //		bool GetExpertViewSelectedFlag();

@@ -12,7 +12,7 @@
 #include <cassert>
 #include <cstdlib>
 #ifndef NDEBUG
-		#include <iostream>
+#include <iostream>
 #endif
 
 using namespace std;
@@ -27,51 +27,51 @@ const string LibraryConfiguration::kObjectDictionaryFile = "od.xml";
 string LibraryConfiguration::libResourcePath;
 
 const string& LibraryConfiguration::GetLibResourcePath()
-{	
+{
 	if (LibraryConfiguration::libResourcePath.empty())
 	{
 		const char* libResourcePathEnvVar = std::getenv(kLibResourcePathEnvVar.c_str());
-		if (libResourcePathEnvVar) 
+		if (libResourcePathEnvVar)
 			LibraryConfiguration::libResourcePath = libResourcePathEnvVar;
 		else
 			LibraryConfiguration::libResourcePath = kDefaultLibResourcePath;
 #ifndef NDEBUG
 		cout << "Library resource path evaluated to: " << LibraryConfiguration::libResourcePath << endl;
 #endif
-	}	
+	}
 	return LibraryConfiguration::libResourcePath;
 }
 
 const string LibraryConfiguration::GetObjectDictinaryFilePath(void)
 {
 	return string(LibraryConfiguration::GetLibResourcePath()
-		+ kPathSeparator 
-		+ kObjectDictionaryFile);
+	              + kPathSeparator
+	              + kObjectDictionaryFile);
 }
 
 const string LibraryConfiguration::GetXddSchemaFilePath(void)
 {
 	return string(LibraryConfiguration::GetLibResourcePath()
-		+ kPathSeparator 
-		+ kRelXDDSchemaPath);
+	              + kPathSeparator
+	              + kRelXDDSchemaPath);
 }
 
 const string LibraryConfiguration::GetProjectFileSchemaFilePath(void)
 {
 	return string(LibraryConfiguration::GetLibResourcePath()
-		+ kPathSeparator 
-		+ kRelProjectFileSchemaPath);
+	              + kPathSeparator
+	              + kRelProjectFileSchemaPath);
 }
 
 const string LibraryConfiguration::GetTxt2CdcFilePath(void)
 {
 	string path(LibraryConfiguration::GetLibResourcePath()
-		+ kPathSeparator 
-		+ kTxt2CdcFile);
+	            + kPathSeparator
+	            + kTxt2CdcFile);
 
 #if defined(_WIN32) && defined(_MSC_VER)
-		return (path + ".exe");
+	return (path + ".exe");
 #else
-		return path;
+	return path;
 #endif
 }

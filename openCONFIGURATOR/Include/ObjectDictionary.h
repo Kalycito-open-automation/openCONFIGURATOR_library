@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -69,8 +69,8 @@ using namespace std;
 /**
  *****************************************************************************
  \class			ObjectDictionary
- \brief			Handles the object dictionary for each index	
- 
+ \brief			Handles the object dictionary for each index
+
  *****************************************************************************/
 class ObjectDictionary
 {
@@ -89,11 +89,11 @@ class ObjectDictionary
 
 		class sattrIdxSIdx
 		{
-		public:
-			char* Idx;
-			char* startIndex;
-			char* endIndex;
-			ObjectType objectType;
+			public:
+				char* Idx;
+				char* startIndex;
+				char* endIndex;
+				ObjectType objectType;
 		};
 
 		vector<sattrIdxSIdx> attribCollObj;
@@ -103,9 +103,9 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to process the Object Dictionary file and generate the DataTypeCollection, IndexCollection and SubIndexCollection lists
-		 
-		 \param		reader		xml Variable of type xmlTextReaderPtr 
-		 
+
+		 \param		reader		xml Variable of type xmlTextReaderPtr
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -114,7 +114,7 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return pointer to ObjectDictionary object
-		 
+
 		 \return	ObjectDictionary*
 		 */
 		/*****************************************************************************/
@@ -122,7 +122,7 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall adds the an attribute(subindex) to the attribute collection(Index)
-		 
+
 		 \param		object	Structure Variable of sattrIdxSIdx to hold the attribute Object
 
 		 \return	void
@@ -132,11 +132,11 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall create an objects and attributes of the type and indexId
-		 
+
 		 \param		value		Character pointer to the value of the object
 		 \param		objType		Enum variable of ObjectType to hold the value of Object type
 		 \param		idxId		Character pointer to the value of Index
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -144,9 +144,9 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This is a member function of CObjectDictionary returns index value of the object dictionary
-		 
+
 		 \param		indexId            Character Pointer Variable to hold the value of Index
-		 
+
 		 \return	Index*
 		 */
 		/*****************************************************************************/
@@ -154,10 +154,10 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This is a member function of CObjectDictionary returns the object dictonary for sub index
-		 
+
 		 \param		idxId       Character pointer variable to hold the value of Index
 		 \param		sIdxId      Character pointer variable to hold the value of Sub-Index
-		 
+
 		 \return	SubIndex*
 		 */
 		/*****************************************************************************/
@@ -165,24 +165,24 @@ class ObjectDictionary
 		/*****************************************************************************/
 		/**
 		 \brief		This is a member function of CObjectDictionary returns the range of the object dictionary ids
-		 
+
 		 \param		idxId		Character Pointer Variable to hold the value of Index
-		 \param		startIdx	Character Pointer Variable to hold the value of Start Index 
+		 \param		startIdx	Character Pointer Variable to hold the value of Start Index
 		 \param		endIdx      Character Pointer Variable to hold the value of End Index
-		 
+
 		 \return	BOOL
 		 \retval	TRUE		to check
-		 \retval	FALSE		to check	
+		 \retval	FALSE		to check
 		 */
 		/*****************************************************************************/
 		bool CheckInTheRange(const char* idxId, const char* startIdx, const char* endIdx);
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the name of the Index given the Object Name and Index ID
-		 
+
 		 \param		idxId			Character pointer to the value of Object index
 		 \param		objectName		Character pointer to the value of Object name
-		 
+
 		 \return	char*
 		 */
 		/*****************************************************************************/

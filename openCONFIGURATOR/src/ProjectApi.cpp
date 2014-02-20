@@ -19,7 +19,7 @@
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace std;
 
-namespace openCONFIGURATOR 
+namespace openCONFIGURATOR
 {
 	namespace Library
 	{
@@ -41,9 +41,9 @@ namespace openCONFIGURATOR
 					}
 					if (result.IsSuccessful())
 					{
-						string fallbackPath = pathToMNXdd.empty() 
-							? kDefaultMNXDD 
-							: pathToMNXdd;
+						string fallbackPath = pathToMNXdd.empty()
+						                      ? kDefaultMNXDD
+						                      : pathToMNXdd;
 
 						result = Translate(ValidateXDDFile(fallbackPath.c_str()));
 						if (result.IsSuccessful())
@@ -116,7 +116,7 @@ namespace openCONFIGURATOR
 					if (ProjectConfiguration::GetInstance().IsInitialized())
 					{
 						ProjectConfiguration::GetInstance().ResetConfiguration();
-						result = CloseProject();			
+						result = CloseProject();
 					}
 					if (result.IsSuccessful())
 					{

@@ -2,7 +2,7 @@
  ******************************************************************************
  \file		ApplicationProcess.cpp
 
- \brief		This file contains the class member definitions that are used for handling the objects within the 'Application Process' tag in the XML configuration file(XDD/XDC) 
+ \brief		This file contains the class member definitions that are used for handling the objects within the 'Application Process' tag in the XML configuration file(XDD/XDC)
  ******************************************************************************
 
  */
@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -66,7 +66,7 @@
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -81,7 +81,7 @@ ApplicationProcess::ApplicationProcess() :
 /* Destructor */
 
 /**
- 
+
 
  */
 
@@ -90,7 +90,8 @@ ApplicationProcess::~ApplicationProcess(void)
 	//Add destructor code here
 }
 
-vector<Parameter> ApplicationProcess::GetParameterCollection(void){
+vector<Parameter> ApplicationProcess::GetParameterCollection(void)
+{
 	return this->ParameterCollection;
 }
 
@@ -128,10 +129,10 @@ void ApplicationProcess::DeleteParameterCollection()
 	ParameterCollection.clear();
 }
 
-INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(const char *uniqueIdRef)
+INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(const char* uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
-			loopCount++)
+	        loopCount++)
 	{
 		Parameter parameterObj;
 		parameterObj = ParameterCollection[loopCount];
@@ -143,10 +144,10 @@ INT32 ApplicationProcess::GetParameterIndexbyUniqueIDRef(const char *uniqueIdRef
 	return 0;
 }
 
-Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(const char *uniqueIdRef)
+Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(const char* uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < ParameterCollection.size();
-			loopCount++)
+	        loopCount++)
 	{
 		Parameter parameterObj;
 
@@ -159,7 +160,7 @@ Parameter* ApplicationProcess::GetParameterbyUniqueIDRef(const char *uniqueIdRef
 	return NULL;
 }
 
-INT32 ApplicationProcess::GetCDTUniqueIDRef(const char *uniqueIdRef)
+INT32 ApplicationProcess::GetCDTUniqueIDRef(const char* uniqueIdRef)
 {
 	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
@@ -174,7 +175,7 @@ INT32 ApplicationProcess::GetCDTUniqueIDRef(const char *uniqueIdRef)
 	return 0;
 }
 
-ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(const char *uniqueId)
+ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(const char* uniqueId)
 {
 	for (UINT32 loopCount = 0; loopCount < CDTCollection.size(); loopCount++)
 	{
@@ -189,7 +190,7 @@ ComplexDataType* ApplicationProcess::GetCDTbyUniqueID(const char *uniqueId)
 	return NULL;
 }
 
-ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(const char *uniqueRefId)
+ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(const char* uniqueRefId)
 {
 	for (UINT32 iLoopCount = 0; iLoopCount < CDTCollection.size(); iLoopCount++)
 	{
@@ -199,8 +200,8 @@ ComplexDataType* ApplicationProcess::GetCDTByDtUniqueRefID(const char *uniqueRef
 		if (NULL != complexDtObj.nameIdAttr->GetDtUniqueRefId())
 		{
 			if (0
-					== strcmp(uniqueRefId,
-							complexDtObj.nameIdAttr->GetDtUniqueRefId()))
+			        == strcmp(uniqueRefId,
+			                  complexDtObj.nameIdAttr->GetDtUniqueRefId()))
 			{
 				return &CDTCollection[iLoopCount];
 			}
@@ -224,7 +225,7 @@ void ApplicationProcess::UpdatePreviousCDTUId(const char* uniqueID, INT32 cDtPos
 }
 
 Parameter ApplicationProcess::GetUniqueIDRefbyParameterIndex(
-		INT32 parameterPosition)
+    INT32 parameterPosition)
 {
 	Parameter parameterObj;
 

@@ -1,11 +1,11 @@
 /************************************************************************
 \file BoostShared.h
 \brief	Master-Include file for Boost-Headers to be used in the library.
-		
-		This header file shall include Boost-Headers which issue warnings at 
+
+		This header file shall include Boost-Headers which issue warnings at
 		warning level 4 ("/W4") of Microsoft Visual Studio's C++ compiler.
-		Any implementation file using any of these Boost-Headers shall include 
-		this Master-Include file instead of directly including those Boost-Headers.		
+		Any implementation file using any of these Boost-Headers shall include
+		this Master-Include file instead of directly including those Boost-Headers.
 \author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 ************************************************************************/
 

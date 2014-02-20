@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -66,7 +66,7 @@ using namespace std;
  *****************************************************************************
  \class		Index
  \brief		This function has the definitions of Index collection,PDO type for all datatypes
- 
+
  *****************************************************************************/
 
 class Index: public BaseIndex
@@ -78,9 +78,9 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to add the given SubIndex to the collection list
-		 
-		 \param		objSubIndex		Class variable of CSubIndex for object subindex		
-		 
+
+		 \param		objSubIndex		Class variable of CSubIndex for object subindex
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -88,9 +88,9 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the SubIndex at the given position in the collection list
-		 
+
 		 \param		subIndexPosition		Integer to hold the value of subindex id
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -98,7 +98,7 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the objects in the SubIndex collection list
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -106,17 +106,17 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to assign PDO type to the private member pdoType
-		 
+
 		 \param		varPDOType		Enum Variable of PDOType to hold the value of PDO type
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
 		void SetPDOType(PDOType varPDOType);
 		/*****************************************************************************/
 		/**
-		 \brief		This function shall be used to swap the position of two SubIndex objects in the collection list 
-		 
+		 \brief		This function shall be used to swap the position of two SubIndex objects in the collection list
+
 		 \param		fromPosition	Integer to hold the from SubIndex object position
 		 \param		toPosition		Integer to hold the to SubIndex object position
 
@@ -127,7 +127,7 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to update the DataType structure variable for SubIndex objects in the collection list
-		 
+
 		 \return		void
 		 */
 		/*****************************************************************************/
@@ -135,7 +135,7 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the number of objects in the SubIndex collection list
-		 
+
 		 \return	INT32
 		 */
 		/*****************************************************************************/
@@ -143,7 +143,7 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the private member pdoType
-		 
+
 		 \return	PDOType
 		 */
 		/*****************************************************************************/
@@ -151,9 +151,9 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the SubIndex object at the given position in the collection list
-		 
+
 		 \param		subIndexPosition 	Integer  to hold the value of subindex id
-		 
+
 		 \return	SubIndex*
 		 */
 		/*****************************************************************************/
@@ -161,9 +161,9 @@ class Index: public BaseIndex
 		/*****************************************************************************/
 		/**
 		 \brief			This function shall be used to return the SubIndex object(whose subIndexId value matches the given parameter) from the collection list
-		 
+
 		 \param			subIndexId		Character pointer to the subIndexId value
-		 
+
 		 \return		SubIndex*
 		 */
 		/*****************************************************************************/
@@ -177,9 +177,9 @@ class Index: public BaseIndex
 
 		/************************************************************************
 		\brief Equality operator.
-		
+
 		\param index Index for comparison.
-		
+
 		\return true if this instances' index is numerically equal to the index of the argument.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 		************************************************************************/
@@ -187,9 +187,9 @@ class Index: public BaseIndex
 
 		/************************************************************************
 		\brief Query if this Index contains a SubIndex with the given index.
-		
-		\param subIndex 8bit index of the SubIndex to query.		
-		
+
+		\param subIndex 8bit index of the SubIndex to query.
+
 		\return true if a SubIndex with the given index exists, false otherwise.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
 		************************************************************************/
@@ -197,9 +197,9 @@ class Index: public BaseIndex
 
 		/************************************************************************
 		\brief Gets a pointer to a SubIndex by its index.
-		
+
 		\param subIndex	8bit index of the SubIndex.
-		
+
 		\return Pointer to the SubIndex-Object or NULL if not found.
 		\note The returned pointer will possibly be invalidated by adding/removing SubIndex-Objects after obtaining it.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
@@ -208,9 +208,9 @@ class Index: public BaseIndex
 
 		/************************************************************************
 		\brief Gets a reference to a SubIndex by its index.
-		
+
 		\param subIndex	8bit index of the SubIndex.
-		
+
 		\return Reference to the SubIndex-Object.
 		\note The returned reference will possibly be invalidated by adding/removing SubIndex-Objects after obtaining it.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.

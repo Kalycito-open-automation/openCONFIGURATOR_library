@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -71,7 +71,7 @@
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -83,7 +83,7 @@ IndexCollection::IndexCollection(void) :
 /* Destructor */
 
 /**
- 
+
 
  */
 
@@ -94,7 +94,7 @@ IndexCollection::~IndexCollection(void)
 
 void IndexCollection::AddIndex(Index objIndex)
 {
-	
+
 	char* subStr = new char[SUBINDEX_LEN];
 	subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
 	if ((0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16")))
@@ -102,7 +102,7 @@ void IndexCollection::AddIndex(Index objIndex)
 		objIndex.SetPDOType(PDO_RPDO);
 	}
 	else if ((0 == strcmp(subStr, "18")) || (0 == strcmp(subStr, "1A"))
-			|| (0 == strcmp(subStr, "1a")))
+	         || (0 == strcmp(subStr, "1a")))
 	{
 		objIndex.SetPDOType(PDO_TPDO);
 	}
@@ -111,7 +111,7 @@ void IndexCollection::AddIndex(Index objIndex)
 		objIndex.SetPDOType(PDO_INVALID);
 	}
 	delete[] subStr;
-	
+
 	indexCollection.push_back(objIndex);
 }
 
@@ -136,8 +136,8 @@ void IndexCollection::DeletePDOs()
 		objIndex = indexCollection[loopCount];
 		subStr = SubString(subStr, objIndex.GetIndexValue(), 0, 2);
 		if ((0 == strcmp(subStr, "1A")) || (0 == strcmp(subStr, "1a"))
-				|| (0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16"))
-				|| (0 == strcmp(subStr, "18")))
+		        || (0 == strcmp(subStr, "14")) || (0 == strcmp(subStr, "16"))
+		        || (0 == strcmp(subStr, "18")))
 		{
 			indexCollection.erase(indexCollection.begin() + loopCount);
 			loopCount = 0;
@@ -149,7 +149,7 @@ void IndexCollection::DeletePDOs()
 void IndexCollection::DeletePIObjects()
 {
 	UINT32 iLoopCount = 0;
-	char* subStr = new char[1+1];
+	char* subStr = new char[1 + 1];
 
 	Index objIndex;
 	for (iLoopCount = 0; iLoopCount < indexCollection.size(); iLoopCount++)
@@ -173,19 +173,19 @@ Index* IndexCollection::GetIndexByPosition(INT32 indexPosition)
 Index* IndexCollection::GetIndexbyIndexValue(const char* indexId)
 {
 	Index objIndex;
-	if(NULL != indexId)
+	if (NULL != indexId)
 	{
-		char *idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
+		char* idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
 		strcpy(idxIdUpper, indexId);
 		idxIdUpper = ConvertToUpper(idxIdUpper);
 
 		for (UINT32 loopCount = 0; loopCount < indexCollection.size(); loopCount++)
 		{
 			objIndex = indexCollection[loopCount];
-			//NULL check values 
-			if(objIndex.GetIndexValue() != NULL)
+			//NULL check values
+			if (objIndex.GetIndexValue() != NULL)
 			{
-				char *objIdxIdUpper = new char[strlen(objIndex.GetIndexValue()) + STR_ALLOC_BUFFER];
+				char* objIdxIdUpper = new char[strlen(objIndex.GetIndexValue()) + STR_ALLOC_BUFFER];
 				strcpy(objIdxIdUpper, objIndex.GetIndexValue());
 				objIdxIdUpper = ConvertToUpper(objIdxIdUpper);
 				if (0 == strcmp(objIdxIdUpper, idxIdUpper))
@@ -227,8 +227,8 @@ Index* IndexCollection::GetIndexPtr(const UINT32 index)
 {
 	vector<Index>::iterator it = this->indexCollection.begin();
 	for (;
-		it != this->indexCollection.end() && (it->GetIndex() != index);
-		++it)
+	        it != this->indexCollection.end() && (it->GetIndex() != index);
+	        ++it)
 	{}
 	if (it == this->indexCollection.end())
 		return NULL;

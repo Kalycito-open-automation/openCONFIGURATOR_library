@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -136,7 +136,7 @@ class BuildTime
 {
 	public:
 		time_t rawtime;
-		struct tm * timeinfo;
+		struct tm* timeinfo;
 		char buffer[BUILDTIME_BUF_LEN];
 };
 
@@ -177,7 +177,7 @@ char* ConvertToUpper(char* str);
  \return	char*
  */
 /*****************************************************************************/
-char* IntToAscii(LONG srcValue, char *destStr, INT32 baseValue);
+char* IntToAscii(LONG srcValue, char* destStr, INT32 baseValue);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given Index ID is of PDO type
@@ -266,7 +266,7 @@ char* PadLeft(char* str, char padChar, INT32 padLength);
  \return	ULONG
  */
 /*****************************************************************************/
-ULONG HexToInt(const char *hexStr);
+ULONG HexToInt(const char* hexStr);
 /*****************************************************************************************/
 /**
  \brief			This function shall return the Index class pointer for the index id of the MN
@@ -300,7 +300,7 @@ char* GetParameterAccess(char* accessStr);
  \retval	FALSE				if end element condition is not satisfied
  */
 /*****************************************************************************/
-bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compareElement);
+bool CheckEndElement(INT32 elementId, const char* srcElement, const char* compareElement);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given elementId is XML_READER_TYPE_ELEMENT and if srcElement and compareElement strings are the same
@@ -314,7 +314,7 @@ bool CheckEndElement(INT32 elementId, const char *srcElement, const char *compar
  \retval	FALSE				if start element condition is not satisfied
  */
 /*****************************************************************************/
-bool CheckStartElement(INT32 elementId, const char *srcElement, const char *compareElement);
+bool CheckStartElement(INT32 elementId, const char* srcElement, const char* compareElement);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given datatype is a simple datatype
@@ -327,7 +327,7 @@ bool CheckStartElement(INT32 elementId, const char *srcElement, const char *comp
  \retval	FALSE			if the given datatype is not a simple datatype
  */
 /*****************************************************************************/
-bool CheckifSimpleDT(const char *datatypeName, char *dataSize);
+bool CheckifSimpleDT(const char* datatypeName, char* dataSize);
 /*****************************************************************************/
 /**
  \brief		This function shall return the string with CN node id
@@ -349,7 +349,7 @@ char* GetPIName(INT32 nodeID);
  \return	void
  */
 /*****************************************************************************/
-void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO);
+void SetIndexAttributes(xmlTextReaderPtr reader, Index* indexObj, bool& hasPDO);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding attribute of the SubIndex in the calling function
@@ -360,7 +360,7 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index *indexObj, bool& hasPDO);
  \return	void
  */
 /*****************************************************************************/
-void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj);
+void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex* sidxObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding IEC datatype of the datatype object in the calling function
@@ -371,7 +371,7 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex *sidxObj);
  \return	void
  */
 /*****************************************************************************/
-void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType *dtObj);
+void SetDataTypeAttributes(xmlTextReaderPtr reader, DataType* dtObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the hexadecimal string version of the given hexadecimal value
@@ -431,7 +431,7 @@ bool CheckIfHex(const char* srcStr);
  */
 /******************************************************************************************/
 void WriteXAPElements(ProcessImage piCollObj[], xmlTextWriterPtr& xmlWriter,
-		INT32 varCount, PIDirectionType piType);
+                      INT32 varCount, PIDirectionType piType);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the xml tag & autogenerated context to xap.h
@@ -455,7 +455,7 @@ void StartXAPxml(xmlTextWriterPtr& xmlWriter, xmlDocPtr& xmlDocObj);
  */
 /******************************************************************************************/
 void EndWritingXAP(xmlTextWriterPtr& xmlWriter, char* xmlFileName,
-		xmlDocPtr& xmlDocObj);
+                   xmlDocPtr& xmlDocObj);
 /*****************************************************************************/
 /**
  \brief		This function shall process the Node value, Name and its attributes
@@ -553,8 +553,8 @@ INT32 GetConfigTime();
  */
 /*****************************************************************************/
 void SetSIdxValue(char* indexId, char* sidxId, char* value,
-		IndexCollection *indexCollObj, INT32 nodeId, NodeType nodeType,
-		bool setDefaultValue);
+                  IndexCollection* indexCollObj, INT32 nodeId, NodeType nodeType,
+                  bool setDefaultValue);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to add other required CN indices
@@ -579,7 +579,7 @@ ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId);
  */
 /*****************************************************************************/
 void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
-		PDOType pdoType, Node *nodeObj);
+                    PDOType pdoType, Node* nodeObj);
 /*****************************************************************************************/
 /**
  \brief		This function shall return the total no. of Indices and Sub Indices that can be written to the CDC for the node ID
@@ -620,7 +620,7 @@ void UpdateCNCycleTime(IndexCollection* indexCollObj, char* cycleTimeValue);
  \return	void
  */
 /*****************************************************************************/
-void UpdateNumberOfEnteriesSIdx(Index *indexObj);
+void UpdateNumberOfEnteriesSIdx(Index* indexObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given data type is of string type
@@ -691,7 +691,7 @@ void CopyMNPropDefToAct(INT32 nodeId, NodeType nodeType);
  */
 /*****************************************************************************/
 void CopySubIndexDefToAct(INT32 nodeId, NodeType nodeType, bool forceCopy,
-		char *indexId, char *subIndexId);
+                          char* indexId, char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall copy the index's default value to the actual value
@@ -703,7 +703,7 @@ void CopySubIndexDefToAct(INT32 nodeId, NodeType nodeType, bool forceCopy,
  \return	void
  */
 /*****************************************************************************/
-void CopyIndexDefToAct(INT32 nodeId, NodeType nodeType, char *indexId);
+void CopyIndexDefToAct(INT32 nodeId, NodeType nodeType, char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to set the flag to enable inclusion in CDC generation for the required MN Index
@@ -738,7 +738,7 @@ bool CheckAllowedDTForMapping(const char* dataTypeName);
  \return	void
  */
 /*****************************************************************************/
-void SetFeatures(xmlTextReaderPtr reader, Feature *featureObj);
+void SetFeatures(xmlTextReaderPtr reader, Feature* featureObj);
 /*****************************************************************************/
 /**
  \brief		This function shall return the Index after sorting the collection by offset value
@@ -958,8 +958,8 @@ void UpdateCNMultipleCycleAssign(Node* nodeObj);
  \return	void
  */
 /*****************************************************************************/
-void UpdateMNNodeAssignmentIndex(Node *nodeObj, char* indexId,
-		bool allowMNSubindex);
+void UpdateMNNodeAssignmentIndex(Node* nodeObj, char* indexId,
+                                 bool allowMNSubindex);
 /*****************************************************************************/
 /**
  \brief		This function shall validate CN's PRes Timeout value with the PRes default timeout value
@@ -997,7 +997,7 @@ void CopyOldNodeIdAssignmentObject(Node* nodeObj, INT32 oldNodeId);
  */
 /*****************************************************************************/
 void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
-		char* indexId);
+        char* indexId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check accessType to determine inclusion in CDC generation
@@ -1026,7 +1026,7 @@ SubIndex* DuplicateSubIndexObject(SubIndex* objSubindex);
  */
 /*****************************************************************************/
 void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
-		char* cdcBuffer, bool enablePDO);
+                             char* cdcBuffer, bool enablePDO);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the buffer with the Index data in the Index collection that can be written in the CDC
@@ -1038,8 +1038,8 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
  \return	void
  */
 /******************************************************************************************/
-void FormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
-		NodeType eNodeType);
+void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+               NodeType eNodeType);
 /*****************************************************************************/
 /**
  \brief		This function shall check if the default value is same as the actual value
@@ -1079,8 +1079,8 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj);
  \return	void
  */
 /******************************************************************************************/
-void BRSpecificFormatCdc(IndexCollection *objIndexCollection, char* Buffer1,
-		NodeType eNodeType, INT32 iNodeId);
+void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+                         NodeType eNodeType, INT32 iNodeId);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the buffer(char pointer) with the Index data(id value, datatype value, actual value) to be used for CDC generation in a BnR specific format
@@ -1114,7 +1114,7 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId);
  */
 /*****************************************************************************/
 void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
-		char* socToleranceValue);
+                          char* socToleranceValue);
 /*****************************************************************************/
 /**
  \brief		This function shall sort the Node ID in a given Node ID collection
@@ -1125,7 +1125,7 @@ void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
  \return	void
  */
 /*****************************************************************************/
-void SortNodeID(INT32 *nodeIDColl, INT32 collectionSize);
+void SortNodeID(INT32* nodeIDColl, INT32 collectionSize);
 /*****************************************************************************/
 /**
  \brief		This function shall check if the MN node is a PRes chained station
@@ -1270,7 +1270,7 @@ void ResetAllSubIndexFlag(Index* indexObj);
  */
 /*****************************************************************************/
 ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, const char* indexId,
-		const char* sidxId, AttributeType attributeType, const char* attributeValue);
+                                 const char* sidxId, AttributeType attributeType, const char* attributeValue);
 /*****************************************************************************/
 /**
  \brief		This function shall set the system time during time of build
@@ -1320,7 +1320,7 @@ char* ConvertStringToHex(char* srcStr);
  \return	char* / NULL
  */
 /*****************************************************************************/
-char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue);
+char* UnsignedToAlphaNumeric(unsigned srcValue, char* destStr, INT32 baseValue);
 
 /*****************************************************************************/
 /**
@@ -1332,7 +1332,7 @@ char* UnsignedToAlphaNumeric(unsigned srcValue, char *destStr, INT32 baseValue);
  \return	void
  */
 /*****************************************************************************/
-void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj);
+void SetParameterAttributes(xmlTextReaderPtr reader, Parameter* parameterObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr of the Parameter object in the calling function
@@ -1343,7 +1343,7 @@ void SetParameterAttributes(xmlTextReaderPtr reader, Parameter *parameterObj);
  \return	void
  */
 /*****************************************************************************/
-void SetParaDT(xmlTextReaderPtr reader, Parameter *parameterObj);
+void SetParaDT(xmlTextReaderPtr reader, Parameter* parameterObj);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to assign the retrieved attribute value from xml file to the corresponding nameIdDtAttr and size of the varDeclaration structure variable in the calling function
@@ -1377,7 +1377,7 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos);
  \return	ocfmRetCode		Error code
  */
 /*****************************************************************************/
-ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename);
+ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char* schema_filename);
 
 /*****************************************************************************
  \brief		Handle an error which occurs in XML schema validation
@@ -1385,7 +1385,7 @@ ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename);
  \param[in]		ctx		Error context
  \param[out]	msg		Error message
 *****************************************************************************/
-void HandleSchemaValidationError(void*, const char *msg, ...);
+void HandleSchemaValidationError(void*, const char* msg, ...);
 
 namespace openCONFIGURATOR
 {

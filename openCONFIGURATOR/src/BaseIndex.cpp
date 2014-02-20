@@ -2,7 +2,7 @@
  ******************************************************************************
  \file		BaseIndex.cpp
 
- \brief		This file contains the class member definitions that are used for handling the attributes of an Index/SubIndex object 
+ \brief		This file contains the class member definitions that are used for handling the attributes of an Index/SubIndex object
  ******************************************************************************
 
  */
@@ -23,7 +23,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -79,7 +79,7 @@ using namespace openCONFIGURATOR::Library::Utilities;
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -253,18 +253,18 @@ const char* BaseIndex::GetObjectType()
 {
 	switch (objectType)
 	{
-	case DEFTYPE:
-		return "DEFTYPE";
-	case DEFSTRUCT:
-		return "DEFSTRUCT";
-	case VAR:
-		return "VAR";
-	case ARRAY:
-		return "ARRAY";
-	case RECORD:
-		return "RECORD";
-	default:
-		return NULL;
+		case DEFTYPE:
+			return "DEFTYPE";
+		case DEFSTRUCT:
+			return "DEFSTRUCT";
+		case VAR:
+			return "VAR";
+		case ARRAY:
+			return "ARRAY";
+		case RECORD:
+			return "RECORD";
+		default:
+			return NULL;
 	}
 }
 
@@ -273,7 +273,7 @@ ObjectType BaseIndex::GetEObjectType()
 	return objectType;
 }
 
-void BaseIndex::SetObjectType(const ObjectType objectType) 
+void BaseIndex::SetObjectType(const ObjectType objectType)
 {
 	this->objectType = objectType;
 }
@@ -285,27 +285,27 @@ void BaseIndex::SetObjectType(const char* objTypeStr)
 
 	tempObjtype = ConvertToUpper(tempObjtype);
 	if ((0 == strcmp(tempObjtype, "5"))
-			|| (0 == strcmp(tempObjtype, "DEFTYPE")))
+	        || (0 == strcmp(tempObjtype, "DEFTYPE")))
 	{
 		objectType = DEFTYPE;
 	}
 	else if ((0 == strcmp(tempObjtype, "6"))
-			|| (0 == strcmp(tempObjtype, "DEFSTRUCT")))
+	         || (0 == strcmp(tempObjtype, "DEFSTRUCT")))
 	{
 		objectType = DEFSTRUCT;
 	}
 	else if ((0 == strcmp(tempObjtype, "7"))
-			|| (0 == strcmp(tempObjtype, "VAR")))
+	         || (0 == strcmp(tempObjtype, "VAR")))
 	{
 		objectType = VAR;
 	}
 	else if ((0 == strcmp(tempObjtype, "8"))
-			|| (0 == strcmp(tempObjtype, "ARRAY")))
+	         || (0 == strcmp(tempObjtype, "ARRAY")))
 	{
 		objectType = ARRAY;
 	}
 	else if ((0 == strcmp(tempObjtype, "9"))
-			|| (0 == strcmp(tempObjtype, "RECORD")))
+	         || (0 == strcmp(tempObjtype, "RECORD")))
 	{
 		objectType = RECORD;
 	}
@@ -320,20 +320,20 @@ const char* BaseIndex::GetPDOMapping()
 {
 	switch (pdoMapping)
 	{
-	case NOT_DEFINED:
-		return "NOT_DEFINED";
-	case NO:
-		return "NO";
-	case DEFAULT:
-		return "DEFAULT";
-	case OPTIONAL:
-		return "OPTIONAL";
-	case RPDO:
-		return "RPDO";
-	case TPDO:
-		return "TPDO";
-	default:
-		return NULL;
+		case NOT_DEFINED:
+			return "NOT_DEFINED";
+		case NO:
+			return "NO";
+		case DEFAULT:
+			return "DEFAULT";
+		case OPTIONAL:
+			return "OPTIONAL";
+		case RPDO:
+			return "RPDO";
+		case TPDO:
+			return "TPDO";
+		default:
+			return NULL;
 	}
 }
 
@@ -534,12 +534,12 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 			else
 			{
 				boost::format formatter(kMsgValueNotWithinRange);
-				formatter 
-					% value
-					% this->GetName()
-					% nodeId
-					% ulowLimit
-					% uhighLimit;
+				formatter
+				% value
+				% this->GetName()
+				% nodeId
+				% ulowLimit
+				% uhighLimit;
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(formatter.str());
 				LOG_FATAL() << formatter.str();
@@ -571,14 +571,14 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 				retFlag = true;
 			}
 			else
-			{				
+			{
 				boost::format formatter(kMsgValueNotWithinRange);
-				formatter 
-					% value
-					% this->GetName()
-					% nodeId
-					% ulowLimit
-					% uhighLimit;
+				formatter
+				% value
+				% this->GetName()
+				% nodeId
+				% ulowLimit
+				% uhighLimit;
 				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 				objException.setErrorString(formatter.str());
 				LOG_FATAL() << formatter.str();
@@ -602,24 +602,24 @@ bool BaseIndex::GetFlagIfIncludedCdc()
 
 void BaseIndex::DeleteAllMemberMemory()
 {
-	if(indexId != NULL)
+	if (indexId != NULL)
 		delete[] indexId;
-	if(name != NULL)
+	if (name != NULL)
 		delete[] name;
-	if(highLimit != NULL)
+	if (highLimit != NULL)
 		delete[] highLimit;
 	//dataType.Initialize();
-	if(dataTypeValue != NULL)
+	if (dataTypeValue != NULL)
 		delete[] dataTypeValue;
-	if(defaultValue != NULL)
+	if (defaultValue != NULL)
 		delete[] defaultValue;
-	if(actualValue != NULL)
+	if (actualValue != NULL)
 		delete[] actualValue;
-	if(accessType != NULL)
+	if (accessType != NULL)
 		delete[] accessType;
-	if(lowLimit != NULL)
+	if (lowLimit != NULL)
 		delete[] lowLimit;
-	if(uniqueIdRef != NULL)
+	if (uniqueIdRef != NULL)
 		delete[] uniqueIdRef;
 }
 

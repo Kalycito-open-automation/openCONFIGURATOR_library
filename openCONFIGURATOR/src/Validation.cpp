@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -75,11 +75,11 @@ using namespace openCONFIGURATOR::Library::Utilities;
 // 				F U N C T I O N  D E F I N I T I O N S  					//
 //==========================================================================//
 
-ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32 *nodePos,
-		bool& nodeExist)
+ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32* nodePos,
+                         bool& nodeExist)
 {
 	Node nodeObj;
-	NodeCollection *nodeCollObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
 	ocfmRetCode exceptionObj;
 
 	try
@@ -100,7 +100,7 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32 *nodePos,
 		if (nodeCollObj->GetNumberOfNodes() > 0)
 		{
 			for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
-					nodeLC++)
+			        nodeLC++)
 			{
 				nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodeLC);
 
@@ -130,14 +130,15 @@ ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, UINT32 *nodePos,
 			LOG_FATAL() << kMsgNoNodesConfigured;
 			throw exceptionObj;
 		}
-	} catch (ocfmRetCode& ex)
+	}
+	catch (ocfmRetCode& ex)
 	{
 		return ex;
 	}
 }
 
 ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
-		INT32 *idxPos)
+                          INT32* idxPos)
 {
 	UINT32 nodePos;
 	bool bFlag = false;
@@ -167,8 +168,8 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 			throw exceptionObj;
 		}
 		Node nodeObj;
-		NodeCollection *nodeCollObj = NULL;
-		IndexCollection *idxCollObj = NULL;
+		NodeCollection* nodeCollObj = NULL;
+		IndexCollection* idxCollObj = NULL;
 		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 		nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
 		idxCollObj = nodeObj.GetIndexCollection();
@@ -186,13 +187,13 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 		{
 			//Check for existance of the Index
 			for (INT32 idxLC = 0; idxLC < idxCollObj->GetNumberofIndexes();
-					idxLC++)
+			        idxLC++)
 			{
-				Index *idxObj = NULL;
+				Index* idxObj = NULL;
 				idxObj = idxCollObj->GetIndexByPosition(idxLC);
 
-				char *objIdxIdUpper = new char[strlen(idxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
-				char *idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
+				char* objIdxIdUpper = new char[strlen(idxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
+				char* idxIdUpper = new char[strlen(indexId) + STR_ALLOC_BUFFER];
 				strcpy(objIdxIdUpper, idxObj->GetIndexValue());
 				objIdxIdUpper = ConvertToUpper(objIdxIdUpper);
 				strcpy(idxIdUpper, indexId);
@@ -221,7 +222,8 @@ ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, const char* indexId,
 				delete[] idxIdUpper;
 			}
 		}
-	} catch (ocfmRetCode& ex)
+	}
+	catch (ocfmRetCode& ex)
 	{
 		return ex;
 	}
@@ -234,7 +236,7 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 	try
 	{
 		if ((NULL == idxId) || (NULL == sidxId) || (NULL == idxPos)
-				|| (NULL == sidxPos))
+		        || (NULL == sidxPos))
 		{
 			boost::format formatter(kMsgNullArgument);
 			formatter % "'idxId', 'sidxId', 'idxPos', 'sidxPos'";
@@ -244,9 +246,9 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 			throw objException;
 		}
 		Node nodeObj;
-		NodeCollection *nodeCollObj = NULL;
-		IndexCollection *idxCollObj = NULL;
-		Index *idxObj = NULL;
+		NodeCollection* nodeCollObj = NULL;
+		IndexCollection* idxCollObj = NULL;
+		Index* idxObj = NULL;
 
 		objException = IfIndexExists(nodeId, nodeType, idxId, idxPos);
 
@@ -270,13 +272,13 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 		{
 			//Check for existance of the SubIndex
 			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
-					sidxLC++)
+			        sidxLC++)
 			{
 				SubIndex* sidxObj = NULL;
 				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
 
-				char *objSidxIdUpper = new char[strlen(sidxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
-				char *sidxIdUpper = new char[strlen(sidxId) + STR_ALLOC_BUFFER];
+				char* objSidxIdUpper = new char[strlen(sidxObj->GetIndexValue()) + STR_ALLOC_BUFFER];
+				char* sidxIdUpper = new char[strlen(sidxId) + STR_ALLOC_BUFFER];
 				strcpy(objSidxIdUpper, sidxObj->GetIndexValue());
 				strcpy(sidxIdUpper, sidxId);
 				objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
@@ -294,10 +296,10 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 				{
 					// SubIndex Doesn't Exist
 					boost::format formatter(kMsgNonExistingSubIndex);
-					formatter 
-						% HexToInt<UINT32>(string(idxId)) 
-						% HexToInt<UINT32>(string(sidxId))
-						% nodeId;
+					formatter
+					% HexToInt<UINT32>(string(idxId))
+					% HexToInt<UINT32>(string(sidxId))
+					% nodeId;
 					objException.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 					objException.setErrorString(formatter.str());
 					LOG_FATAL() << formatter.str();
@@ -313,7 +315,8 @@ ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* idxId,
 		{
 			objException.setErrorCode(OCFM_ERR_UNKNOWN);
 		}
-	} catch (ocfmRetCode& ex)
+	}
+	catch (ocfmRetCode& ex)
 	{
 		return ex;
 	}
@@ -344,12 +347,12 @@ bool CheckIfDataTypeExists(const char* dataValue, INT32 nodeId)
 
 bool CheckIfDataTypeByNameExists(const char* dtName, INT32 nodeId)
 {
-	NodeCollection *nodeCollObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	Node nodeObj = nodeCollObj->GetNode(nodeId);
-	DataTypeCollection *dtCollObj = NULL;
+	DataTypeCollection* dtCollObj = NULL;
 	dtCollObj = nodeObj.GetDataTypeCollection();
-	DataType *dtObj = NULL;
+	DataType* dtObj = NULL;
 	dtObj = dtCollObj->GetDataTypeByName(dtName);
 	if (NULL == dtObj)
 	{
@@ -362,12 +365,12 @@ bool CheckIfDataTypeByNameExists(const char* dtName, INT32 nodeId)
 }
 
 bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
-		const char* subIndexId)
+                           const char* subIndexId)
 {
 	Node nodeObj;
-	NodeCollection *nodeCollObj = NULL;
-	IndexCollection *idxCollObj = NULL;
-	Index *idxObj = NULL;
+	NodeCollection* nodeCollObj = NULL;
+	IndexCollection* idxCollObj = NULL;
+	Index* idxObj = NULL;
 
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	nodeObj = nodeCollObj->GetNode(nodeType, nodeId);
@@ -386,13 +389,13 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
 	{
 		//Check for existance of the SubIndex
 		for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
-				sidxLC++)
+		        sidxLC++)
 		{
 			SubIndex* objSubIndexPtr;
 			objSubIndexPtr = idxObj->GetSubIndexByPosition(sidxLC);
 
-			char *objSidxIdUpper = new char[strlen(objSubIndexPtr->GetIndexValue()) + STR_ALLOC_BUFFER];
-			char *sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
+			char* objSidxIdUpper = new char[strlen(objSubIndexPtr->GetIndexValue()) + STR_ALLOC_BUFFER];
+			char* sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
 			strcpy(objSidxIdUpper, objSubIndexPtr->GetIndexValue());
 			strcpy(sidxIdUpper, subIndexId);
 			objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
@@ -476,21 +479,21 @@ bool CheckIfSubIndexExists(INT32 nodeId, NodeType nodeType, const char* indexID,
 //	return retVal;
 //}
 
-bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexCollection *indexCollObj, Node *nodeObj)
+bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index* indexObj, IndexCollection* indexCollObj, Node* nodeObj)
 {
 	ocfmRetCode exceptionObj;
-	char *varCommIdx = new char[INDEX_LEN];
+	char* varCommIdx = new char[INDEX_LEN];
 	//char customError[200] = { 0 };
 
 	if (pdoTypeVar == PDO_TPDO)
 	{
-		char *varIdx = new char[SUBINDEX_LEN];
+		char* varIdx = new char[SUBINDEX_LEN];
 		varIdx = SubString(varIdx, indexObj->GetIndexValue(), 2, 2);
-		strcpy(varCommIdx, (char *) "18");
+		strcpy(varCommIdx, (char*) "18");
 		strcat(varCommIdx, varIdx);
 		//If varIdx != "00" throw error as only the 1st object 1A00 shall be implemented on a CN
 		if (0 != strcmp(varIdx, "00"))
-		{	
+		{
 			boost::format formatter(kMsgIndexInvalid);
 			formatter % indexObj->GetIndex() % nodeObj->GetNodeId();
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_INDEXID);
@@ -504,9 +507,9 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	}
 	else if (pdoTypeVar == PDO_RPDO)
 	{
-		char *varIdx = new char[SUBINDEX_LEN];
+		char* varIdx = new char[SUBINDEX_LEN];
 		varIdx = SubString(varIdx, indexObj->GetIndexValue(), 2, 2);
-		strcpy(varCommIdx, (char *) "14");
+		strcpy(varCommIdx, (char*) "14");
 		strcat(varCommIdx, varIdx);
 		delete[] varIdx;
 	}
@@ -516,14 +519,14 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		return false;
 	}
 
-	Index *commIndexObj = NULL;
+	Index* commIndexObj = NULL;
 	commIndexObj = indexCollObj->GetIndexbyIndexValue(varCommIdx);
 	if (NULL == commIndexObj)
 	{
-		//throw exception as matching communication index not found for a CN		
+		//throw exception as matching communication index not found for a CN
 		boost::format formatter(kMsgNonExistingIndex);
 		formatter % HexToInt<unsigned int>(string(varCommIdx))
-			% nodeObj->GetNodeId();
+		% nodeObj->GetNodeId();
 		exceptionObj.setErrorCode(OCFM_ERR_INDEXID_NOT_FOUND);
 		exceptionObj.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -532,15 +535,15 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 	}
 	delete[] varCommIdx;
 
-	SubIndex *subIndexObj = NULL;
-	subIndexObj = commIndexObj->GetSubIndexbyIndexValue((char *) "01");
+	SubIndex* subIndexObj = NULL;
+	subIndexObj = commIndexObj->GetSubIndexbyIndexValue((char*) "01");
 	if (NULL == subIndexObj)
 	{
 		//Throw exception as Target node id sidx not found in a CN TPDO comm param object
 		boost::format formatter(kMsgNonExistingSubIndex);
-		formatter % commIndexObj->GetIndex() 
-			% 1 
-			% nodeObj->GetNodeId();
+		formatter % commIndexObj->GetIndex()
+		% 1
+		% nodeObj->GetNodeId();
 		exceptionObj.setErrorCode(OCFM_ERR_SUBINDEXID_NOT_FOUND);
 		exceptionObj.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -553,17 +556,17 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		{
 			boost::format formatter(kMsgAttributeValueInvalid);
 			formatter % ""
-				% ACTUALVALUE
-				% commIndexObj->GetIndex()
-				% 1
-				% nodeObj->GetNodeId()
-				% "non-empty";
+			% ACTUALVALUE
+			% commIndexObj->GetIndex()
+			% 1
+			% nodeObj->GetNodeId()
+			% "non-empty";
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 			exceptionObj.setErrorString(formatter.str());
 			LOG_FATAL() << formatter.str();
 			throw exceptionObj;
 		}
-		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetActualValue());
+		INT32 mappedNodeId = GetDecimalValue((char*) subIndexObj->GetActualValue());
 
 		if (pdoTypeVar == PDO_TPDO)
 		{
@@ -571,11 +574,11 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 			{
 				boost::format formatter(kMsgAttributeValueInvalid);
 				formatter % subIndexObj->GetActualValue()
-					% ACTUALVALUE
-					% commIndexObj->GetIndex()
-					% 1
-					% nodeObj->GetNodeId()
-					% "0";
+				% ACTUALVALUE
+				% commIndexObj->GetIndex()
+				% 1
+				% nodeObj->GetNodeId()
+				% "0";
 				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 				exceptionObj.setErrorString(formatter.str());
 				LOG_FATAL() << formatter.str();
@@ -592,15 +595,15 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 			{
 				StationType stnType = nodeObj->GetStationType();
 				if ((CHAINED == stnType)
-					&& (BROADCAST_NODEID == mappedNodeId))
+				        && (BROADCAST_NODEID == mappedNodeId))
 				{
-					subIndexObj->SetActualValue((char *) "0xF0");
+					subIndexObj->SetActualValue((char*) "0xF0");
 				}
 
 				if ((CHAINED != stnType)
-					&& (MN_NODEID == mappedNodeId))
+				        && (MN_NODEID == mappedNodeId))
 				{
-					subIndexObj->SetActualValue((char *) "0x0");
+					subIndexObj->SetActualValue((char*) "0x0");
 				}
 
 				if ((BROADCAST_NODEID != mappedNodeId))
@@ -624,28 +627,28 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		{
 			boost::format formatter(kMsgAttributeValueInvalid);
 			formatter % ""
-				% DEFAULTVALUE
-				% commIndexObj->GetIndex()
-				% 1
-				% nodeObj->GetNodeId()
-				% "non-empty";
+			% DEFAULTVALUE
+			% commIndexObj->GetIndex()
+			% 1
+			% nodeObj->GetNodeId()
+			% "non-empty";
 			exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 			exceptionObj.setErrorString(formatter.str());
 			LOG_FATAL() << formatter.str();
 			throw exceptionObj;
 		}
-		INT32 mappedNodeId = GetDecimalValue((char *) subIndexObj->GetDefaultValue());
+		INT32 mappedNodeId = GetDecimalValue((char*) subIndexObj->GetDefaultValue());
 		if (pdoTypeVar == PDO_TPDO)
 		{
 			if (BROADCAST_NODEID != mappedNodeId)
 			{
 				boost::format formatter(kMsgAttributeValueInvalid);
 				formatter % subIndexObj->GetDefaultValue()
-					% DEFAULTVALUE
-					% commIndexObj->GetIndex()
-					% 1
-					% nodeObj->GetNodeId()
-					% "0";
+				% DEFAULTVALUE
+				% commIndexObj->GetIndex()
+				% 1
+				% nodeObj->GetNodeId()
+				% "0";
 				exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 				exceptionObj.setErrorString(formatter.str());
 				LOG_FATAL() << formatter.str();
@@ -658,15 +661,15 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 			{
 				StationType stnType = nodeObj->GetStationType();
 				if ((CHAINED == stnType)
-					&& (BROADCAST_NODEID == mappedNodeId))
+				        && (BROADCAST_NODEID == mappedNodeId))
 				{
-					subIndexObj->SetActualValue((char *) "0xF0");
+					subIndexObj->SetActualValue((char*) "0xF0");
 				}
 
 				if ((CHAINED != stnType)
-					&& (MN_NODEID == mappedNodeId))
+				        && (MN_NODEID == mappedNodeId))
 				{
-					subIndexObj->SetActualValue((char *) "0x0");
+					subIndexObj->SetActualValue((char*) "0x0");
 				}
 
 				if ((BROADCAST_NODEID != mappedNodeId))
@@ -688,8 +691,8 @@ bool CheckPdoCommParam(PDOType pdoTypeVar, bool isBuild, Index *indexObj, IndexC
 		//Throw exception as Both default & Actual Target node id  value is not configured
 		boost::format formatter("Mapping communication parameter %#x/%#x on node %d: No nodeId configured.");
 		formatter % commIndexObj->GetIndex()
-			% 1
-			% nodeObj->GetNodeId();
+		% 1
+		% nodeObj->GetNodeId();
 		exceptionObj.setErrorCode(OCFM_ERR_INVALID_VALUE);
 		exceptionObj.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
@@ -712,31 +715,31 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, Index* indexObj)
 	}
 	else
 	{
-		switch(pdoTypeVal)
+		switch (pdoTypeVal)
 		{
 			case PDO_TPDO:
-					if( (strcmp(indexObj->GetPDOMapping(), "TPDO") == 0))
-					{
-						retVal = true;
-					}
-					else
-					{
-						//default pdo mapping ?
-					}
-					break;
+				if ((strcmp(indexObj->GetPDOMapping(), "TPDO") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					//default pdo mapping ?
+				}
+				break;
 			case PDO_RPDO:
-					if( (strcmp(indexObj->GetPDOMapping(), "RPDO") == 0))
-					{
-						retVal = true;
-					}
-					else
-					{
-						//default pdo mapping ?
-					}
-					break;
+				if ((strcmp(indexObj->GetPDOMapping(), "RPDO") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					//default pdo mapping ?
+				}
+				break;
 			default:
-					retVal = false;
-					break;
+				retVal = false;
+				break;
 		}
 	}
 	return retVal;
@@ -755,31 +758,31 @@ bool CheckForValidPDOMapping(PDOType pdoTypeVal, SubIndex* sidxObj)
 	}
 	else
 	{
-		switch(pdoTypeVal)
+		switch (pdoTypeVal)
 		{
 			case PDO_TPDO:
-					if( (strcmp(sidxObj->GetPDOMapping(), "TPDO") == 0))
-					{
-						retVal = true;
-					}
-					else
-					{
-						//default pdo mapping ?
-					}
-					break;
+				if ((strcmp(sidxObj->GetPDOMapping(), "TPDO") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					//default pdo mapping ?
+				}
+				break;
 			case PDO_RPDO:
-					if( (strcmp(sidxObj->GetPDOMapping(), "RPDO") == 0))
-					{
-						retVal = true;
-					}
-					else
-					{
-						//default pdo mapping ?
-					}
-					break;
+				if ((strcmp(sidxObj->GetPDOMapping(), "RPDO") == 0))
+				{
+					retVal = true;
+				}
+				else
+				{
+					//default pdo mapping ?
+				}
+				break;
 			default:
-					retVal = false;
-					break;
+				retVal = false;
+				break;
 		}
 	}
 	return retVal;
@@ -795,71 +798,71 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
 	strcpy(pdoMappingUpper, pdoMappingVal);
 	accessTypeUpper = ConvertToUpper(accessTypeUpper);
 	pdoMappingUpper = ConvertToUpper(pdoMappingUpper);
-	
-	switch(pdoTypeVal)
+
+	switch (pdoTypeVal)
 	{
 		case PDO_RPDO:
-		{
-			LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an RPDO.";
-			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
-				if((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
+				LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an RPDO.";
+				if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 				{
-					retVal = true;
+					if ((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						retVal = false;
+					}
+				}
+				else if ((strcmp(pdoMappingUpper, "RPDO") == 0))
+				{
+					if ((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						retVal = false;
+					}
 				}
 				else
 				{
 					retVal = false;
 				}
+				break;
 			}
-			else if ((strcmp(pdoMappingUpper, "RPDO") == 0))
-			{
-				if((strcmp(accessTypeUpper, "WO") == 0) || (strcmp(accessTypeUpper, "WRITE") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEOUTPUT") == 0))
-				{
-					retVal = true;
-				}
-				else
-				{
-					retVal = false;
-				}
-			}
-			else
-			{
-				retVal = false;
-			}
-			break;
-		}
 		case PDO_TPDO:
-		{
-			LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an TPDO.";
-			if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 			{
-				if((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
+				LOG_INFO() << "Checking for AccessType: " << accessTypeUpper << " with PDOmapping: " << pdoMappingUpper << " in an TPDO.";
+				if ((strcmp(pdoMappingUpper, "DEFAULT") == 0) || (strcmp(pdoMappingUpper, "OPTIONAL") == 0))
 				{
-					retVal = true;
+					if ((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						retVal = false;
+					}
+				}
+				else if ((strcmp(pdoMappingUpper, "TPDO") == 0))
+				{
+					if ((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
+					{
+						retVal = true;
+					}
+					else
+					{
+						retVal = false;
+					}
 				}
 				else
 				{
 					retVal = false;
 				}
+				break;
 			}
-			else if ((strcmp(pdoMappingUpper, "TPDO") == 0))
-			{
-				if((strcmp(accessTypeUpper, "RO") == 0) || (strcmp(accessTypeUpper, "READ") == 0) || (strcmp(accessTypeUpper, "RW") == 0) || (strcmp(accessTypeUpper, "READWRITE") == 0) || (strcmp(accessTypeUpper, "READWRITEINPUT") == 0))
-				{
-					retVal = true;
-				}
-				else
-				{
-					retVal = false;
-				}
-			}
-			else
-			{
-				retVal = false;
-			}
-			break;
-		}
 		default:
 			retVal = false;
 			break;

@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -63,8 +63,8 @@ using namespace std;
 /**
  ******************************************************************************************************
  \class			IndexCollection
- \brief			This class has definition of Index collection for all datatypes		
- 
+ \brief			This class has definition of Index collection for all datatypes
+
  ******************************************************************************************************/
 class IndexCollection
 {
@@ -75,7 +75,7 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the 0x14XX, 0x16XX, 0x18XX, 0x1AXX Index objects in the collection list and update the count
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -83,7 +83,7 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the PIO Index objects in the collection list and update the count
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -99,9 +99,9 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to add an Index object to a collection list and update the count
-		 
+
 		 \param		objIndex	Class variable of Index for object index
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -109,9 +109,9 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to delete the Index object at given position in the collection list and update the count
-		 
+
 		 \param		indexPosition	Integer to hold index id
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -119,7 +119,7 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the number of indices in the collection list
-		 
+
 		 \return	INT32
 		 \deprecated Replaced by IndexCollection::Size().
 		 */
@@ -128,9 +128,9 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Index object at the given position in the collection list
-		 
+
 		 \param		indexPosition    Integer to hold index count
-		 
+
 		 \return	Index*
 		 \note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
 		 */
@@ -139,9 +139,9 @@ class IndexCollection
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Index object whose indexId matches the given parameter in the collection list
-		 
+
 		 \param		indexId    Character pointer to the indexId value
-		 
+
 		 \return	Index*
 		 \note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
 		 */
@@ -150,10 +150,10 @@ class IndexCollection
 
 		/************************************************************************
 		\brief Query if this collection contains an Index object with the given index.
-		
+
 		\param index    16bit index of the Index to query.
-		\param subIndex	8bit index of the SubIndex to query. Supply 0 to query for Index alone.		
-		
+		\param subIndex	8bit index of the SubIndex to query. Supply 0 to query for Index alone.
+
 		\retval true If index exists, has no subIndices and subIndex 0 was queried.
 		\retval true If index exists, has subIndices and queried subIndex exists.
 		\retval false In all other cases.
@@ -163,9 +163,9 @@ class IndexCollection
 
 		/************************************************************************
 		\brief Gets a pointer to an Index by its index.
-		
+
 		\param 16bit index of the Index.
-		
+
 		\return Pointer to the Index-Object or NULL if not found.
 		\note The returned pointer will possibly be invalidated by adding/removing Index-Objects after obtaining it.
 		\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
@@ -174,9 +174,9 @@ class IndexCollection
 
 		/************************************************************************
 		\brief Gets a reference to an Index by its index.
-		
+
 		\param 16bit index of the Index.
-		
+
 		\return Reference to the Index-Object.
 		\throws ocfmRetCode ConfiguratorError OCFM_ERR_INDEXID_NOT_FOUND if index is not in the collection.
 		\note The returned reference will possibly be invalidated by adding/removing Index-Objects after obtaining it.

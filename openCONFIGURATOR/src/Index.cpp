@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -70,7 +70,7 @@
 /* Constructor */
 
 /**
- 
+
 
  */
 
@@ -83,7 +83,7 @@ Index::Index(void) :
 /* Destructor */
 
 /**
- 
+
 
  */
 
@@ -136,9 +136,9 @@ SubIndex* Index::GetSubIndexbyIndexValue(const char* subIndexId)
 {
 	SubIndex* objSidx = NULL;
 
-	if( NULL != subIndexId)
+	if (NULL != subIndexId)
 	{
-		char *sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
+		char* sidxIdUpper = new char[strlen(subIndexId) + STR_ALLOC_BUFFER];
 		strcpy(sidxIdUpper, subIndexId);
 		sidxIdUpper = ConvertToUpper(sidxIdUpper);
 
@@ -150,7 +150,7 @@ SubIndex* Index::GetSubIndexbyIndexValue(const char* subIndexId)
 			{
 				if (objSidx->GetIndexValue() != NULL)
 				{
-					char *objSidxIdUpper = new char[strlen(objSidx->GetIndexValue()) + STR_ALLOC_BUFFER];
+					char* objSidxIdUpper = new char[strlen(objSidx->GetIndexValue()) + STR_ALLOC_BUFFER];
 					strcpy(objSidxIdUpper, objSidx->GetIndexValue());
 					objSidxIdUpper = ConvertToUpper(objSidxIdUpper);
 					if (0 == strcmp(objSidxIdUpper, sidxIdUpper))
@@ -189,7 +189,7 @@ void Index::UpdateArraySubObjects()
 		objSidx = &subIndexCollection[loopCount];
 		//Check for null , alignment changes
 		if ((NULL != objSidx->GetIndexValue())
-				&& 0 == (strcmp(objSidx->GetIndexValue(), "00")))
+		        && 0 == (strcmp(objSidx->GetIndexValue(), "00")))
 			continue;
 		objSidx->SetDataTypeST(this->GetDataType());
 	}
@@ -215,8 +215,8 @@ SubIndex* Index::GetSubIndexPtr(const UINT32 subIndex)
 {
 	vector<SubIndex>::iterator it = this->subIndexCollection.begin();
 	for (;
-		it != this->subIndexCollection.end() && (it->GetIndex() != subIndex);
-		++it)
+	        it != this->subIndexCollection.end() && (it->GetIndex() != subIndex);
+	        ++it)
 	{}
 	if (it == this->subIndexCollection.end())
 		return NULL;

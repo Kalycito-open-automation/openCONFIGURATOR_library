@@ -22,7 +22,7 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
+ 3. Neither the name of Kalycito Infotech Private Limited nor the names of
  its contributors may be used to endorse or promote products derived
  from this software without prior written permission. For written
  permission, please contact info@kalycito.com.
@@ -66,7 +66,7 @@ using namespace std;
  ******************************************************************************************************
  \class			NetworkManagement
  \brief			This class handles Feature collection of each node present in the network
- 
+
  ******************************************************************************************************/
 class NetworkManagement
 {
@@ -77,15 +77,15 @@ class NetworkManagement
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to calculate the maximum PDO count value from the PDOTPDOChannels parameter in MN xdd and validate if it exceeds the maximum value 256 as in Powerlink Specification Document
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
 		void CalculateMaxPDOCount();
 		/*****************************************************************************/
 		/**
-		 \brief		This function shall be used to delete all features from the collection list 
-		 
+		 \brief		This function shall be used to delete all features from the collection list
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -93,9 +93,9 @@ class NetworkManagement
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to add the given Feature object to the collection list
-		 
+
 		 \param		objFeature		Structure Variable of Feature to add a feature to collection list
-		 
+
 		 \return	void
 		 */
 		/*****************************************************************************/
@@ -111,7 +111,7 @@ class NetworkManagement
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the number of features in the collection list
-		 
+
 		 \return	UINT32
 		 */
 		/*****************************************************************************/
@@ -119,9 +119,9 @@ class NetworkManagement
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the Feature object at the given position in the collection list
-		 
+
 		 \param		featurePosition  	Unsigned integer to hold count value
-		 
+
 		 \return	Feature*
 		 */
 		/*****************************************************************************/
@@ -129,7 +129,7 @@ class NetworkManagement
 		/*****************************************************************************/
 		/**
 		 \brief		This function shall be used to return the value of the Feature object in the collection list whose type and name match the given parameters
-		 
+
 		 \param		featureType		Enum variable of FeatureType to hold the feature type
 		 \param		featureName		Character pointer to the feature name
 
@@ -138,7 +138,7 @@ class NetworkManagement
 		/*****************************************************************************/
 		char* GetNwMgmtFeatureValue(FeatureType featureType, const char* featureName);
 
-		
+
 
 	private:
 		vector<Feature> FeatureCollection;
