@@ -1379,15 +1379,12 @@ void ProcessNode(xmlTextReaderPtr reader, NodeType nodeType, INT32 nodePos);
 /*****************************************************************************/
 ocfmRetCode ValidateXMLFile(const xmlDocPtr doc, const char *schema_filename);
 
-/**
+/*****************************************************************************
  \brief		Handle an error which occurs in XML schema validation
 
- \param		ctx		Error context
- \param		msg		Error message
-
- \return	char*	Return error message
- */
-/*****************************************************************************/
+ \param[in]		ctx		Error context
+ \param[out]	msg		Error message
+*****************************************************************************/
 void HandleSchemaValidationError(void*, const char *msg, ...);
 
 namespace openCONFIGURATOR

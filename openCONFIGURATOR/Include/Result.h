@@ -85,10 +85,12 @@ namespace openCONFIGURATOR
 			const std::string kMsgEmptyArgument = "Argument(s) '%s' must not be empty.";
 			const std::string kMsgMappingInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping is enabled (NumberOfEntries != 0) but mapping entry is zero. Expected valid mapping entry.";
 
-			/** @addtogroup apireturn @{ */
-			/************************************************************************
+			/** \addtogroup apireturn
+			 * @{
+			 */
+			/**
 			\brief Error codes returned by the %openCONFIGURATOR API-Functions within Result.
-			************************************************************************/
+			*/
 			DLLEXPORT enum ErrorCode 
 			{ 
 				SUCCESS = 0, /**< Operation completed successfully. */
@@ -152,11 +154,11 @@ namespace openCONFIGURATOR
 				MAPPING_INVALID /**< An enabled mapping entry is empty. */
 			};
 
-			/************************************************************************
+			/**
 			\brief	Result returned by all functions of the %openCONFIGURATOR API.
 			
 					Contains an ErrorCode and a descriptive error string.
-			************************************************************************/
+			*/
 			class DLLEXPORT Result
 			{
 
@@ -171,9 +173,9 @@ namespace openCONFIGURATOR
 				ErrorCode GetErrorCode() const;
 				const std::string& GetErrorString() const;
 
-				/************************************************************************
+				/**
 				\return <code>True</code> if operation was successful, <code>false</code> otherwise.
-				************************************************************************/
+				*/
 				bool IsSuccessful() const;
 
 			};// Result

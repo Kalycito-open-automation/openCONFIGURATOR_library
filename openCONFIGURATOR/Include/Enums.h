@@ -136,9 +136,9 @@ typedef unsigned long int ULONG;
 /******************************************************************************
  Enumerations
  *****************************************************************************/
-/** @addtogroup odapi
-*  @{
-*/
+/** \addtogroup odapi
+ * @{
+ */
 /** 
 * ObjectType is used to denote what kind of object is at that particular index within the Object Dictionary
 */
@@ -235,9 +235,9 @@ enum IEC_Datatype
 	WSTRING			/**< WSTRING to hold multi byte strings */
 };
 
-/** @addtogroup odapi
-*  @{
-*/
+/** \addtogroup odapi
+ * @{
+ */
 /** 
 * List of available attributes for the index or subindex.
 */
@@ -393,11 +393,13 @@ DLLEXPORT enum ConfiguratorError
 	OCFM_ERR_MAPPING_INVALID
 };
 
-/** @addtogroup imexport @{ */
-/************************************************************************
+/** \addtogroup imexport 
+ * @{
+ */
+/**
  \brief List of available process image representations.
  \author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
-************************************************************************/
+*/
 DLLEXPORT enum OutputLanguage {
 	C, /**< ANSI C*/
 	CSHARP, /**< Microsoft C Sharp*/
@@ -414,13 +416,15 @@ namespace openCONFIGURATOR
 		{
 			namespace AccessType
 			{
-				/** @addtogroup xddapi @{ */
-				/************************************************************************
+				/** \addtogroup xddapi 
+				 * @{
+				 */
+				/**
 				\brief	Accesstype for objects/subobjects of the ObjectDictionary.
 
 						See EPSG DS 301, v1.1.0, v1.2.0
 				\author David Puffer, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
-				************************************************************************/
+				*/
 				enum AccessType 
 				{
 					INVALID,
@@ -440,13 +444,15 @@ namespace openCONFIGURATOR
 			
 			namespace PlkDataType
 			{
-				/** @addtogroup xddapi @{ */
-				/************************************************************************
+				/** \addtogroup xddapi
+				 * @{
+				 */
+				/**
 				\brief	Powerlink data types
 
 						See EPSG DS 301, v1.1.0, v1.2.0
 				\author Christoph Rücker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
-				************************************************************************/
+				*/
 				enum PlkDataType
 				{
 					BOOLEAN = 0x0001,

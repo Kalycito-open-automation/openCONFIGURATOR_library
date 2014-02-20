@@ -150,7 +150,7 @@ bool IsValidAccessTypeForPdo(PDOType pdoTypeVal, const char* pdoMappingVal, cons
 /**
  \brief		Normalizes the value field and updates the base index Obj with the normalized value
 
- \param[in/out]		idxObj		Class pointer of BaseIndex to get its properties
+ \param[in,out]		idxObj		Class pointer of BaseIndex to get its properties
  \param[in]			attrType	Enum to hold the Attribute type of the index
  */
 void NormalizeAttributeValue(BaseIndex *idxObj, AttributeType attrType);

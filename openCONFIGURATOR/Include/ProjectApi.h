@@ -17,8 +17,10 @@ namespace openCONFIGURATOR
 	{
 		namespace API
 		{
-			/** @addtogroup projectapi @{ */
-			/************************************************************************
+			/** \addtogroup projectapi
+			 * @{
+			 */
+			/**
 			\brief	Create a new %openCONFIGURATOR project.
 
 			\param[in] projectName	Name of the new project.
@@ -26,33 +28,33 @@ namespace openCONFIGURATOR
 			\param[in] pathToMNXdd	path to MN-XDD (if empty, a default MN-XDD will be used).
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result NewProject(const std::string projectName, const std::string projectPath, const std::string pathToMNXdd = "");
 
-			/************************************************************************
+			/**
 			\brief	Save %openCONFIGURATOR project.
 
 					Updates the project file with the current configuration and saves all imported XDDs as XDCs.
 
 			\warning Not implemented.
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject(void);
 
-			/************************************************************************
+			/**
 			\brief	Close project and free allocated resources.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject(void);
 
-			/************************************************************************
+			/**
 			\brief	Open existing %openCONFIGURATOR project.
 
 			\param[in] projectFile Projekt to open.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string projectFile);
 			/** @} */
 		}

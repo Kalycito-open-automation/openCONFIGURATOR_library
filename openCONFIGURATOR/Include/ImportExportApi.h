@@ -22,8 +22,10 @@ namespace openCONFIGURATOR
 	{
 		namespace API
 		{ 
-			/** @addtogroup imexport @{ */
-			/************************************************************************
+			/** \addtogroup imexport
+			 * @{
+			 */
+			/**
 			\brief	Generate the process image description for a POWERLINK network.
 					
 			Generate a process image description file in the programming language specified by the user. 
@@ -33,10 +35,10 @@ namespace openCONFIGURATOR
 			\param[in] fileName	File name for the process image code file (will default to "PI.*" if empty).
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateProcessImageDescription(const OutputLanguage lang, const std::string outputPath, const std::string fileName);
 
-			/************************************************************************
+			/**
 			\brief	Generate the stack configuration file for a POWERLINK network.
 
 			Generate a POWERLINK stack configuration file in the CDC file format (Concise Device Configuration) in text and binary format.
@@ -45,7 +47,7 @@ namespace openCONFIGURATOR
 			\param[in] fileName	File name for the stack configuration file (will default to "mnobd.*" if empty).
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
-			************************************************************************/
+			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string outputPath, const std::string fileName);
 			/** @} */
 		}
