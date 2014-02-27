@@ -586,7 +586,8 @@ namespace openCONFIGURATOR
 					NMTCNSoC2PReq
 				};
 				/** @} */
-				static const std::string PlkFeatureStrings[] = {
+				static const std::string PlkFeatureStrings[] =
+				{
 					"CFMConfigManager",
 					"DLLErrBadPhysMode",
 					"DLLErrMacBuffer",
@@ -711,6 +712,28 @@ namespace openCONFIGURATOR
 				VERIFYSERIALNUMBER
 			};
 			/** @} */
+		}
+		namespace ProjectFile
+		{
+			namespace ViewType
+			{
+				/** \addtogroup projectfileapi
+				* @{
+				*/
+				/**
+				\brief	%openCONFIGURATOR project view type
+
+				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+					*/
+
+				DLLEXPORT enum ViewType
+				{
+					BASIC = 0, /**< Basic View Mode */
+					ADVANCED /**< Advanced View Mode */
+				};
+				/** @} */
+			}
+
 		}
 	}
 }

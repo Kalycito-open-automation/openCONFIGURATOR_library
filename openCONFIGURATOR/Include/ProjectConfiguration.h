@@ -19,13 +19,19 @@
 #include "Internal.h"
 #include "Validation.h"
 #include "BoostShared.h"
+#include "Result.h"
+#include "Enums.h"
 
+#include <map>
 #include <libxml/xmlwriter.h>
 #include <libxml/encoding.h>
 #include <libxml/xmlreader.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
+
+using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::Library::ProjectFile::ViewType;
 
 class ProjectConfiguration
 {
@@ -69,6 +75,22 @@ class ProjectConfiguration
 		openCONFIGURATOR::Library::ErrorHandling::Result SaveProject(void);
 		void ResetConfiguration(void);
 
+		Result AddPath(const std::string id, const std::string path);
+		Result GetPath(const std::string id, std::string& pathResult);
+		Result DeletePath(const std::string id);
+
+		Result AddViewSetting(ViewType viewType, const std::string name, const std::string value);
+		Result GetViewSetting(ViewType viewType, const std::string name, std::string& value);
+		Result DeleteViewSetting(ViewType viewType, const std::string name);
+		Result SetActiveViewSettings(ViewType viewType);
+		Result GetActiveViewSettings(ViewType& viewType);
+
+		Result AddAutoGenerationSetting(const std::string type, const std::string name, const std::string value);
+		Result GetAutoGenerationSetting(const std::string name, const std::string type, std::string& settingValue);
+		Result DeleteAutoGenerationSetting(const string id, const string name);
+		Result SetActiveAutoGenerationSetting(const string id);
+		Result GetActiveAutoGenerationSetting(std::string& activeAutoGenSetting);
+
 		~ProjectConfiguration(void);
 
 	private:
@@ -82,7 +104,7 @@ class ProjectConfiguration
 		void ProcessPath(xmlTextReaderPtr xmlReader);
 		void ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader);
 		void ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader);
-		void ProcessAutogenerationSetting(xmlTextReaderPtr xmlReader);
+		void ProcessViewSettings(xmlTextReaderPtr xmlReader);
 		void ProcessGenerator(xmlTextReaderPtr xmlReader);
 
 		void CreateProjectFolder(void);
@@ -139,7 +161,8 @@ class ProjectConfiguration
 		std::string creationDate;
 		
 		bool generateMNOBD;
-		std::string autogenerationSettingID;
+
+		std::string currentAutogenerationSetting;
 
 		//Project paths
 		boost::filesystem::path defaultOutputPath;
@@ -150,6 +173,80 @@ class ProjectConfiguration
 		boost::optional<UINT32> asyncMTU;
 		boost::optional<UINT32> multiplexedCycleLength;
 		boost::optional<UINT32> prescaler;
+
+		//Project Settings
+		class Setting
+		{
+			public:
+				Setting():
+					name(""),
+					value("")
+				{}
+
+				Setting(std::string name, std::string value):
+					name(name),
+					value(value)
+				{}
+
+				std::string GetName()
+				{
+					return this->name;
+				}
+
+				std::string GetValue()
+				{
+					return this->value;
+				}
+
+			private:
+				std::string name;
+				std::string value;
+
+};
+
+		class ViewSetting : public Setting
+		{
+			public:
+				ViewSetting(ViewType type, std::string name, std::string value) : Setting(name, value), viewType(type)
+				{}
+
+
+				ViewType GetViewType()
+				{
+					return this->viewType;
+				}
+
+			private:
+				ViewType viewType;
+		};
+
+		class AutoGenSetting : public Setting
+		{
+			public:
+				AutoGenSetting(std::string id, std::string name, std::string value) : Setting(name, value), id(id)
+				{}
+
+				std::string GetAutoGenId()
+				{
+					return this->id;
+				}
+			private:
+				std::string id;
+		};
+
+		class Path : public Setting
+		{
+			public:
+				Path(std::string name, std::string value) : Setting(name, value)
+				{}
+		};
+
+		ViewType activeViewSettingType;
+		std::string activeAutogenerationSettingsID;
+		
+		std::vector<ViewSetting> viewSettings;
+		std::vector<Path> pathSettings;
+		std::vector<AutoGenSetting> autogenerationSettings;
 };
 
 #endif // PROJECTCONFIGURATION_H_

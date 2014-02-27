@@ -202,6 +202,22 @@ namespace BR.FS.CdcBuilder
                     return 5468;
                 case ErrorCode.PARAMETER_VALUE_INVALID:
                     return 5469;
+                case ErrorCode.PATH_EXISTS:
+                    return 5470;
+                case ErrorCode.PATH_DOES_NOT_EXIST:
+                    return 5471;
+                case ErrorCode.VIEW_SETTING_EXISTS:
+                    return 5472;
+                case ErrorCode.VIEW_SETTING_DOES_NOT_EXIST:
+                    return 5473;
+                case ErrorCode.VIEW_SETTINGS_DOES_NOT_EXIST:
+                    return 5474;
+                case ErrorCode.AUTO_GEN_SETTING_EXISTS:
+                    return 5475;
+                case ErrorCode.AUTO_GEN_SETTING_DOES_NOT_EXIST:
+                    return 5476;
+                case ErrorCode.AUTO_GEN_SETTINGS_DOES_NOT_EXIST:
+                    return 5477;
                 default:
                     return 0;
             }

@@ -86,6 +86,15 @@ namespace openCONFIGURATOR
 			const std::string kMsgParameterValueInvalid = "Node %d: For parameter '%d' the given value '%s' is invalid.";
 			const std::string kMsgParameterValueNotSet = "Node %d: Parameter '%d' value is not set.";
 			const std::string kMsgMappingInvalid = "Mapping-Object 0x%X/0x%X on node %d: Mapping is enabled (NumberOfEntries != 0) but mapping entry is zero. Expected valid mapping entry.";
+			const std::string kMsgPathExists = "The Path '%s' already exists in the openCONFIGUGRATOR project.";
+			const std::string kMsgPathDoesNotExist = "The Path '%s' does not exist in the openCONFIGUGRATOR project.";
+			const std::string kMsgViewSettingExists = "The ViewSetting '%s' with Type '%s' already exists in the openCONFIGUGRATOR project.";
+			const std::string kMsgViewSettingDoesNotExist = "The ViewSetting '%s' with Type '%s' does not exist in the openCONFIGUGRATOR project.";
+			const std::string kMsgViewSettingsDoesNotExist = "The ViewSettings with Type '%s' does not exists in the openCONFIGUGRATOR project.";
+			const std::string kMsgAutoGenSettingExists = "The AutoGeneration Setting '%s' within Group ID '%s' and already exists in the openCONFIGUGRATOR project.";
+			const std::string kMsgAutoGenSettingDoesNotExist = "The AutoGeneration Setting '%s' within Group ID '%s' does not exist in the openCONFIGUGRATOR project.";
+			const std::string kMsgAutoGenSettingsDoesNotExist = "The AutoGenerationSettings with ID '%s' does not exists in the openCONFIGUGRATOR project.";
+
 
 			/** \addtogroup apireturn
 			 * @{
@@ -155,7 +164,15 @@ namespace openCONFIGURATOR
 				NO_PROJECT_LOADED, /**< No project loaded. */
 				MAPPING_INVALID, /**< An enabled mapping entry is empty. */
 				PARAMETER_VALUE_NOT_SET, /**< A specific parameter value is not set. */
-				PARAMETER_VALUE_INVALID /**< A value is invalid for a specific parameter. */
+				PARAMETER_VALUE_INVALID, /**< A value is invalid for a specific parameter. */
+				PATH_EXISTS, /**< A path already exists in the project configuration. */
+				PATH_DOES_NOT_EXIST, /**< A path does not exists in the project configuration. */
+				VIEW_SETTING_EXISTS, /**< A view setting exists in the project configuration. */
+				VIEW_SETTING_DOES_NOT_EXIST, /**< A view setting does not exist in the project configuration. */
+				VIEW_SETTINGS_DOES_NOT_EXIST, /**< A view settings group does not exist in the project configuration. */
+				AUTO_GEN_SETTING_EXISTS, /**< An auto generation setting already exists in the project configuration. */
+				AUTO_GEN_SETTING_DOES_NOT_EXIST, /**< An auto generation setting does not exist in the project configuration. */
+				AUTO_GEN_SETTINGS_DOES_NOT_EXIST /**< An auto generation settings group does not exist in the project configuration. */
 			};
 
 			/**

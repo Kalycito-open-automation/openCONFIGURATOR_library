@@ -55,6 +55,58 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string projectFile);
+
+			/**
+			\brief	Add a path setting to the %openCONFIGURATOR project.
+
+			This setting will be stored in the PathSettings section in  the %openCONFIGURATOR project file.
+
+			\param[in] id of the path.
+			\param[in] path itself.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddPath(const std::string id, const std::string path);
+			
+			/**
+			\brief	Get a path setting from the %openCONFIGURATOR project.
+
+			\param[in] id of the path.
+			\param[out] path to be retrieved.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetPath(const std::string id, std::string& path);
+
+			/**
+			\brief	Delete a path setting from the %openCONFIGURATOR project.
+
+			\param[in] id of the path.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeletePath(const std::string id);
+
+			/**
+			\brief	Set the active auto calculation configuration.
+
+			Currently the %openCONFIGURATOR library supports generating the MN mapping and node assignements (ID: "all") or generating nothing (ID: "none"). 
+
+			\param[in] id of the configuration.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetActiveAutoCalculationConfig(const std::string id);
+			
+			
+			/**
+			\brief	Get the active auto calculation configuration.
+
+			\param[out] id of the configuration to be retrieved. 
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveAutoCalculationConfig(std::string& id);
 			/** @} */
 		}
 	}

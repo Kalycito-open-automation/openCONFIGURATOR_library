@@ -75,6 +75,7 @@
 	<Compile Include="ErrorCode.cs" />
 	<Compile Include="NodeParameter.cs" />
 	<Compile Include="PlkDataType.cs" />
+	<Compile Include="ViewType.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPER.cs" />
     <Compile Include="openCONFIGURATORcsharpWRAPPERPINVOKE.cs" />
     <Compile Include="OutputLanguage.cs" />
