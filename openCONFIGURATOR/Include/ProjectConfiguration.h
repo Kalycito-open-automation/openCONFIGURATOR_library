@@ -18,12 +18,22 @@
 #include "NodeCollection.h"
 #include "Internal.h"
 #include "Validation.h"
+#include "Result.h"
+#include "Enums.h"
+#include "AutoGenSetting.h"
+#include "Path.h"
+#include "ViewSetting.h"
 
+#include <map>
 #include <libxml/xmlwriter.h>
 #include <libxml/encoding.h>
 #include <libxml/xmlreader.h>
 
 #include "BoostShared.h"
+
+using namespace openCONFIGURATOR::Library::ErrorHandling;
+using namespace openCONFIGURATOR::GUI::ProjectFile::ViewType;
+using namespace openCONFIGURATOR::GUI::ProjectFile::Setting;
 
 class ProjectConfiguration
 {
@@ -60,6 +70,22 @@ class ProjectConfiguration
 		ocfmRetCode LoadProject(const std::string& projectFile);
 		void ResetConfiguration(void);
 
+		Result AddPath(const std::string& id, const std::string& path);
+		Result GetPath(const std::string& id, std::string& pathResult);
+		Result DeletePath(const std::string& id);
+
+		Result AddViewSetting(const ViewType& viewType, const std::string& name, const std::string& value);
+		Result GetViewSetting(const ViewType& viewType, const std::string& name, std::string& value);
+		Result DeleteViewSetting(const ViewType& viewType, const std::string& name);
+		Result SetActiveViewSettings(const ViewType& viewType);
+		Result GetActiveViewSettings(ViewType& viewType);
+
+		Result AddAutoGenerationSetting(const std::string& type, const std::string& name, const std::string& value);
+		Result GetAutoGenerationSetting(const std::string& name, const std::string& type, std::string& settingValue);
+		Result DeleteAutoGenerationSetting(const string& id, const string& name);
+		Result SetActiveAutoGenerationSetting(const string& id);
+		Result GetActiveAutoGenerationSetting(std::string& activeAutoGenSetting);
+
 		~ProjectConfiguration(void);
 
 	private:
@@ -73,7 +99,7 @@ class ProjectConfiguration
 		void ProcessPath(xmlTextReaderPtr xmlReader);
 		void ProcessNetworkConfiguration(xmlTextReaderPtr xmlReader);
 		void ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader);
-		void ProcessAutogenerationSetting(xmlTextReaderPtr xmlReader);
+		void ProcessViewSettings(xmlTextReaderPtr xmlReader);
 
 		/*
 		void SynchronizeMultiplexedCycleLength(void);
@@ -119,7 +145,8 @@ class ProjectConfiguration
 		std::string projectFile;
 		std::string projectPath;
 		bool generateMNOBD;
-		std::string autogenerationSettingID;
+
+		std::string currentAutogenerationSetting;
 
 		//Project paths
 		std::string defaultOutputPath;
@@ -129,6 +156,14 @@ class ProjectConfiguration
 		boost::optional<UINT32> asyncMTU;
 		boost::optional<UINT32> multiplexedCycleLength;
 		boost::optional<UINT32> prescaler;
+
+		//Project Settings
+		ViewType activeViewSettingType;
+		std::string activeAutogenerationSettingsID;
+
+		std::vector<ViewSetting> viewSettings;
+		std::vector<Path> pathSettings;
+		std::vector<AutoGenSetting> autogenerationSettings;
 };
 
 #endif // PROJECTCONFIGURATION_H_

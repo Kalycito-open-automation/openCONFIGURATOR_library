@@ -67,6 +67,10 @@ Module includes the openCONFIGURATOR API functions
 	@{
 		\brief Module handles the project related manipulations in the %openCONFIGURATOR library.
 	@} 
+	@defgroup projectfileapi Project File Module
+	@{
+		\brief Module handles the project file related manipulations in the %openCONFIGURATOR library.
+	@}
 	@defgroup xddapi XDD Module
 	@{
 		\brief Module handles XDD related functions of the %openCONFIGURATOR library.

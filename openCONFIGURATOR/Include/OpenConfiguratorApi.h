@@ -14,6 +14,7 @@
 #include "XddApi.h"
 #include "UtilityApi.h"
 #include "ProjectApi.h"
+#include "ProjectFileApi.h"
 #include "ImportExportApi.h"
 
 #endif

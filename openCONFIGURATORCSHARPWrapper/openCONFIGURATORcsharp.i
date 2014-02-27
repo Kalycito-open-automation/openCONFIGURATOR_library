@@ -29,6 +29,9 @@
 %apply bool& OUTPUT { bool& exists };
 
 %template(VectorWrapper) std::vector<unsigned int>;
+%typemap(cstype) openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType & "out ViewType"
+%typemap(csin) openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType & %{out $csinput%}  
+%typemap(imtype) openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType & "out ViewType"
 
 %ignore MN_NODEID;
 %ignore BROADCAST_NODEID;
@@ -71,6 +74,7 @@
 %ignore GetPlkFeatureDefaultValue(const int enumVal);
 %ignore PlkFeatureStrings;
 %ignore PlkFeatureDefaultValues;
+%ignore C_SDO_SEQULAYERTIMEOUT;
 
 %include "../openCONFIGURATOR/Include/Exports.h"
 %include "../openCONFIGURATOR/Include/Enums.h"
@@ -143,8 +147,16 @@ namespace openCONFIGURATOR
 				NO_PROJECT_LOADED,
 				MAPPING_INVALID,
 				PARAMETER_VALUE_NOT_SET,
-				PARAMETER_VALUE_INVALID
-			};
+				PARAMETER_VALUE_INVALID, 
+				PATH_EXISTS, 
+				PATH_DOES_NOT_EXIST,
+				VIEW_SETTING_EXISTS,
+				VIEW_SETTING_DOES_NOT_EXIST,
+				VIEW_SETTINGS_DOES_NOT_EXIST,
+				AUTO_GEN_SETTING_EXISTS,
+				AUTO_GEN_SETTING_DOES_NOT_EXIST,
+				AUTO_GEN_SETTINGS_DOES_NOT_EXIST
+			};		
 
 			class DLLEXPORT Result
 			{
@@ -212,6 +224,19 @@ namespace openCONFIGURATOR{
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType type, unsigned int& size);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const unsigned int nodeId, const openCONFIGURATOR::Library::ObjectDictionary::PlkFeature::PlkFeature feature, std::string& featureValue);
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddPath(const std::string id, const std::string path);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetPath(const std::string id, std::string& path);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeletePath(const std::string id);
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddViewSetting(const openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType viewType, const std::string name, const std::string value);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetViewSetting(openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType viewType, const std::string name, std::string& value);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteViewSetting(const openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType viewType, const std::string name);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetActiveView(const openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType viewType);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveView(openCONFIGURATOR::GUI::ProjectFile::ViewType::ViewType& viewType);
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetActiveAutoCalculationConfig(const std::string activeAutoGenerationSetting);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveAutoCalculationConfig(std::string& activeAutoGenerationSetting);
 		}
 	}
 }

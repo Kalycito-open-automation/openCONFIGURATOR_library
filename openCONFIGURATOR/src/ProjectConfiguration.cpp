@@ -12,6 +12,8 @@
 using namespace std;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::Utilities;
+using namespace openCONFIGURATOR::GUI::ProjectFile::ViewType;
+using namespace openCONFIGURATOR::GUI::ProjectFile::Setting;
 
 const string PROJECT_XML_ROOT_ELEMENT = "openCONFIGURATORProject";
 const string PROJECT_XML_VERSION_ATTRIBUTE = "version";
@@ -24,6 +26,11 @@ const string PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE = "defaultOutputPath";
 const string PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT = "ProjectConfiguration";
 const string PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE = "activeAutoGenerationSetting";
 const string PROJECT_XML_PROJECT_CONFIGURATION_PROJECT_NAME_ATTRIBUTE = "name";
+
+const string PROJECT_XML_IDECONFIGURATION_ELEMENT = "IDEConfiguration";
+const string PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT = "ViewSettings";
+const string PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE = "type";
+const string PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE = "activeViewSetting";
 
 const string PROJECT_XML_SETTING_ELEMENT = "Setting";
 const string PROJECT_XML_SETTING_NAME_ATTRIBUTE = "name";
@@ -67,22 +74,32 @@ const string PROJECT_XML_NODE_MN_TRANSMITSPRES_ATTRIBUTE = "transmitsPRes";
 const string PROJECT_XML_VALUE_TRUE = "true";
 const string PROJECT_XML_VALUE_FALSE = "false";
 
+const string PROJECT_AUTOGEN_SETTING_ALL = "all";
+const string PROJECT_AUTOGEN_SETTING_NONE = "none";
+
+const string PROJECT_VIEW_SETTING_BASIC = "BASIC";
+const string PROJECT_VIEW_SETTING_ADVANCED = "ADVANCED";
+
 ProjectConfiguration ProjectConfiguration::instance;
 
-ProjectConfiguration::ProjectConfiguration(void) :
+ProjectConfiguration::ProjectConfiguration() :
 	initialized(false),
 	projectFile(),
 	projectPath(),
 	generateMNOBD(true),
-	autogenerationSettingID(),
 	defaultOutputPath(),
 	cycleTime(),
 	asyncMTU(),
 	multiplexedCycleLength(),
-	prescaler()
+	prescaler(),
+	activeViewSettingType(BASIC),
+	viewSettings(),
+	pathSettings(),
+	activeAutogenerationSettingsID(PROJECT_AUTOGEN_SETTING_ALL),
+	autogenerationSettings()
 {}
 
-void ProjectConfiguration::ResetConfiguration(void)
+void ProjectConfiguration::ResetConfiguration()
 {
 	initialized = false;
 
@@ -96,15 +113,21 @@ void ProjectConfiguration::ResetConfiguration(void)
 	multiplexedCycleLength = boost::none;
 	prescaler = boost::none;
 
-	autogenerationSettingID = "";
+	activeViewSettingType = BASIC;
+	activeAutogenerationSettingsID = PROJECT_AUTOGEN_SETTING_ALL;
+
+	viewSettings.clear();
+	autogenerationSettings.clear();
+	pathSettings.clear();
+
 }
 
-ProjectConfiguration::~ProjectConfiguration(void)
+ProjectConfiguration::~ProjectConfiguration()
 {
 
 }
 
-ProjectConfiguration& ProjectConfiguration::GetInstance(void)
+ProjectConfiguration& ProjectConfiguration::GetInstance()
 {
 	return ProjectConfiguration::instance;
 }
@@ -119,7 +142,7 @@ void ProjectConfiguration::SetDefaultOutputPath(const string& defaultOutputPath)
 	this->defaultOutputPath = defaultOutputPath;
 }
 
-bool ProjectConfiguration::IsInitialized(void) const
+bool ProjectConfiguration::IsInitialized() const
 {
 	return initialized;
 }
@@ -129,7 +152,7 @@ void ProjectConfiguration::SetInitialized(bool initialized)
 	this->initialized = initialized;
 }
 
-bool ProjectConfiguration::GetGenerateMNOBD(void) const
+bool ProjectConfiguration::GetGenerateMNOBD() const
 {
 	return generateMNOBD;
 }
@@ -139,7 +162,7 @@ void ProjectConfiguration::SetGenerateMNOBD(bool generateMNOBD)
 	this->generateMNOBD = generateMNOBD;
 }
 
-const string& ProjectConfiguration::GetProjectPath(void) const
+const string& ProjectConfiguration::GetProjectPath() const
 {
 	return projectPath;
 }
@@ -149,7 +172,7 @@ void ProjectConfiguration::SetProjectPath(const string& projectPath)
 	this->projectPath = projectPath;
 }
 
-const string& ProjectConfiguration::GetProjectFile(void) const
+const string& ProjectConfiguration::GetProjectFile() const
 {
 	return projectFile;
 }
@@ -159,7 +182,7 @@ void ProjectConfiguration::SetProjectFile(const string& projectFile)
 	this->projectFile = projectFile;
 }
 
-const boost::optional<UINT32>& ProjectConfiguration::GetCycleTime(void) const
+const boost::optional<UINT32>& ProjectConfiguration::GetCycleTime() const
 {
 	return this->cycleTime;
 }
@@ -169,7 +192,7 @@ void ProjectConfiguration::SetCycleTime(UINT32 cycleTime)
 	this->cycleTime = cycleTime;
 }
 
-const boost::optional<UINT32>& ProjectConfiguration::GetAsyncMTU(void) const
+const boost::optional<UINT32>& ProjectConfiguration::GetAsyncMTU() const
 {
 	return this->asyncMTU;
 }
@@ -179,7 +202,7 @@ void ProjectConfiguration::SetAsyncMTU(UINT32 asyncMTU)
 	this->asyncMTU = asyncMTU;
 }
 
-const boost::optional<UINT32>& ProjectConfiguration::GetMultiplexedCycleLength(void) const
+const boost::optional<UINT32>& ProjectConfiguration::GetMultiplexedCycleLength() const
 {
 	return this->multiplexedCycleLength;
 }
@@ -189,7 +212,7 @@ void ProjectConfiguration::SetMultiplexedCycleLength(UINT32 multiplexedCycleLeng
 	this->multiplexedCycleLength = multiplexedCycleLength;
 }
 
-const boost::optional<UINT32>& ProjectConfiguration::GetPrescaler(void) const
+const boost::optional<UINT32>& ProjectConfiguration::GetPrescaler() const
 {
 	return this->prescaler;
 }
@@ -288,9 +311,11 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 
 					if (!xmlAttributeName.empty()
 					        && !xmlAttributeValue.empty()
-					        && xmlAttributeValue == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
+					        && xmlAttributeName == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
 					{
-						autogenerationSettingID = xmlAttributeValue;
+						this->activeAutogenerationSettingsID = xmlAttributeValue;
+						if(this->activeAutogenerationSettingsID == PROJECT_AUTOGEN_SETTING_ALL)
+							SetGenerateMNOBD(true);
 					}
 				}
 			}
@@ -300,6 +325,38 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 			if (xmlTextReaderHasAttributes(xmlReader) == 1)
 			{
 				ProcessAutogenerationSettings(xmlReader);
+			}
+		}
+		else if (xmlName == PROJECT_XML_IDECONFIGURATION_ELEMENT)
+		{
+			if (xmlTextReaderHasAttributes(xmlReader) == 1)
+			{
+				while (xmlTextReaderMoveToNextAttribute(xmlReader))
+				{
+					const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+					                                ? (const char*) xmlTextReaderConstName(xmlReader)
+					                                : "";
+					const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+					                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+					                                 : "";
+
+					if (!xmlAttributeName.empty()
+					        && !xmlAttributeValue.empty()
+					        && xmlAttributeName == PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE)
+					{
+						if(xmlAttributeValue == PROJECT_VIEW_SETTING_BASIC)
+							this->activeViewSettingType = BASIC;
+						else if(xmlAttributeValue == PROJECT_VIEW_SETTING_ADVANCED)
+							this->activeViewSettingType = ADVANCED;
+					}
+				}
+			}
+		}
+		else if (xmlName == PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT)
+		{
+			if (xmlTextReaderHasAttributes(xmlReader) == 1)
+			{
+				ProcessViewSettings(xmlReader);
 			}
 		}
 		else if (xmlName == PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT)
@@ -326,7 +383,6 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 
 void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlReader)
 {
-	string currentAutogenerationSetting;
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
 		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
@@ -343,56 +399,99 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 			currentAutogenerationSetting = xmlAttributeValue;
 		}
 	}
-	//Process the selected AutogenerationSetting
-	if (currentAutogenerationSetting == this->autogenerationSettingID)
+	//Process the AutogenerationSetting
+	while (xmlTextReaderNodeType(xmlReader) != 1)
+		xmlTextReaderRead(xmlReader);
+
+	xmlNodePtr node = xmlTextReaderCurrentNode(xmlReader);
+	while (node != NULL)
 	{
-		INT32 retVal = xmlTextReaderRead(xmlReader);
-		while (retVal == 1)
+		string autogenerationSettingName;
+		string autogenerationSettingValue;
+		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 0)
 		{
-			const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
-			                       ? (const char*) xmlTextReaderConstName(xmlReader)
-			                       : "";
-			if (xmlName == PROJECT_XML_SETTING_ELEMENT)
+			xmlAttr* attribute = node->properties;
+			while (attribute && attribute->name && attribute->children)
 			{
-				if (xmlTextReaderHasAttributes(xmlReader) == 1)
+				if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
 				{
-					ProcessAutogenerationSetting(xmlReader);
+				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+				autogenerationSettingName = (char*) value;
+				xmlFree(value);
 				}
-				retVal = xmlTextReaderRead(xmlReader);
+				else if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
+				{
+				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+				autogenerationSettingValue = (char*) value;
+				xmlFree(value);
+				}
+				attribute = attribute->next;
 			}
-			else
-			{
-				retVal = 0;
-			}
+			this->AddAutoGenerationSetting(currentAutogenerationSetting, autogenerationSettingName, autogenerationSettingValue);
 		}
-		if (retVal != 0)
-		{
-			xmlCleanupParser();
-			xmlMemoryDump();
-			throw ocfmRetCode(OCFM_ERR_PARSE_XML);
-		}
+		node = xmlNextElementSibling(node);
 	}
+
 }
 
-void ProjectConfiguration::ProcessAutogenerationSetting(xmlTextReaderPtr xmlReader)
+void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 {
+	ViewType currentViewSetting;
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
-		const string xmlName = ((const char*) xmlTextReaderConstName(xmlReader))
-		                       ? (const char*) xmlTextReaderConstName(xmlReader)
-		                       : "";
-		//const xmlChar* xmlValue = xmlTextReaderConstValue(xmlReader);
+		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
+		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                                 : "";
 
-		if (xmlName == PROJECT_XML_SETTING_NAME_ATTRIBUTE)
+		if (!xmlAttributeName.empty()
+		        && !xmlAttributeValue.empty()
+		        && xmlAttributeName == PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE)
 		{
-			//Process Setting attribute Name
-		}
-		else if (xmlName == PROJECT_XML_SETTING_VALUE_ATTRIBUTE)
-		{
-			//Process Setting attribute Value
+			if(xmlAttributeValue == PROJECT_VIEW_SETTING_BASIC)
+				currentViewSetting = BASIC;
+			else if(xmlAttributeValue == PROJECT_VIEW_SETTING_ADVANCED)
+				currentViewSetting = ADVANCED;
 		}
 	}
+
+	//Process the ViewSetting
+
+	while (xmlTextReaderNodeType(xmlReader) != 1)
+		xmlTextReaderRead(xmlReader);
+
+	xmlNodePtr node = xmlTextReaderCurrentNode(xmlReader);
+	while (node != NULL)
+	{
+		string settingNameStr;
+		string settingValueStr;
+		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 0)
+		{
+			xmlAttr* attribute = node->properties;
+			while (attribute && attribute->name && attribute->children)
+			{
+				if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
+				{
+				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+				settingNameStr = (char*) value;
+				xmlFree(value);
+				}
+				else if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
+				{
+				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+				settingValueStr = (char*) value;
+				xmlFree(value);
+				}
+				attribute = attribute->next;
+			}
+			this->AddViewSetting(currentViewSetting, settingNameStr, settingValueStr);
+		}
+		node = xmlNextElementSibling(node);
+	}
 }
+
 
 // TODO: ProcessProjectNode?
 void ProjectConfiguration::ProcessNode(xmlTextReaderPtr xmlReader)
@@ -661,22 +760,24 @@ void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 	        && !xmlAttributeValue.empty()
 	        && xmlAttributeName == PROJECT_XML_PATH_ID_ATTRIBUTE)
 	{
-		if (xmlAttributeValue == PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE)
+		string pathId = xmlAttributeValue;
+
+		xmlTextReaderMoveToNextAttribute(xmlReader);
+		xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		                   ? (const char*) xmlTextReaderConstName(xmlReader)
+		                   : "";
+		xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		                    ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                    : "";
+		if (!xmlAttributeName.empty()
+		        && xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE
+		        && !xmlAttributeValue.empty())
 		{
-			xmlTextReaderMoveToNextAttribute(xmlReader);
-			xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-			                   ? (const char*) xmlTextReaderConstName(xmlReader)
-			                   : "";
-			xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-			                    ? (const char*) xmlTextReaderConstValue(xmlReader)
-			                    : "";
-			if (!xmlAttributeName.empty()
-			        && !xmlAttributeValue.empty()
-			        && xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE)
-			{
-				this->SetDefaultOutputPath(xmlAttributeValue);
-			}
+			this->AddPath(pathId, string(xmlAttributeValue));
+			if(pathId == PROJECT_XML_PATH_DEFAULT_OUTPUT_ATTRIBUTE)
+				this->SetDefaultOutputPath(string(xmlAttributeValue));
 		}
+
 	}
 }
 
@@ -724,7 +825,7 @@ void ProjectConfiguration::ProcessNetworkConfiguration(xmlTextReaderPtr xmlReade
 // Shouldn't a cycleLength defined in the MN-XDD just overwrite the setting in the project-settings?
 // TODO: If a setting within the MN-XDD overwrites a setting from the project-file, there should be an INFO log-entry.
 // FIXME: What happens with MN and CN-Settings defined in the project-file AND the respective XDD?
-void ProjectConfiguration::SynchronizeMultiplexedCycleLength(void)
+void ProjectConfiguration::SynchronizeMultiplexedCycleLength()
 {
 	stringstream convertString;
 	INT32 indexPos = 0;
@@ -813,7 +914,7 @@ void ProjectConfiguration::SynchronizeMultiplexedCycleLength(void)
 }
 
 // FIXME: Why??
-void ProjectConfiguration::SynchronizeCycleTime(void)
+void ProjectConfiguration::SynchronizeCycleTime()
 {
 	stringstream convertString;
 	INT32 indexPos = 0;
@@ -857,7 +958,7 @@ void ProjectConfiguration::SynchronizeCycleTime(void)
 }
 
 // FIXME: Why??
-void ProjectConfiguration::SynchronizeAsyncMtu(void)
+void ProjectConfiguration::SynchronizeAsyncMtu()
 {
 	stringstream convertString;
 	INT32 indexPos = 0;
@@ -906,7 +1007,7 @@ void ProjectConfiguration::SynchronizeAsyncMtu(void)
 }
 
 // FIXME: Why??
-void ProjectConfiguration::SynchronizePrescaler(void)
+void ProjectConfiguration::SynchronizePrescaler()
 {
 	stringstream convertString;
 	INT32 indexPos = 0;
@@ -1050,3 +1151,215 @@ void ProjectConfiguration::OverrideNodeConfiguration(Node& node,
 	}
 	*/
 }
+//Path setting manipulation
+Result ProjectConfiguration::AddPath(const string& id, const string& path)
+{
+	for (std::vector<Path>::iterator it = this->pathSettings.begin(); it != this->pathSettings.end(); ++it)
+	{
+		if (it->GetName() == id)
+		{
+			boost::format formatter(kMsgPathExists);
+			formatter % id;
+			return Result(PATH_EXISTS, formatter.str());
+		}
+	}
+	this->pathSettings.push_back(Path(id, path));
+	return Result();
+}
+
+Result ProjectConfiguration::GetPath(const string& id, std::string& pathResult)
+{
+	for (std::vector<Path>::iterator it = this->pathSettings.begin(); it != this->pathSettings.end(); ++it)
+	{
+		if (it->GetName() == id)
+		{
+			pathResult = it->GetValue();
+			return Result();
+		}
+	}
+	boost::format formatter(kMsgPathDoesNotExist);
+	formatter % id;
+	return Result(PATH_DOES_NOT_EXIST, formatter.str());
+}
+
+Result ProjectConfiguration::DeletePath(const string& id)
+{
+	std::vector<Path>::iterator toDelete;
+	bool found = false;
+	for (toDelete = this->pathSettings.begin(); toDelete != this->pathSettings.end(); ++toDelete)
+	{
+		if (toDelete->GetName() == id)
+		{
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+	{
+		boost::format formatter(kMsgPathDoesNotExist);
+		formatter % id;
+		return Result(PATH_DOES_NOT_EXIST, formatter.str());
+	}
+
+	this->pathSettings.erase(toDelete);
+	return Result();
+}
+
+//View Setting manipulation
+Result ProjectConfiguration::AddViewSetting(const ViewType& viewType, const string& name, const string& value)
+{
+	for (std::vector<ViewSetting>::iterator it = this->viewSettings.begin(); it != this->viewSettings.end(); ++it)
+	{
+		if (it->GetName() == name && it->GetViewType() == viewType)
+		{
+			boost::format formatter(kMsgViewSettingExists);
+				formatter % name,
+				formatter % viewType;
+				return Result(VIEW_SETTING_EXISTS, formatter.str());
+		}
+	}
+	this->viewSettings.push_back(ViewSetting(viewType, name, value));
+	return Result();
+}
+Result ProjectConfiguration::GetViewSetting(const ViewType& viewType, const string& name, string& value)
+{
+	for (std::vector<ViewSetting>::iterator it = this->viewSettings.begin(); it != this->viewSettings.end(); ++it)
+	{
+		if (it->GetName() == name && it->GetViewType() == viewType)
+		{
+			value = it->GetValue();
+			return Result();
+		}
+	}
+	boost::format formatter(kMsgViewSettingDoesNotExist);
+	formatter % name,
+	formatter % viewType;
+	return Result(VIEW_SETTING_DOES_NOT_EXIST, formatter.str());
+}
+Result ProjectConfiguration::DeleteViewSetting(const ViewType& viewType, const std::string& name)
+{
+	std::vector<ViewSetting>::iterator toDelete;
+	bool found = false;
+	for (toDelete = this->viewSettings.begin(); toDelete != this->viewSettings.end(); ++toDelete)
+	{
+		if (toDelete->GetViewType() == viewType && toDelete->GetName() == name)
+		{
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+	{
+		boost::format formatter(kMsgViewSettingDoesNotExist);
+		formatter % name,
+		formatter % viewType;
+		return Result(VIEW_SETTING_DOES_NOT_EXIST, formatter.str());
+	}
+
+	this->viewSettings.erase(toDelete);
+	return Result();
+}
+Result ProjectConfiguration::SetActiveViewSettings(const ViewType& viewType)
+{
+	for (std::vector<ViewSetting>::iterator it = this->viewSettings.begin(); it != this->viewSettings.end(); ++it)
+	{
+		if (it->GetViewType() == viewType)
+		{
+			this->activeViewSettingType = viewType;
+			return Result();
+		}
+	}
+
+	boost::format formatter(kMsgViewSettingsDoesNotExist);
+	formatter % viewType;
+	return Result(VIEW_SETTINGS_DOES_NOT_EXIST, formatter.str());
+}
+Result ProjectConfiguration::GetActiveViewSettings(ViewType& viewType)
+{
+	viewType = this->activeViewSettingType;
+	return Result();
+}
+
+//Autogeneration Setting manipulation
+Result ProjectConfiguration::AddAutoGenerationSetting(const string& id, const string& name, const string& value)
+{
+	for (std::vector<AutoGenSetting>::iterator it = this->autogenerationSettings.begin(); it != this->autogenerationSettings.end(); ++it)
+	{
+		if (it->GetName() == name && it->GetAutoGenId() == id)
+		{
+			boost::format formatter(kMsgAutoGenSettingExists);
+			formatter % name,
+			formatter % id;
+			return Result(AUTO_GEN_SETTING_EXISTS, formatter.str());
+		}
+	}
+	this->autogenerationSettings.push_back(AutoGenSetting(id, name, value));
+	return Result();
+}
+Result ProjectConfiguration::GetAutoGenerationSetting(const string& id, const string& name, std::string& settingValue)
+{
+	for (std::vector<AutoGenSetting>::iterator it = this->autogenerationSettings.begin(); it != this->autogenerationSettings.end(); ++it)
+	{
+		if (it->GetName() == name && it->GetAutoGenId() == id)
+		{
+			settingValue = it->GetValue();
+			return Result();
+		}
+
+	}
+	boost::format formatter(kMsgAutoGenSettingDoesNotExist);
+	formatter % name,
+	formatter % id;
+	return Result(AUTO_GEN_SETTING_DOES_NOT_EXIST, formatter.str());
+}
+
+Result ProjectConfiguration::DeleteAutoGenerationSetting(const string& id, const string& name)
+{
+	std::vector<AutoGenSetting>::iterator toDelete;
+	bool found = false;
+	for (toDelete = this->autogenerationSettings.begin(); toDelete != this->autogenerationSettings.end(); ++toDelete)
+	{
+		if (toDelete->GetName() == name && toDelete->GetAutoGenId() == id)
+		{
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+	{
+		boost::format formatter(kMsgAutoGenSettingDoesNotExist);
+		formatter % name,
+		formatter % id;
+		return Result(AUTO_GEN_SETTING_DOES_NOT_EXIST, formatter.str());
+	}
+
+	this->autogenerationSettings.erase(toDelete);
+	return Result();
+
+}
+
+Result ProjectConfiguration::SetActiveAutoGenerationSetting(const string& id)
+{
+	//for (std::vector<AutoGenSetting>::iterator it = this->autogenerationSettings.begin(); it != this->autogenerationSettings.end(); ++it)
+	//{
+	//	if (it->GetAutoGenId() == id)
+	//	{
+			this->activeAutogenerationSettingsID = id;
+			if(this->activeAutogenerationSettingsID == PROJECT_AUTOGEN_SETTING_ALL)
+				SetGenerateMNOBD(true);
+			else if(this->activeAutogenerationSettingsID == PROJECT_AUTOGEN_SETTING_NONE)
+				SetGenerateMNOBD(false);
+			return Result();
+	//	}
+	//}
+	//boost::format formatter(kMsgAutoGenSettingsDoesNotExist);
+	//formatter % id;
+	//return Result(AUTO_GEN_SETTINGS_DOES_NOT_EXIST, formatter.str());
+}
+Result ProjectConfiguration::GetActiveAutoGenerationSetting(std::string& activeAutoGenSetting)
+{
+	activeAutoGenSetting = this->activeAutogenerationSettingsID;
+	return Result();
+}
+
+

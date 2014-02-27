@@ -139,6 +139,113 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
+
+			DLLEXPORT Result AddPath(const std::string id, const std::string path)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						if(id.empty() || path.empty())
+							return Result(ARGUMENT_INVALID_EMPTY, "ID or Path argument must not be empty.");
+						return ProjectConfiguration::GetInstance().AddPath(id, path);
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+			DLLEXPORT Result GetPath(const std::string id, std::string& path)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						if(id.empty())
+							return Result(ARGUMENT_INVALID_EMPTY, "ID argument must not be empty.");
+						return ProjectConfiguration::GetInstance().GetPath(id, path);
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
+			DLLEXPORT Result DeletePath(const std::string id)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						if(id.empty())
+							return Result(ARGUMENT_INVALID_EMPTY, "ID argument must not be empty.");
+						return ProjectConfiguration::GetInstance().DeletePath(id);
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
+			DLLEXPORT Result SetActiveAutoCalculationConfig(const std::string activeAutoGenerationSetting)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						if(activeAutoGenerationSetting.empty())
+							return Result(ARGUMENT_INVALID_EMPTY, "ID argument must not be empty.");
+						return ProjectConfiguration::GetInstance().SetActiveAutoGenerationSetting(activeAutoGenerationSetting);
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
+			DLLEXPORT Result GetActiveAutoCalculationConfig(std::string& activeAutoGenerationSetting)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						return ProjectConfiguration::GetInstance().GetActiveAutoGenerationSetting(activeAutoGenerationSetting);
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

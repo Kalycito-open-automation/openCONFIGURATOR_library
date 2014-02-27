@@ -491,7 +491,7 @@ namespace openCONFIGURATOR
 				/**
 				\brief	Powerlink features
 
-				THE SEQUENCE OF THE ENUM MUST NOT CHANGE 
+				THE SEQUENCE OF THE ENUM MUST NOT CHANGE
 
 						See EPSG DS 301, v1.1.0, v1.2.0
 				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
@@ -802,6 +802,33 @@ namespace openCONFIGURATOR
 			};
 			/** @} */
 		}
+	}
+	namespace GUI
+	{
+		namespace ProjectFile
+		{
+			namespace ViewType
+			{
+				/** \addtogroup projectfileapi
+				* @{
+				*/
+				/**
+				\brief	%openCONFIGURATOR project view type
+
+				\author Christoph R&uuml;cker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+					*/
+
+				DLLEXPORT enum ViewType
+				{
+					BASIC = 0, /**< Basic View Mode */
+					ADVANCED /**< Advanced View Mode */
+				};
+				/** @} */
+			}
+
+		}
+
+
 	}
 }
 
