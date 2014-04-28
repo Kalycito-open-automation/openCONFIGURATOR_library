@@ -73,8 +73,10 @@
 #define PRES_DEFAULT_PAYLOAD	36
 /** Defines the Poll request default payload value. */
 #define PREQ_DEFAULT_PAYLOAD	36
-/** Defines the SDO sequence layer timeout default value. */
+/** SDO sequence layer timeout default value. */
 #define C_SDO_SEQULAYERTIMEOUT "15000"
+/** PDORPDOChannels feature default value. */
+#define PDORPDOChannels 256
 
 /** Defines the length of the string for which the number of entries value for an MN in the CDC. */
 #define OFFSET_NUM_ENTRIES_MN		0
@@ -104,8 +106,6 @@
 
 /** Defines the total no of characters for the value in 1F22 index. */
 #define OFFSET_FIRST_INDEX_IN_1F22		11
-/** Defines the maximum number of cross traffic stations allowed for a controlled node. */
-#define MAX_CN_CROSS_TRAFFIC_STN		3
 
 /** Defines the index id for the NMT_MultiplCycleAssign_AU8 object.  */
 #define MULTIPL_CYCLE_ASSIGN_OBJECT			"1F9B"
