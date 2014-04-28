@@ -87,6 +87,7 @@
 #include "../Include/Logging.h"
 #include "../Include/Result.h"
 #include "../Include/BoostShared.h"
+#include "../Include/NetworkManagement.h"
 
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 using namespace openCONFIGURATOR::Library::Utilities;
@@ -2986,6 +2987,11 @@ void UpdateCNVisibleNode(Node* nodeObj)
 	    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
 	        (char*) "1F8D"));
 
+	int maxRPDOChannels = 0;
+	char* maxRPDOChannelsFeature = nodeObj->GetNetworkManagement()->GetNwMgmtFeatureValue(GENERAL_FEATURES, "PDORPDOChannels");
+	if(maxRPDOChannelsFeature)
+		maxRPDOChannels = atoi(maxRPDOChannelsFeature);
+
 	for (INT32 idxLC = 0; idxLC < pdoIndexCollObj->GetNumberofIndexes();
 	        idxLC++)
 	{
@@ -3027,14 +3033,13 @@ void UpdateCNVisibleNode(Node* nodeObj)
 							        && !(CheckIfValueZero(
 							                 (char*) sidxObj2->GetActualValue())))
 							{
-								crossTxStnCnt++;
-								//FIXME: Check whether there are enough receive objects for the cross traffic
-								if (MAX_CN_CROSS_TRAFFIC_STN < crossTxStnCnt)
+								crossTxStnCnt++;	
+								if (maxRPDOChannels < crossTxStnCnt)
 								{
 									boost::format formatter(kMsgCrossTrafficStationLimitExceeded);
 									formatter % nodeObj->GetNodeId()
 									% crossTxStnCnt
-									% MAX_CN_CROSS_TRAFFIC_STN;
+									% maxRPDOChannels;
 									exceptionObj.setErrorCode(OCFM_ERR_CN_EXCEEDS_CROSS_TRAFFIC_STN);
 									exceptionObj.setErrorString(formatter.str());
 									LOG_FATAL() << formatter.str();
@@ -3045,14 +3050,16 @@ void UpdateCNVisibleNode(Node* nodeObj)
 								//copy the MN objects
 								if (CheckIfHex((char*) sidxObj2->GetActualValue()))
 								{
-									mappedNodeId = SubString(mappedNodeId, sidxObj2->GetActualValue(), 2, 2);
+									mappedNodeId = SubString(mappedNodeId, sidxObj2->GetActualValue(), 2, strlen(sidxObj2->GetActualValue()) - 2);
 								}
 								else
 								{
 									strcpy(mappedNodeId, sidxObj2->GetActualValue());
 								}
 
-								mappedNodeId = PadLeft(mappedNodeId, '0', 2);
+								if(strlen(mappedNodeId) == 1)
+									mappedNodeId = PadLeft(mappedNodeId, '0', 2);
+
 
 								if (true == IsCNNodeAssignmentValid(nodeObj))
 								{
@@ -3746,7 +3753,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 			                         (char*) sidxObj->GetAccessType());
 
 			if ((sidxObj->GetActualValue() != NULL)
-			        && (sidxObj->GetFlagIfIncludedCdc() == true)
+					&& (sidxObj->GetFlagIfIncludedCdc() == true)
 			        && ((true == includeAccess) || (true == mappingPDO))
 			        && (true == IsDefaultActualNotEqual(sidxObj)))
 			{

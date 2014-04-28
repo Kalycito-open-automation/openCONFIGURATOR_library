@@ -103,7 +103,7 @@
 /** Defines the total no of characters for the value in 1F22 index. */
 #define OFFSET_FIRST_INDEX_IN_1F22		11
 /** Defines the maximum number of cross traffic stations allowed for a controlled node. */
-#define MAX_CN_CROSS_TRAFFIC_STN		3
+//#define MAX_CN_CROSS_TRAFFIC_STN		3
 
 /** Defines the index id for the NMT_MultiplCycleAssign_AU8 object.  */
 #define MULTIPL_CYCLE_ASSIGN_OBJECT			"1F9B"
