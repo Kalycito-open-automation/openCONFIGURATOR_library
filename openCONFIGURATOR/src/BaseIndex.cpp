@@ -98,7 +98,7 @@ BaseIndex::BaseIndex(void) :
 	pdoMapping(NOT_DEFINED),
 	nodeId(0),
 	parameterIndex(-1),
-	includeInCDC(false)
+	includeInCDC(true)
 {}
 
 /****************************************************************************************************/
