@@ -241,16 +241,20 @@ void SetIndexAttributes(xmlTextReaderPtr reader, Index* indexObj, bool& hasPDO)
 	{
 		indexObj->SetUniqueIDRef((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
+	//else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
+	//{
+	//	if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
+	//	{
+	//		indexObj->SetFlagIfIncludedCdc(false);
+	//	}
+	//	else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
+	//	{
+	//		indexObj->SetFlagIfIncludedCdc(true);
+	//	}
+	//}
+	else
 	{
-		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
-		{
-			indexObj->SetFlagIfIncludedCdc(false);
-		}
-		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
-		{
-			indexObj->SetFlagIfIncludedCdc(true);
-		}
+		LOG_ERROR() << "Unknown XML-Attribute '" << name << "'.";
 	}
 }
 
@@ -318,17 +322,17 @@ void SetSubIndexAttributes(xmlTextReaderPtr reader, SubIndex* sidxObj)
 	{
 		sidxObj->SetUniqueIDRef((char*) value);
 	}
-	else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
-	{
-		if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
-		{
-			sidxObj->SetFlagIfIncludedCdc(false);
-		}
-		else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
-		{
-			sidxObj->SetFlagIfIncludedCdc(true);
-		}
-	}
+	//else if (!strcmp(ConvertToUpper((char*) name), "CDCFLAG"))
+	//{
+	//	if (!strcmp(ConvertToUpper((char*) value), "FALSE"))
+	//	{
+	//		sidxObj->SetFlagIfIncludedCdc(false);
+	//	}
+	//	else if (!strcmp(ConvertToUpper((char*) value), "TRUE"))
+	//	{
+	//		sidxObj->SetFlagIfIncludedCdc(true);
+	//	}
+	//}
 	else
 	{
 		LOG_ERROR() << "Unknown XML-Attribute '" << name << "'.";

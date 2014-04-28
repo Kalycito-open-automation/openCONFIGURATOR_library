@@ -10414,16 +10414,15 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	INT32 indexPos;
 
 	indexCollObj = nodeObj->GetIndexCollection();
-	/* 1006*/
-	//strcpy(indexId, "1006");
-	//exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
 
 	/*  1300*/
 	strcpy(indexId, "1300");
 	exceptionObj = IfIndexExists(MN_NODEID, MN, indexId, &indexPos);
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
-		SetBasicIndexAttributes(MN_NODEID, MN, indexId, (char*) "5000",
+		Index idx = indexCollObj->GetIndexRef(0x1300);
+		if(idx.GetActualValue() == NULL)
+			SetBasicIndexAttributes(MN_NODEID, MN, indexId, C_SDO_SEQULAYERTIMEOUT,
 		                        (char*) "SDO_SequLayerTimeout_U32", true);
 	}
 
@@ -10433,21 +10432,12 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
-		strcpy(sidxId, "00");
-		SetSIdxValue(indexId, sidxId, (char*) "3", indexCollObj,
+		if(indexObj->GetSubIndexRef(0x3).GetActualValue() == NULL)
+		{
+			strcpy(sidxId, "03");
+			SetSIdxValue(indexId, sidxId, (char*) "40", indexCollObj,
 		             nodeObj->GetNodeId(), MN, false);
-		/* Set subindex value 40 or 0000028 */
-		strcpy(sidxId, "01");
-		SetSIdxValue(indexId, sidxId, (char*) "40", indexCollObj,
-		             nodeObj->GetNodeId(), MN, false);
-		strcpy(sidxId, "02");
-		SetSIdxValue(indexId, sidxId, (char*) "40", indexCollObj,
-		             nodeObj->GetNodeId(), MN, false);
-		strcpy(sidxId, "03");
-		SetSIdxValue(indexId, sidxId, (char*) "40", indexCollObj,
-		             nodeObj->GetNodeId(), MN, false);
+		}
 	}
 
 	/*  1C09*/

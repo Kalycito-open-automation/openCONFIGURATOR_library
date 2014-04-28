@@ -73,6 +73,8 @@
 #define PRES_DEFAULT_PAYLOAD	36
 /** Defines the Poll request default payload value. */
 #define PREQ_DEFAULT_PAYLOAD	36
+/** Defines the SDO sequence layer timeout default value. */
+#define C_SDO_SEQULAYERTIMEOUT "15000"
 
 /** Defines the length of the string for which the number of entries value for an MN in the CDC. */
 #define OFFSET_NUM_ENTRIES_MN		0
