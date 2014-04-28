@@ -2532,83 +2532,83 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 				/*
 				if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED8") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = UCHAR_MAX;
+				lowerLimit = 0;
+				upperLimit = UCHAR_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED16") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = UINT_MAX;
+				lowerLimit = 0;
+				upperLimit = UINT_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED24") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = 16777215;
+				lowerLimit = 0;
+				upperLimit = 16777215;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED32") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = 4294967295;
+				lowerLimit = 0;
+				upperLimit = 4294967295;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED40") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = 1099511627775;
+				lowerLimit = 0;
+				upperLimit = 1099511627775;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED48") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = 281474976710655;
+				lowerLimit = 0;
+				upperLimit = 281474976710655;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED56") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = 72057594037927935;
+				lowerLimit = 0;
+				upperLimit = 72057594037927935;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"UNSIGNED64") == 0)
 				{
-					lowerLimit = 0;
-					upperLimit = ULLONG_MAX;
+				lowerLimit = 0;
+				upperLimit = ULLONG_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER8") == 0)
 				{
-					lowerLimit = SCHAR_MIN;
-					upperLimit = SCHAR_MAX;
+				lowerLimit = SCHAR_MIN;
+				upperLimit = SCHAR_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER16") == 0)
 				{
-					lowerLimit = SHRT_MIN;
-					upperLimit = SHRT_MAX;
+				lowerLimit = SHRT_MIN;
+				upperLimit = SHRT_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER24") == 0)
 				{
-					lowerLimit = -8388608;
-					upperLimit = 8388607;
+				lowerLimit = -8388608;
+				upperLimit = 8388607;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER32") == 0)
 				{
-					lowerLimit = LONG_MIN;
-					upperLimit = LONG_MAX;
+				lowerLimit = LONG_MIN;
+				upperLimit = LONG_MAX;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER40") == 0)
 				{
-					lowerLimit = -549755813888;
-					upperLimit = 549755813887;
+				lowerLimit = -549755813888;
+				upperLimit = 549755813887;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER48") == 0)
 				{
-					lowerLimit = -140737488355328;
-					upperLimit = 140737488355327;
+				lowerLimit = -140737488355328;
+				upperLimit = 140737488355327;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER56") == 0)
 				{
-					lowerLimit = -36028797018963968;
-					upperLimit = 36028797018963967;
+				lowerLimit = -36028797018963968;
+				upperLimit = 36028797018963967;
 				}
 				else if(strcmp(StringToUpper(dtObj.dataTypeName),"INTEGER64") == 0)
 				{
-					lowerLimit = LLONG_MIN;
-					upperLimit = LLONG_MAX;
+				lowerLimit = LLONG_MIN;
+				upperLimit = LLONG_MAX;
 				}
 				*/
 				//check hex values
@@ -2623,8 +2623,8 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 					/*
 					if(!(number >= lowerLimit && number <=upperLimit))
 					{
-						limitError.OCFMException(OCFM_ERR_DATA_TYPE_RANGE_EXCEED);
-						throw limitError;
+					limitError.OCFMException(OCFM_ERR_DATA_TYPE_RANGE_EXCEED);
+					throw limitError;
 					}
 					*/
 					// Allocate space for normalized hex-value: '0x' + hexValue + null-termination
@@ -2646,13 +2646,49 @@ void NormalizeAttributeValue(BaseIndex* const idxObj, AttributeType attrType)
 				//Check data type attributes with non hex values
 				/*else
 				{
-					int number = (int)strtol(tempActVal, NULL, 10);
-					if(!(number >= lowerLimit && number <=upperLimit))
-					{
-						limitError.OCFMException(OCFM_ERR_DATA_TYPE_RANGE_EXCEED);
-						throw limitError;
-					}
+				int number = (int)strtol(tempActVal, NULL, 10);
+				if(!(number >= lowerLimit && number <=upperLimit))
+				{
+				limitError.OCFMException(OCFM_ERR_DATA_TYPE_RANGE_EXCEED);
+				throw limitError;
+				}
 				}*/
+			}
+
+
+			const char* tmpValue = NULL;
+			if (attrType == ACTUALVALUE)
+				tmpValue = idxObj->GetActualValue();
+			else
+				tmpValue = idxObj->GetDefaultValue();
+
+			const string value(tmpValue);
+
+			//Convert the IP_ADDRESS to hex value
+			if (strcmp(dtObj.dataTypeName, "IP_ADDRESS") == 0)
+			{
+				if(value.compare(0, 2, "0x") != 0 && value.compare(0, 2, "0X") != 0)
+				{
+					string completeValue = "0x";
+					vector<std::string> ipAddressParts;
+					boost::split(ipAddressParts, value, boost::is_any_of("."));
+
+					for (vector<string>::iterator it = ipAddressParts.begin(); it != ipAddressParts.end(); ++it)
+					{
+						stringstream stream;
+
+						stream << std::hex << atol(it->c_str());
+						string tempNr = stream.str();
+						if (tempNr.size() == 1)
+							tempNr.insert(0, "0");
+						completeValue += tempNr;
+					}
+
+					if (attrType == ACTUALVALUE)
+						idxObj->SetActualValue(completeValue.c_str());
+					else
+						idxObj->SetDefaultValue(completeValue.c_str());
+				}
 			}
 		}
 	}
