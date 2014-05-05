@@ -2185,46 +2185,21 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					}
 					else
 					{
-						char actValue[64] = { 0 };
-
-						if (true == isStringDt)
+						if (isStringDt)
 						{
-							strcpy(actValue, (char*) sidxObj->GetActualValue());
-							strcpy(actValue,
-							       ConvertStringToHex((char*) actValue));
-							strcat(cdcBuffer, actValue);
+							strcat(cdcBuffer, ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
 						}
 						else
 						{
 							//non empty non-zero actual values are only written to cdc
 							if ((0 != strcmp(sidxObj->GetActualValue(), ""))
-							        && (!(CheckIfValueZero(
-							                  (char*) sidxObj->GetActualValue()))))
+							        && (!(CheckIfValueZero((char*) sidxObj->GetActualValue()))))
 							{
-								if (true
-								        == CheckIfHex(
-								            (char*) sidxObj->GetActualValue()))
-								{
-									INT32 actValueLen = strlen(
-									                        (char*) sidxObj->GetActualValue());
-									strncpy(actValue,
-									        ((char*)(sidxObj->GetActualValue()
-									                 + 2)), actValueLen - 2);
-									actValue[actValueLen - 2] = '\0';
-
-									strcat(cdcBuffer,
-									       PadLeft(actValue, '0', padLength));
-								}
+								string actualValueStr = std::string(sidxObj->GetActualValue());
+								if (CheckIfHex((char*) sidxObj->GetActualValue()))
+									strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 								else
-								{
-									strcpy(actValue,
-									       IntToAscii(
-									           atoi(
-									               sidxObj->GetActualValue()),
-									           actValue, 16));
-									strcat(cdcBuffer,
-									       PadLeft(actValue, '0', padLength));
-								}
+									strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 							}
 						}
 					}
@@ -3335,31 +3310,17 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 
 				strcat(cdcBuffer, "\t");
 
-				char actValue[64] = { 0 };
 				if (isStringDT)
 				{
-					strcpy(actValue, (char*) indexObj->GetActualValue());
-					strcpy(actValue, ConvertStringToHex((char*) actValue));
-					strcat(cdcBuffer, actValue);
+					strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 				}
 				else
 				{
+					string actualValueStr = std::string(indexObj->GetActualValue());
 					if (CheckIfHex((char*) indexObj->GetActualValue()))
-					{
-						INT32 actValLen = strlen(
-						                      (char*) indexObj->GetActualValue());
-						strncpy(actValue, (indexObj->GetActualValue() + 2),
-						        actValLen - 2);
-						actValue[actValLen - 2] = '\0';
-						strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
-					}
+						strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 					else
-					{
-						strcpy(actValue,
-						       IntToAscii(atoi(indexObj->GetActualValue()),
-						                  actValue, 16));
-						strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
-					}
+						strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 				}
 				strcat(cdcBuffer, "\n");
 			}
@@ -3528,38 +3489,20 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 				}
 				else
 				{
-					char actValue[64] = { 0 };
 					if (isStringDT)
 					{
-						strcpy(actValue, (char*) sidxObj->GetActualValue());
-						strcpy(actValue, ConvertStringToHex((char*) actValue));
-						strcat(cdcBuffer, actValue);
+						strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 					}
 					else
 					{
+						string actualValueStr = std::string(sidxObj->GetActualValue());
 						if (CheckIfHex((char*) sidxObj->GetActualValue()))
-						{
-							INT32 len = strlen(
-							                (char*) sidxObj->GetActualValue());
-							strncpy(actValue, (sidxObj->GetActualValue() + 2),
-							        len - 2);
-							actValue[len - 2] = '\0';
-
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
-						}
+							strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 						else
-						{
-							strcpy(actValue,
-							       IntToAscii(atoi(sidxObj->GetActualValue()),
-							                  actValue, 16));
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
-						}
+							strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 					}
+					strcat(cdcBuffer, "\n");
 				}
-
-				strcat(cdcBuffer, "\n");
 				if ((0 == sidxLC) && mappingPDO && (true == noOfEnteriesAdded))
 				{
 					sidxLC = noOfTotalSubIndexes - 1;
@@ -3642,12 +3585,9 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 
 				strcat(cdcBuffer, "\t");
 
-				char actValue[64] = { 0 };
 				if (isStringDT)
 				{
-					strcpy(actValue, (char*) indexObj->GetActualValue());
-					strcpy(actValue, ConvertStringToHex((char*) actValue));
-					strcat(cdcBuffer, actValue);
+					strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 				}
 				else
 				{
@@ -3845,12 +3785,9 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				}
 				else
 				{
-					char actValue[64] = { 0 };
 					if (isStringDT)
 					{
-						strcpy(actValue, (char*) sidxObj->GetActualValue());
-						strcpy(actValue, ConvertStringToHex((char*) actValue));
-						strcat(cdcBuffer, actValue);
+						strcat(cdcBuffer, ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
 					}
 					else
 					{
@@ -3860,8 +3797,8 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						else
 							strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 					}
+					strcat(cdcBuffer, "\n");
 				}
-				strcat(cdcBuffer, "\n");
 				if ((0 == sidxLC) && mappingPDO && (true == noOfEnteriesAdded))
 				{
 					sidxLC = noOfTotalSubIndexes - 1;
@@ -12276,7 +12213,7 @@ bool IsDefaultActualNotEqual(BaseIndex* baseIndexObj)
 
 	if (NULL == baseIndexObj->GetDefaultValue())
 		return true;
-	bool retValue;
+	bool retValue = false;
 	DataType dtObj = baseIndexObj->GetDataType();
 	if (dtObj.dataTypeName != NULL)
 	{

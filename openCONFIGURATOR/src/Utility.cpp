@@ -283,28 +283,14 @@ bool CheckIfMappingPDO(const char* indexId)
 }
 
 
-char* ConvertStringToHex(char* srcStr)
+string ConvertStringToHex(const string& srcStr)
 {
-	INT32 srcStrLen = 0;
-
-	if (NULL == srcStr)
+	std::stringstream ss;
+	for (unsigned i = 0; i < srcStr.length(); ++i)
 	{
-		LOG_FATAL() << "Parameter 'srcStr', must not be NULL.";
-		return NULL;
+		ss << std::hex << unsigned(srcStr.at(i));
 	}
-	srcStrLen = strlen(srcStr);
-	char* tempSrcStr = new char[srcStrLen + 1];
-	char* tempHexStr = new char[(srcStrLen * 2) + 1];
-	strcpy(tempSrcStr, (char*) srcStr);
-	strcpy(srcStr, "");
-	for (INT32 iloopCntr = 0; iloopCntr < srcStrLen; iloopCntr++)
-	{
-		sprintf(tempHexStr, "%X", tempSrcStr[iloopCntr]);
-		strcat(srcStr, (char*) tempHexStr);
-	}
-	delete[] tempSrcStr;
-	delete[] tempHexStr;
-	return srcStr;
+	return ss.str();
 }
 
 char* ConvertToHexformat(char* hexValue, INT32 padLength, bool doPadding)

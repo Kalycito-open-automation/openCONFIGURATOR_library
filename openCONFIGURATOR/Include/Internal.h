@@ -1303,12 +1303,12 @@ ocfmRetCode ParseFile(const char* fileName, INT32 nodePos, NodeType nodeType);
 /**
  \brief		This function shall be used to return the hexadecimal string version of the given string parameter
 
- \param		srcStr		Character pointer to the string to be converted to hex
+ \param		srcStr		string source
 
- \return	char* / NULL
+ \return	Converted string
  */
 /*****************************************************************************/
-char* ConvertStringToHex(char* srcStr);
+string ConvertStringToHex(const string& srcStr);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to return the alphanumeric string of the given unsigned value parameter
