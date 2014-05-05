@@ -10273,23 +10273,29 @@ void CreateMNPDOVar(INT32 offsetVal, INT32 dataSize, IEC_Datatype iecDataType,
 			LOG_ERROR() << "Unknown data type: " << iecDataType;
 			break;
 	}
-	//TODO: piObjectObj.indexId &/|| piObjectObj.sIdxId may be null
-	strcpy(mnPDOobj.indexId, piObjectObj.indexId);
-	strcpy(mnPDOobj.subIndexId, piObjectObj.sIdxId);
-	/* Assign the value*/
-	mnPDOobj.value = new char[10 + ALLOC_BUFFER];
-	char* padStr = new char[5 + ALLOC_BUFFER];
-	padStr = IntToAscii(dataSize, padStr, 16);
-	padStr = PadLeft(padStr, '0', 4);
-	padStr = ConvertToUpper(padStr);
-	strcpy(mnPDOobj.value, "0x");
-	strcat(mnPDOobj.value, padStr);
-	/* Set the Offset*/
-	strcat(mnPDOobj.value, "0000");
-	/* Set the Reserved*/
-	strcat(mnPDOobj.value, "00");
+	if(piObjectObj.indexId != NULL && piObjectObj.sIdxId != NULL)
+	{
+		strcpy(mnPDOobj.indexId, piObjectObj.indexId);
+		strcpy(mnPDOobj.subIndexId, piObjectObj.sIdxId);
+		/* Assign the value*/
+		mnPDOobj.value = new char[10 + ALLOC_BUFFER];
+		char* padStr = new char[5 + ALLOC_BUFFER];
+		padStr = IntToAscii(dataSize, padStr, 16);
+		padStr = PadLeft(padStr, '0', 4);
+		padStr = ConvertToUpper(padStr);
+		strcpy(mnPDOobj.value, "0x");
+		strcat(mnPDOobj.value, padStr);
+		/* Set the Offset*/
+		strcat(mnPDOobj.value, "0000");
+		/* Set the Reserved*/
+		strcat(mnPDOobj.value, "00");
 
-	nodeObj->AddMNPDOvar(mnPDOobj, pdoType);
+		nodeObj->AddMNPDOvar(mnPDOobj, pdoType);
+	}
+	else
+	{
+		LOG_ERROR() << "Cannot create MN PDO for datatype";
+	}
 
 }
 
