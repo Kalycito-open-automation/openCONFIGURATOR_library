@@ -1416,7 +1416,6 @@ namespace openCONFIGURATOR
 			************************************************************************/
 			template <typename T>
 			T HexToInt(const string& hexString);
-
 		}
 	}
 }

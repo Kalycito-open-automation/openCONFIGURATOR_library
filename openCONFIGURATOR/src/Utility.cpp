@@ -640,6 +640,7 @@ string openCONFIGURATOR::Library::Utilities::IntToHex(const T number, const unsi
 template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned short>(const unsigned short number, const unsigned int padLength, const string& prefix, const string& suffix);
 template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned int>(const unsigned int number, const unsigned int padLength, const string& prefix, const string& suffix);
 template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned long>(const unsigned long number, const unsigned int padLength, const string& prefix, const string& suffix);
+template string openCONFIGURATOR::Library::Utilities::IntToHex<unsigned long long>(const unsigned long long number, const unsigned int padLength, const string& prefix, const string& suffix);
 
 template <typename T>
 T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
@@ -659,3 +660,4 @@ T openCONFIGURATOR::Library::Utilities::HexToInt(const string& hexString)
 template unsigned short openCONFIGURATOR::Library::Utilities::HexToInt<unsigned short>(const string& hexString);
 template unsigned int openCONFIGURATOR::Library::Utilities::HexToInt<unsigned int>(const string& hexString);
 template unsigned long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long>(const string& hexString);
+template unsigned long long openCONFIGURATOR::Library::Utilities::HexToInt<unsigned long long>(const string& hexString);

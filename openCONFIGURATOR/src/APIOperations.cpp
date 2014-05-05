@@ -3651,22 +3651,11 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				}
 				else
 				{
+					string actualValueStr = std::string(indexObj->GetActualValue());
 					if (CheckIfHex((char*) indexObj->GetActualValue()))
-					{
-						INT32 actValLen = strlen(
-						                      (char*) indexObj->GetActualValue());
-						strncpy(actValue, (indexObj->GetActualValue() + 2),
-						        actValLen - 2);
-						actValue[actValLen - 2] = '\0';
-						strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
-					}
+						strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 					else
-					{
-						strcpy(actValue,
-						       IntToAscii(atoi(indexObj->GetActualValue()),
-						                  actValue, 16));
-						strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
-					}
+						strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 				}
 				strcat(cdcBuffer, "\n");
 			}
@@ -3865,28 +3854,13 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 					}
 					else
 					{
+						string actualValueStr = std::string(sidxObj->GetActualValue());
 						if (CheckIfHex((char*) sidxObj->GetActualValue()))
-						{
-							INT32 actualValLen = strlen(
-							                         (char*) sidxObj->GetActualValue());
-							strncpy(actValue, (sidxObj->GetActualValue() + 2),
-							        actualValLen - 2);
-							actValue[actualValLen - 2] = '\0';
-
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
-						}
+							strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 						else
-						{
-							strcpy(actValue,
-							       IntToAscii(atoi(sidxObj->GetActualValue()),
-							                  actValue, 16));
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
-						}
+							strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 					}
 				}
-
 				strcat(cdcBuffer, "\n");
 				if ((0 == sidxLC) && mappingPDO && (true == noOfEnteriesAdded))
 				{
