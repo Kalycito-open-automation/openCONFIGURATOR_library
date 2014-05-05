@@ -3662,10 +3662,21 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 					}
 					else
 					{
-						strcpy(actValue,
-						       IntToAscii(atoi(indexObj->GetActualValue()),
-						                  actValue, 16));
-						strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
+							if(strcmp(indexObj->GetDataType().GetName(), "Unsigned64") == 0)
+							{
+								unsigned long long actualValueUll = boost::lexical_cast<unsigned long long>(indexObj->GetActualValue());
+								std::ostringstream oss;
+								oss << std::hex << actualValueUll;
+								strcpy(actValue, oss.str().c_str());
+							}
+							else
+							{
+								long long actualValueLl = boost::lexical_cast<long long>(indexObj->GetActualValue());
+								std::ostringstream oss;
+								oss << std::hex << actualValueLl;
+								strcpy(actValue, oss.str().c_str());
+							}
+							strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
 					}
 				}
 				strcat(cdcBuffer, "\n");
@@ -3878,11 +3889,21 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						}
 						else
 						{
-							strcpy(actValue,
-							       IntToAscii(atoi(sidxObj->GetActualValue()),
-							                  actValue, 16));
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
+							if(strcmp(sidxObj->GetDataType().GetName(), "Unsigned64") == 0)
+							{
+								unsigned long long actualValueUll = boost::lexical_cast<unsigned long long>(sidxObj->GetActualValue());
+								std::ostringstream oss;
+								oss << std::hex << actualValueUll;
+								strcpy(actValue, oss.str().c_str());
+							}
+							else
+							{
+								long long actualValueLl = boost::lexical_cast<long long>(sidxObj->GetActualValue());
+								std::ostringstream oss;
+								oss << std::hex << actualValueLl;
+								strcpy(actValue, oss.str().c_str());
+							}
+							strcat(cdcBuffer, PadLeft(actValue, '0', padLength));
 						}
 					}
 				}
