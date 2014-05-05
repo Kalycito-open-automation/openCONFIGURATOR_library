@@ -2185,10 +2185,11 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					}
 					else
 					{
-						char actValue[64] = { 0 };
+						char* actValue = NULL;
 
 						if (true == isStringDt)
 						{
+							char* actValue = new char[strlen(sidxObj->GetActualValue()) * 2  + 1];
 							strcpy(actValue, (char*) sidxObj->GetActualValue());
 							strcpy(actValue,
 							       ConvertStringToHex((char*) actValue));
@@ -2196,6 +2197,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 						}
 						else
 						{
+							char* actValue = new char[padLength + 1];
 							//non empty non-zero actual values are only written to cdc
 							if ((0 != strcmp(sidxObj->GetActualValue(), ""))
 							        && (!(CheckIfValueZero(
@@ -2217,16 +2219,25 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 								}
 								else
 								{
-									strcpy(actValue,
-									       IntToAscii(
-									           atoi(
-									               sidxObj->GetActualValue()),
-									           actValue, 16));
-									strcat(cdcBuffer,
-									       PadLeft(actValue, '0', padLength));
+									if(strcmp(sidxObj->GetDataType().GetName(), "Unsigned64") == 0)
+									{
+										unsigned long long actualValueUll = boost::lexical_cast<unsigned long long>(sidxObj->GetActualValue());
+										std::ostringstream oss;
+										oss << std::hex << actualValueUll;
+										strcpy(actValue, oss.str().c_str());
+									}
+									else
+									{
+										long long actualValueLl = boost::lexical_cast<long long>(sidxObj->GetActualValue());
+										std::ostringstream oss;
+										oss << std::hex << actualValueLl;
+										strcpy(actValue, oss.str().c_str());
+									}
+									strcat(cdcBuffer, PadLeft(actValue, '0', padLength));
 								}
 							}
 						}
+						delete[] actValue;
 					}
 					strcat(cdcBuffer, "\n");
 				}
@@ -3642,15 +3653,17 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 
 				strcat(cdcBuffer, "\t");
 
-				char actValue[64] = { 0 };
+				char* actValue = NULL;
 				if (isStringDT)
 				{
+					char* actValue = new char[strlen(indexObj->GetActualValue()) * 2 + 1]();
 					strcpy(actValue, (char*) indexObj->GetActualValue());
 					strcpy(actValue, ConvertStringToHex((char*) actValue));
 					strcat(cdcBuffer, actValue);
 				}
 				else
 				{
+					char* actValue = new char[padLen + 1]();
 					if (CheckIfHex((char*) indexObj->GetActualValue()))
 					{
 						INT32 actValLen = strlen(
@@ -3679,6 +3692,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 							strcat(cdcBuffer, PadLeft(actValue, '0', padLen));
 					}
 				}
+				delete[] actValue;
 				strcat(cdcBuffer, "\n");
 			}
 			else
@@ -3867,21 +3881,23 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				}
 				else
 				{
-					char actValue[64] = { 0 };
+					char* actValue = NULL;
 					if (isStringDT)
 					{
+						char* actValue = new char[strlen(sidxObj->GetActualValue()) * 2  + 1];
 						strcpy(actValue, (char*) sidxObj->GetActualValue());
 						strcpy(actValue, ConvertStringToHex((char*) actValue));
 						strcat(cdcBuffer, actValue);
 					}
 					else
 					{
+						char* actValue = new char[padLength + 1];
 						if (CheckIfHex((char*) sidxObj->GetActualValue()))
 						{
 							INT32 actualValLen = strlen(
-							                         (char*) sidxObj->GetActualValue());
+								(char*) sidxObj->GetActualValue());
 							strncpy(actValue, (sidxObj->GetActualValue() + 2),
-							        actualValLen - 2);
+actualValLen - 2);
 							actValue[actualValLen - 2] = '\0';
 
 							strcat(cdcBuffer,
@@ -3906,6 +3922,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 							strcat(cdcBuffer, PadLeft(actValue, '0', padLength));
 						}
 					}
+					delete[] actValue;
 				}
 
 				strcat(cdcBuffer, "\n");
@@ -12344,7 +12361,7 @@ bool IsDefaultActualNotEqual(BaseIndex* baseIndexObj)
 
 	if (NULL == baseIndexObj->GetDefaultValue())
 		return true;
-	bool retValue;
+	bool retValue = false;
 	DataType dtObj = baseIndexObj->GetDataType();
 	if (dtObj.dataTypeName != NULL)
 	{
