@@ -402,38 +402,38 @@ ocfmRetCode Node::SetForcedCycle(const char* tempForcedCycleVal)
 
 	GetSubIndexAttributes(240, MN, indexId, sidxId, NAME, sidxName);
 	SetBasicSubIndexAttributes(240, MN, indexId, sidxId, tempForcedCycleVal,
-	                           sidxName, true);
+	                           sidxName);
 
-	Index* idxObj1 = NULL;
-	idxObj1 = GetMNIndexValues(indexId);
-	if (NULL != idxObj1)
-	{
-		//UpdateNumberOfEnteriesSIdx(objMN1F92Index);
-		idxObj1->SetFlagIfIncludedCdc(true);
-		if (NULL != idxObj1->GetSubIndexbyIndexValue((char*) "00"))
-		{
-			idxObj1->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
-			    true);
-		}
-	}
+	//Index* idxObj1 = NULL;
+	//idxObj1 = GetMNIndexValues(indexId);
+	//if (NULL != idxObj1)
+	//{
+	//	//UpdateNumberOfEnteriesSIdx(objMN1F92Index);
+	//	idxObj1->SetFlagIfIncludedCdc(true);
+	//	if (NULL != idxObj1->GetSubIndexbyIndexValue((char*) "00"))
+	//	{
+	//		idxObj1->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
+	//		    true);
+	//	}
+	//}
 
 	strcpy(sidxName, "");
 	GetSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId, NAME,
 	                      sidxName);
 	SetBasicSubIndexAttributes(this->GetNodeId(), CN, indexId, sidxId,
-	                           tempForcedCycleVal, sidxName, true);
+	                           tempForcedCycleVal, sidxName);
 
-	Index* idxObj;
-	idxObj = this->indexCollObj->GetIndexbyIndexValue(indexId);
-	if (NULL != idxObj)
-	{
-		idxObj->SetFlagIfIncludedCdc(true);
-		if (NULL != idxObj->GetSubIndexbyIndexValue((char*) "00"))
-		{
-			idxObj->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
-			    true);
-		}
-	}
+	//Index* idxObj;
+	//idxObj = this->indexCollObj->GetIndexbyIndexValue(indexId);
+	//if (NULL != idxObj)
+	//{
+	//	idxObj->SetFlagIfIncludedCdc(true);
+	//	if (NULL != idxObj->GetSubIndexbyIndexValue((char*) "00"))
+	//	{
+	//		idxObj->GetSubIndexbyIndexValue((char*) "00")->SetFlagIfIncludedCdc(
+	//		    true);
+	//	}
+	//}
 
 	forcedCycle = new char[strlen(tempForcedCycleVal) + ALLOC_BUFFER];
 	strcpy((char*) forcedCycle, tempForcedCycleVal);
@@ -493,14 +493,13 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 
 	GetSubIndexAttributes(240, MN, indexId, sidxId, NAME, subIndName);
 	SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, sidxId, presTimoutVal,
-	                           subIndName, true);
+	                           subIndName);
 
 	Index* idxObj = NULL;
 	idxObj = GetMNIndexValues(indexId);
 	if (NULL != idxObj)
 	{
 		UpdateNumberOfEnteriesSIdx(idxObj);
-		idxObj->SetFlagIfIncludedCdc(true);
 	}
 
 	delete[] subIndName;

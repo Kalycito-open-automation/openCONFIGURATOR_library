@@ -564,7 +564,7 @@ void SetSIdxValue(char* indexId, char* sidxId, char* value,
  \return	ocfmRetCode		ConfiguratorErrors
  */
 /*****************************************************************************/
-ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId);
+//ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId);
 /*****************************************************************************/
 /**
  \brief		This function shall create the MN PDO's in a collection used for process image manipulation
@@ -599,7 +599,7 @@ INT32 GetNodeTotalIndexSubIndex(INT32 nodeId);
  \return	void
  */
 /*****************************************************************************/
-void SetFlagForRequiredCNIndexes(INT32 nodeId);
+//void SetFlagForRequiredCNIndexes(INT32 nodeId);
 /*****************************************************************************/
 /**
  \brief		This function shall update the cycle time index value(0x1006) of the CN
@@ -713,7 +713,7 @@ void CopyIndexDefToAct(INT32 nodeId, NodeType nodeType, char* indexId);
  \return	void
  */
 /*****************************************************************************/
-void SetFlagForRequiredMNIndexes(INT32 nodeId);
+//void SetFlagForRequiredMNIndexes(INT32 nodeId);
 /*****************************************************************************/
 /**
  \brief		This function shall be used to check if the given dataTypeName is allowed for mapping

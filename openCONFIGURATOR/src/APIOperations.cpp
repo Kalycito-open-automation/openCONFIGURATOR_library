@@ -952,7 +952,6 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, const char* indexId,
 					//all the subobjects is of type VAR
 					sidxObj->SetPDOMapping((char*) "NOT_DEFINED");
 					sidxObj->SetObjectType((char*) "VAR");
-					sidxObj->SetFlagIfIncludedCdc(true);
 					pobjIndex->AddSubIndex(*sidxObj);
 				}
 			}
@@ -1247,7 +1246,6 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, const char* indexId)
 				Index indexObj;
 				indexObj.SetNodeID(nodeId);
 				indexObj.SetIndexValue(indexId);
-				indexObj.SetFlagIfIncludedCdc(true);
 				indexCollObj->AddIndex(indexObj);
 			}
 			else
@@ -1281,7 +1279,7 @@ ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, const char* indexId)
 }
 
 ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
-                                    const char* indexId, const char* indexValue, const char* indexName, bool includeInCDC)
+                                    const char* indexId, const char* indexValue, const char* indexName)
 {
 	ocfmRetCode errCodeObj(OCFM_ERR_UNKNOWN);
 
@@ -1339,7 +1337,6 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 		}
 
 		indexObj->SetName(indexName);
-		indexObj->SetFlagIfIncludedCdc(includeInCDC);
 
 		if (NULL != indexValue)
 		{
@@ -1366,8 +1363,7 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType,
 }
 
 ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
-                                       const char* indexId, const char* sidxId, const char* indexValue, const char* indexName,
-                                       bool includeInCDC)
+                                       const char* indexId, const char* sidxId, const char* indexValue, const char* indexName)
 {
 	ocfmRetCode errCodeObj(OCFM_ERR_UNKNOWN);
 
@@ -1467,7 +1463,6 @@ ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 		}
 
 		sidxObj->SetName(indexName);
-		sidxObj->SetFlagIfIncludedCdc(includeInCDC);
 
 		if (sidxObj->IsIndexValueValid(indexValue))
 		{
@@ -1614,7 +1609,7 @@ ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType,
 			}
 		}
 
-		indexObj->SetFlagIfIncludedCdc(includeInCDC);
+		indexObj->SetForceToCDC(includeInCDC);
 
 		if ((ARRAY == indexObj->GetEObjectType())
 		        || (RECORD == indexObj->GetEObjectType()))
@@ -1813,7 +1808,7 @@ ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 			subIndexObj->SetObjectType(objectType);
 		}
 
-		subIndexObj->SetFlagIfIncludedCdc(includeInCDC);
+		subIndexObj->SetForceToCDC(includeInCDC);
 
 		if (NULL != actualValue)
 		{
@@ -1973,7 +1968,7 @@ ocfmRetCode SetSubIndexAttribute(INT32 nodeId, NodeType nodeType, const char* in
 			case HIGHLIMIT:
 				// No Operation
 				break;
-			case FLAGIFINCDC:
+			case FORCETOCDC:
 				// No Operation
 				break;
 			default:
@@ -2119,8 +2114,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					return;
 				}
 
-				if ((true == sidxObj->GetFlagIfIncludedCdc())
-				        && ((true
+				if (((true
 				             == ReactivateMappingPDO(indexCollObj, indexObj))
 				            || (true == IsDefaultActualNotEqual(sidxObj))))
 				{
@@ -2283,7 +2277,6 @@ void UpdateCNSoCTolerance(IndexCollection* indexCollObj,
 		if (NULL != socToleranceValue)
 		{
 			indexObj->SetActualValue(socToleranceValue);
-			indexObj->SetFlagIfIncludedCdc(true);
 		}
 		else
 		{
@@ -2664,14 +2657,10 @@ void UpdateCNPresMNActLoad(Node* nodeObj)
 				strcpy(actValue, (char*) "0x");
 				strcat(actValue, conValue);
 				sidxObj->SetActualValue(actValue);
-
-				indexObj->SetFlagIfIncludedCdc(true);
-				sidxObj->SetFlagIfIncludedCdc(true);
 			}
 			else
 			{
 				sidxObj->SetActualValue((char*) "");
-				sidxObj->SetFlagIfIncludedCdc(false);
 			}
 		}
 	}
@@ -2748,8 +2737,6 @@ void UpdatePreqActLoad(Node* nodeObj)
 			strcat(actValue, conValue);
 
 			sidxObj->SetActualValue(actValue);
-			indexObj->SetFlagIfIncludedCdc(true);
-			sidxObj->SetFlagIfIncludedCdc(true);
 
 			//set the value in MN
 			if (CN == nodeObj->GetNodeType())
@@ -2773,8 +2760,6 @@ void UpdatePreqActLoad(Node* nodeObj)
 					if (NULL != sidxObjMN)
 					{
 						sidxObjMN->SetActualValue(actValue);
-						indexObjMN->SetFlagIfIncludedCdc(true);
-						sidxObjMN->SetFlagIfIncludedCdc(true);
 					}
 
 					//00'th sub index is set to FE(a max value) for make to reflect in cdc
@@ -2864,8 +2849,6 @@ void UpdatePresActLoad(Node* nodeObj)
 			strcpy(actValue, (char*) "0x");
 			strcat(actValue, conValue);
 			subIndexObj->SetActualValue(actValue);
-			indexObj->SetFlagIfIncludedCdc(true);
-			subIndexObj->SetFlagIfIncludedCdc(true);
 
 			//set the value in MN
 			if (CN == nodeObj->GetNodeType())
@@ -2889,8 +2872,6 @@ void UpdatePresActLoad(Node* nodeObj)
 					if (NULL != subIndexObj)
 					{
 						subIndexObj->SetActualValue(actValue);
-						indexObj->SetFlagIfIncludedCdc(true);
-						subIndexObj->SetFlagIfIncludedCdc(true);
 					}
 
 					//00'th sub index is set to FE(a max value) for make to reflect in cdc
@@ -2955,12 +2936,12 @@ void UpdateCNVisibleNode(Node* nodeObj)
 	SubIndex* sidxObj2 = NULL;
 	INT32 crossTxStnCnt = 0;
 
-	ResetAllSubIndexFlag(
-	    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
-	        (char*) "1F81"));
-	ResetAllSubIndexFlag(
-	    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
-	        (char*) "1F8D"));
+	//ResetAllSubIndexFlag(
+	//    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
+	//        (char*) "1F81"));
+	//ResetAllSubIndexFlag(
+	//    (nodeObj->GetIndexCollection())->GetIndexbyIndexValue(
+	//        (char*) "1F8D"));
 
 	int maxRPDOChannels = PDORPDOChannels;
 	char* maxRPDOChannelsFeature = nodeObj->GetNetworkManagement()->GetNwMgmtFeatureValue(GENERAL_FEATURES, "PDORPDOChannels");
@@ -3128,8 +3109,6 @@ bool CopyMNSubindexToCN(Node* nodeObj, const char* indexId, const char* subIndex
 		else if (NULL != sidxObjMN->GetActualValue())
 		{
 			sidxObjCN->SetActualValue((char*) sidxObjMN->GetActualValue());
-			sidxObjCN->SetFlagIfIncludedCdc(true);
-			indexObjCN->SetFlagIfIncludedCdc(true);
 			sidxCopied = true;
 		}
 		else
@@ -3144,29 +3123,29 @@ bool CopyMNSubindexToCN(Node* nodeObj, const char* indexId, const char* subIndex
 	return sidxCopied;
 }
 
-void ResetAllSubIndexFlag(Index* indexObj)
-{
-	if (NULL == indexObj)
-	{
-		LOG_FATAL() << "Parameter 'indexObj' must not be NULL.";
-		return;
-	}
-
-	for (INT32 sidxLC = 0; sidxLC < indexObj->GetNumberofSubIndexes(); sidxLC++)
-	{
-		SubIndex* sidxObj = NULL;
-		sidxObj = indexObj->GetSubIndexByPosition(sidxLC);
-		if (NULL != sidxObj)
-		{
-			sidxObj->SetFlagIfIncludedCdc(false);
-		}
-		else
-		{
-			LOG_ERROR() << "Subindex at position " << sidxLC << " is NULL.";
-		}
-	}
-	indexObj->SetFlagIfIncludedCdc(false);
-}
+//void ResetAllSubIndexFlag(Index* indexObj)
+//{
+//	if (NULL == indexObj)
+//	{
+//		LOG_FATAL() << "Parameter 'indexObj' must not be NULL.";
+//		return;
+//	}
+//
+//	for (INT32 sidxLC = 0; sidxLC < indexObj->GetNumberofSubIndexes(); sidxLC++)
+//	{
+//		SubIndex* sidxObj = NULL;
+//		sidxObj = indexObj->GetSubIndexByPosition(sidxLC);
+//		if (NULL != sidxObj)
+//		{
+//			sidxObj->SetFlagIfIncludedCdc(false);
+//		}
+//		else
+//		{
+//			LOG_ERROR() << "Subindex at position " << sidxLC << " is NULL.";
+//		}
+//	}
+//	indexObj->SetFlagIfIncludedCdc(false);
+//}
 
 void ResetAllPdos(INT32 nodeId, NodeType nodeType)
 {
@@ -3400,7 +3379,6 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 			                         (char*) sidxObj->GetAccessType());
 
 			if ((sidxObj->GetActualValue() != NULL)
-			        && (sidxObj->GetFlagIfIncludedCdc() == true)
 			        && ((true == includeAccess) || (true == mappingPDO))
 			        && (true == IsDefaultActualNotEqual(sidxObj)))
 			{
@@ -3682,7 +3660,6 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 			                         (char*) sidxObj->GetAccessType());
 
 			if ((sidxObj->GetActualValue() != NULL)
-					&& (sidxObj->GetFlagIfIncludedCdc() == true)
 			        && ((true == includeAccess) || (true == mappingPDO))
 			        && (true == IsDefaultActualNotEqual(sidxObj)))
 			{
@@ -4109,8 +4086,7 @@ INT32 GetNodeTotalIndexSubIndex(INT32 nodeId)
 		Index* indexObj = NULL;
 		indexObj = indexCollObj->GetIndexByPosition(indexLC);
 
-		if ((indexObj->GetFlagIfIncludedCdc() == true)
-		        && (true == CheckAccessTypeForInclude((char*) indexObj->GetAccessType())
+		if ((true == CheckAccessTypeForInclude((char*) indexObj->GetAccessType())
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue())))
 		{
 			if (indexObj->GetNumberofSubIndexes() == 0)
@@ -4173,7 +4149,6 @@ INT32 GetNodeTotalIndexSubIndex(INT32 nodeId)
 							delete[] sidxId;
 							if ((sidxObjTemp != NULL)
 							        && (sidxObjTemp->GetActualValue() != NULL)
-							        && (true == sidxObjTemp->GetFlagIfIncludedCdc())
 							        && (true == IsDefaultActualNotEqual(sidxObjTemp)))
 							{
 								if (0 == GetDecimalValue((char*) sidxObjTemp->GetActualValue()))
@@ -4223,7 +4198,6 @@ INT32 GetNodeTotalIndexSubIndex(INT32 nodeId)
 				        sidxLC < indexObj->GetNumberofSubIndexes(); sidxLC++)
 				{
 					if ((indexObj->GetSubIndexByPosition(sidxLC)->GetActualValue() != NULL)
-					        && (true == indexObj->GetSubIndexByPosition(sidxLC)->GetFlagIfIncludedCdc())
 					        && (true == CheckAccessTypeForInclude((char*) indexObj->GetSubIndexByPosition(
 					                    sidxLC)->GetAccessType()))
 					        && (true == IsDefaultActualNotEqual(indexObj->GetSubIndexByPosition(sidxLC))))
@@ -4257,8 +4231,7 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId)
 		Index* indexObj = NULL;
 		indexObj = indexCollObj->GetIndexByPosition(indexLC);
 
-		if (indexObj->GetFlagIfIncludedCdc() == true
-		        && (true == CheckAccessTypeForInclude((char*) indexObj->GetAccessType())
+		if ((true == CheckAccessTypeForInclude((char*) indexObj->GetAccessType())
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue())))
 		{
 			if (indexObj->GetNumberofSubIndexes() == 0)
@@ -4319,7 +4292,6 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId)
 							delete[] sidxId;
 							if ((NULL != sidxObjTemp)
 							        && (sidxObjTemp->GetActualValue() != NULL)
-							        && (true == sidxObjTemp->GetFlagIfIncludedCdc())
 							        && (true == IsDefaultActualNotEqual(sidxObjTemp)))
 							{
 								if (0 == GetDecimalValue((char*) sidxObjTemp->GetActualValue()))
@@ -4352,7 +4324,6 @@ INT32 BRSpecificgetCNsTotalIndexSubIndex(INT32 nodeId)
 				        sidxLC < indexObj->GetNumberofSubIndexes(); sidxLC++)
 				{
 					if (indexObj->GetSubIndexByPosition(sidxLC)->GetActualValue() != NULL
-					        && true == indexObj->GetSubIndexByPosition(sidxLC)->GetFlagIfIncludedCdc()
 					        && true == CheckAccessTypeForInclude((char*) indexObj->GetSubIndexByPosition(sidxLC)->GetAccessType())
 					        && true == IsDefaultActualNotEqual(indexObj->GetSubIndexByPosition(sidxLC)))
 					{
@@ -4661,8 +4632,7 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 	{
 		Index* indexObj;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
-		if (indexObj->GetFlagIfIncludedCdc() == true)
-		{
+
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
 				tempBuffer1 = new char[CDC_BUFFER];
@@ -4673,16 +4643,15 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				strcat(Buffer1, tempBuffer1);
 				delete[] tempBuffer1;
 			}
+		
 		}
-	}
 	// write all objects except pdo
 	for (INT32 indexLC = 0; indexLC < noOfIndexes; indexLC++)
 	{
 		Index* indexObj;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
 
-		if (indexObj->GetFlagIfIncludedCdc() == true
-		        && true
+		if (true
 		        == CheckAccessTypeForInclude(
 		            (char*) indexObj->GetAccessType())
 		        && CheckIfNotPDO((char*) indexObj->GetIndexValue()))
@@ -4701,8 +4670,7 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 			{
 				SubIndex* sidxObj = indexObj->GetSubIndexbyIndexValue(
 				                        (char*) "F0");
-				if (NULL != sidxObj && true == sidxObj->GetFlagIfIncludedCdc()
-				        && true
+				if (NULL != sidxObj && true
 				        == CheckAccessTypeForInclude(
 				            (char*) sidxObj->GetAccessType())
 				        && NULL != sidxObj->GetActualValue()
@@ -4746,8 +4714,7 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 	{
 		Index* indexObj;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
-		if (indexObj->GetFlagIfIncludedCdc() == true
-		        && (true
+		if ((true
 		            == CheckAccessTypeForInclude(
 		                (char*) indexObj->GetAccessType())
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
@@ -4765,8 +4732,7 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 	{
 		Index* indexObj;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
-		if (indexObj->GetFlagIfIncludedCdc() == true)
-		{
+
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
 				tempBuffer1 = new char[CDC_BUFFER];
@@ -4775,9 +4741,9 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				strcat(Buffer1, tempBuffer1);
 				delete[] tempBuffer1;
 			}
+		
 		}
 	}
-}
 
 //TODO: only buffer is used not the fileptr. should be removed in header & related functions
 void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
@@ -4812,8 +4778,6 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 			exceptionObj.setErrorString(errorString.str());
 			throw exceptionObj;
 		}
-		if (indexObj->GetFlagIfIncludedCdc() == true)
-		{
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
 				//non-Zero values of 00'th subindex are only being disabled.
@@ -4839,14 +4803,12 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				}
 			}
 		}
-	}
 	// write all objects except pdo
 	for (INT32 indexLC = 0; indexLC < noOfIndexes; indexLC++)
 	{
 		Index* indexObj;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
-		if (indexObj->GetFlagIfIncludedCdc() == true
-		        && true
+		if (true
 		        == CheckAccessTypeForInclude(
 		            (char*) indexObj->GetAccessType())
 		        && CheckIfNotPDO((char*) indexObj->GetIndexValue()))
@@ -4868,7 +4830,6 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				SubIndex* sidxObj = indexObj->GetSubIndexbyIndexValue(
 				                        (char*) "F0");
 				if (NULL != sidxObj
-				        && true == sidxObj->GetFlagIfIncludedCdc()
 				        && true == CheckAccessTypeForInclude((char*) sidxObj->GetAccessType())
 				        && NULL != sidxObj->GetActualValue()
 				        && 0 != strcmp((char*) sidxObj->GetActualValue(), "")
@@ -4911,9 +4872,7 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 	{
 		Index* indexObj = NULL;
 		indexObj = objIndexCollection->GetIndexByPosition(indexLC);
-		if (indexObj->GetFlagIfIncludedCdc() == true
-		        && (true
-		            == CheckAccessTypeForInclude(
+		if ((true == CheckAccessTypeForInclude(
 		                (char*) indexObj->GetAccessType())
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 		        && !CheckIfNotPDO((char*) indexObj->GetIndexValue()))
@@ -4939,8 +4898,6 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 			exceptionObj.setErrorCode(OCFM_ERR_MEMORY_ALLOCATION_ERROR);
 			throw exceptionObj;
 		}
-		if (indexObj->GetFlagIfIncludedCdc() == true)
-		{
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
 				//non-Zero values of 00'th subindex are only being enabled.
@@ -4965,9 +4922,9 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 					delete[] tempBuffer1;
 				}
 			}
+		
 		}
 	}
-}
 
 INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
                  Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
@@ -7018,9 +6975,9 @@ ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, const char* inde
 				else
 					strcpy(outAttributeValue, "");
 				break;
-			case FLAGIFINCDC:
+			case FORCETOCDC:
 				/* Flag if it should be included in cdc*/
-				if (indexObj->GetFlagIfIncludedCdc() == true)
+				if (indexObj->GetForceToCDC() == true)
 					strcpy(outAttributeValue, "1");
 				else
 					strcpy(outAttributeValue, "0");
@@ -7159,9 +7116,9 @@ ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 				else
 					strcpy(outAttributeValue, "");
 				break;
-			case FLAGIFINCDC:
+			case FORCETOCDC:
 				/* Flag if it should be included in cdc*/
-				if (indexObj->GetFlagIfIncludedCdc() == true)
+				if (indexObj->GetForceToCDC() == true)
 					strcpy(outAttributeValue, "1");
 				else
 					strcpy(outAttributeValue, "0");
@@ -7291,8 +7248,8 @@ ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType,
 				else
 					strcpy(outAttributeValue, "");
 				break;
-			case FLAGIFINCDC:
-				if (subIndexObj->GetFlagIfIncludedCdc() == true)
+			case FORCETOCDC:
+				if (subIndexObj->GetForceToCDC() == true)
 					strcpy(outAttributeValue, "1");
 				else
 					strcpy(outAttributeValue, "0");
@@ -7455,8 +7412,8 @@ ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos,
 				else
 					strcpy(outAttributeValue, "");
 				break;
-			case FLAGIFINCDC:
-				if (subIndexObj->GetFlagIfIncludedCdc() == true)
+			case FORCETOCDC:
+				if (subIndexObj->GetForceToCDC() == true)
 					strcpy(outAttributeValue, "1");
 				else
 					strcpy(outAttributeValue, "0");
@@ -8306,7 +8263,6 @@ void GetMNPDOSubIndex(MNPdoVariable mnPdoVarObj, INT32& prevSubIndex,
 	strcat(actValue, mnPdoVarObj.indexId);
 
 	subIndexObj->SetActualValue(actValue);
-	subIndexObj->SetFlagIfIncludedCdc(true);
 	delete[] actValue;
 
 	AddPDOIndexsToMN(mnPdoVarObj.indexId, mnPdoVarObj.subIndexId,
@@ -8340,13 +8296,11 @@ void SetSIdxValue(char* indexId, char* sidxId, char* value,
 			sidxObj->SetActualValue((char*) sidxObj->GetDefaultValue());
 		else
 			sidxObj->SetActualValue(value);
-		sidxObj->SetFlagIfIncludedCdc(true);
 	}
 	else
 	{
 		stRetInfo = AddSubIndex(nodeId, nodeType, indexId, sidxId);
 		sidxObj = indexObj->GetSubIndexbyIndexValue(sidxId);
-		sidxObj->SetFlagIfIncludedCdc(true);
 		if (setDefaultValue)
 			sidxObj->SetActualValue((char*) sidxObj->GetDefaultValue());
 		else
@@ -8606,7 +8560,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 					char* tempSidxId = new char[SUBINDEX_LEN];
 					strcpy(tempSidxId, "01");
-					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappNodeID, (char*) "NodeID_U8", true);
+					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappNodeID, (char*) "NodeID_U8");
 					delete[] mappNodeID;
 
 					GetSubIndexAttributes(nodeObj.GetNodeId(), CN, (char*) "1400", (char*) "02", ACTUALVALUE, versionNumber);
@@ -8615,7 +8569,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					{
 						strcpy(versionNumber, "0x0");
 					}
-					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, (char*) "02", versionNumber, (char*) "MappingVersion_U8", true);
+					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, (char*) "02", versionNumber, (char*) "MappingVersion_U8");
 
 					strcpy(indexIdMN, "1A");
 					strcat(indexIdMN, sidxId);
@@ -8626,8 +8580,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					{
 						exceptionObj = AddIndex(MN_NODEID, MN, indexIdMN);
 					}
-
-					indexObj->SetFlagIfIncludedCdc(true);
 
 					if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 					{
@@ -8669,7 +8621,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 						if (indexObj != NULL)
 						{
-							indexObj->SetFlagIfIncludedCdc(true);
 							GetMNPDOSubIndex(mnPDOObj, prevSubIndex, indexObj, indexIdMN, outPrevSize);
 							outPrevSize = outPrevSize + mnPDOObj.dataSize;
 						}
@@ -8709,8 +8660,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						/* set bFlag to true for 1800*/
 					}
 					indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
-					if (indexObjTemp != NULL)
-						indexObjTemp->SetFlagIfIncludedCdc(true);
 
 					inPrevSubIndex = 0;
 					inPrevSize = 0;
@@ -8724,7 +8673,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					mappingSidxId = IntToAscii((nodeObj.GetNodeId()), mappingSidxId, 10);
 					char* tempSidxId = new char[SUBINDEX_LEN];
 					strcpy(tempSidxId, "01");
-					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappingSidxId, (char*) "NodeID_U8", true);
+					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappingSidxId, (char*) "NodeID_U8");
 
 					GetSubIndexAttributes(nodeObj.GetNodeId(), CN, (char*) "1800", (char*) "02", ACTUALVALUE, versionNumber);
 					if ((NULL == versionNumber)
@@ -8732,7 +8681,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					{
 						strcpy(versionNumber, "0x0");
 					}
-					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, (char*) "02", versionNumber, (char*) "MappingVersion_U8", true);
+					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, (char*) "02", versionNumber, (char*) "MappingVersion_U8");
 					delete[] tempSidxId;
 
 					strcpy(indexIdMN, "16");
@@ -8757,7 +8706,6 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						MNPdoVariable mnPDOobj;
 						mnPDOobj = nodeObj.MNPDOINVarCollection[pdoInLC];
 						indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
-						indexObjTemp->SetFlagIfIncludedCdc(true);
 
 						if (inPrevSubIndex >= 254)
 						{
@@ -8807,7 +8755,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		SetPresMNNodeAssigmentBits();
 
 		//delete[] arrangedNodeIDbyStation;
-		SetFlagForRequiredMNIndexes(MN_NODEID);
+		//SetFlagForRequiredMNIndexes(MN_NODEID);
 	}
 
 	catch (ocfmRetCode& exObj)
@@ -10347,7 +10295,7 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 		Index idx = indexCollObj->GetIndexRef(0x1300);
 		if(idx.GetActualValue() == NULL)
 			SetBasicIndexAttributes(MN_NODEID, MN, indexId, C_SDO_SEQULAYERTIMEOUT,
-		                        (char*) "SDO_SequLayerTimeout_U32", true);
+		                        (char*) "SDO_SequLayerTimeout_U32");
 	}
 
 	/* 1C02*/
@@ -10370,8 +10318,6 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
 
 		AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(),
 		               (char*) "40", false);
@@ -10384,8 +10330,6 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
 
 		char* val = new char[8];
 		INT32 ilConfigDate;
@@ -10402,8 +10346,6 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
 
 		char* val = new char[50];
 		INT32 ilConfigTime;
@@ -10421,8 +10363,6 @@ void AutogenerateOtherIndexs(Node* nodeObj)
 	if (OCFM_ERR_SUCCESS == exceptionObj.getErrorCode())
 	{
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
 
 		AddForEachSIdx(indexId, indexCollObj, nodeObj->GetNodeId(), (char*) "",
 		               true);
@@ -11070,7 +11010,6 @@ void SetPresMNNodeAssigmentBits()
 			IntToAscii(tempValue, &nodeAssignData[2], 16);
 
 			sidxObj->SetActualValue(nodeAssignData);
-			sidxObj->SetFlagIfIncludedCdc(true);
 			delete[] nodeAssignData;
 		}
 	}
@@ -11159,19 +11098,19 @@ ocfmRetCode RecalculateMultiplex()
 					}
 					else if (actValue == NULL || strcmp(actValue, "") == 0)
 					{
-						char* sidxName = new char[50];
-						sidxName[0] = 0;
-						GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
-						                      NAME, sidxName);
-						char* subIndFlag = new char[10];
-						GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
-						                      FLAGIFINCDC, subIndFlag);
-						INT32 sidxExistFlag = atoi(subIndFlag);
-						SetBasicSubIndexAttributes(MN_NODEID, MN, indexId,
-						                           value, (char*) "", sidxName,
-						                           (sidxExistFlag != 0));
-						delete[] sidxName;
-						delete[] subIndFlag;
+						//char* sidxName = new char[50];
+						//sidxName[0] = 0;
+						//GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
+						//                      NAME, sidxName);
+						//char* subIndFlag = new char[10];
+						//GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
+						//                      FLAGIFINCDC, subIndFlag);
+						//INT32 sidxExistFlag = atoi(subIndFlag);
+						//SetBasicSubIndexAttributes(MN_NODEID, MN, indexId,
+						//                           value, (char*) "", sidxName,
+						//                           (sidxExistFlag != 0));
+						//delete[] sidxName;
+						//delete[] subIndFlag;
 						continue;
 					}
 					else
@@ -11212,19 +11151,19 @@ ocfmRetCode RecalculateMultiplex()
 							if (mnMultiActualValue == 0)
 							{
 
-								char* sidxName = new char[50];
-								sidxName[0] = 0;
-								GetSubIndexAttributes(MN_NODEID, MN, indexId,
-								                      value, NAME, sidxName);
-								char* subIndFlag = new char[10];
-								GetSubIndexAttributes(MN_NODEID, MN, indexId,
-								                      value, FLAGIFINCDC, subIndFlag);
-								INT32 iCNsubIndFlag = atoi(subIndFlag);
-								SetBasicSubIndexAttributes(MN_NODEID, MN,
-								                           indexId, value, (char*) "", sidxName,
-								                           (iCNsubIndFlag != 0));
-								delete[] sidxName;
-								delete[] subIndFlag;
+								//char* sidxName = new char[50];
+								//sidxName[0] = 0;
+								//GetSubIndexAttributes(MN_NODEID, MN, indexId,
+								//                      value, NAME, sidxName);
+								//char* subIndFlag = new char[10];
+								//GetSubIndexAttributes(MN_NODEID, MN, indexId,
+								//                      value, FLAGIFINCDC, subIndFlag);
+								//INT32 iCNsubIndFlag = atoi(subIndFlag);
+								//SetBasicSubIndexAttributes(MN_NODEID, MN,
+								//                           indexId, value, (char*) "", sidxName,
+								//                           (iCNsubIndFlag != 0));
+								//delete[] sidxName;
+								//delete[] subIndFlag;
 								continue;
 							}
 							else if (cnActualValue <= mnMultiActualValue)
@@ -11250,20 +11189,20 @@ ocfmRetCode RecalculateMultiplex()
 				else
 				{
 					// station other than multiplexed
-					char* subIndName = new char[50];
-					subIndName[0] = 0;
-					GetSubIndexAttributes(MN_NODEID, MN, indexId, value, NAME,
-					                      subIndName);
+					//char* subIndName = new char[50];
+					//subIndName[0] = 0;
+					//GetSubIndexAttributes(MN_NODEID, MN, indexId, value, NAME,
+					//                      subIndName);
 
-					char* subIndFlag = new char[10];
-					GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
-					                      FLAGIFINCDC, subIndFlag);
+					//char* subIndFlag = new char[10];
+					//GetSubIndexAttributes(MN_NODEID, MN, indexId, value,
+					//                      FLAGIFINCDC, subIndFlag);
 
-					INT32 iCNsubIndFlag = atoi(subIndFlag);
-					SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, value,
-					                           (char*) "", subIndName, (iCNsubIndFlag != 0));
-					delete[] subIndName;
-					delete[] subIndFlag;
+					//INT32 iCNsubIndFlag = atoi(subIndFlag);
+					//SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, value,
+					//                           (char*) "", subIndName, (iCNsubIndFlag != 0));
+					//delete[] subIndName;
+					//delete[] subIndFlag;
 				}
 				delete[] value;
 			} // end of if loop 1
@@ -12005,8 +11944,6 @@ void UpdateMNNodeAssignmentIndex(Node* nodeObj, char* indexId,
 	{
 		Index* indexObj = NULL;
 		indexObj = indexCollObj->GetIndexbyIndexValue(indexId);
-		/* $:set Flag to true*/
-		indexObj->SetFlagIfIncludedCdc(true);
 
 		for (INT32 sidxLC = indexObj->GetNumberofSubIndexes() - 1; sidxLC >= 0;
 		        sidxLC--)
@@ -12167,14 +12104,12 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 		sidxObj = indexObj->GetSubIndexbyIndexValue(tempOldNodeIdCN);
 		if (NULL != sidxObj)
 		{
-			bool tempOldFlg = false;
 			if (NULL != (char*) sidxObj->GetActualValue())
 			{
 				tempOldActualValue = new char[strlen(
 				                                  (char*) sidxObj->GetActualValue()) + STR_ALLOC_BUFFER];
 				strcpy((char*) tempOldActualValue,
 				       (char*) sidxObj->GetActualValue());
-				tempOldFlg = sidxObj->GetFlagIfIncludedCdc();
 			}
 			exceptionObj = IfSubIndexExists(MN_NODEID, MN, indexId, tempNodeIdCN,
 			                                &subIndexPos, &indexPos);
@@ -12194,7 +12129,6 @@ void CopyOldNodeIdAssignmentObjectSubindex(Node* nodeObj, INT32 oldNodeId,
 			{
 				//copy the actual value to here
 				sidxObj1->SetActualValue(tempOldActualValue);
-				sidxObj1->SetFlagIfIncludedCdc(tempOldFlg);
 			}
 			// reset the actual value of the old node id subindex
 			SetSubIndexAttribute(MN_NODEID, MN, indexId, tempOldNodeIdCN,
@@ -12213,7 +12147,11 @@ bool IsDefaultActualNotEqual(BaseIndex* baseIndexObj)
 
 	if (NULL == baseIndexObj->GetDefaultValue())
 		return true;
-	bool retValue = false;
+
+	if(baseIndexObj->GetForceToCDC())
+		return true;
+
+	bool retValue;
 	DataType dtObj = baseIndexObj->GetDataType();
 	if (dtObj.dataTypeName != NULL)
 	{
@@ -12280,8 +12218,6 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj)
 			        sidxLC++)
 			{
 				if (indexObj->GetSubIndexByPosition(sidxLC)->GetActualValue() != NULL
-				        && true
-				        == indexObj->GetSubIndexByPosition(sidxLC)->GetFlagIfIncludedCdc()
 				        && true
 				        == IsDefaultActualNotEqual(
 				            indexObj->GetSubIndexByPosition(sidxLC)))
@@ -12355,8 +12291,6 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj)
 	        sidxLC++)
 	{
 		if (commIndexObj->GetSubIndexByPosition(sidxLC)->GetActualValue() != NULL
-		        && true
-		        == commIndexObj->GetSubIndexByPosition(sidxLC)->GetFlagIfIncludedCdc()
 		        && true
 		        == CheckAccessTypeForInclude(
 		            (char*) commIndexObj->GetSubIndexByPosition(sidxLC)->GetAccessType())
@@ -12624,17 +12558,9 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 			        || (strcmp(sidxObj->GetActualValue(), "") == 0))
 			{
 				sidxObj->SetActualValue((char*) "0x50");
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
-			else if (sidxObj->GetActualValue() != NULL
-			         && IsDefaultActualNotEqual(sidxObj))
-			{
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
 		}
-	}
 
 	//loss of SoA
 	indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1C0C");
@@ -12647,17 +12573,9 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 			        || (strcmp(sidxObj->GetActualValue(), "") == 0))
 			{
 				sidxObj->SetActualValue((char*) "0x50");
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
-			else if (sidxObj->GetActualValue() != NULL
-			         && IsDefaultActualNotEqual(sidxObj))
-			{
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
 		}
-	}
 
 	//loss of PReq
 	indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1C0D");
@@ -12670,18 +12588,10 @@ void SetCNLossObjects(INT32 nodeId, NodeType nodeType)
 			        || (strcmp(sidxObj->GetActualValue(), "") == 0))
 			{
 				sidxObj->SetActualValue((char*) "0x50");
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
-			else if (sidxObj->GetActualValue() != NULL
-			         && IsDefaultActualNotEqual(sidxObj))
-			{
-				sidxObj->SetFlagIfIncludedCdc(true);
-				indexObj->SetFlagIfIncludedCdc(true);
 			}
 		}
 	}
-}
 
 void SetBuildTime()
 {

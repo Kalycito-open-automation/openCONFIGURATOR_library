@@ -214,7 +214,7 @@ ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, const char* indexId, co
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId, const char* indexValue, const char* indexName, bool includeInCDC);
+ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId, const char* indexValue, const char* indexName);
 
 /**
  \brief		This API shall be used to set the attributes [IndexValue, IndexName & flagIfInCdc] of a sub index for a node
@@ -229,7 +229,7 @@ ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, const char*
 
  \return		ocfmRetCode			ConfiguratorErrors
  */
-ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId, const char* sidxId, const char* indexValue, const char* indexName, bool includeInCDC);
+ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, const char* indexId, const char* sidxId, const char* indexValue, const char* indexName);
 
 /**
  \brief		This API shall be used to check for the presence of a Node of given node ID and type in the collection list. If the node is present, the nodePos and nodeExist parameters are updated to reflect this in the calling function
