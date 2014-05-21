@@ -872,18 +872,18 @@ ocfmRetCode ImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 		 */
 		xmlMemoryDump();
 
-		/* Add other required index*/
-		if (CN == nodeType)
-		{
-			SetFlagForRequiredCNIndexes(nodeId);
-			/* Not required only in case of auto generation 1020 of CN should be updated else it should be as it is imported*/
-			//AddOtherRequiredCNIndexes(iNodeID);
-		}
-		if (MN == nodeType)
-		{
-			SetFlagForRequiredMNIndexes(nodeId);
+		///* Add other required index*/
+		//if (CN == nodeType)
+		//{
+		//	//SetFlagForRequiredCNIndexes(nodeId);
+		//	/* Not required only in case of auto generation 1020 of CN should be updated else it should be as it is imported*/
+		//	//AddOtherRequiredCNIndexes(iNodeID);
+		//}
+		//if (MN == nodeType)
+		//{
+		//	//SetFlagForRequiredMNIndexes(nodeId);
 
-		}
+		//}
 
 		/* Copy default value of pdos to act value*/
 		CopyPDODefToAct(nodeId, nodeType);
@@ -1281,16 +1281,16 @@ ocfmRetCode ReImportXML(const char* fileName, INT32 nodeId, NodeType nodeType)
 			 */
 			xmlMemoryDump();
 
-			/* Add other required index*/
-			if (nodeType == CN)
-			{
-				SetFlagForRequiredCNIndexes(nodeId);
-				/* Not required only in case of autogenartion 1020 of CN should be updated else it shud be as it is imported*/
-			}
-			if (nodeType == MN)
-			{
-				SetFlagForRequiredMNIndexes(nodeId);
-			}
+			///* Add other required index*/
+			//if (nodeType == CN)
+			//{
+			//	//SetFlagForRequiredCNIndexes(nodeId);
+			//	/* Not required only in case of autogenartion 1020 of CN should be updated else it shud be as it is imported*/
+			//}
+			//if (nodeType == MN)
+			//{
+			//	//SetFlagForRequiredMNIndexes(nodeId);
+			//}
 			/* Copy default value of pdos to act value*/
 			CopyPDODefToAct(nodeId, nodeType);
 			//CopyMNPropDefToAct(nodeId, nodeType);
@@ -1849,16 +1849,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 					bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
 					               BAD_CAST "uniqueIDRef",
 					               BAD_CAST idxObj->GetUniqueIDRef());
-			if (idxObj->GetFlagIfIncludedCdc() == 0)
-			{
-				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-				               BAD_CAST "CDCFlag", BAD_CAST "FALSE");
-			}
-			else if (idxObj->GetFlagIfIncludedCdc() == 1)
-			{
-				bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-				               BAD_CAST "CDCFlag", BAD_CAST "TRUE");
-			}
 
 			xmlTextWriterSetIndent(xtwWriter, 1);
 
@@ -1972,17 +1962,6 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 							               BAD_CAST "uniqueIDRef",
 							               BAD_CAST sidxObj->GetUniqueIDRef());
 						}
-					}
-
-					if (sidxObj->GetFlagIfIncludedCdc() == 0)
-					{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "CDCFlag", BAD_CAST "FALSE");
-					}
-					else if (sidxObj->GetFlagIfIncludedCdc() == 1)
-					{
-						bytesWritten = xmlTextWriterWriteAttribute(xtwWriter,
-						               BAD_CAST "CDCFlag", BAD_CAST "TRUE");
 					}
 					// End SubObject Tag
 					bytesWritten = xmlTextWriterEndElement(xtwWriter);
@@ -2207,154 +2186,155 @@ ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType)
 	return objException;
 }
 
-void SetFlagForRequiredCNIndexes(INT32 nodeId)
-{
-	Index* idxObj = NULL;
-	IndexCollection* idxCollObj = NULL;
-	NodeCollection* nodeCollObj = NULL;
-	Node* nodeObj = NULL;
-	SubIndex* sidxObj = NULL;
-	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-	nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
-	idxCollObj = nodeObj->GetIndexCollection();
-
-	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
-
-	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
-	{
-		idxObj = idxCollObj->GetIndexByPosition(idxLC);
-
-		if ((CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false)
-		        || (strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
-		        || (strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0)
-		        || (strcmp((char*) idxObj->GetIndexValue(), "1020") == 0)
-		        || (strcmp((char*) idxObj->GetIndexValue(), "1006") == 0)
-		        || CheckIfManufactureSpecificObject(
-		            (char*) idxObj->GetIndexValue()))
-		{
-			idxObj->SetFlagIfIncludedCdc(true);
-			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
-			        sidxLC++)
-			{
-				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
-				if (sidxObj != NULL)
-				{
-					sidxObj->SetFlagIfIncludedCdc(true);
-				}
-
-			}
-		}
-	}
-}
-
-void SetFlagForRequiredMNIndexes(INT32 nodeId)
-{
-	Index* idxObj = NULL;
-	IndexCollection* idxCollObj = NULL;
-	NodeCollection* nodeCollObj = NULL;
-	Node* nodeObj = NULL;
-
-	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-	nodeObj = nodeCollObj->GetNodePtr(MN, nodeId);
-	idxCollObj = nodeObj->GetIndexCollection();
-
-	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
-
-	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
-	{
-		idxObj = idxCollObj->GetIndexByPosition(idxLC);
-
-		if (CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false
-		        || strcmp((char*) idxObj->GetIndexValue(), "1006") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1020") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1300") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1C02") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1C09") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F26") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F27") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F84") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F8B") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F8D") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F92") == 0
-		        || strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
-		{
-			idxObj->SetFlagIfIncludedCdc(true);
-			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
-			        sidxLC++)
-			{
-				SubIndex* sidxObj = NULL;
-				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
-				sidxObj->SetFlagIfIncludedCdc(true);
-			}
-		}
-		else if (strcmp((char*) idxObj->GetIndexValue(), "1F8A") == 0)
-		{
-			idxObj->SetFlagIfIncludedCdc(true);
-			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
-			        sidxLC++)
-			{
-				SubIndex* sidxObj = NULL;
-				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
-				if (strcmp((char*) sidxObj->GetIndexValue(), "02") == 0)
-				{
-					sidxObj->SetFlagIfIncludedCdc(true);
-					break;
-				}
-			}
-		}
-	}
-}
+//FIXME: Not needed if Flag is behaviour is fixed
+//void SetFlagForRequiredCNIndexes(INT32 nodeId)
+//{
+//	Index* idxObj = NULL;
+//	IndexCollection* idxCollObj = NULL;
+//	NodeCollection* nodeCollObj = NULL;
+//	Node* nodeObj = NULL;
+//	SubIndex* sidxObj = NULL;
+//	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+//	nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
+//	idxCollObj = nodeObj->GetIndexCollection();
+//
+//	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
+//
+//	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
+//	{
+//		idxObj = idxCollObj->GetIndexByPosition(idxLC);
+//
+//		if ((CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false)
+//		        || (strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
+//		        || (strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0)
+//		        || (strcmp((char*) idxObj->GetIndexValue(), "1020") == 0)
+//		        || (strcmp((char*) idxObj->GetIndexValue(), "1006") == 0)
+//		        || CheckIfManufactureSpecificObject(
+//		            (char*) idxObj->GetIndexValue()))
+//		{
+//			idxObj->SetFlagIfIncludedCdc(true);
+//			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
+//			        sidxLC++)
+//			{
+//				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
+//				if (sidxObj != NULL)
+//				{
+//					sidxObj->SetFlagIfIncludedCdc(true);
+//				}
+//
+//			}
+//		}
+//	}
+//}
+//
+//void SetFlagForRequiredMNIndexes(INT32 nodeId)
+//{
+//	Index* idxObj = NULL;
+//	IndexCollection* idxCollObj = NULL;
+//	NodeCollection* nodeCollObj = NULL;
+//	Node* nodeObj = NULL;
+//
+//	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+//	nodeObj = nodeCollObj->GetNodePtr(MN, nodeId);
+//	idxCollObj = nodeObj->GetIndexCollection();
+//
+//	INT32 idxTotal = idxCollObj->GetNumberofIndexes();
+//
+//	for (INT32 idxLC = 0; idxLC < idxTotal; idxLC++)
+//	{
+//		idxObj = idxCollObj->GetIndexByPosition(idxLC);
+//
+//		if (CheckIfNotPDO((char*) idxObj->GetIndexValue()) == false
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1006") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1020") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1300") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1C02") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1C09") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1C14") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F26") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F27") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F84") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F8B") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F8D") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F92") == 0
+//		        || strcmp((char*) idxObj->GetIndexValue(), "1F98") == 0)
+//		{
+//			idxObj->SetFlagIfIncludedCdc(true);
+//			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
+//			        sidxLC++)
+//			{
+//				SubIndex* sidxObj = NULL;
+//				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
+//				sidxObj->SetFlagIfIncludedCdc(true);
+//			}
+//		}
+//		else if (strcmp((char*) idxObj->GetIndexValue(), "1F8A") == 0)
+//		{
+//			idxObj->SetFlagIfIncludedCdc(true);
+//			for (INT32 sidxLC = 0; sidxLC < idxObj->GetNumberofSubIndexes();
+//			        sidxLC++)
+//			{
+//				SubIndex* sidxObj = NULL;
+//				sidxObj = idxObj->GetSubIndexByPosition(sidxLC);
+//				if (strcmp((char*) sidxObj->GetIndexValue(), "02") == 0)
+//				{
+//					sidxObj->SetFlagIfIncludedCdc(true);
+//					break;
+//				}
+//			}
+//		}
+//	}
+//}
 
 //TODO: unused function
-ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
-{
-	ocfmRetCode objException;
-	char* mnIndex = new char[INDEX_LEN];
-	char* sIdx = new char[SUBINDEX_LEN];
-	IndexCollection* idxCollObj = NULL;
-	NodeCollection* nodeCollObj = NULL;
-	Node* nodeObj = NULL;
-
-	try
-	{
-		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-		nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
-		idxCollObj = nodeObj->GetIndexCollection();
-
-		/* Add 1006*/
-		strcpy(mnIndex, "1020");
-		objException = AddIndex(nodeObj->GetNodeId(), CN, mnIndex);
-		if ((objException.getErrorCode() != 0)
-		        && (objException.getErrorCode() != OCFM_ERR_INDEX_ALREADY_EXISTS))
-		{
-			return objException;
-		}
-
-		char* valueStr = new char[16];
-		valueStr = IntToAscii(configDateGlobal, valueStr, 10);
-
-		/* Set 5ms pxcValue*/
-		/* Set subindex pxcValue 40 or 0000028 */
-		strcpy(sIdx, "01");
-		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(),
-		             CN, false);
-
-		valueStr = IntToAscii(configTimeGlobal, valueStr, 10);
-
-		strcpy(sIdx, "02");
-		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(),
-		             CN, false);
-
-		delete[] valueStr;
-	}
-	catch (ocfmRetCode& ex)
-	{
-		return ex;
-	}
-	objException.setErrorCode(OCFM_ERR_SUCCESS);
-	return objException;
-}
+//ocfmRetCode AddOtherRequiredCNIndexes(INT32 nodeId)
+//{
+//	ocfmRetCode objException;
+//	char* mnIndex = new char[INDEX_LEN];
+//	char* sIdx = new char[SUBINDEX_LEN];
+//	IndexCollection* idxCollObj = NULL;
+//	NodeCollection* nodeCollObj = NULL;
+//	Node* nodeObj = NULL;
+//
+//	try
+//	{
+//		nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+//		nodeObj = nodeCollObj->GetNodePtr(CN, nodeId);
+//		idxCollObj = nodeObj->GetIndexCollection();
+//
+//		/* Add 1006*/
+//		strcpy(mnIndex, "1020");
+//		objException = AddIndex(nodeObj->GetNodeId(), CN, mnIndex);
+//		if ((objException.getErrorCode() != 0)
+//		        && (objException.getErrorCode() != OCFM_ERR_INDEX_ALREADY_EXISTS))
+//		{
+//			return objException;
+//		}
+//
+//		char* valueStr = new char[16];
+//		valueStr = IntToAscii(configDateGlobal, valueStr, 10);
+//
+//		/* Set 5ms pxcValue*/
+//		/* Set subindex pxcValue 40 or 0000028 */
+//		strcpy(sIdx, "01");
+//		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(),
+//		             CN, false);
+//
+//		valueStr = IntToAscii(configTimeGlobal, valueStr, 10);
+//
+//		strcpy(sIdx, "02");
+//		SetSIdxValue(mnIndex, sIdx, valueStr, idxCollObj, nodeObj->GetNodeId(),
+//		             CN, false);
+//
+//		delete[] valueStr;
+//	}
+//	catch (ocfmRetCode& ex)
+//	{
+//		return ex;
+//	}
+//	objException.setErrorCode(OCFM_ERR_SUCCESS);
+//	return objException;
+//}
 
 UINT32 GetDataSize(const string& dataTypeVal)
 {

@@ -98,7 +98,7 @@ BaseIndex::BaseIndex(void) :
 	pdoMapping(NOT_DEFINED),
 	nodeId(0),
 	parameterIndex(-1),
-	includeInCDC(true)
+	forceToCDC(false)
 {}
 
 /****************************************************************************************************/
@@ -590,14 +590,14 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 	return retFlag;
 }
 
-void BaseIndex::SetFlagIfIncludedCdc(bool flagVal)
+void BaseIndex::ForceToCDC(bool flagVal)
 {
-	includeInCDC = flagVal;
+	forceToCDC = flagVal;
 }
 
-bool BaseIndex::GetFlagIfIncludedCdc()
+bool BaseIndex::GetForceToCDC()
 {
-	return includeInCDC;
+	return forceToCDC;
 }
 
 void BaseIndex::DeleteAllMemberMemory()

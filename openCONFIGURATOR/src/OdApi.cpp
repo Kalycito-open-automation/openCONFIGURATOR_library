@@ -45,7 +45,7 @@ namespace openCONFIGURATOR
 						Result result = Translate(AddIndex(nodeId, nodeType, indexString.c_str()));
 						if (!result.IsSuccessful())
 							return result;
-						result = Translate(SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str(), false));
+						result = Translate(SetBasicIndexAttributes(nodeId, nodeType, indexString.c_str(), actualValue.c_str(), name.c_str()));
 						if (!result.IsSuccessful())
 							return result;
 
@@ -100,15 +100,14 @@ namespace openCONFIGURATOR
 								//else
 								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
-							case FLAGIFINCDC:
+							case FORCETOCDC:
 								{
-									// TODO: Remove as soon as flag is being removed
 									string attributeValueLowerCase(attributeValue);
 									transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
 									if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
-										indexPtr->SetFlagIfIncludedCdc(true);
+										indexPtr->ForceToCDC(true);
 									else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
-										indexPtr->SetFlagIfIncludedCdc(false);
+										indexPtr->ForceToCDC(false);
 									else
 									{
 										boost::format formatter(kMsgAttributeValueInvalid);
@@ -198,15 +197,14 @@ namespace openCONFIGURATOR
 								//else
 								//	throw ocfmRetCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
 								break;
-							case FLAGIFINCDC:
+							case FORCETOCDC:
 								{
-									// TODO: Remove as soon as flag is being removed
 									string attributeValueLowerCase(attributeValue);
 									transform(attributeValueLowerCase.begin(), attributeValueLowerCase.end(), attributeValueLowerCase.begin(), ::tolower);
 									if (attributeValueLowerCase == "true" || attributeValueLowerCase == "1")
-										subIndexPtr->SetFlagIfIncludedCdc(true);
+										subIndexPtr->ForceToCDC(true);
 									else if (attributeValueLowerCase == "false" || attributeValueLowerCase == "0")
-										subIndexPtr->SetFlagIfIncludedCdc(false);
+										subIndexPtr->ForceToCDC(false);
 									else
 									{
 										boost::format formatter(kMsgAttributeValueInvalid);
@@ -316,7 +314,7 @@ namespace openCONFIGURATOR
 						if (!result.IsSuccessful())
 							return result;
 
-						return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str(), false));
+						return Translate(SetBasicSubIndexAttributes(nodeId, nodeType, indexString.c_str(), subIndexString.c_str(), actualValue.c_str(), name.c_str()));
 					}
 					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
 				}
