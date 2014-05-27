@@ -275,7 +275,7 @@ void ocfmRetCode::setErrorCode(ConfiguratorError error)
 			this->errorString = "XDD schema validation context creation failed";
 			break;
 		case OCFM_ERR_XML_PARSING_ERROR:
-			this->errorString = "XDD parsing failed due to wrong XML syntax";
+			this->errorString = "XDD/XDC parsing failed due to wrong XML syntax";
 			break;
 		case OCFM_ERR_CANNOT_CREATE_DIR:
 			this->errorString = "Can not create project directory";

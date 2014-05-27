@@ -102,6 +102,8 @@ namespace openCONFIGURATOR
 			/**
 			\brief	Get the active auto calculation configuration.
 
+			Currently the %openCONFIGURATOR library supports generating the MN mapping and node assignements (ID: "all") or generating nothing (ID: "none").
+
 			\param[out] id of the configuration to be retrieved. 
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result

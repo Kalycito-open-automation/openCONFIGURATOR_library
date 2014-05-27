@@ -112,7 +112,7 @@ ProjectConfiguration::ProjectConfiguration(void) :
 	activeViewSettingType(BASIC),
 	viewSettings(),
 	pathSettings(),
-	activeAutogenerationSettingsID(""),
+	activeAutogenerationSettingsID("all"),
 	autogenerationSettings()
 {}
 
@@ -133,7 +133,7 @@ void ProjectConfiguration::ResetConfiguration(void)
 	prescaler = boost::none;
 
 	activeViewSettingType = BASIC;
-	activeAutogenerationSettingsID = "";
+	activeAutogenerationSettingsID = "all";
 
 	viewSettings.clear();
 	autogenerationSettings.clear();
@@ -153,6 +153,7 @@ ProjectConfiguration& ProjectConfiguration::GetInstance(void)
 
 const boost::filesystem::path& ProjectConfiguration::GetDefaultOutputPath() const
 {
+
 	return defaultOutputPath;
 }
 
@@ -338,6 +339,12 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 	{
 		return exceptionThrown;
 	}
+
+	if (GetDefaultOutputPath().empty())
+	{
+		SetDefaultOutputPath(boost::filesystem::path(GetProjectPath().generic_string() + PATH_SEPARATOR + "output"));
+	}
+
 	this->initialized = true;
 	this->alreadysaved = true;
 	LOG_INFO() << "Project-Load finished.";
@@ -387,9 +394,11 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 					        && !xmlAttributeValue.empty()
 					        && xmlAttributeName == PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE)
 					{
-						this->activeAutogenerationSettingsID = xmlAttributeValue;						
-						if(this->activeAutogenerationSettingsID.compare("all") == 0)
+						this->activeAutogenerationSettingsID = xmlAttributeValue;
+						if (this->activeAutogenerationSettingsID.compare("all") == 0)
 							SetGenerateMNOBD(true);
+						else if (this->activeAutogenerationSettingsID.compare("none") == 0)
+							SetGenerateMNOBD(false);
 					}
 				}
 			}
@@ -425,9 +434,9 @@ void ProjectConfiguration::ProcessProject(xmlTextReaderPtr xmlReader)
 					        && !xmlAttributeValue.empty()
 					        && xmlAttributeName == PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE)
 					{
-						if(xmlAttributeValue.compare("BASIC") == 0)
+						if (xmlAttributeValue.compare("BASIC") == 0)
 							this->activeViewSettingType = BASIC;
-						else if(xmlAttributeValue.compare("ADVANCED") == 0)
+						else if (xmlAttributeValue.compare("ADVANCED") == 0)
 							this->activeViewSettingType = ADVANCED;
 					}
 				}
@@ -494,20 +503,20 @@ void ProjectConfiguration::ProcessAutogenerationSettings(xmlTextReaderPtr xmlRea
 			xmlAttr* attribute = node->properties;
 			while (attribute && attribute->name && attribute->children)
 			{
-				if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
+				if (xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
 				{
-				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
-				autogenerationSettingName = (char*) value;
-				xmlFree(value);
+					xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+					autogenerationSettingName = (char*) value;
+					xmlFree(value);
 				}
-				else if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
-			{
-				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
-				autogenerationSettingValue = (char*) value;
-				xmlFree(value);
-			}
+				else if (xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
+				{
+					xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+					autogenerationSettingValue = (char*) value;
+					xmlFree(value);
+				}
 				attribute = attribute->next;
-		}
+			}
 			this->AddAutoGenerationSetting(currentAutogenerationSetting, autogenerationSettingName, autogenerationSettingValue);
 		}
 		node = xmlNextElementSibling(node);
@@ -521,8 +530,8 @@ void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 	while (xmlTextReaderMoveToNextAttribute(xmlReader))
 	{
 		const string xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-		                       ? (const char*) xmlTextReaderConstName(xmlReader)
-		                       : "";
+		                                ? (const char*) xmlTextReaderConstName(xmlReader)
+		                                : "";
 		const string xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
 		                                 ? (const char*) xmlTextReaderConstValue(xmlReader)
 		                                 : "";
@@ -531,42 +540,42 @@ void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 		        && !xmlAttributeValue.empty()
 		        && xmlAttributeName == PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE)
 		{
-			if(xmlAttributeValue.compare("BASIC") == 0)
+			if (xmlAttributeValue.compare("BASIC") == 0)
 				currentViewSetting = BASIC;
-			else if(xmlAttributeValue.compare("ADVANCED") == 0)
+			else if (xmlAttributeValue.compare("ADVANCED") == 0)
 				currentViewSetting = ADVANCED;
 		}
 	}
-	
+
 	//Process the ViewSetting
-	
+
 	while (xmlTextReaderNodeType(xmlReader) != 1)
 		xmlTextReaderRead(xmlReader);
 
 	xmlNodePtr node = xmlTextReaderCurrentNode(xmlReader);
 	while (node != NULL)
-		{
+	{
 		string settingNameStr = "";
 		string settingValueStr = "";
-		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 0)
+		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 1)
 		{
 			xmlAttr* attribute = node->properties;
 			while (attribute && attribute->name && attribute->children)
 			{
-				if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
+				if (xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str()) == 1)
 				{
-				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
-				settingNameStr = (char*) value;
-				xmlFree(value);
-		}
-				else if(xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
+					xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+					settingNameStr = (char*) value;
+					xmlFree(value);
+				}
+				else if (xmlStrEqual(attribute->name, (xmlChar*) PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str()) == 1)
 				{
-				xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
-				settingValueStr = (char*) value;
-				xmlFree(value);
-	}
+					xmlChar* value = xmlNodeListGetString(node->doc, attribute->children, 1);
+					settingValueStr = (char*) value;
+					xmlFree(value);
+				}
 				attribute = attribute->next;
-}
+			}
 			this->AddViewSetting(currentViewSetting, settingNameStr, settingValueStr);
 		}
 		node = xmlNextElementSibling(node);
@@ -923,24 +932,24 @@ void ProjectConfiguration::ProcessPath(xmlTextReaderPtr xmlReader)
 	{
 		string pathId = xmlAttributeValue;
 
-			xmlTextReaderMoveToNextAttribute(xmlReader);
-			xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
-			                   ? (const char*) xmlTextReaderConstName(xmlReader)
-			                   : "";
-			xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
-			                    ? (const char*) xmlTextReaderConstValue(xmlReader)
-			                    : "";
-			if (!xmlAttributeName.empty()
+		xmlTextReaderMoveToNextAttribute(xmlReader);
+		xmlAttributeName = ((const char*) xmlTextReaderConstName(xmlReader))
+		                   ? (const char*) xmlTextReaderConstName(xmlReader)
+		                   : "";
+		xmlAttributeValue = ((const char*) xmlTextReaderConstValue(xmlReader))
+		                    ? (const char*) xmlTextReaderConstValue(xmlReader)
+		                    : "";
+		if (!xmlAttributeName.empty()
 		        && xmlAttributeName == PROJECT_XML_PATH_PATH_ATTRIBUTE
 		        && !xmlAttributeValue.empty())
-			{
+		{
 			this->AddPath(pathId, string(xmlAttributeValue));
-			if(pathId.compare("defaultOutputPath") == 0)
+			if (pathId.compare("defaultOutputPath") == 0)
 				this->SetDefaultOutputPath(boost::filesystem::path(xmlAttributeValue));
-			}
-
 		}
+
 	}
+}
 
 // TODO: Where are the properties set in this method ever used?
 // If these settings are not defined within an MN-XDD, but just the project file, will
@@ -1336,8 +1345,12 @@ openCONFIGURATOR::Library::ErrorHandling::Result ProjectConfiguration::SaveProje
 		}
 		else
 		{
-			//Update existing project file
-			UpdateProjectFile();
+			//Update existing valid project file
+			Result result = ValidateProjectFile(projectPath.generic_string() +  PATH_SEPARATOR + projectFile);
+			if (result.IsSuccessful())
+				UpdateProjectFile();
+			else
+				throw result;
 		}
 
 		//Update XDCs indices with actual values
@@ -1536,6 +1549,42 @@ void ProjectConfiguration::WriteProjectFile(void)
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
 		xmlTextWriterEndElement(writer);
+		if (!viewSettings.empty())
+		{
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == BASIC)
+				{
+					xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlTextWriterEndElement(writer);
+				}
+
+			}
+			xmlTextWriterEndElement(writer);
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "ADVANCED");
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == ADVANCED)
+				{
+					xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlTextWriterEndElement(writer);
+				}
+
+			}
+			xmlTextWriterEndElement(writer);
+			xmlTextWriterEndElement(writer);
+		}
 
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ELEMENT.c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PROJECT_CONFIGURATION_ACTIVE_AUTOGEN_SETTING_ATTRIBUTE.c_str(), BAD_CAST "all");
@@ -1546,12 +1595,23 @@ void ProjectConfiguration::WriteProjectFile(void)
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().c_str());
 		xmlTextWriterEndElement(writer);
 
+		for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
+		{
+			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+			xmlTextWriterEndElement(writer);
+
+		}
 		xmlTextWriterEndElement(writer);
+
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "all");
 		xmlTextWriterEndElement(writer);
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "none");
+		xmlTextWriterEndElement(writer);
 		xmlTextWriterEndElement(writer);
 
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT.c_str());
@@ -1769,11 +1829,6 @@ void ProjectConfiguration::UpdateProjectFile(void)
 		string projectPathStr = ProjectConfiguration::GetInstance().GetProjectPath().generic_string();
 		boost::filesystem::path projectFilePath(projectPathStr + PATH_SEPARATOR + GetProjectFile());
 		boost::filesystem::path mnXdcPath = nodeCollection->GetNodeRef(240).GetXdcPath();
-		string mnXdcPathString = "";
-		if (mnXdcPath.is_relative())
-			mnXdcPathString  = mnXdcPath.generic_string().substr(projectPathStr.size() + 1, mnXdcPath.generic_string().size());
-		else
-			mnXdcPathString  = mnXdcPath.generic_string();
 
 		xmlDocPtr pDoc = xmlParseFile(projectFilePath.generic_string().c_str());
 		if (pDoc == NULL)
@@ -1785,8 +1840,10 @@ void ProjectConfiguration::UpdateProjectFile(void)
 			xmlMemoryDump();
 			throw Result(FILE_READ_FAILED, formatter.str());
 		}
+
 		//update Generator section
 		string xpathGenerator = "//co:Generator";
+		//Create XPath context has to be freed
 		xmlXPathObjectPtr pResultingXPathObject = GetNodeSet(pDoc, xpathGenerator.c_str());
 		if (pResultingXPathObject)
 		{
@@ -1794,7 +1851,6 @@ void ProjectConfiguration::UpdateProjectFile(void)
 			for (int i = 0; i < pNodeSet->nodeNr; ++i)
 			{
 				xmlNodePtr pGeneratorNode(pNodeSet->nodeTab[i]);
-
 				//Update vendor attribute
 				if (xmlHasProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str()))
 				{
@@ -1846,30 +1902,286 @@ void ProjectConfiguration::UpdateProjectFile(void)
 				}
 			}
 		}
+		//Create GeneratorSection
+		else
+		{
+			string xpathProject = "//co:openCONFIGURATORProject";
+			xmlXPathObjectPtr pResultingXPathObjectProject = GetNodeSet(pDoc, xpathProject.c_str());
+			if (pResultingXPathObjectProject)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectProject->nodesetval);
+				xmlNodePtr projectNode(pNodeSet->nodeTab[0]);
+
+				xmlNodePtr pGeneratorNode = xmlNewNode(0, BAD_CAST PROJECT_XML_GENERATOR_ELEMENT.c_str());
+				xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_VENDOR_ATTRIBUTE.c_str(), BAD_CAST "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
+				xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLNAME_ATTRIBUTE.c_str(), BAD_CAST "openCONFIGURATOR");
+				xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_TOOLVERSION_ATTRIBUTE.c_str(), BAD_CAST "1.4.0");
+				xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_CREATEDON_ATTRIBUTE.c_str(), BAD_CAST GetCreationDate().c_str());
+				xmlNewProp(pGeneratorNode, BAD_CAST PROJECT_XML_GENERATOR_MODIFIEDON_ATTRIBUTE.c_str(), BAD_CAST GetCurrentDateTime().c_str());
+
+				//Insert the Generator element before the first child element of the Project element
+				xmlAddPrevSibling(xmlFirstElementChild(projectNode), pGeneratorNode);
+			}
+			xmlXPathFreeObject(pResultingXPathObjectProject);
+		}
 		xmlXPathFreeObject(pResultingXPathObject);
 
-		string xpathPath = "//co:Path[@id='defaultOutputPath']";
-		pResultingXPathObject = GetNodeSet(pDoc, xpathPath.c_str());
-		if (pResultingXPathObject)
+		//Update ViewSettings section
+		string xpathPathIDEConfiguration = "//co:IDEConfiguration";
+		xmlXPathObjectPtr pResultingXPathObjectIDEConfiguration = GetNodeSet(pDoc, xpathPathIDEConfiguration.c_str());
+		if (pResultingXPathObjectIDEConfiguration)
 		{
-			xmlNodeSetPtr pNodeSet(pResultingXPathObject->nodesetval);
+			//Delete existing ViewSettings section
+			xmlNodeSetPtr pNodeSet(pResultingXPathObjectIDEConfiguration->nodesetval);
+			xmlNodePtr pPathNode(pNodeSet->nodeTab[0]);
+			xmlUnlinkNode(pPathNode);
+			xmlFreeNode(pPathNode);
+		}
+		xmlXPathFreeObject(pResultingXPathObjectIDEConfiguration);
+
+		// Create the ViewSetting
+		string xpathPathProjectConf = "//co:ProjectConfiguration";
+		xmlXPathObjectPtr pResultingXPathObjectIDE = GetNodeSet(pDoc, xpathPathProjectConf.c_str());
+		if (pResultingXPathObjectIDE)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObjectIDE->nodesetval);
+			xmlNodePtr pParentNode(pNodeSet->nodeTab[0]);
+
+			xmlNodePtr pNodeIDEConf = xmlNewNode(0, BAD_CAST PROJECT_XML_IDECONFIGURATION_ELEMENT.c_str());
+			if (this->activeViewSettingType == BASIC)
+				xmlNewProp(pNodeIDEConf, BAD_CAST PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+			if (this->activeViewSettingType == ADVANCED)
+				xmlNewProp(pNodeIDEConf, BAD_CAST PROJECT_XML_IDECONFIGURATION_ACTIVE_VIEW_SETTING_ATTRIBUTE.c_str(), BAD_CAST "ADVANCED");
+
+			xmlNodePtr pNodeViewBasic = xmlNewNode(0, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlNewProp(pNodeViewBasic, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "BASIC");
+
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == BASIC)
+				{
+					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlAddChild(pNodeViewBasic, pNodeNew);
+				}
+			}
+
+			xmlNodePtr pNodeViewAdvanced = xmlNewNode(0, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_ELEMENT.c_str());
+			xmlNewProp(pNodeViewAdvanced, BAD_CAST PROJECT_XML_IDECONFIGURATION_VIEW_SETTINGS_TYPE_ATTRIBUTE.c_str(), BAD_CAST "ADVANCED");
+
+
+			for (std::vector<ViewSetting>::iterator it = viewSettings.begin(); it != viewSettings.end(); ++it)
+			{
+				if (it->GetViewType() == ADVANCED)
+				{
+					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_SETTING_ELEMENT.c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_SETTING_NAME_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_SETTING_VALUE_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlAddChild(pNodeViewAdvanced, pNodeNew);
+				}
+			}
+
+			xmlAddChild(pNodeIDEConf, pNodeViewAdvanced);
+			xmlAddChild(pNodeIDEConf, pNodeViewBasic);
+
+			xmlAddPrevSibling(pParentNode, pNodeIDEConf);
+
+			xmlXPathFreeObject(pResultingXPathObjectIDE);
+		}
+
+
+
+		//Update PathSettings
+		string xpathPathPath = "//co:PathSettings/co:Path";
+		xmlXPathObjectPtr pResultingXPathObjectIPathSettings = GetNodeSet(pDoc, xpathPathPath.c_str());
+		if (pResultingXPathObjectIPathSettings)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObjectIPathSettings->nodesetval);
+			xmlNodePtr pPathNode(pNodeSet->nodeTab[0]);
+
+			bool createPath = true;
+			//Update default output path
 			for (int i = 0; i < pNodeSet->nodeNr; ++i)
 			{
 				xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
-
-				//Update path attribute
-				if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str()))
+				xmlChar* tempID = xmlGetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str());
+				string id = (char*) tempID;
+				xmlFree(tempID);
+				if (id.compare("defaultOutputPath") == 0)
 				{
 					xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+					createPath = false;
 				}
-				else
-				{
-					xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
-				}
+			}
+			if (createPath)
+			{
+				xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
+				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				xmlAddNextSibling(pPathNode, pNodeNew);
+			}
 
+			//Update other paths
+			for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
+			{
+				createPath = true;
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+					xmlChar* tempID = xmlGetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str());
+					string id = (char*) tempID;
+					xmlFree(tempID);
+					if (id.compare(it->GetName()) == 0)
+					{
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+						createPath = false;
+					}
+
+				}
+				if (createPath)
+				{
+					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlAddNextSibling(pPathNode, pNodeNew);
+				}
+			}
+
+			//Delete no longer existing paths
+			if ((unsigned int) pNodeSet->nodeNr > pathSettings.size() + 1)
+			{
+				for (int i = 0; i < pNodeSet->nodeNr; ++i)
+				{
+					xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+					xmlChar* tempID = xmlGetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str());
+					string id = (char*) tempID;
+					xmlFree(tempID);
+
+					bool deletePath = true;
+					if (id.compare("defaultOutputPath") == 0)
+						deletePath = false;
+
+					for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
+					{
+						if (it->GetName().compare(id) == 0)
+						{
+							deletePath = false;
+						}
+					}
+
+					if (deletePath)
+					{
+						xmlUnlinkNode(pPathNode);
+						xmlFreeNode(pPathNode);
+					}
+
+				}
 			}
 		}
-		xmlXPathFreeObject(pResultingXPathObject);
+		//when Path Settings do not exist create them
+		else
+		{
+			string xpathPathProjectConf = "//co:AutoGenerationSettings";
+			xmlXPathObjectPtr pResultingXPathObjectProjectConfig = GetNodeSet(pDoc, xpathPathProjectConf.c_str());
+			if (pResultingXPathObjectProjectConfig)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectProjectConfig->nodesetval);
+				xmlNodePtr pParentNode(pNodeSet->nodeTab[0]);
+
+				xmlNodePtr pNodePathSettings = xmlNewNode(0, BAD_CAST PROJECT_XML_PROJECT_PATHSETTINGS_ELEMENT.c_str());
+
+				xmlNodePtr pNodeDefaultOutputPath = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+				xmlNewProp(pNodeDefaultOutputPath, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
+				xmlNewProp(pNodeDefaultOutputPath, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				xmlAddChild(pNodePathSettings, pNodeDefaultOutputPath);
+
+				for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
+				{
+					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlAddChild(pNodePathSettings, pNodeNew);
+				}
+
+				xmlAddPrevSibling(pParentNode, pNodePathSettings);
+
+				xmlXPathFreeObject(pResultingXPathObjectProjectConfig);
+			}
+			xmlXPathFreeObject(pResultingXPathObjectIPathSettings);
+		}
+
+
+		//Update AutoGeneration Settings
+		string xpathPath = "//co:AutoGenerationSettings";
+		xmlXPathObjectPtr pResultingXPathObjectAutoGenSetting = GetNodeSet(pDoc, xpathPath.c_str());
+		if (pResultingXPathObjectAutoGenSetting)
+		{
+			xmlNodeSetPtr pNodeSet(pResultingXPathObjectAutoGenSetting->nodesetval);
+			bool allExists = false;
+			bool noneExists = false;
+			for (int i = 0; i < pNodeSet->nodeNr; ++i)
+			{
+
+				xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
+
+				xmlChar* temp = xmlGetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str());
+				string id = (char*) temp;
+				xmlFree(temp);
+
+				if (id.compare("all") == 0)
+				{
+					allExists = true;
+				}
+				else if (id.compare("none") == 0)
+				{
+					noneExists = true;
+				}
+			}
+
+			string xpathPathAutoGenerationSetting = "//co:ProjectConfiguration";
+			xmlXPathObjectPtr pResultingXPathObjectAutoGenSettings = GetNodeSet(pDoc, xpathPathAutoGenerationSetting.c_str());
+			if (pResultingXPathObjectAutoGenSettings)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectAutoGenSettings->nodesetval);
+				xmlNodePtr pParentNode(pNodeSet->nodeTab[0]);
+				if (!allExists)
+				{
+					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "all");
+					xmlAddChild(pParentNode, pNodeNew);
+				}
+				if (!noneExists)
+				{
+					xmlNodePtr pNodeNew2 = xmlNewNode(0, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+					xmlNewProp(pNodeNew2, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "none");
+					xmlAddChild(pParentNode, pNodeNew2);
+				}
+			}
+			xmlXPathFreeObject(pResultingXPathObjectAutoGenSettings);
+		}
+		//when Autogeneration Settings do not exist create the default ones
+		else
+		{
+			string xpathPathAutoGenerationSetting = "//co:ProjectConfiguration";
+			xmlXPathObjectPtr pResultingXPathObjectAutoGenSettings = GetNodeSet(pDoc, xpathPathAutoGenerationSetting.c_str());
+			if (pResultingXPathObjectAutoGenSettings)
+			{
+				xmlNodeSetPtr pNodeSet(pResultingXPathObjectAutoGenSettings->nodesetval);
+				xmlNodePtr pParentNode(pNodeSet->nodeTab[0]);
+				xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "all");
+				xmlAddChild(pParentNode, pNodeNew);
+
+				xmlNodePtr pNodeNew2 = xmlNewNode(0, BAD_CAST PROJECT_XML_AUTOGENERATION_SETTINGS_ELEMENT.c_str());
+				xmlNewProp(pNodeNew2, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "none");
+				xmlAddChild(pParentNode, pNodeNew2);
+			}
+			xmlXPathFreeObject(pResultingXPathObjectAutoGenSettings);
+		}
+		xmlXPathFreeObject(pResultingXPathObjectAutoGenSetting);
+
+
 
 		if (GetGenerateMNOBD())
 		{
@@ -1983,8 +2295,12 @@ void ProjectConfiguration::UpdateProjectFile(void)
 			}
 		}
 		xmlXPathFreeObject(pResultingXPathObject);
-
 		string xpathMn = "//co:MN[@nodeID='240']";
+		string mnXdcPathString = "";
+		if (mnXdcPath.is_relative())
+			mnXdcPathString  = mnXdcPath.generic_string().substr(projectPathStr.size() + 1, mnXdcPath.generic_string().size());
+		else
+			mnXdcPathString  = mnXdcPath.generic_string();
 		pResultingXPathObject = GetNodeSet(pDoc, xpathMn.c_str());
 		if (pResultingXPathObject)
 		{
@@ -2159,7 +2475,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 
 						if (existingNode == nodeObj->GetNodeId())
 						{
-							//Update name attribute
+							//Update name attribute anyway
 							if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str()))
 							{
 								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
@@ -2169,7 +2485,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
 							}
 
-							//Update pathToXDC attribute
+							//Update pathToXDC attribute anyway
 							if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str()))
 							{
 								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
@@ -2177,6 +2493,67 @@ void ProjectConfiguration::UpdateProjectFile(void)
 							else
 							{
 								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+							}
+
+							//Update isChained attribute if existing or node is chained
+							if (nodeObj->GetStationType() == CHAINED)
+							{
+								
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST "true");
+								}
+								else
+								{
+									xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST "true");
+								}
+							}
+							else
+							{
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST "false");
+								}
+							}
+
+							//Update isMultiplexed attribute if existing or node is multiplexed
+							if (nodeObj->GetStationType() == MULTIPLEXED)
+							{
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST "true");
+								}
+								else
+								{
+									xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST "true");
+								}
+							}
+							else
+							{
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST "false");
+								}
+							}
+
+							//Update forcedCycle attribute if existing or node has forced cycle
+							if (nodeObj->GetForceCycleFlag())
+							{
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetForcedCycleValue());
+								}
+								else
+								{
+									xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetForcedCycleValue());
+								}
+							}
+							else
+							{
+								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str()))
+								{
+									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST "0");
+								}
 							}
 
 							//TODO Add missing node parameter if used lateron
@@ -2312,6 +2689,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 		xmlXPathFreeObject(pResultingXPathObject);
 
 		//Save the project file
+
 		xmlSaveFormatFileEnc(projectFilePath.generic_string().c_str(), pDoc, "UTF-8", 1);
 		xmlFreeDoc(pDoc);
 		xmlCleanupParser();
@@ -2331,6 +2709,11 @@ void ProjectConfiguration::UpdateNodeConfigurations(void)
 		for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
 		{
 			Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+			//Validate before updating the XDC
+			Result retValue = Translate(ValidateXDDFile(nodeObj->GetXdcPath().generic_string().c_str()));
+			if (!retValue.IsSuccessful())
+				throw retValue;
+
 			//Load the nodes XDC file
 			xmlDocPtr pDoc = xmlParseFile(nodeObj->GetXdcPath().generic_string().c_str());
 			if (pDoc == NULL)
@@ -2386,14 +2769,14 @@ void ProjectConfiguration::UpdateNodeConfigurations(void)
 					xmlXPathFreeObject(pResultingXPathObject);
 				}
 				if (index->HasSubIndices())
-				{			
+				{
 					for (int j = 0; j < index->GetNumberofSubIndexes(); j++)
 					{
 						SubIndex* subIndex = index->GetSubIndexByPosition(j);
 						if (IsDefaultActualNotEqual(subIndex) && subIndex->GetActualValue() != NULL)
 						{
 							//Correct the number of entries if not sufficient indices available
-							if(j == 0)
+							if (j == 0)
 							{
 								//Get nr of subindices in the xdc file
 								string xpath = "//plk:Object[@index='";
@@ -2539,7 +2922,7 @@ Result ProjectConfiguration::DeletePath(const string id)
 			break;
 		}
 	}
-	if(notFound)
+	if (notFound)
 	{
 		boost::format formatter(kMsgPathDoesNotExist);
 		formatter % id;
@@ -2558,9 +2941,9 @@ Result ProjectConfiguration::AddViewSetting(ViewType viewType, const string name
 		if (it->GetName().compare(name) == 0 && it->GetViewType() == viewType)
 		{
 			boost::format formatter(kMsgViewSettingExists);
-				formatter % name,
-				formatter % viewType;
-				return Result(VIEW_SETTING_EXISTS, formatter.str());
+			formatter % name,
+			          formatter % viewType;
+			return Result(VIEW_SETTING_EXISTS, formatter.str());
 		}
 	}
 	this->viewSettings.push_back(ViewSetting(viewType, name, value));
@@ -2578,7 +2961,7 @@ Result ProjectConfiguration::GetViewSetting(ViewType viewType, const string name
 	}
 	boost::format formatter(kMsgViewSettingDoesNotExist);
 	formatter % name,
-	formatter % viewType;
+	          formatter % viewType;
 	return Result(VIEW_SETTING_DOES_NOT_EXIST, formatter.str());
 }
 Result ProjectConfiguration::DeleteViewSetting(ViewType viewType, const std::string name)
@@ -2594,11 +2977,11 @@ Result ProjectConfiguration::DeleteViewSetting(ViewType viewType, const std::str
 			break;
 		}
 	}
-	if(notFound)
+	if (notFound)
 	{
 		boost::format formatter(kMsgViewSettingDoesNotExist);
 		formatter % name,
-		formatter % viewType;
+		          formatter % viewType;
 		return Result(VIEW_SETTING_DOES_NOT_EXIST, formatter.str());
 	}
 
@@ -2635,7 +3018,7 @@ Result ProjectConfiguration::AddAutoGenerationSetting(const string id, const str
 		{
 			boost::format formatter(kMsgAutoGenSettingExists);
 			formatter % name,
-			formatter % id;
+			          formatter % id;
 			return Result(AUTO_GEN_SETTING_EXISTS, formatter.str());
 		}
 	}
@@ -2655,7 +3038,7 @@ Result ProjectConfiguration::GetAutoGenerationSetting(const string id, const str
 	}
 	boost::format formatter(kMsgAutoGenSettingDoesNotExist);
 	formatter % name,
-	formatter % id;
+	          formatter % id;
 	return Result(AUTO_GEN_SETTING_DOES_NOT_EXIST, formatter.str());
 }
 
@@ -2672,11 +3055,11 @@ Result ProjectConfiguration::DeleteAutoGenerationSetting(const string id, const 
 			break;
 		}
 	}
-	if(notFound)
+	if (notFound)
 	{
 		boost::format formatter(kMsgAutoGenSettingDoesNotExist);
 		formatter % name,
-		formatter % id;
+		          formatter % id;
 		return Result(AUTO_GEN_SETTING_DOES_NOT_EXIST, formatter.str());
 	}
 
@@ -2691,8 +3074,16 @@ Result ProjectConfiguration::SetActiveAutoGenerationSetting(const string id)
 	//{
 	//	if (it->GetAutoGenId().compare(id) == 0)
 	//	{
-			this->activeAutogenerationSettingsID = id;
-			return Result();
+	this->activeAutogenerationSettingsID = id;
+
+	//TODO
+	//Only all and none are supported at the moment
+	if (id.compare("all") == 0)
+		this->SetGenerateMNOBD(true);
+	else if (id.compare("none") == 0)
+		this->SetGenerateMNOBD(false);
+
+	return Result();
 	//	}
 	//}
 	//boost::format formatter(kMsgAutoGenSettingsDoesNotExist);

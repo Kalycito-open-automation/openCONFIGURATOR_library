@@ -71,7 +71,6 @@
     <Compile Include="AttributeType.cs" />
 	<Compile Include="Result.cs" />
 	<Compile Include="PlkFeature.cs" />
-	<Compile Include="ObjectType.cs" />
 	<Compile Include="ErrorCode.cs" />
 	<Compile Include="NodeParameter.cs" />
 	<Compile Include="PlkDataType.cs" />

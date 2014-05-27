@@ -836,6 +836,7 @@ Result ValidateProjectFile(const string& fileName)
 		else
 		{
 			exceptionObject.setErrorCode(OCFM_ERR_XML_PARSING_ERROR);
+			exceptionObject.setErrorString("Project file parsing failed due to wrong XML syntax.");
 		}
 
 		//CleanUp XML Parser
