@@ -3477,7 +3477,7 @@ User: pufferd
       <TransportLayers>
       </TransportLayers>
       <NetworkManagement>
-        <GeneralFeatures DLLFeatureMN="false" NMTBootTimeNotActive="8000000" NMTCycleTimeMax="60000" NMTCycleTimeMin="200" NMTErrorEntries="2" />
+        <GeneralFeatures DLLFeatureMN="false" NMTBootTimeNotActive="8000000" PDORPDOChannels="3" NMTCycleTimeMax="60000" NMTCycleTimeMin="200" NMTErrorEntries="2" />
         <CNFeatures DLLCNFeatureMultiplex="true" NMTCNSoC2PReq="0" />
         <Diagnostic>
         </Diagnostic>

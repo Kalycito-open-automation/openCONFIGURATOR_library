@@ -89,8 +89,7 @@ void ProjectApiTest::testSaveProject()
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = SaveProject();
-	//NOT IMPLEMENTED
-	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == LEGACY_ERROR);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = CloseProject();
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);

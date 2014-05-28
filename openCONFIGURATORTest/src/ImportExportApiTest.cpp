@@ -59,7 +59,10 @@ ImportExportApiTest::ImportExportApiTest(void) {}
 
 ImportExportApiTest::~ImportExportApiTest(void) {}
 
-void ImportExportApiTest::setUp() {}
+void ImportExportApiTest::setUp() {
+	this->retCode = OpenProject(".\\testProject\\testProject.xml");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
 
 void ImportExportApiTest::tearDown()
 {
@@ -69,9 +72,6 @@ void ImportExportApiTest::tearDown()
 
 void ImportExportApiTest::testGenerateProcessImageDescription()
 {
-	this->retCode = OpenProject(".\\testProject\\testProject.xml");
-	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
 	this->retCode = GenerateStackConfiguration(".\\testProject\\output", "mnobd");
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
@@ -79,9 +79,6 @@ void ImportExportApiTest::testGenerateProcessImageDescription()
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = GenerateProcessImageDescription(CSHARP, ".\\testProject\\output", "PI");
-	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
-	this->retCode = CloseProject();
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 }
 

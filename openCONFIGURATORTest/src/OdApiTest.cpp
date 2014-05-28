@@ -107,150 +107,150 @@ void OdApiTest::testSetIndexAttribute()
 
 	this->retCode = AddIndex(1, 8208, "30", "Index2010", VAR);
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-	/*	string getNameString;
-		this->retCode = GetIndexAttribute(1, 8208, NAME, getNameString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getNameString.compare("Index2010") == 0);
+	string getNameString;
+	this->retCode = GetIndexAttribute(1, 8208, NAME, getNameString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getNameString.compare("Index2010") == 0);
 
-		this->retCode = SetIndexAttribute(1, 8208, NAME, "Index2010New");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, NAME, "Index2010New");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		string setNameString;
-		this->retCode = GetIndexAttribute(1, 8208, NAME, setNameString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(setNameString.compare("Index2010New") == 0);
+	string setNameString;
+	this->retCode = GetIndexAttribute(1, 8208, NAME, setNameString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(setNameString.compare("Index2010New") == 0);
 
-		this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "DEFTYPE");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "DEFTYPE");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		string getObjecttypeString;
-		this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, getObjecttypeString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getObjecttypeString.compare("DEFTYPE") == 0);
+	string getObjecttypeString;
+	this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, getObjecttypeString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getObjecttypeString.compare("DEFTYPE") == 0);
 
-		this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "DEFSTRUCT");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "DEFSTRUCT");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		string setObjecttypeString;
-		this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(setObjecttypeString.compare("DEFSTRUCT") == 0);
-		setObjecttypeString.clear();
+	string setObjecttypeString;
+	this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(setObjecttypeString.compare("DEFSTRUCT") == 0);
+	setObjecttypeString.clear();
 
-		this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "VAR");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "VAR");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(setObjecttypeString.compare("VAR") == 0);
-		setObjecttypeString.clear();
+	this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(setObjecttypeString.compare("VAR") == 0);
+	setObjecttypeString.clear();
 
-		//this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "ARRAY");
-		//cout << this->retCode.getError() << endl;
-		//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	//this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "ARRAY");
+	//cout << this->retCode.getError() << endl;
+	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		//this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
-		//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		//CPPUNIT_ASSERT(setObjecttypeString.compare("ARRAY") == 0);
-		//setObjecttypeString.clear();
+	//this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
+	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	//CPPUNIT_ASSERT(setObjecttypeString.compare("ARRAY") == 0);
+	//setObjecttypeString.clear();
 
-		//this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "RECORD");
-		//cout << this->retCode.getErrorCode() <<endl;
-		//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	//this->retCode = SetIndexAttribute(1, 8208, OBJECTTYPE, "RECORD");
+	//cout << this->retCode.getErrorCode() <<endl;
+	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		//this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
-		//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		//CPPUNIT_ASSERT(setObjecttypeString.compare("RECORD") == 0);
-
-
-		this->retCode = SetIndexAttribute(1, 8208, ACCESSTYPE, "ro");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
-		string getAccesstypeString;
-		this->retCode = GetIndexAttribute(1, 8208, ACCESSTYPE, getAccesstypeString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getAccesstypeString.compare("ro") == 0);
+	//this->retCode = GetIndexAttribute(1, 8208, OBJECTTYPE, setObjecttypeString);
+	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	//CPPUNIT_ASSERT(setObjecttypeString.compare("RECORD") == 0);
 
 
-		this->retCode = SetIndexAttribute(1, 8208, HIGHLIMIT, "10");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, ACCESSTYPE, "ro");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		string getHighLimitString;
-		this->retCode = GetIndexAttribute(1, 8208, HIGHLIMIT, getHighLimitString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getHighLimitString.compare("10") == 0);
-
-		this->retCode = SetIndexAttribute(1, 8208, LOWLIMIT, "5");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
-		string getLowLimitString;
-		this->retCode = GetIndexAttribute(1, 8208, LOWLIMIT, getLowLimitString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getLowLimitString.compare("5") == 0);
-
-		this->retCode = SetIndexAttribute(1, 8208, LOWLIMIT, "11");
-		CPPUNIT_ASSERT(this->retCode.GetErrorCode() == OBJECT_LIMITS_INVALID);
+	string getAccesstypeString;
+	this->retCode = GetIndexAttribute(1, 8208, ACCESSTYPE, getAccesstypeString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getAccesstypeString.compare("ro") == 0);
 
 
-		this->retCode = SetIndexAttribute(1, 8208, HIGHLIMIT, "4");
-		CPPUNIT_ASSERT(this->retCode.GetErrorCode() == OBJECT_LIMITS_INVALID);
+	this->retCode = SetIndexAttribute(1, 8208, HIGHLIMIT, "10");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		this->retCode = SetIndexAttribute(1, 8208, DEFAULTVALUE, "7");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	string getHighLimitString;
+	this->retCode = GetIndexAttribute(1, 8208, HIGHLIMIT, getHighLimitString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getHighLimitString.compare("10") == 0);
 
-		string getDefaultValueString;
-		this->retCode = GetIndexAttribute(1, 8208, DEFAULTVALUE, getDefaultValueString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getDefaultValueString.compare("7") == 0);
+	this->retCode = SetIndexAttribute(1, 8208, LOWLIMIT, "5");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		this->retCode = SetIndexAttribute(1, 8208, ACTUALVALUE, "8");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	string getLowLimitString;
+	this->retCode = GetIndexAttribute(1, 8208, LOWLIMIT, getLowLimitString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getLowLimitString.compare("5") == 0);
 
-		string getActualValueString;
-		this->retCode = GetIndexAttribute(1, 8208, ACTUALVALUE, getActualValueString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getActualValueString.compare("8") == 0);
-
-		this->retCode = SetIndexAttribute(1, 8208, ACTUALVALUE, "0x16");
-		CPPUNIT_ASSERT(this->retCode.GetErrorCode() == VALUE_NOT_WITHIN_RANGE);
-
-		string getPDOMappingValue;
-		this->retCode = GetIndexAttribute(1, 8208, PDOMAPPING, getPDOMappingValue);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getPDOMappingValue.compare("NOT_DEFINED") == 0);
-
-		this->retCode = SetIndexAttribute(1, 8208, PDOMAPPING, "optional");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
-		this->retCode = GetIndexAttribute(1, 8208, PDOMAPPING, getPDOMappingValue);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getPDOMappingValue.compare("OPTIONAL") == 0);
+	this->retCode = SetIndexAttribute(1, 8208, LOWLIMIT, "11");
+	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == OBJECT_LIMITS_INVALID);
 
 
-		string getFlagincdcString;
-		this->retCode = GetIndexAttribute(1, 8208, FLAGIFINCDC, getFlagincdcString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(getFlagincdcString.compare("0") == 0);
+	this->retCode = SetIndexAttribute(1, 8208, HIGHLIMIT, "4");
+	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == OBJECT_LIMITS_INVALID);
 
-		this->retCode = SetIndexAttribute(1, 8208, FLAGIFINCDC, "1");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, DEFAULTVALUE, "7");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		string setFlagincdcString;
-		this->retCode = GetIndexAttribute(1, 8208, FLAGIFINCDC, setFlagincdcString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(setFlagincdcString.compare("1") == 0);
-		setFlagincdcString.clear();
+	string getDefaultValueString;
+	this->retCode = GetIndexAttribute(1, 8208, DEFAULTVALUE, getDefaultValueString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getDefaultValueString.compare("7") == 0);
 
-		this->retCode = SetIndexAttribute(1, 8208, FLAGIFINCDC, "false");
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	this->retCode = SetIndexAttribute(1, 8208, ACTUALVALUE, "8");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-		this->retCode = GetIndexAttribute(1, 8208, FLAGIFINCDC, setFlagincdcString);
-		CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-		CPPUNIT_ASSERT(setFlagincdcString.compare("0") == 0);
+	string getActualValueString;
+	this->retCode = GetIndexAttribute(1, 8208, ACTUALVALUE, getActualValueString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getActualValueString.compare("8") == 0);
 
-		this->retCode = SetIndexAttribute(1, 8208, FLAGIFINCDC, "ttrue");
-		CPPUNIT_ASSERT(this->retCode.GetErrorCode() == ATTRIBUTEVALUE_INVALID);
-	*/
+	this->retCode = SetIndexAttribute(1, 8208, ACTUALVALUE, "0x16");
+	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == VALUE_NOT_WITHIN_RANGE);
+
+	string getPDOMappingValue;
+	this->retCode = GetIndexAttribute(1, 8208, PDOMAPPING, getPDOMappingValue);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getPDOMappingValue.compare("NOT_DEFINED") == 0);
+
+	this->retCode = SetIndexAttribute(1, 8208, PDOMAPPING, "optional");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = GetIndexAttribute(1, 8208, PDOMAPPING, getPDOMappingValue);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getPDOMappingValue.compare("OPTIONAL") == 0);
+
+
+	string getFlagincdcString;
+	this->retCode = GetIndexAttribute(1, 8208, FORCETOCDC, getFlagincdcString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(getFlagincdcString.compare("0") == 0);
+
+	this->retCode = SetIndexAttribute(1, 8208, FORCETOCDC, "1");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	string setFlagincdcString;
+	this->retCode = GetIndexAttribute(1, 8208, FORCETOCDC, setFlagincdcString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(setFlagincdcString.compare("1") == 0);
+	setFlagincdcString.clear();
+
+	this->retCode = SetIndexAttribute(1, 8208, FORCETOCDC, "false");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = GetIndexAttribute(1, 8208, FORCETOCDC, setFlagincdcString);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(setFlagincdcString.compare("0") == 0);
+
+	this->retCode = SetIndexAttribute(1, 8208, FORCETOCDC, "ttrue");
+	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == ATTRIBUTEVALUE_INVALID);
+
 	this->retCode = CloseProject();
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
@@ -269,11 +269,11 @@ void OdApiTest::testSetIndexActualValue()
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = SetIndexAttribute(1, 8208, HIGHLIMIT, "10");
-	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	//Check Low Limit
 	this->retCode = SetIndexAttribute(1, 8208, LOWLIMIT, "5");
-	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = SetIndexActualValue(1, 8208, "8");
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
@@ -359,7 +359,7 @@ void OdApiTest::testSetSubIndexAttribute()
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 	CPPUNIT_ASSERT(getSubIndexValue.compare("") == 0);
 
-	this->retCode = GetSubIndexAttribute(1, 8208, 12, FLAGIFINCDC, getSubIndexValue);
+	this->retCode = GetSubIndexAttribute(1, 8208, 12, FORCETOCDC, getSubIndexValue);
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 	CPPUNIT_ASSERT(getSubIndexValue.compare("0") == 0);
 
