@@ -11965,37 +11965,20 @@ void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType)
 	}
 	INT32 subIndexPos;
 	INT32 indexPos;
-	ocfmRetCode exceptionObj;
-	exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
+	ocfmRetCode exceptionObj = IfSubIndexExists(nodeId, nodeType, (char*) "1F98",
 	                                (char*) "03", &subIndexPos, &indexPos);
 	if (exceptionObj.getErrorCode() != OCFM_ERR_SUCCESS)
 	{
 		return;
 	}
 
-	SubIndex* sidxObj = NULL;
-	IndexCollection* indexCollObj = NULL;
+	NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
+	Node* nodeObj = nodeCollObj->GetNodePtr(nodeType, nodeId);
+	IndexCollection* indexCollObj = nodeObj->GetIndexCollection();
 
-	Node* nodeObj = NULL;
-	NodeCollection* nodeCollObj = NULL;
+	Index* indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1F98");
+	SubIndex*sidxObj = indexObj->GetSubIndexbyIndexValue((char*) "03");
 
-	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-	nodeObj = nodeCollObj->GetNodePtr(nodeType, nodeId);
-	indexCollObj = nodeObj->GetIndexCollection();
-
-	Index* indexObj = NULL;
-
-	indexObj = indexCollObj->GetIndexbyIndexValue((char*) "1F98");
-	if (indexObj == NULL)
-	{
-		return;
-	}
-
-	sidxObj = indexObj->GetSubIndexbyIndexValue((char*) "03");
-	if (sidxObj == NULL)
-	{
-		return;
-	}
 	char* tempValStr = NULL;
 	INT32 tempValue = 0;
 	bool add25microsec = false;
@@ -12041,6 +12024,7 @@ void CalculateCNPollResponse(INT32 nodeId, NodeType nodeType)
 
 	tempVal = IntToAscii(tempValue, tempVal, 10);
 	nodeObj->SetPollResponseTimeout(tempVal);
+
 	delete[] tempValStr;
 	delete[] tempVal;
 }

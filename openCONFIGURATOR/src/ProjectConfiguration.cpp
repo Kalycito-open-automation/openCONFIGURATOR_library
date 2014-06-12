@@ -298,41 +298,6 @@ ocfmRetCode ProjectConfiguration::LoadProject(const string& projectFile)
 		xmlCleanupParser();
 		xmlMemoryDump();
 
-		// FIXME: What is this code block good for??
-		NodeCollection* nodeCollObj = NodeCollection::GetNodeColObjectPointer();
-
-		char* presTimeoutVal = new char[50];
-		presTimeoutVal[0] = 0;
-
-		for (INT32 i = 0; i < nodeCollObj->GetNumberOfNodes(); i++)
-		{
-			Node nodeObj = nodeCollObj->GetNodebyCollectionIndex(i);
-			INT32 nodeId = nodeObj.GetNodeId();
-			NodeType nodeType = nodeObj.GetNodeType();
-
-			CopyPDODefToAct(nodeId, nodeType);
-			//CopyMNPropDefToAct(nodeId, nodeType);
-
-			if ((nodeId != MN_NODEID) && (nodeType != MN))
-			{
-				char* nodeIdHexStr = new char[SUBINDEX_LEN];
-				nodeIdHexStr = IntToAscii(nodeId, nodeIdHexStr, 16);
-				nodeIdHexStr = PadLeft(nodeIdHexStr, '0', 2);
-				GetSubIndexAttributes(MN_NODEID, MN, "1f92", nodeIdHexStr, ACTUALVALUE, presTimeoutVal);
-				LOG_DEBUG() << "Actual Value for PollResponse-Timeout (0x1F92) for node " << nodeId << " set to: " << presTimeoutVal;
-				if (((presTimeoutVal == NULL)
-				        || (strlen(presTimeoutVal) == 0))
-				        || (!(ValidateCNPresTimeout(nodeIdHexStr, presTimeoutVal))))
-				{
-					CalculateCNPollResponse(nodeId, nodeType);
-				}
-
-				delete[] nodeIdHexStr;
-			}
-		}
-		delete[] presTimeoutVal;
-		// FIXME end
-
 		this->OverrideNetworkConfiguration();
 	}
 	catch (ocfmRetCode& exceptionThrown)
