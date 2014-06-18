@@ -93,7 +93,7 @@ ENDIF(WIN32)
 # Swig wrapper build options
 ###############################################################################
 SET_SOURCE_FILES_PROPERTIES(openconfiguratorWrapper.i PROPERTIES CPLUSPLUS ON)
-SWIG_ADD_MODULE(openConfiguratorWrapper tcl openconfiguratorWrapper.i)
+SWIG_ADD_MODULE(openConfiguratorWrapper tcl8 openconfiguratorWrapper.i)
 
 ###############################################################################
 # Remove lib prefix under Linux

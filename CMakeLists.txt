@@ -82,11 +82,10 @@ IF(WIN32)
 			"OPEN_CONFIGURATOR_NET_WRAPPER" ON)
 		OPTION (OPEN_CONFIGURATOR_UNIT_TESTS "Build openCONFIGURATOR unit tests." OFF)
 	ENDIF()	
-#	OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK wrapper library." OFF)
 ELSE()
-	OPTION (OPEN_CONFIGURATOR_NET_WRAPPER "Build openCONFIGURATOR C# wrapper library." OFF)
-#	OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK wrapper library." OFF)
+	#OPTION (OPEN_CONFIGURATOR_NET_WRAPPER "Build openCONFIGURATOR C# wrapper library." OFF)
 ENDIF(WIN32)
+OPTION (OPEN_CONFIGURATOR_TCL_WRAPPER "Build openCONFIGURATOR TCL/TK wrapper library." OFF)
 OPTION (OPEN_CONFIGURATOR_DOCUMENTATION "Build openCONFIGURATOR source code documentation." OFF)
 
 ###############################################################################
@@ -119,9 +118,9 @@ ENDIF()
 ###############################################################################
 # Add a target to generate TCL wrapper
 ###############################################################################
-#IF(OPEN_CONFIGURATOR_TCL_WRAPPER)
-#	ADD_SUBDIRECTORY(openCONFIGURATORWrapper)
-#ENDIF()
+IF(OPEN_CONFIGURATOR_TCL_WRAPPER)
+	ADD_SUBDIRECTORY(openCONFIGURATORWrapper)
+ENDIF()
 
 ###############################################################################
 # Add subprojects

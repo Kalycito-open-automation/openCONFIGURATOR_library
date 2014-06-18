@@ -1,156 +1,170 @@
 /**
- ******************************************************************************
- \file			openConfiguratorWrapper.i
+********************************************************************************
+\file   openconfiguratorWrapper.h
 
- \brief			An TCL wrapper interface configuration file for the openCONFIGURATOR.dll 
- ******************************************************************************
- */
+\brief  TCL wrapper interface configuration for the openCONFIGURATOR library
 
-/*
- © Kalycito Infotech Private Limited
+\author Ramakrishnan Periyakaruppan
 
- License:
+\copyright (c) 2014, Kalycito Infotech Private Limited
+					 All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+	* Redistributions of source code must retain the above copyright
+	  notice, this list of conditions and the following disclaimer.
+	* Redistributions in binary form must reproduce the above copyright
+	  notice, this list of conditions and the following disclaimer in the
+	  documentation and/or other materials provided with the distribution.
+	* Neither the name of the copyright holders nor the
+	  names of its contributors may be used to endorse or promote products
+	  derived from this software without specific prior written permission.
 
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************/
 
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
-
- 3. Neither the name of Kalycito Infotech Private Limited nor the names of 
- its contributors may be used to endorse or promote products derived
- from this software without prior written permission. For written
- permission, please contact info@kalycito.com.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
-
- Severability Clause:
-
- If a provision of this License is or becomes illegal, invalid or
- unenforceable in any jurisdiction, that shall not affect:
- 1. the validity or enforceability in that jurisdiction of any other
- provision of this License; or
- 2. the validity or enforceability in other jurisdictions of that or
- any other provision of this License.
-
- ****************************************************************************/
- 
- %module openConfiguratorWrapper
+%module openConfiguratorWrapper
 #define DLLEXPORT
 /* Windows Platform */
 #if defined(_WIN32) && defined(_MSC_VER)
-	 #undef DLLEXPORT
+//	 #undef DLLEXPORT
 	 #define DLLEXPORT  __declspec(dllexport)
-	 
 #endif
 
+#define SWIGRUNTIME_DEBUG
+
 %{
-/* Simply include the header definitions for the SWIG */
+/* Simply include the header definitions */
 #include "../openCONFIGURATOR/Include/Exports.h"
-#include "../openCONFIGURATOR/Include/Declarations.h"
-#include "../openCONFIGURATOR/Include/Exception.h"
-#include "../openCONFIGURATOR/Include/Enums.h"
+#include "../openCONFIGURATOR/Include/Result.h"
+#include "../openCONFIGURATOR/Include/ProjectFileApi.h"
 %}
 
 /* Include all the required SWIG interfaces */
-%include cpointer.i
-%include cstring.i
 %include typemaps.i
 %include exception.i
 %include std_except.i
 %include std_string.i
 
-/* Conversions for pointer output to handled in TCL */
-%pointer_functions(char, charp)
-%pointer_functions(long, longp)
-%pointer_functions(int, intp)
-%pointer_functions(bool, boolp)
-%pointer_functions(AutoGenerate, AutoGeneratep)
-%pointer_functions(AutoSave, AutoSavep)
-%pointer_functions(ViewMode, ViewModep)
-%pointer_functions(StationType, StationTypep)
-%cstring_bounded_output(char *outAttributeValue, 512);
-%cstring_bounded_output(char *outIndexID, 100);
-%cstring_bounded_output(char *outSubIndexID, 100);
-%cstring_bounded_output(char *outNodeName, 100);
-%cstring_bounded_output(char *outFeatureValue, 512);
-%cstring_bounded_output(char *outDataTypes, 1000);
-%cstring_bounded_output(char *outForcedCycle, 10);
+
+/** Ignore all the unwanted defines, enums and functions using %ignore **/
+%ignore MN_NODEID;
+%ignore BROADCAST_NODEID;
+%ignore PI_VAR_COUNT;
+%ignore PRES_DEFAULT_PAYLOAD;
+%ignore PREQ_DEFAULT_PAYLOAD;
+%ignore OFFSET_NUM_ENTRIES_MN;
+%ignore OFFSET_NUM_ENTRIES_CN;
+%ignore OFFSET_INDEX;
+%ignore OFFSET_SUBINDEX;
+%ignore OFFSET_SIZE;
+%ignore OFFSET_DATA;
+%ignore INDEX_SIZE;
+%ignore SUBINDEX_SIZE;
+%ignore NODE_ID;
+%ignore ERR_STRING_LEN;
+%ignore OFFSET_FIRST_INDEX_IN_MN_OBD;
+%ignore OFFSET_FIRST_INDEX_IN_1F22;
+%ignore MAX_CN_CROSS_TRAFFIC_STN;
+%ignore MULTIPL_CYCLE_ASSIGN_OBJECT;
+%ignore MNCN_POLLRESPONSE_TIMEOUT_OBJECT;
+%ignore PATH_SEPARATOR;
+%ignore DateTime;
+%ignore IEC_Datatype;
+%ignore NodeType;
+%ignore PDOMapping;
+%ignore PDOType;
+%ignore ParameterAccess;
+%ignore StationType;
+%ignore AccessType;
+%ignore ConfiguratorError;
+%ignore FeatureType;
+%ignore PlkFeatureStrings;
+
+%ignore GetAccessType(const std::string& accessType);
+%ignore GetObjectType(const std::string& objectType);
+%ignore GetPlkFeature(const int enumVal);
+%ignore openCONFIGURATOR::Library::ErrorHandling::Translate(const ocfmRetCode& legacyError);
+
+/**
+* Rename the CONST enum member to CONSTANT. Because the AccessType member CONST is 
+* referred as const (which is a keyword) by the SWIG interpreter.
+**/
+%rename ("CONSTANT") "CONST";
 
 
-%include "../openCONFIGURATOR/Include/Declarations.h"
 %include "../openCONFIGURATOR/Include/Exports.h"
-%include "../openCONFIGURATOR/Include/Enums.h"
-%include "../openCONFIGURATOR/Include/Exception.h"
+%include "../openCONFIGURATOR/Include/Result.h"
+%include "../openCONFIGURATOR/Include/ProjectFileApi.h"
 
-using namespace std; 
-
-
-%inline %{
+%inline 
+%{
 
 /* Copy all the API declarations here */
- ocfmRetCode ImportXML(char *fileName, INT32 nodeId, NodeType nodeType);
- ocfmRetCode ReImportXML(char* fileName, INT32 nodeId, NodeType nodeType);
- ocfmRetCode GenerateXAP(char* xapFilePath);
- ocfmRetCode GenerateCDC(char* cdcPath);
- ocfmRetCode GenerateNET(char* netFilePath);
- ocfmRetCode CreateNode(INT32 nodeId, NodeType nodeType, char* nodeName);
- ocfmRetCode DeleteNode(INT32 nodeId, NodeType nodeType);
- ocfmRetCode DeleteNodeObjDict(INT32 nodeId, NodeType nodeType);
- ocfmRetCode DeleteIndex(INT32 nodeId, NodeType nodeType, char* indexId);
- ocfmRetCode DeleteSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexID);
- ocfmRetCode AddIndex(INT32 nodeId, NodeType nodeType, char* indexId);
- ocfmRetCode AddSubIndex(INT32 nodeId, NodeType nodeType, char* indexId, char* subIndexId);
- ocfmRetCode SetBasicIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* indexValue, char* indexName, bool includeInCDC);
- ocfmRetCode SetBasicSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* indexValue, char* indexName, bool includeInCDC);
- ocfmRetCode IfNodeExists(INT32 nodeId, NodeType nodeType, INT32 *nodePos, bool& nodeExist);
- ocfmRetCode IfIndexExists(INT32 nodeId, NodeType nodeType, char* indexId, INT32 *idxPos);
- ocfmRetCode IfSubIndexExists(INT32 nodeId, NodeType nodeType, char* idxId, char* sidxId, INT32* sidxPos, INT32* idxPos);
- ocfmRetCode GetIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, AttributeType attributeType, char* outAttributeValue);
- ocfmRetCode GetSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, AttributeType attributeType, char* outAttributeValue);
- ocfmRetCode GetNodeCount(INT32 nodeId, INT32* outNodeCount);
- ocfmRetCode GetIndexCount(INT32 nodeId, NodeType nodeType, INT32* outIndexCount);
- ocfmRetCode GetSubIndexCount(INT32 nodeId, NodeType nodeType, char* indexId, INT32* outSubIndexCount);
- ocfmRetCode GetNodeAttributesbyNodePos(INT32 nodePos, INT32* outNodeId, char* outNodeName, StationType* outStationType, char* outForcedCycle, bool* outIsForcedCycle);
- ocfmRetCode GetIndexIDbyIndexPos(INT32 nodeId, NodeType nodeType, INT32 indexPos, char* outIndexId);
- ocfmRetCode GetSubIndexIDbySubIndexPos(INT32 nodeId, NodeType nodeType, char* indexId, INT32 subIndexPos, char* outSubIndexID);
- ocfmRetCode GetIndexIDbyPositions(INT32 nodePos, INT32 indexPos, char* outIndexID);
- ocfmRetCode GetSubIndexIDbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, char* outSubIndexID);
- ocfmRetCode GetIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, AttributeType attributeType, char* outAttributeValue);
- ocfmRetCode GetSubIndexAttributesbyPositions(INT32 nodePos, INT32 indexPos, INT32 subIndexPos, AttributeType attributeType, char* outAttributeValue);
- void LoadObjectDictionary(char* xmlFilePath);
- ocfmRetCode SaveNode(const char* fileName, INT32 nodeId, NodeType nodeType);
- ocfmRetCode SaveProject(char* projectPath, char* projectName);
- ocfmRetCode OpenProject(char* projectPath, char* projectFileName);
- ocfmRetCode FreeProjectMemory();
- ocfmRetCode GetProjectSettings(AutoGenerate *autoGenStatus, AutoSave *autoSaveStatus, ViewMode *viewMode, bool* isExpertViewAlreadySet);
- ocfmRetCode SetProjectSettings(AutoGenerate autoGenStatus, AutoSave autoSaveStatus, ViewMode viewMode, bool isExpertViewAlreadySet);
- ocfmRetCode GenerateMNOBD();
- ocfmRetCode SetAllIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
- ocfmRetCode SetAllSubIndexAttributes(INT32 nodeId, NodeType nodeType, char* indexId, char* sidxId, char* actualValue, char* indexName, char* accessType, char* dataTypeName, char* pdoMappingVal, char* defaultValue, char* highLimitVal, char* lowLimitVal, char* objectType, bool includeInCDC);
- ocfmRetCode GetFeatureValue(INT32 nodeId, NodeType nodeType, FeatureType featureType, char* featureName, char* outFeatureValue);
- ocfmRetCode UpdateNodeParams(INT32 currentNodeId, INT32 newNodeID, NodeType nodeType, char* nodeName, StationType stationType, char* forcedCycleVal, bool isForcedCycle, char* presTimeoutVal);
- ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType, char* outDataTypes);
- ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, char* nodeName, char* importXmlFile);
- INT32 GetDataSize(char* dataTypeVal);
- ocfmRetCode ValidateXDDFile(char *fileName);
+namespace openCONFIGURATOR
+{
+	namespace Library
+	{
+		namespace API
+		{
+			/* NodeApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result AddNode(const UINT32, const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result DeleteNode(const UINT32);
+			openCONFIGURATOR::Library::ErrorHandling::Result ReplaceXdd(const UINT32, const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result IsExistingNode(const UINT32, bool&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(UINT32&);
+			openCONFIGURATOR::Library::ErrorHandling::Result SetNodeParameter(const UINT32, const openCONFIGURATOR::Library::NodeParameter::NodeParameter, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetNodeParameter(const UINT32, const openCONFIGURATOR::Library::NodeParameter::NodeParameter, std::string&);
+
+
+			/* XddApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType, UINT32&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetFeatureValue(const UINT32, const openCONFIGURATOR::Library::ObjectDictionary::PlkFeature::PlkFeature, std::string&);
+
+
+			/* ProjectApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result NewProject(const std::string, const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result SaveProject();
+			openCONFIGURATOR::Library::ErrorHandling::Result CloseProject();
+			openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result AddPath(const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetPath(const std::string, std::string&);
+			openCONFIGURATOR::Library::ErrorHandling::Result DeletePath(const std::string );
+			openCONFIGURATOR::Library::ErrorHandling::Result SetActiveAutoCalculationConfig(const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetActiveAutoCalculationConfig(std::string&);
+
+			/* ProjectFileApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result AddViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType, const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType, const std::string, std::string&);
+			openCONFIGURATOR::Library::ErrorHandling::Result DeleteViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result SetActiveView(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetActiveView(openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType&);
+
+			/* ImportExportApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result GenerateProcessImageDescription(const OutputLanguage, const std::string, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GenerateStackConfiguration(const std::string, const std::string);
+
+			/* OdApi.h */
+			openCONFIGURATOR::Library::ErrorHandling::Result SetIndexActualValue(const UINT32, const UINT32, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexActualValue(const UINT32, const UINT32, const UINT32, const std::string);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetIndexAttribute(const UINT32, const UINT32, AttributeType, std::string&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexAttribute(const UINT32, const UINT32, const UINT32, AttributeType, std::string&);
+			openCONFIGURATOR::Library::ErrorHandling::Result IsExistingIndex(const UINT32, const UINT32, bool& exists);
+			openCONFIGURATOR::Library::ErrorHandling::Result IsExistingSubIndex(const UINT32, const UINT32, const UINT32, bool&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const UINT32, UINT32&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const UINT32, const UINT32, UINT32&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const UINT32, const UINT32, const bool, UINT32&);
+		}
+	}
+}
 
 %}
-
-
