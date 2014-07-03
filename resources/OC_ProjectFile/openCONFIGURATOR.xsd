@@ -204,7 +204,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="MN" type="oc:tMN" />
-            <xs:element name="CN" type="oc:tCN" maxOccurs="unbounded" />
+            <xs:element name="CN" type="oc:tCN" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
 
