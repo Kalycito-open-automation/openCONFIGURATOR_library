@@ -1026,7 +1026,7 @@ SubIndex* DuplicateSubIndexObject(SubIndex* objSubindex);
  */
 /*****************************************************************************/
 void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
-                             char* cdcBuffer, bool enablePDO);
+		std::string& cdcBuffer, bool enablePDO);
 /*****************************************************************************************/
 /**
  \brief		This function shall write the buffer with the Index data in the Index collection that can be written in the CDC
@@ -1038,7 +1038,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
  \return	void
  */
 /******************************************************************************************/
-void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+void FormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
                NodeType eNodeType);
 /*****************************************************************************/
 /**
@@ -1079,7 +1079,7 @@ bool ReactivateMappingPDO(IndexCollection* indexCollObj, Index* indexObj);
  \return	void
  */
 /******************************************************************************************/
-void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+void BRSpecificFormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
                          NodeType eNodeType, INT32 iNodeId);
 /*****************************************************************************************/
 /**
@@ -1092,7 +1092,7 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
  \return	void
  */
 /******************************************************************************************/
-void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId);
+void BRSpecificGetIndexData(Index* indexObj, std::string& cdcBuffer, INT32 nodeId);
 /*****************************************************************************************/
 /**
  \brief		This function shall return the total no. of Indices and Sub Indices that can be written to the CDC((recommended by BnR) for the node ID

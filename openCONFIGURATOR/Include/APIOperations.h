@@ -163,7 +163,7 @@ void AddForEachSIdx(char* indexId, IndexCollection* indexCollObj, INT32 nodeId,
  \param[in]		isReAssignment		Boolean flag to specify node id assignment or re-assingnment
  \return		void
  */
-void GetAllNodeIdAssignment(char* Buffer, bool isReAssignment);
+void GetAllNodeIdAssignment(std::string& Buffer, bool isReAssignment);
 
 /**
 \brief		Default attributes to an Index are set from the object dictionary
