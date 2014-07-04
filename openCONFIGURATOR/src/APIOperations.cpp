@@ -2045,7 +2045,7 @@ ocfmRetCode CheckUpperAndLowerLimits(const char* lowLimitVal, const char* highLi
 }
 
 void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
-                             char* cdcBuffer, bool enablePDO)
+		std::string& cdcBuffer, bool enablePDO)
 {
 	ocfmRetCode exceptionObj;
 
@@ -2070,17 +2070,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 		throw exceptionObj;
 	}
 
-	if (!cdcBuffer)
-	{
-		boost::format formatter(kMsgNullArgument);
-		formatter % "'cdcBuffer'";
-		exceptionObj.setErrorCode(OCFM_ERR_INVALID_PARAMETER);
-		exceptionObj.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		throw exceptionObj;
-	}
-
-	strcpy(cdcBuffer, "");
+	cdcBuffer.clear();
 	if (0 != indexObj->GetNumberofSubIndexes())
 	{
 
@@ -2120,12 +2110,12 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 				{
 					bool isStringDt = false;
 					//Format: 1600    01   00000000   Act_value
-					strcat(cdcBuffer, indexObj->GetIndexValue());
+					cdcBuffer.append(indexObj->GetIndexValue());
 					//Place a tab
-					strcat(cdcBuffer, "\t");
+					cdcBuffer.append("\t");
 
-					strcat(cdcBuffer, sidxObj->GetIndexValue());
-					strcat(cdcBuffer, "\t");
+					cdcBuffer.append(sidxObj->GetIndexValue());
+					cdcBuffer.append("\t");
 					//Add datatype
 					DataType dtObj;
 					dtObj = sidxObj->GetDataType();
@@ -2139,7 +2129,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 							INT32 len = strlen(sidxObj->GetActualValue());
 							IntToAscii(len, dataSizeStr, 16);
 							dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-							strcat(cdcBuffer, dataSizeStr);
+							cdcBuffer.append(dataSizeStr);
 							padLength = len * 2;
 							isStringDt = true;
 						}
@@ -2147,7 +2137,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 						{
 							IntToAscii(dtObj.dataSize, dataSizeStr, 16);
 							dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-							strcat(cdcBuffer, dataSizeStr);
+							cdcBuffer.append(dataSizeStr);
 							padLength = dtObj.dataSize * 2;
 							isStringDt = false;
 						}
@@ -2155,10 +2145,10 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					else
 					{
 						//txt2cdc will not be success
-						strcat(cdcBuffer, (const char*) "00000000");
+						cdcBuffer.append((const char*) "00000000");
 					}
 					delete[] dataSizeStr;
-					strcat(cdcBuffer, "\t");
+					cdcBuffer.append("\t");
 
 					if (false == enablePDO)
 					{
@@ -2169,8 +2159,7 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 						{
 							char actValue[20];
 							strcpy(actValue, "0");
-							strcat(cdcBuffer,
-							       PadLeft(actValue, '0', padLength));
+							cdcBuffer.append(PadLeft(actValue, '0', padLength));
 						}
 						else
 						{
@@ -2181,23 +2170,23 @@ void EnableDisableMappingPDO(IndexCollection* indexCollObj, Index* indexObj,
 					{
 						if (isStringDt)
 						{
-							strcat(cdcBuffer, ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
+							cdcBuffer.append(ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
 						}
 						else
 						{
 							//non empty non-zero actual values are only written to cdc
-							if ((0 != strcmp(sidxObj->GetActualValue(), ""))
+							if (strlen(sidxObj->GetActualValue()) != 0
 							        && (!(CheckIfValueZero((char*) sidxObj->GetActualValue()))))
 							{
 								string actualValueStr = std::string(sidxObj->GetActualValue());
 								if (CheckIfHex((char*) sidxObj->GetActualValue()))
-									strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+									cdcBuffer.append(IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", ""));
 								else
-									strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+									cdcBuffer.append(IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 							}
 						}
 					}
-					strcat(cdcBuffer, "\n");
+					cdcBuffer.append("\n");
 				}
 			}
 		}
@@ -3224,9 +3213,9 @@ void ResetAllPdos(INT32 nodeId, NodeType nodeType)
 	}
 }
 
-void GetIndexData(Index* indexObj, char* cdcBuffer)
+void GetIndexData(Index* indexObj, std::string& cdcBuffer)
 {
-	if ((indexObj == NULL) || (cdcBuffer == NULL))
+	if ((NULL == indexObj))
 	{
 		boost::format formatter(kMsgNullArgument);
 		formatter
@@ -3240,19 +3229,19 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 	bool isStringDT = false;
 	//Get the Index Value
 
-	strcpy(cdcBuffer, "");
+	cdcBuffer.clear();
 	if ((0 == indexObj->GetNumberofSubIndexes()))
 	{
 		if (NULL != indexObj->GetActualValue())
 		{
 			if (true == IsDefaultActualNotEqual(indexObj))
 			{
-				strcpy(cdcBuffer, indexObj->GetIndexValue());
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append(indexObj->GetIndexValue());
+				cdcBuffer.append("\t");
 
 				//There are no subindexes, So add "00"
-				strcat(cdcBuffer, "00");
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("00");
+				cdcBuffer.append("\t");
 
 				DataType dtObj;
 				INT32 padLen = 0;
@@ -3266,7 +3255,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 						dataSizeStr = IntToAscii(dtObj.dataSize, dataSizeStr,
 						                         16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLen = dtObj.dataSize * 2;
 						isStringDT = false;
 					}
@@ -3275,7 +3264,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 						INT32 actValLen = strlen(indexObj->GetActualValue());
 						dataSizeStr = IntToAscii(actValLen, dataSizeStr, 16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLen = actValLen * 2;
 						isStringDT = true;
 					}
@@ -3283,25 +3272,25 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 				else
 				{
 					//txt2cdc will not be successful
-					strcat(cdcBuffer, "00000000");
+					cdcBuffer.append("00000000");
 				}
 				delete[] dataSizeStr;
 
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
 				if (isStringDT)
 				{
-					strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
+					cdcBuffer.append(ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 				}
 				else
 				{
 					string actualValueStr = std::string(indexObj->GetActualValue());
 					if (CheckIfHex((char*) indexObj->GetActualValue()))
-						strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", "").c_str());
+						cdcBuffer.append(IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", ""));
 					else
-						strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
+						cdcBuffer.append(IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 				}
-				strcat(cdcBuffer, "\n");
+				cdcBuffer.append("\n");
 			}
 			else
 			{
@@ -3408,19 +3397,19 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 
 				if (idxAdded)
 				{
-					strcat(cdcBuffer, indexObj->GetIndexValue());
+					cdcBuffer.append(indexObj->GetIndexValue());
 				}
 				else
 				{
-					strcpy(cdcBuffer, indexObj->GetIndexValue());
+					cdcBuffer.append(indexObj->GetIndexValue());
 					idxAdded = true;
 				}
 
 				//Place a tab
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
-				strcat(cdcBuffer, sidxObj->GetIndexValue());
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append(sidxObj->GetIndexValue());
+				cdcBuffer.append("\t");
 				//Add datatype
 				DataType dtObj;
 				dtObj = sidxObj->GetDataType();
@@ -3434,7 +3423,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 						dataSizeStr = IntToAscii(dtObj.dataSize, dataSizeStr,
 						                         16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLength = dtObj.dataSize * 2;
 						isStringDT = false;
 					}
@@ -3443,18 +3432,18 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 						INT32 actualValLen = strlen(sidxObj->GetActualValue());
 						dataSizeStr = IntToAscii(actualValLen, dataSizeStr, 16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLength = actualValLen * 2;
 						isStringDT = true;
 					}
 				}
 				else
 				{
-					strcat(cdcBuffer, "00000000");
+					cdcBuffer.append("00000000");
 				}
 
 				delete[] dataSizeStr;
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
 				// Add the reset value for that Index,SubIndex
 				if ((0 == strcmp(sidxObj->GetIndexValue(), "00")) && mappingPDO
@@ -3462,24 +3451,24 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 				{
 					char actValue[20];
 					strcpy(actValue, "0");
-					strcat(cdcBuffer, PadLeft(actValue, '0', padLength));
+					cdcBuffer.append(PadLeft(actValue, '0', padLength));
 					resetValueAdded = true;
 				}
 				else
 				{
 					if (isStringDT)
 					{
-						strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
+						cdcBuffer.append(ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 					}
 					else
 					{
 						string actualValueStr = std::string(sidxObj->GetActualValue());
 						if (CheckIfHex((char*) sidxObj->GetActualValue()))
-							strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+							cdcBuffer.append(IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", ""));
 						else
-							strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+							cdcBuffer.append(IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 					}
-					strcat(cdcBuffer, "\n");
+					cdcBuffer.append("\n");
 				}
 				if ((0 == sidxLC) && mappingPDO && (true == noOfEnteriesAdded))
 				{
@@ -3498,9 +3487,9 @@ void GetIndexData(Index* indexObj, char* cdcBuffer)
 	}
 }
 
-void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
+void BRSpecificGetIndexData(Index* indexObj, std::string& cdcBuffer, INT32 nodeId)
 {
-	if ((indexObj == NULL) || (cdcBuffer == NULL))
+	if ((NULL == indexObj))
 	{
 		boost::format formatter(kMsgNullArgument);
 		formatter
@@ -3514,19 +3503,19 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 	bool isStringDT = false;
 	//Get the Index Value
 
-	strcpy(cdcBuffer, "");
-	if ((0 == indexObj->GetNumberofSubIndexes()))
+	cdcBuffer.clear();
+	if (indexObj->GetNumberofSubIndexes() == 0)
 	{
-		if (NULL != indexObj->GetActualValue())
+		if (indexObj->GetActualValue() != NULL)
 		{
-			if (true == IsDefaultActualNotEqual(indexObj))
+			if (IsDefaultActualNotEqual(indexObj) == true)
 			{
-				strcpy(cdcBuffer, indexObj->GetIndexValue());
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append(indexObj->GetIndexValue());
+				cdcBuffer.append("\t");
 
 				//There are no subindexes, So add "00"
-				strcat(cdcBuffer, "00");
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("00");
+				cdcBuffer.append("\t");
 
 				DataType dtObj;
 				INT32 padLen = 0;
@@ -3540,7 +3529,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						dataSizeStr = IntToAscii(dtObj.dataSize, dataSizeStr,
 						                         16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLen = dtObj.dataSize * 2;
 						isStringDT = false;
 					}
@@ -3549,7 +3538,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						INT32 actValLen = strlen(indexObj->GetActualValue());
 						dataSizeStr = IntToAscii(actValLen, dataSizeStr, 16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLen = actValLen * 2;
 						isStringDT = true;
 					}
@@ -3557,25 +3546,25 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				else
 				{
 					//txt2cdc will not be successful
-					strcat(cdcBuffer, "00000000");
+					cdcBuffer.append("00000000");
 				}
 				delete[] dataSizeStr;
 
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
 				if (isStringDT)
 				{
-					strcat(cdcBuffer, ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
+					cdcBuffer.append(ConvertStringToHex(string(indexObj->GetActualValue())).c_str());
 				}
 				else
 				{
 					string actualValueStr = std::string(indexObj->GetActualValue());
 					if (CheckIfHex((char*) indexObj->GetActualValue()))
-						strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", "").c_str());
+						cdcBuffer.append(IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLen, "", ""));
 					else
-						strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
+						cdcBuffer.append(IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLen, "", "").c_str());
 				}
-				strcat(cdcBuffer, "\n");
+				cdcBuffer.append("\n");
 			}
 			else
 			{
@@ -3659,7 +3648,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 			bool includeAccess = CheckAccessTypeForInclude(
 			                         (char*) sidxObj->GetAccessType());
 
-			if ((sidxObj->GetActualValue() != NULL)
+			if ((sidxObj->GetActualValue() != NULL) && strlen(sidxObj->GetActualValue()) != 0
 			        && ((true == includeAccess) || (true == mappingPDO))
 			        && (true == IsDefaultActualNotEqual(sidxObj)))
 			{
@@ -3703,19 +3692,19 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 
 				if (idxAdded)
 				{
-					strcat(cdcBuffer, indexObj->GetIndexValue());
+					cdcBuffer.append(indexObj->GetIndexValue());
 				}
 				else
 				{
-					strcpy(cdcBuffer, indexObj->GetIndexValue());
+					cdcBuffer.append(indexObj->GetIndexValue());
 					idxAdded = true;
 				}
 
 				//Place a tab
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
-				strcat(cdcBuffer, sidxObj->GetIndexValue());
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append(sidxObj->GetIndexValue());
+				cdcBuffer.append("\t");
 				//Add datatype
 				DataType dtObj;
 				dtObj = sidxObj->GetDataType();
@@ -3729,7 +3718,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						dataSizeStr = IntToAscii(dtObj.dataSize, dataSizeStr,
 						                         16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLength = dtObj.dataSize * 2;
 						isStringDT = false;
 					}
@@ -3738,18 +3727,18 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 						INT32 actualValLen = strlen(sidxObj->GetActualValue());
 						dataSizeStr = IntToAscii(actualValLen, dataSizeStr, 16);
 						dataSizeStr = PadLeft(dataSizeStr, '0', 8);
-						strcat(cdcBuffer, dataSizeStr);
+						cdcBuffer.append(dataSizeStr);
 						padLength = actualValLen * 2;
 						isStringDT = true;
 					}
 				}
 				else
 				{
-					strcat(cdcBuffer, "00000000");
+					cdcBuffer.append("00000000");
 				}
 
 				delete[] dataSizeStr;
-				strcat(cdcBuffer, "\t");
+				cdcBuffer.append("\t");
 
 				// Add the reset value for that Index,SubIndex
 				if ((0 == strcmp(sidxObj->GetIndexValue(), "00")) && mappingPDO
@@ -3757,24 +3746,24 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 				{
 					char actValue[20];
 					strcpy(actValue, "0");
-					strcat(cdcBuffer, PadLeft(actValue, '0', padLength));
+					cdcBuffer.append(PadLeft(actValue, '0', padLength));
 					resetValueAdded = true;
 				}
 				else
 				{
 					if (isStringDT)
 					{
-						strcat(cdcBuffer, ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
+						cdcBuffer.append(ConvertStringToHex(string(sidxObj->GetActualValue())).c_str());
 					}
 					else
 					{
 						string actualValueStr = std::string(sidxObj->GetActualValue());
 						if (CheckIfHex((char*) sidxObj->GetActualValue()))
-							strcat(cdcBuffer, IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+							cdcBuffer.append(IntToHex<unsigned long long>(HexToInt<unsigned long long>(actualValueStr), padLength, "", ""));
 						else
-							strcat(cdcBuffer, IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
+							cdcBuffer.append(IntToHex<unsigned long long>(boost::lexical_cast<unsigned long long>(actualValueStr), padLength, "", "").c_str());
 					}
-					strcat(cdcBuffer, "\n");
+					cdcBuffer.append("\n");
 				}
 				if ((0 == sidxLC) && mappingPDO && (true == noOfEnteriesAdded))
 				{
@@ -3793,7 +3782,7 @@ void BRSpecificGetIndexData(Index* indexObj, char* cdcBuffer, INT32 nodeId)
 	}
 }
 
-void WriteCNsData(char* fileName)
+void WriteCNsData(ofstream& cdcFile)
 {
 	ocfmRetCode exceptionObj;
 	NodeCollection* nodeCollObj = NULL;
@@ -3801,12 +3790,8 @@ void WriteCNsData(char* fileName)
 	nodeCollObj = NodeCollection::GetNodeColObjectPointer();
 	assert(nodeCollObj);
 
-	INT32 len = 0;
-	char* cdcBuffer2 = NULL;
-	char* mainBuffer = NULL;
 	char* tempStr = new char[50];
 	INT32 cnCount = 0;
-	FILE* fileptr = new FILE();
 	Node nodeObj;
 	IndexCollection* indexCollObj = NULL;
 
@@ -3815,11 +3800,6 @@ void WriteCNsData(char* fileName)
 		nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodeLC);
 		if (CN == nodeObj.GetNodeType())
 		{
-			if (NULL == (fileptr = fopen(fileName, "a+")))
-			{
-				//cout << "Problem" <<endl;
-			}
-
 			//AddOtherRequiredCNIndexes(objNode.getNodeId());
 			indexCollObj = nodeObj.GetIndexCollection();
 			if (indexCollObj->GetNumberofIndexes() == 0)
@@ -3829,7 +3809,6 @@ void WriteCNsData(char* fileName)
 				exceptionObj.setErrorCode(OCFM_ERR_NO_INDEX_FOUND);
 				exceptionObj.setErrorString(formatter.str());
 				LOG_FATAL() << formatter.str();
-				delete fileptr;
 				throw exceptionObj;
 			}
 
@@ -3840,16 +3819,15 @@ void WriteCNsData(char* fileName)
 			strcpy(commentStr, "////Configuration Data for CN-");
 			commentStr = strcat(commentStr, tempStr);
 			commentStr = strcat(commentStr, "\n");
-			len = strlen(commentStr);
-			if ((fwrite(commentStr, sizeof(char), len, fileptr)) != 0)
+			cdcFile << commentStr;
+			if (cdcFile.bad())
 			{
-				fclose(fileptr);
+				cdcFile.close();
 			}
 
 			delete[] commentStr;
 
 			Index* indexObj = NULL;
-			char* cdcBuffer3 = NULL;
 
 			/*************WRITE MN'S 1006,1020 Indexes Values *******************************/
 
@@ -3989,9 +3967,8 @@ void WriteCNsData(char* fileName)
 
 			UpdateCNVisibleNode(&nodeObj);
 			UpdateCNPresMNActLoad(&nodeObj);
-
-			cdcBuffer3 = new char[30000]();
-			cdcBuffer2 = new char[60000]();
+			std::string cdcBuffer = std::string();
+			cdcBuffer.reserve(10000);
 
 			char* noOfEnteries = new char[10];
 			//workaround for B&R Bus Controller stack
@@ -4002,58 +3979,46 @@ void WriteCNsData(char* fileName)
 			/*1 is not added for the size*/
 			noOfEnteries = PadLeft(noOfEnteries, '0', 8);
 			noOfEnteries = ConvertToUpper(noOfEnteries);
-			strcpy(cdcBuffer3, noOfEnteries);
-			strcat(cdcBuffer3, "\n");
-			strcpy(cdcBuffer2, cdcBuffer3);
+			cdcBuffer.append(noOfEnteries);
+			cdcBuffer.append("\n");
 			delete[] noOfEnteries;
 
 			////workaround for B&R Bus Controller stack
 			//FormatCdc(objIndexCollection, Buffer4, fileptr, CN);
-			BRSpecificFormatCdc(indexCollObj, cdcBuffer3, CN,
+			BRSpecificFormatCdc(indexCollObj, cdcBuffer, CN,
 			                    nodeObj.GetNodeId());
-			strcat(cdcBuffer2, cdcBuffer3);
-			delete[] cdcBuffer3;
 
 			//Convert CN NodeID to Hex
 			IntToAscii(nodeObj.GetNodeId(), tempStr, 16);
-			char* tempStr2 = new char[50];
-			strcpy(tempStr2, "1F22\t");
+			std::string tempStr2 = std::string();
+			tempStr2.append("1F22\t");
 			tempStr = PadLeft(tempStr, '0', 2);
 
 			///write CN-n NodeID  in the next to 1F22
-			strcat(tempStr2, tempStr);
-			strcat(tempStr2, "\t");
+			tempStr2.append(tempStr);
+			tempStr2.append("\t");
 
 			//write the size of CN-n Buffer
-			INT32 dataLenCN = GetCNDataLen(cdcBuffer2);
+			INT32 dataLenCN = GetCNDataLen(cdcBuffer.c_str());
 
 			//Convert length to Hex
 			IntToAscii(dataLenCN, tempStr, 16);
 			//printf("c%s",tempStr);
 
 			tempStr = PadLeft(tempStr, '0', 8);
-			strcat(tempStr2, tempStr);
+			tempStr2.append(tempStr);
+			tempStr2.append("\n");
 
 			// First write the IF22 data in a Buffer and then CN-ns Object Dictionary
-			mainBuffer = new char[strlen(cdcBuffer2) + 50];
-			strcpy(mainBuffer, tempStr2);
-			strcat(mainBuffer, "\n");
-			strcat(mainBuffer, cdcBuffer2);
-			delete[] tempStr2;
-			delete[] cdcBuffer2;
+			cdcBuffer.insert(0, tempStr2);
 
 			//write all CNs data in the file
-			dataLenCN = strlen(mainBuffer);
-			if (NULL == (fileptr = fopen(fileName, "a+")))
+			cdcFile << cdcBuffer;
+			if(cdcFile.bad())
 			{
-				//cout << "Problem" <<endl;
+				cdcFile.close();
 			}
-			if (0 != (fwrite(mainBuffer, sizeof(char), dataLenCN, fileptr)))
-			{
-				fclose(fileptr);
 			}
-			delete[] mainBuffer;
-		}
 
 	}
 	delete[] tempStr;
@@ -4350,9 +4315,6 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 	LOG_INFO() << "Generating CDC.";
 	Node nodeObjMN;
 	IndexCollection* indexCollObj;
-	char* Buffer1 = NULL;
-	char* tempFileName = NULL;
-	char* tempOutputFileName = NULL;
 
 	ocfmRetCode exceptionObj(OCFM_ERR_UNKNOWN);
 	ocfmRetCode storeExceptionObj;
@@ -4473,11 +4435,12 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 		}
 
 
-		FILE* fileptr = new FILE();
-		tempFileName = new char[strlen(cdcPath) + 5];
-		sprintf(tempFileName, "%s.txt", cdcPath);
+		ofstream cdcFile;
+		string tempFileName = cdcPath;
+		tempFileName.append(".txt");
+		cdcFile.open(tempFileName.c_str(), ios::out);
 
-		if ((fileptr = fopen(tempFileName, "w+")) == NULL)
+		if (!cdcFile.is_open())
 		{
 			boost::format formatter(kMsgFileReadFailed);
 			formatter % tempFileName;
@@ -4487,102 +4450,66 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 			throw exceptionObj;
 		}
 
-		Buffer1 = new char[CDC_BUFFER]();
+		//Buffer1 = (char*)malloc(CDC_BUFFER);
+		std::string nrOfEntries;
 		char* noOfEntries = new char[10];
 		noOfEntries = IntToAscii(GetNodeTotalIndexSubIndex(MN_NODEID),
 		                         noOfEntries, 16);
 		noOfEntries = PadLeft(noOfEntries, '0', 8);
-		strcpy(Buffer1, noOfEntries);
-		strcat(Buffer1, "\n");
-		UINT32 len;
-		len = strlen(Buffer1);
+		nrOfEntries.append(std::string(noOfEntries));
+		nrOfEntries.append("\n");
 		delete[] noOfEntries;
 
-		/* Write number of enteries */
-		if ((len != (fwrite(Buffer1, sizeof(char), len, fileptr))))
-		{
-			LOG_FATAL() << "Error writing CDC-Buffer.";
-		}
-		delete[] Buffer1;
 
-		Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())]();
-		GetAllNodeIdAssignment(Buffer1, false);
-		strcat(Buffer1, "\n");
-		//Write all 1F81 NodeId Assignment
-		len = strlen(Buffer1);
-		if ((len != (fwrite(Buffer1, sizeof(char), len, fileptr))))
-		{
-			LOG_FATAL() << "Error writing CDC-Buffer.";
-		}
-		delete[] Buffer1;
+		std::string nodeIdAssignements;
+		GetAllNodeIdAssignment(nodeIdAssignements, false);
+		nodeIdAssignements.append("\n");
 
-		fclose(fileptr);
 
-		if ((fileptr = fopen(tempFileName, "a+")) == NULL)
-		{
-			boost::format formatter(kMsgFileReadFailed);
-			formatter % tempFileName;
-			exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-			exceptionObj.setErrorString(formatter.str());
-			LOG_FATAL() << formatter.str();
-			throw exceptionObj;
-		}
 		objNodeCollection = NodeCollection::GetNodeColObjectPointer();
 		nodeObjMN = objNodeCollection->GetMNNode();
 		indexCollObj = nodeObjMN.GetIndexCollection();
 		//cout<<"Write MN CDC"<<endl;
 
 		//Get all the MN's Default Data in Buffer1
-		Buffer1 = new char[(CDC_MN_BUFFER * objNodeCollection->GetCNNodesCount())]();
-		FormatCdc(indexCollObj, Buffer1, MN);
+		std::string cdcMNBody;
+		FormatCdc(indexCollObj, cdcMNBody,  MN);
 
-		len = strlen(Buffer1);
-		if ((len != (fwrite(Buffer1, sizeof(char), len, fileptr))))
+		cdcFile << nrOfEntries << nodeIdAssignements << cdcMNBody;
+		if (cdcFile.bad())
 		{
+			cdcFile.close();
 			LOG_FATAL() << "Error writing CDC-Buffer.";
 		}
-		delete[] Buffer1;
-		fclose(fileptr);
+
 		//cout<<"Completed writing MN CDC. Starting CN CDC part"<<endl;
 		/*************************Write CN's Data in Buffer2***************************************************/
-		WriteCNsData((char*) tempFileName);
+		WriteCNsData(cdcFile);
 		//INT32 ret;
 
 		//Write all the IF81 nodeId ReAssignment in Buffer1
 		if (objNodeCollection->GetNumberOfNodes() != 0)
 		{
-			if ((fileptr = fopen(tempFileName, "a+")) == NULL)
+			std::string nodeIdReAssignement("\n");
+			GetAllNodeIdAssignment(nodeIdReAssignement, true);
+			cdcFile << nodeIdReAssignement;
+			if (cdcFile.bad())
 			{
-				boost::format formatter(kMsgFileReadFailed);
-				formatter % tempFileName;
-				exceptionObj.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-				exceptionObj.setErrorString(formatter.str());
-				LOG_FATAL() << formatter.str();
-				throw exceptionObj;
-			}
-
-			Buffer1 = new char[(CDC_BUFFER * objNodeCollection->GetCNNodesCount())]();
-			GetAllNodeIdAssignment(Buffer1, true);
-			len = strlen(Buffer1);
-			if ((len != (fwrite(Buffer1, sizeof(char), len, fileptr))))
-			{
+				cdcFile.close();
 				LOG_FATAL() << "Error writing CDC-Buffer.";
 			}
-			delete[] Buffer1;
-			fclose(fileptr);
 		}
+		cdcFile.close();
 
 		// Convert CDC txt file to Binary
 		INT32 returnFromTxt2Cdc;
-		tempOutputFileName = new char[strlen(cdcPath) + 5];
-		sprintf(tempOutputFileName, "%s.cdc", cdcPath);
+		string tempOutputFileName = cdcPath;
+		tempOutputFileName.append(".cdc");
 
 		string txt2cdcCommand(LibraryConfiguration::GetTxt2CdcFilePath());
 		txt2cdcCommand.append(" \"" + string(tempFileName) + "\"");
 		txt2cdcCommand.append(" \"" + string(tempOutputFileName) + "\"");
 		returnFromTxt2Cdc = system(txt2cdcCommand.c_str());
-		delete[] tempFileName;
-		delete[] tempOutputFileName;
 
 		if (OCFM_ERR_SUCCESS == returnFromTxt2Cdc)
 		{
@@ -4611,10 +4538,10 @@ ocfmRetCode GenerateCDC(const char* cdcPath, const ProjectConfiguration& project
 }
 
 //TODO: only buffer is used not the fileptr. Should be removed in header & related functions
-void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+void FormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
                NodeType eNodeType)
 {
-	if (objIndexCollection == NULL || Buffer1 == NULL)
+	if ((NULL == objIndexCollection))
 	{
 		boost::format formatter(kMsgNullArgument);
 		formatter % "'objIndexCollection', 'Buffer1'";
@@ -4623,8 +4550,8 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 		LOG_FATAL() << formatter.str();
 		throw exceptionObj;
 	}
-	char* tempBuffer1 = NULL;
-	strcpy(Buffer1, "");
+	std::string tempBuffer1 = std::string();
+	Buffer1.clear();
 	// UINT32 len;
 	INT32 noOfIndexes = objIndexCollection->GetNumberofIndexes();
 	//disable mapping pdo
@@ -4635,13 +4562,11 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
-				tempBuffer1 = new char[CDC_BUFFER];
 				//len = strlen(Buffer1);
 				//GetIndexData(objIndex,Buffer1);
 				EnableDisableMappingPDO(objIndexCollection, indexObj,
 				                        tempBuffer1, false);
-				strcat(Buffer1, tempBuffer1);
-				delete[] tempBuffer1;
+				Buffer1.append(tempBuffer1);
 			}
 		
 		}
@@ -4660,11 +4585,9 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 			        || (strcmp(indexObj->GetIndexValue(), "1F81") != 0
 			            && MN == eNodeType))
 			{
-				tempBuffer1 = new char[15000];
+				tempBuffer1.clear();
 				GetIndexData(indexObj, tempBuffer1);
-				strcat(Buffer1, tempBuffer1);
-
-				delete[] tempBuffer1;
+				Buffer1.append(tempBuffer1);
 			}
 			else
 			{
@@ -4677,11 +4600,11 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				        && 0 != strcmp((char*) sidxObj->GetActualValue(), "")
 				        && true == IsDefaultActualNotEqual(sidxObj))
 				{
-					tempBuffer1 = new char[CDC_BUFFER];
-					strcpy(tempBuffer1, "1F81");
-					strcat(tempBuffer1, "\t");
-					strcat(tempBuffer1, "F0");
-					strcat(tempBuffer1, "\t00000004\t");
+					tempBuffer1.clear();
+					tempBuffer1.append("1F81");
+					tempBuffer1.append("\t");
+					tempBuffer1.append("F0");
+					tempBuffer1.append("\t00000004\t");
 
 					char actValue[20];
 					actValue[0] = '\0';
@@ -4691,20 +4614,19 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 						strncpy(actValue, (sidxObj->GetActualValue() + 2),
 						        len - 2);
 						actValue[len - 2] = '\0';
-						strcat(tempBuffer1, PadLeft(actValue, '0', 8));
+						tempBuffer1.append(PadLeft(actValue, '0', 8));
 					}
 					else
 					{
 						strcpy(actValue,
 						       IntToAscii(atoi(sidxObj->GetActualValue()),
 						                  actValue, 16));
-						strcat(tempBuffer1, PadLeft(actValue, '0', 8));
+						tempBuffer1.append(PadLeft(actValue, '0', 8));
 					}
 
-					strcat(tempBuffer1, "\n");
+					tempBuffer1.append("\n");
 					// len = strlen(TempBuffer1);
-					strcat(Buffer1, tempBuffer1);
-					delete[] tempBuffer1;
+					Buffer1.append(tempBuffer1);
 				}
 			}
 		}
@@ -4720,11 +4642,9 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 		        && !CheckIfNotPDO((char*) indexObj->GetIndexValue()))
 		{
-			tempBuffer1 = new char[3 * CDC_BUFFER];
+			tempBuffer1.clear();
 			GetIndexData(indexObj, tempBuffer1);
-			strcat(Buffer1, tempBuffer1);
-
-			delete[] tempBuffer1;
+			Buffer1.append(tempBuffer1);
 		}
 	}
 	//reenable the pdos
@@ -4735,22 +4655,21 @@ void FormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 
 			if (CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 			{
-				tempBuffer1 = new char[CDC_BUFFER];
+				tempBuffer1.clear();
 				EnableDisableMappingPDO(objIndexCollection, indexObj,
 				                        tempBuffer1, true);
-				strcat(Buffer1, tempBuffer1);
-				delete[] tempBuffer1;
+				Buffer1.append(tempBuffer1);
 			}
 		
 		}
 	}
 
 //TODO: only buffer is used not the fileptr. should be removed in header & related functions
-void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
+void BRSpecificFormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
                          NodeType eNodeType, INT32 iNodeId)
 {
 	ocfmRetCode exceptionObj;
-	if ((objIndexCollection == NULL) || (Buffer1 == NULL))
+	if ((NULL == objIndexCollection))
 	{
 		boost::format formatter(kMsgNullArgument);
 		formatter % "'objIndexCollection', 'Buffer1'";
@@ -4760,8 +4679,9 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 		throw exceptionObj;
 	}
 
-	char* tempBuffer1 = NULL;
-	strcpy(Buffer1, "");
+	std::string tempBuffer1 = std::string();
+	tempBuffer1.reserve(5000);
+
 	// UINT32 len;
 	INT32 noOfIndexes = objIndexCollection->GetNumberofIndexes();
 	//disable mapping pdo
@@ -4794,12 +4714,10 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				}
 				if (!CheckIfValueZero((char*) sidxObj->GetActualValue()))
 				{
-					tempBuffer1 = new char[CDC_BUFFER];
-					//len = strlen(Buffer1);
+					tempBuffer1.clear();
 					EnableDisableMappingPDO(objIndexCollection, indexObj,
 					                        tempBuffer1, false);
-					strcat(Buffer1, tempBuffer1);
-					delete[] tempBuffer1;
+					Buffer1.append(tempBuffer1);
 				}
 			}
 		}
@@ -4817,13 +4735,11 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 			        || (strcmp(indexObj->GetIndexValue(), "1F81") != 0
 			            && MN == eNodeType))
 			{
-				tempBuffer1 = new char[15000];
+				tempBuffer1.clear();
 				//commented the GetIndexData fn and BRSpecificGetIndexData is used
 				//GetIndexData(objIndex,TempBuffer1);
 				BRSpecificGetIndexData(indexObj, tempBuffer1, iNodeId);
-				strcat(Buffer1, tempBuffer1);
-
-				delete[] tempBuffer1;
+				Buffer1.append(tempBuffer1);
 			}
 			else
 			{
@@ -4835,11 +4751,11 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				        && 0 != strcmp((char*) sidxObj->GetActualValue(), "")
 				        && true == IsDefaultActualNotEqual(sidxObj))
 				{
-					tempBuffer1 = new char[CDC_BUFFER];
-					strcpy(tempBuffer1, "1F81");
-					strcat(tempBuffer1, "\t");
-					strcat(tempBuffer1, "F0");
-					strcat(tempBuffer1, "\t00000004\t");
+					tempBuffer1.clear();
+					tempBuffer1.append("1F81");
+					tempBuffer1.append("\t");
+					tempBuffer1.append("F0");
+					tempBuffer1.append("\t00000004\t");
 
 					char actValue[20];
 					actValue[0] = '\0';
@@ -4849,20 +4765,19 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 						strncpy(actValue, (sidxObj->GetActualValue() + 2),
 						        len - 2);
 						actValue[len - 2] = '\0';
-						strcat(tempBuffer1, PadLeft(actValue, '0', 8));
+						tempBuffer1.append(PadLeft(actValue, '0', 8));
 					}
 					else
 					{
 						strcpy(actValue,
 						       IntToAscii(atoi(sidxObj->GetActualValue()),
 						                  actValue, 16));
-						strcat(tempBuffer1, PadLeft(actValue, '0', 8));
+						tempBuffer1.append(PadLeft(actValue, '0', 8));
 					}
 
-					strcat(tempBuffer1, "\n");
+					tempBuffer1.append("\n");
 					//  len = strlen(TempBuffer1);
-					strcat(Buffer1, tempBuffer1);
-					delete[] tempBuffer1;
+					Buffer1.append(tempBuffer1);
 				}
 			}
 		}
@@ -4877,11 +4792,9 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 		            || CheckIfMappingPDO((char*) indexObj->GetIndexValue()))
 		        && !CheckIfNotPDO((char*) indexObj->GetIndexValue()))
 		{
-			tempBuffer1 = new char[3 * CDC_BUFFER];
+			tempBuffer1.clear();
 			GetIndexData(indexObj, tempBuffer1);
-			strcat(Buffer1, tempBuffer1);
-
-			delete[] tempBuffer1;
+			Buffer1.append(tempBuffer1);
 		}
 	}
 	//reenable the pdos
@@ -4914,12 +4827,10 @@ void BRSpecificFormatCdc(IndexCollection* objIndexCollection, char* Buffer1,
 				}
 				if (!CheckIfValueZero((char*) sidxObj->GetActualValue()))
 				{
-					tempBuffer1 = new char[CDC_BUFFER];
+					tempBuffer1.clear();
 					EnableDisableMappingPDO(objIndexCollection, indexObj,
 					                        tempBuffer1, true);
-					strcat(Buffer1, tempBuffer1);
-
-					delete[] tempBuffer1;
+					Buffer1.append(tempBuffer1);
 				}
 			}
 		
@@ -10770,7 +10681,7 @@ ocfmRetCode GetNodeDataTypes(INT32 nodeId, NodeType nodeType,
 	return exceptionObj;
 }
 
-void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
+void GetAllNodeIdAssignment(std::string& Buffer1, bool isReAssignment)
 {
 	NodeCollection* objNodeCollection = NULL;
 	Node nodeObjMN;
@@ -10801,21 +10712,21 @@ void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
 		{
 			if (isReAssignment == false)
 			{
-				strcat(Buffer1, "//// NodeId Assignment\n");
+				Buffer1.append("//// NodeId Assignment\n");
 			}
 			else
 			{
-				strcat(Buffer1, "//// NodeId Reassignment\n");
+				Buffer1.append("//// NodeId Reassignment\n");
 			}
-			strcat(Buffer1, "1F81");
-			strcat(Buffer1, "\t");
+			Buffer1.append("1F81");
+			Buffer1.append("\t");
 			INT32 nodeID = nodeObjCN.GetNodeId();
 			LOG_INFO() << " Writing 0x1F81 data for CN " << nodeID;
 			char* tempStr = new char[10];
 			tempStr = IntToAscii(nodeID, tempStr, 16);
 			tempStr = PadLeft(tempStr, '0', 2);
-			strcat(Buffer1, tempStr);
-			strcat(Buffer1, "\t00000004\t");
+			Buffer1.append(tempStr);
+			Buffer1.append("\t00000004\t");
 
 			SubIndex* mnSidxObj = mnIdxObj->GetSubIndexbyIndexValue(tempStr);
 			if (mnSidxObj != NULL)
@@ -10851,14 +10762,14 @@ void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
 					if (isReAssignment == false)
 					{
 						char* temp = new char[9];
-						strcat(Buffer1, "0");
+						Buffer1.append("0");
 						SubString(temp, destStr, 1, 7);
-						strcat(Buffer1, temp);
+						Buffer1.append(temp);
 						delete[] temp;
 					}
 					else
 					{
-						strcat(Buffer1, destStr);
+						Buffer1.append(destStr);
 					}
 					delete[] destStr;
 				}
@@ -10866,7 +10777,7 @@ void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
 				{
 					char* destStr = new char[9];
 					strcpy(destStr, IntToAscii(atoi(orgValue), destStr, 16));
-					strcat(Buffer1, PadLeft(destStr, '0', 8));
+					Buffer1.append(PadLeft(destStr, '0', 8));
 					delete[] destStr;
 				}
 				delete[] orgValue;
@@ -10875,10 +10786,10 @@ void GetAllNodeIdAssignment(char* Buffer1, bool isReAssignment)
 			{
 				LOG_ERROR() << "SubIndex 0x1F81/0x" << tempStr << " not found.";
 				//handled error case
-				strcat(Buffer1, "00000007");
+				Buffer1.append("00000007");
 			}
 
-			strcat(Buffer1, "\n");
+			Buffer1.append("\n");
 			delete[] tempStr;
 		}
 	}

@@ -71,12 +71,6 @@
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 
 /****************************************************************************************************/
-/* Defines */
-
-#define HEADER_FILE_BUFFER 5000000
-#define TOTAL_MODULES 10000
-
-/****************************************************************************************************/
 /* Global Variables */
 
 INT32 inVarsGlobal = 0;
@@ -104,8 +98,6 @@ static PIIndexTable piIndexTable[NO_OF_PI_ENTERIES] =
 	{ "A8C0", UNSIGNED64, INPUT },
 
 };
-
-ModuleCol moduleColl[TOTAL_MODULES];
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -379,146 +371,81 @@ PIDataInfo* GetIECDT(const char* iecDataType, INT32 dataSize)
 	return stDataInfo;
 }
 
-//TODO: Unused function
-bool CheckIfModuleExists(char* moduleName, INT32& moduleNo, INT32 noOfModules,
-                         ModuleCol modCollObj[])
-{
-	for (INT32 moduleLC = 0; moduleLC <= noOfModules; moduleLC++)
-	{
-		if (!strcmp(moduleName, moduleColl[moduleLC].moduleName))
-		{
-			moduleNo = modCollObj[moduleLC].moduleNo;
-			return true;
-		}
-	}
-	return false;
-}
-
 void GenerateXAPHeaderFile(const char* fileName, ProcessImage piInCol[],
                            ProcessImage piOutCol[], INT32 inVar, INT32 outVar)
 {
-	char* xapFileName = new char[strlen(fileName) + ALLOC_BUFFER];
-	FILE* xapFile = new FILE();
+	string xapFileName = fileName;
+	xapFileName.append(".h");
+	ofstream xapFile;
+	xapFile.open(xapFileName.c_str(), ios::out);
 	ocfmRetCode ex;
 
-	strcpy(xapFileName, fileName);
-	strcat(xapFileName, ".h");
-
-	if (NULL == (xapFile = fopen(xapFileName, "w+ ")))
+	if (!xapFile.is_open())
 	{
 		boost::format formatter(kMsgFileReadFailed);
 		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 		ex.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
-		delete[] xapFileName;
 		throw ex;
 	}
 
 	//write comment
-	char* varComment = new char[strlen(BUILD_COMMENT) + BUILDTIME_BUF_LEN
-	                            + STR_ALLOC_BUFFER + 8]; // 8 is for comment lines
-	strcpy(varComment, "/* ");
-	strcat(varComment, BUILD_COMMENT);
-	strcat(varComment, GetBuildTime());
-	strcat(varComment, " */\n");
-	UINT32 uiStrLength = strlen(varComment);
-	if ((uiStrLength != fwrite(varComment, sizeof(char), uiStrLength, xapFile)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % xapFileName;
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] varComment;
-		delete[] xapFileName;
-		fclose(xapFile);
-		throw ex;
-	}
-	delete[] varComment;
+	stringstream buffer;
+	buffer << "/* " << BUILD_COMMENT << GetBuildTime() << " */\n";
+
 	//write include guard for the headerfile
-	char* xapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_CHECK)
-	                                       + strlen(INCLUDE_GUARD_START) + ALLOC_BUFFER];
-	strcpy(xapHeaderIncludeGuard, INCLUDE_GUARD_CHECK);
-	strcat(xapHeaderIncludeGuard, "\n");
-	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_START);
-	strcat(xapHeaderIncludeGuard, "\n\n");
-	uiStrLength = strlen(xapHeaderIncludeGuard);
+	buffer << INCLUDE_GUARD_CHECK << "\n" << INCLUDE_GUARD_START << "\n\n";
+	xapFile << buffer.str();
 
-	if ((uiStrLength
-	        != fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % xapFileName;
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] xapHeaderIncludeGuard;
-		delete[] xapFileName;
-		fclose(xapFile);
-		throw ex;
-	}
-
-	delete[] xapHeaderIncludeGuard;
 	/* write Input structure */
 	if (0 != inVar)
 	{
 		WriteXAPHeaderContents(piInCol, inVar, INPUT, xapFile);
 	}
 
-	fclose(xapFile);
-
 	/* write Output structure */
-	if (NULL == (xapFile = fopen(xapFileName, "a+")))
-	{
-		boost::format formatter(kMsgFileReadFailed);
-		formatter % xapFileName;
-		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] xapFileName;
-		throw ex;
-	}
-	delete[] xapFileName;
 	if (0 != outVar)
 	{
 		WriteXAPHeaderContents(piOutCol, outVar, OUTPUT, xapFile);
 	}
 
 	//close include guard for the XAP header file
-	xapHeaderIncludeGuard = new char[strlen(INCLUDE_GUARD_END) + ALLOC_BUFFER];
+	xapFile << "\n" << INCLUDE_GUARD_END;
 
-	strcpy(xapHeaderIncludeGuard, "\n");
-	strcat(xapHeaderIncludeGuard, INCLUDE_GUARD_END);
-	uiStrLength = strlen(xapHeaderIncludeGuard);
-	if ((uiStrLength
-	        != fwrite(xapHeaderIncludeGuard, sizeof(char), uiStrLength, xapFile)))
+	if(xapFile.bad())
 	{
 		boost::format formatter(kMsgFileWriteFailed);
 		formatter % xapFileName;
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		ex.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
-		delete[] xapHeaderIncludeGuard;
-		fclose(xapFile);
+		xapFile.close();
 		throw ex;
 	}
 
-	fclose(xapFile);
-	delete[] xapHeaderIncludeGuard;
+	xapFile.close();
 }
 
 void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
-                            PIDirectionType directionType, FILE* xapHeader)
+                            PIDirectionType directionType, ofstream& xapHeader)
 {
-	char* mainBuffer = new char[HEADER_FILE_BUFFER];
-	char* tempBuffer = new char[200];
-	mainBuffer[0] = 0;
+	stringstream mainBuffer;
 	ocfmRetCode ex;
 
 	if (0 != noOfVars)
 	{
-		strcpy(mainBuffer, "\ntypedef struct \n{\n");
+		if (INPUT == directionType)
+		{
+			mainBuffer << "# define COMPUTED_PI_OUT_SIZE ";
+		}
+		else if (OUTPUT == directionType)
+		{
+			mainBuffer << "\n\n# define COMPUTED_PI_IN_SIZE ";
+		}
+
+		stringstream varSection;
+		varSection << "\ntypedef struct \n{\n";
 		INT32 holeFilledIdNo = 1;
 		INT32 totalSize = 0;
 		for (INT32 loopCount = 0; loopCount < noOfVars; loopCount++)
@@ -541,14 +468,7 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 					INT32 filledBits = dataSize - (totalSize % dataSize);
 
 					totalSize = totalSize + filledBits;
-					strcat(mainBuffer, "\tunsigned");
-					strcat(mainBuffer, " ");
-					strcat(mainBuffer, "PADDING_VAR_");
-					strcat(mainBuffer, IntToAscii(holeFilledIdNo, holeid, 10));
-					strcat(mainBuffer, ":");
-					fillBitsStr = IntToAscii(filledBits, fillBitsStr, 10);
-					strcat(mainBuffer, fillBitsStr);
-					strcat(mainBuffer, ";\n");
+					varSection << "\tunsigned PADDING_VAR_" << IntToAscii(holeFilledIdNo, holeid, 10) << ":" << IntToAscii(filledBits, fillBitsStr, 10) << fillBitsStr << ";\n";
 					holeFilledIdNo = holeFilledIdNo + 1;
 					delete[] fillBitsStr;
 				}
@@ -561,37 +481,22 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			//strcpy(moduleNo, SubString(piObj[loopCount].moduleIndex, 2, 2));
 			strcpy(moduleName, piObj[loopCount].moduleName);
 
-			strcat(mainBuffer, "\tunsigned");
-			strcat(mainBuffer, " ");
-			char* tempName = new char[100];
-			strcpy(tempName, "CN");
+			varSection << "\tunsigned CN";
+
 			nodeId = IntToAscii(piObj[loopCount].nodeId, nodeId, 10);
-			strcat(tempName, nodeId);
-			strcat(tempName, "_");
-
-			/* Add Mod NO*/
-			strcat(tempName, "M");
-			strcat(tempName, moduleNo);
-			strcat(tempName, "_");
-
-			strcat(tempName, moduleName);
+			varSection << nodeId << "_M" << moduleNo << "_" << moduleName;
 			if (piObj[loopCount].varDeclName != NULL)
 			{
-				strcat(tempName, "_");
-				strcat(tempName, piObj[loopCount].varDeclName);
+				varSection << "_" << piObj[loopCount].varDeclName;
 			}
 
-			strcat(mainBuffer, tempName);
-			strcat(mainBuffer, ":");
+			varSection << ":";
 
 			char* varTempBuff = new char[50];
 			varTempBuff = IntToAscii(dataSize, varTempBuff, 10);
 			totalSize = dataSize + totalSize;
-			strcat(mainBuffer, varTempBuff);
-			strcat(mainBuffer, ";");
+			varSection << varTempBuff << ";\n";
 
-			strcat(mainBuffer, "\n");
-			delete[] tempName;
 			delete[] moduleName;
 			delete[] moduleNo;
 			delete[] nodeId;
@@ -604,99 +509,59 @@ void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 			INT32 filledBits = 32 - (totalSize % 32);
 
 			totalSize = totalSize + filledBits;
-			strcat(mainBuffer, "\tunsigned");
-			strcat(mainBuffer, " ");
-			strcat(mainBuffer, "PADDING_VAR_");
-			strcat(mainBuffer, IntToAscii(holeFilledIdNo, holeid, 10));
-			strcat(mainBuffer, ":");
+			varSection << "\tunsigned PADDING_VAR_" << IntToAscii(holeFilledIdNo, holeid, 10) << ":";
 			fillBitsStr = IntToAscii(filledBits, fillBitsStr, 10);
-			strcat(mainBuffer, fillBitsStr);
-			strcat(mainBuffer, ";\n");
+			varSection << fillBitsStr << ";\n";
 			//iHoleFilledIdNo = iHoleFilledIdNo + 1; Unused operation
 
 			delete[] fillBitsStr;
 		}
-		strcat(mainBuffer, "}");
-
-		if (INPUT == directionType)
-		{
-			strcpy(tempBuffer, "# define COMPUTED_PI_OUT_SIZE ");
-			strcat(mainBuffer, " PI_OUT;");
-		}
-		else if (OUTPUT == directionType)
-		{
-
-			strcpy(tempBuffer, "\n\n# define COMPUTED_PI_IN_SIZE ");
-			strcat(mainBuffer, " PI_IN;");
-			strcat(mainBuffer, "\n");
-		}
+		varSection << "}";
 
 		char* strSize = new char[50];
-
 		/* write the size in bytes*/
 		totalSize = totalSize / 8;
 		strSize = IntToAscii(totalSize, strSize, 10);
-		strcat(tempBuffer, strSize);
+		mainBuffer << strSize;
 		delete[] strSize;
+
+		if (directionType == INPUT)
+		{
+			varSection << " PI_OUT;";
+		}
+		else if (directionType == OUTPUT)
+		{
+			varSection << " PI_IN;\n";
+		}
+		mainBuffer << varSection.str();
 	}
 	else
 	{
-		strcpy(tempBuffer, "");
+		mainBuffer << "";
 	}
 
-	UINT32 tempBufferLen = strlen(tempBuffer);
-
-	if ((tempBufferLen
-	        != fwrite(tempBuffer, sizeof(char), tempBufferLen, xapHeader)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % "C/C++ Header";
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] mainBuffer;
-		delete[] tempBuffer;
-		throw ex;
-	}
-	delete[] tempBuffer;
-
-	tempBufferLen = strlen(mainBuffer);
-
-	if ((tempBufferLen
-	        != fwrite(mainBuffer, sizeof(char), tempBufferLen, xapHeader)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % "C/C++ Header";
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] mainBuffer;
-		throw ex;
-	}
-	delete[] mainBuffer;
+	xapHeader << mainBuffer.str();
 }
 
 void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
                            ProcessImage piOutCol[], INT32 iInVar, INT32 iOutVar)
 {
-	char* netFileName = new char[strlen(fileName) + ALLOC_BUFFER];
-	FILE* netFile = new FILE();
+	string netFileName = fileName;
+	netFileName.append(".cs");
+	std::ofstream netFile;
+	netFile.open(netFileName.c_str(), ios::out);
 	ocfmRetCode ex;
 
-	strcpy(netFileName, fileName);
-	strcat(netFileName, ".cs");
 	/* write Input structure */
-	if (NULL == (netFile = fopen(netFileName, "w+")))
+	if (!netFile.is_open())
 	{
 		boost::format formatter(kMsgFileReadFailed);
 		formatter % netFileName;
 		ex.setErrorCode(OCFM_ERR_CANNOT_OPEN_FILE);
 		ex.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
-		delete[] netFileName;
 		throw ex;
 	}
-	delete[] netFileName;
 
 	NodeCollection* objNodeCol = NULL;
 	objNodeCol = NodeCollection::GetNodeColObjectPointer();
@@ -710,34 +575,20 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 	}
 	if ((0 != iInVar) || (0 != iOutVar))
 	{
-		/*Writng Header of .NET Interface*/
-		char* mainBuffer = new char[HEADER_FILE_BUFFER];
-		strcpy(mainBuffer, "using System;\n");
-		strcat(mainBuffer, "using System.Runtime.InteropServices;\n");
-		//writing comments
-		strcat(mainBuffer, "/// <summary>\n");
-		strcat(mainBuffer, "/// ");
-		strcat(mainBuffer, BUILD_COMMENT);
-		strcat(mainBuffer, GetBuildTime());
-		strcat(mainBuffer, "\n");
-		strcat(mainBuffer, "/// </summary>\n");
-
-		strcat(mainBuffer, "\nnamespace openPOWERLINK\n");
-		strcat(mainBuffer, "{\n");
-		UINT32 mainBufLen = strlen(mainBuffer);
-
-		if ((mainBufLen != fwrite(mainBuffer, sizeof(char), mainBufLen, netFile)))
+		/*Writing Header of .NET Interface*/
+		stringstream mainBuffer;
+		mainBuffer << "using System;\nusing System.Runtime.InteropServices;\n/// <summary>\n/// " << BUILD_COMMENT << GetBuildTime() << "\n/// </summary>\n\nnamespace openPOWERLINK\n{\n";
+		netFile << mainBuffer.str();
+		if (netFile.bad())
 		{
 			boost::format formatter(kMsgFileWriteFailed);
 			formatter % netFileName;
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 			ex.setErrorString(formatter.str());
 			LOG_FATAL() << formatter.str();
-			fclose(netFile);
-			delete[] mainBuffer;
+			netFile.close();
 			throw ex;
 		}
-		delete[] mainBuffer;
 	}
 	if (0 != iInVar)
 	{
@@ -751,30 +602,26 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[],
 	}
 	if ((0 != iInVar) || (0 != iOutVar))
 	{
-		char* tempBuffer = new char[10];
-		strcpy(tempBuffer, "}\n");
-		UINT32 tempBufLen = strlen(tempBuffer);
-
-		if ((tempBufLen != fwrite(tempBuffer, sizeof(char), tempBufLen, netFile)))
+		netFile << "}\n";
+		if (netFile.bad())
 		{
 			boost::format formatter(kMsgFileWriteFailed);
 			formatter % netFileName;
 			ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 			ex.setErrorString(formatter.str());
 			LOG_FATAL() << formatter.str();
-			fclose(netFile);
-			delete[] tempBuffer;
+			netFile.close();
 			throw ex;
 		}
-		delete[] tempBuffer;
+
 	}
-	fclose(netFile);
+	netFile.close();
 }
 
 void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
-                            PIDirectionType dirType, FILE* netHeader)
+                            PIDirectionType dirType, ofstream& netHeader)
 {
-	char* mainBuffer = new char[HEADER_FILE_BUFFER]();
+	stringstream mainBuffer;
 
 	char offsetStr[10] = { 0 };
 	UINT32 offsetVal = 0;
@@ -787,116 +634,53 @@ void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars,
 	INT32 netPIVarsCount = GroupNETPIVariables(dirType, objNetPiCol);
 	for (INT32 loopCount = 0; loopCount < netPIVarsCount; loopCount++)
 	{
-		strcat(mainBuffer, "\t\t[FieldOffset(");
+		mainBuffer << "\t\t[FieldOffset(";
 		IntToAscii(offsetVal, offsetStr, 10);
-		strcat(mainBuffer, offsetStr);
-		strcat(mainBuffer, ")]\n");
-		strcat(mainBuffer, "\t\tpublic ");
-		strcat(mainBuffer,
-		       GetDatatypeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar));
+		mainBuffer << offsetStr << ")]\n\t\tpublic " << GetDatatypeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar);
 		offsetVal += GetDatasizeNETPI(objNetPiCol[loopCount].dataInfo.iecDtVar);
-		strcat(mainBuffer, " ");
-		strcat(mainBuffer, objNetPiCol[loopCount].moduleName);
+		mainBuffer << " " << objNetPiCol[loopCount].moduleName;
 		if (objNetPiCol[loopCount].name != NULL)
 		{
-			strcat(mainBuffer, "_");
-			strcat(mainBuffer, objNetPiCol[loopCount].name);
+			mainBuffer << "_" << objNetPiCol[loopCount].name;
 			if ((objNetPiCol[loopCount].count > 0) && (objNetPiCol[loopCount].lastName != NULL))
 			{
-				strcat(mainBuffer, "_to_");
-				strcat(mainBuffer, objNetPiCol[loopCount].lastName);
+				mainBuffer << "_to_" << objNetPiCol[loopCount].lastName;
 			}
 		}
-		strcat(mainBuffer, ";\n");
+		mainBuffer << ";\n";
 	}
 	delete[] objNetPiCol;
 	char* totalSize = new char[20];
 	IntToAscii(totalSizeVal, totalSize, 10);
-	char* tempBuffer1 = new char[200];
-	char* tempBuffer2 = new char[500];
-	tempBuffer1[0] = 0;
-	tempBuffer2[0] = 0;
+	stringstream header;
 
 	if (INPUT == dirType)
 	{
-		strcpy(tempBuffer1, "\n\t/// <summary>\n");
-		strcat(tempBuffer1, "\t/// Struct : ProcessImage Out\n");
-		strcat(tempBuffer1, "\t/// </summary>\n");
-		strcat(tempBuffer1,
-		       "\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = ");
-		strcat(tempBuffer1, totalSize);
-		strcat(tempBuffer1, ")]\n");
-		strcat(tempBuffer1, "\tpublic struct AppProcessImageOut\n");
-		strcat(tempBuffer1, "\t{\n");
-
-		strcpy(tempBuffer2, "\t}\n");
+		header << "\n\t/// <summary>\n\t/// Struct : ProcessImage Out\n\t/// </summary>\n\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = " 
+			<< totalSize << ")]\n\tpublic struct AppProcessImageOut\n\t{\n";
 	}
 	else if (OUTPUT == dirType)
 	{
-
-		strcpy(tempBuffer1, "\n\t/// <summary>\n");
-		strcat(tempBuffer1, "\t/// Struct : ProcessImage In\n");
-		strcat(tempBuffer1, "\t/// </summary>\n");
-		strcat(tempBuffer1,
-		       "\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = ");
-		strcat(tempBuffer1, totalSize);
-		strcat(tempBuffer1, ")]\n");
-		strcat(tempBuffer1, "\tpublic struct AppProcessImageIn\n");
-		strcat(tempBuffer1, "\t{\n");
-
-		strcpy(tempBuffer2, "\t}\n");
+		header << "\n\t/// <summary>\n\t/// Struct : ProcessImage In\n\t/// </summary>\n\t[StructLayout(LayoutKind.Explicit, Pack = 1, Size = " 
+			<< totalSize << ")]\n\tpublic struct AppProcessImageIn\n\t{\n";
 	}
+
+	header << mainBuffer.str() << "\t}\n";
 
 	delete[] totalSize;
 
-	ocfmRetCode ex;
-	UINT32 tempBuf1Len = strlen(tempBuffer1);
-
-	if ((tempBuf1Len
-	        != fwrite(tempBuffer1, sizeof(char), tempBuf1Len, netHeader)))
+	netHeader << header.str();
+	if (netHeader.bad())
 	{
 		boost::format formatter(kMsgFileWriteFailed);
 		formatter % ".NET Header";
+		ocfmRetCode ex;
 		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
 		ex.setErrorString(formatter.str());
 		LOG_FATAL() << formatter.str();
-		delete[] mainBuffer;
-		delete[] tempBuffer1;
-		delete[] tempBuffer2;
+		netHeader.close();
 		throw ex;
 	}
-	delete[] tempBuffer1;
-
-	tempBuf1Len = strlen(mainBuffer);
-
-	if ((tempBuf1Len != fwrite(mainBuffer, sizeof(char), tempBuf1Len, netHeader)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % ".NET Header";
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] tempBuffer2;
-		delete[] mainBuffer;
-		throw ex;
-	}
-	delete[] mainBuffer;
-
-	tempBuf1Len = strlen(tempBuffer2);
-
-	if ((tempBuf1Len
-	        != fwrite(tempBuffer2, sizeof(char), tempBuf1Len, netHeader)))
-	{
-		boost::format formatter(kMsgFileWriteFailed);
-		formatter % ".NET Header";
-		ex.setErrorCode(OCFM_ERR_FILE_CANNOT_OPEN);
-		ex.setErrorString(formatter.str());
-		LOG_FATAL() << formatter.str();
-		delete[] tempBuffer2;
-		throw ex;
-	}
-	delete[] tempBuffer2;
-
 }
 
 INT32 GroupNETHeaderContents(ProcessImage piObject[], INT32 noOfVars,

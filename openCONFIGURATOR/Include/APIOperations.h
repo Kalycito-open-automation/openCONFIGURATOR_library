@@ -91,7 +91,7 @@ void GetIndexData(Index* indexObj, char* cdcBuffer);
  \return	void
  */
 /*****************************************************************************/
-void WriteCNsData(char* fileName);
+void WriteCNsData(ofstream& cdcFile);
 /*****************************************************************************/
 /**
  \brief		This function shall process the 'Complex' datatype collection and generate the process image for the node
@@ -163,7 +163,7 @@ void AddForEachSIdx(char* indexId, IndexCollection* indexCollObj, INT32 nodeId,
  \param[in]		isReAssignment		Boolean flag to specify node id assignment or re-assingnment
  \return		void
  */
-void GetAllNodeIdAssignment(char* Buffer, bool isReAssignment);
+void GetAllNodeIdAssignment(std::string& Buffer, bool isReAssignment);
 
 /**
 \brief		Default attributes to an Index are set from the object dictionary

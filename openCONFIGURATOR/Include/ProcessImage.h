@@ -358,7 +358,7 @@ bool CheckIfProcessImageIdx(const char* idxId);
  \param		xapHeader			File pointer to the header file path
  \return	void
  */
-void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, FILE* xapHeader);
+void WriteXAPHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType directionType, std::ofstream&  xapHeader);
 
 /**
  \brief		This function shall be used to write the contents of given ProcessImage object to .NET header file
@@ -381,7 +381,7 @@ void GenerateNETHeaderFile(const char* fileName, ProcessImage piInCol[], Process
  \param		netHeader		File pointer to the header file
  \return	void
  */
-void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, FILE* netHeader);
+void WriteNETHeaderContents(ProcessImage piObj[], INT32 noOfVars, PIDirectionType dirType, std::ofstream& netHeader);
 
 /**
  \brief		This function shall be used to return the item number at which the NET ProcessImage object has the same module number as the given parameter in the Node collection list
@@ -446,19 +446,6 @@ char* GetDatatypeNETPI(IEC_Datatype dtIEC);
  \return	INT32
  */
 INT32 GetDatasizeNETPI(IEC_Datatype dtIEC);
-
-/**
- \brief		This function shall be used to check if the given module name is present in the collection list. If available it updates the module number in the calling function
-
- \param		moduleName       Character pointer to the value of Module Name
- \param		moduleNo         Integer to hold the value of Module number
- \param		noOfModules      Integer to hold the value of Number of modules
- \param		modCollObj       Structure Class variable of ModuleCol
- \return	BOOL
- \retval	TRUE			if the module is present in the collection
- \retval	FALSE			if the module is not present in the collection
- */
-bool CheckIfModuleExists(char* moduleName, INT32& moduleNo, INT32 noOfModules, ModuleCol modCollObj[]);
 
 /**
  \brief		This function shall be used to set the DataType of a SubIndex belonging to the Index according to the given parameters
