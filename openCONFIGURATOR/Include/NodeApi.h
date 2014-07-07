@@ -72,6 +72,15 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(UINT32& nodeCount);
+
+			/**
+			\brief	Return the nodeIDs of all existing nodes in the POWERLINK network.
+
+			\param[out] nodeIds of the existing nodes.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<UINT32>& nodeIds); 
 			/** @} */
 		}
 	}

@@ -263,3 +263,14 @@ UINT32 IndexCollection::Size() const
 {
 	return this->indexCollection.size();
 }
+
+std::vector<UINT32> IndexCollection::GetIndices()
+{
+	vector<UINT32> returnIndices;
+	vector<Index>::iterator it = this->indexCollection.begin();
+	for (;it != this->indexCollection.end(); ++it)
+	{
+		returnIndices.push_back(it->GetIndex());
+	}
+	return returnIndices;
+}

@@ -638,6 +638,83 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
+
+			DLLEXPORT Result GetIndices(const UINT32 nodeId, std::vector<UINT32>& indices)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						bool nodeExists = false;
+						if (IsExistingNode(nodeId, nodeExists).IsSuccessful() && nodeExists)
+						{
+							indices =  NodeCollection::GetNodeColObjectPointer()->GetNode(nodeId).GetIndexCollection()->GetIndices();
+						}
+						else
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter
+							% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
+						}
+						return Result();
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
+			DLLEXPORT Result GetSubIndices(const UINT32 nodeId, const UINT32 index, std::vector<UINT32>& subIndices)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						bool nodeExists = false;
+						if (IsExistingNode(nodeId, nodeExists).IsSuccessful() && nodeExists)
+						{
+							bool indexExists = false;
+							if (IsExistingIndex(nodeId, index, indexExists).IsSuccessful() && indexExists)
+							{
+								subIndices =  NodeCollection::GetNodeColObjectPointer()->GetNode(nodeId).GetIndexCollection()->GetIndexRef(index).GetSubindices();
+							}
+							else
+							{
+								boost::format formatter(kMsgNonExistingIndex);
+								formatter
+								% index
+								% nodeId;
+								return Result(INDEX_DOES_NOT_EXIST, formatter.str());
+							}
+
+						}
+						else
+						{
+							boost::format formatter(kMsgNonExistingNode);
+							formatter
+							% nodeId;
+							return Result(NODE_DOES_NOT_EXIST, formatter.str());
+						}
+						return Result();
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

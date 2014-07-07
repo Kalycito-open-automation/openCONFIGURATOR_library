@@ -184,6 +184,29 @@ namespace openCONFIGURATOR
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteSubIndex(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex);
+
+			
+			/**
+			\brief	Retrieve all existing indices of a node.
+
+			\param[in] nodeId	Id of the %Node.
+			\param[out] indices	vector to be retrieved.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndices(const UINT32 nodeId, std::vector<UINT32>& indices); 
+			
+			/**
+			\brief	Retrieve all existing subindices of an index of a node.
+
+			\param[in] nodeId	Id of the %Node.
+			\param[in] index	%Index that holds the subindices.
+			\param[out] subIndices vector to be retrieved.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const UINT32 nodeId, const UINT32 index, std::vector<UINT32>& subIndices); 
+
 			/** @} */
 			openCONFIGURATOR::Library::ErrorHandling::Result SetSubIndexAttribute(const UINT32 nodeId, const UINT32 index, const UINT32 subIndex, AttributeType attributeType, const std::string attributeValue);
 		}

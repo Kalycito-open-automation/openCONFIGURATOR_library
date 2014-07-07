@@ -155,6 +155,26 @@ namespace openCONFIGURATOR
 					return Result(UNHANDLED_EXCEPTION, ex.what());
 				}
 			}
+			DLLEXPORT Result GetNodes(std::vector<UINT32>& nodeIds)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						nodeIds = NodeCollection::GetNodeColObjectPointer()->GetNodeIds();
+						return Result();
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const std::exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
 		}
 	}
 }

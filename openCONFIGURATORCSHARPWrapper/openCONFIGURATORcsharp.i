@@ -10,7 +10,8 @@
 %{
 	#include "../openCONFIGURATOR/Include/Exports.h"
 	#include "../openCONFIGURATOR/Include/Enums.h"	
-	#include "../openCONFIGURATOR/Include/Result.h"			
+	#include "../openCONFIGURATOR/Include/Result.h"	
+	#include <vector>		
 %}
 
 /* Include all the required SWIG interfaces */
@@ -26,6 +27,8 @@
 %apply unsigned int& OUTPUT { unsigned int& subIndexCount };
 %apply unsigned int& OUTPUT { unsigned int& nrOfEntries };
 %apply bool& OUTPUT { bool& exists };
+
+%template(VectorWrapper) std::vector<unsigned int>;
 
 %ignore MN_NODEID;
 %ignore BROADCAST_NODEID;
@@ -175,6 +178,7 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result ReplaceXdd(const unsigned int nodeId, const std::string path, const std::string xddFile);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingNode(const unsigned int nodeId, bool& exists);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int& nodeCount);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds); 
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddIndex(const unsigned int nodeId, const unsigned int index, const std::string actualValue, const std::string name, ObjectType objectType);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetIndexAttribute(const unsigned int nodeId, const unsigned int index, AttributeType attributeType, const std::string attributeValue);
@@ -188,6 +192,9 @@ namespace openCONFIGURATOR{
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingIndex(const unsigned int nodeId, const unsigned int index, bool& exists);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result IsExistingSubIndex(const unsigned int nodeId, const unsigned int index, const unsigned int subIndex, bool& exists);
+
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndices(const unsigned int nodeId, std::vector<unsigned int>& indices); 
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const unsigned int nodeId, const unsigned int index, std::vector<unsigned int>& subIndices); 
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const unsigned int nodeId, unsigned int& indexCount);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const unsigned int nodeId, const unsigned int index, unsigned int& subIndexCount);

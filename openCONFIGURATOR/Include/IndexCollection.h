@@ -196,6 +196,12 @@ class IndexCollection
 		************************************************************************/
 		UINT32 Size() const;
 
+		/************************************************************************
+		\return vector with all indices.
+		\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		std::vector<UINT32> GetIndices();
+
 	private:
 		// FIXME: This should not be a vector, since pointers, references and iterators will be invalidated by
 		// insert/remove operations before the "pointed to" element, as well as vector reallocations.

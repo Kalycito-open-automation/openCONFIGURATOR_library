@@ -253,3 +253,14 @@ Node& NodeCollection::GetNodeRef(const UINT32 nodeId)
 		throw result;
 	}
 }
+
+std::vector<UINT32> NodeCollection::GetNodeIds()
+{
+	vector<UINT32> returnIDs;
+	vector<Node>::iterator it = this->nodeCollObj.begin();
+	for (;it != this->nodeCollObj.end(); ++it)
+	{
+		returnIDs.push_back(it->GetNodeId());
+	}
+	return returnIDs;
+}
