@@ -216,6 +216,14 @@ class NodeCollection
 		************************************************************************/
 		Node& GetNodeRef(const UINT32 nodeId);
 
+		/************************************************************************
+		\brief Returns the existing nodes.
+
+		\return NodeID vector.
+
+		\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		const std::vector<UINT32> GetNodeIds();
 	private:
 		NodeCollection(void);
 		NodeCollection(const NodeCollection&);

@@ -217,6 +217,12 @@ class Index: public BaseIndex
 		************************************************************************/
 		SubIndex& GetSubIndexRef(const UINT32 subIndex);
 
+		/************************************************************************
+		\return vector with all subindices.
+		\author Christoph Ruecker, Bernecker + Rainer Industrie Elektronik Ges.m.b.H.
+		************************************************************************/
+		const std::vector<UINT32> GetSubindices();
+
 	private:
 		PDOType pdoType;
 		vector<SubIndex> subIndexCollection;

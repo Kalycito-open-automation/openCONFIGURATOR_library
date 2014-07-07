@@ -240,6 +240,16 @@ SubIndex& Index::GetSubIndexRef(const UINT32 subIndex)
 	}
 }
 
+const std::vector<UINT32> Index::GetSubindices()
+{
+	vector<UINT32> returnSubindices;
+	for (vector<SubIndex>::iterator it = this->subIndexCollection.begin();it != this->subIndexCollection.end(); ++it)
+	{
+		returnSubindices.push_back(it->GetIndex());
+	}
+	return returnSubindices;
+}
+
 #ifndef __GNUC__
 #pragma endregion MemberFunctions
 #endif
