@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %include stl.i
 %include std_string.i
 %include cpointer.i
+%include std_vector.i
 
 %inline 
 %{
@@ -206,7 +207,7 @@ namespace openCONFIGURATOR
 				NODENAME = 0, /**< Name of the node */
 				NODEID, /**< Id of the node */
 				STATIONTYPE, /**< Station type of the node (Normal, Chained or Multiplexed)*/
-				FORCEDMULTIPLEXEDCYCLE, /**< Force a destinct cycle for a multiplexed node*/
+				FORCEDMULTIPLEXEDCYCLE, /**< Force a distinct cycle for a multiplexed node*/
 				TRANSMITSPRES, 
 				ASYNCSLOTTIMEOUT, 
 				ASNDMAXNUMBER,
@@ -341,7 +342,7 @@ namespace openCONFIGURATOR
 			openCONFIGURATOR::Library::ErrorHandling::Result GetNodeCount(unsigned int&);
 			openCONFIGURATOR::Library::ErrorHandling::Result SetNodeParameter(const unsigned int, const openCONFIGURATOR::Library::NodeParameter::NodeParameter, const std::string);
 			openCONFIGURATOR::Library::ErrorHandling::Result GetNodeParameter(const unsigned int, const openCONFIGURATOR::Library::NodeParameter::NodeParameter, std::string& );
-
+			openCONFIGURATOR::Library::ErrorHandling::Result GetNodes(std::vector<unsigned int>& nodeIds);
 
 			/* XddApi.h */
 			openCONFIGURATOR::Library::ErrorHandling::Result GetDataTypeSize(const openCONFIGURATOR::Library::ObjectDictionary::PlkDataType::PlkDataType, unsigned int&);
@@ -351,6 +352,7 @@ namespace openCONFIGURATOR
 			/* ProjectApi.h */
 			openCONFIGURATOR::Library::ErrorHandling::Result NewProject(const std::string, const std::string, const std::string);
 			openCONFIGURATOR::Library::ErrorHandling::Result SaveProject();
+			openCONFIGURATOR::Library::ErrorHandling::Result SaveProjectAs(const std::string, const std::string);
 			openCONFIGURATOR::Library::ErrorHandling::Result CloseProject();
 			openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string);
 			openCONFIGURATOR::Library::ErrorHandling::Result AddPath(const std::string, const std::string);
@@ -380,6 +382,8 @@ namespace openCONFIGURATOR
 			openCONFIGURATOR::Library::ErrorHandling::Result GetIndexCount(const unsigned int, unsigned int&);
 			openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndexCount(const unsigned int, const unsigned int, unsigned int&);
 			openCONFIGURATOR::Library::ErrorHandling::Result GetNumberOfEntries(const unsigned int, const unsigned int, const bool, unsigned int&);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetIndices(const unsigned int nodeId, std::vector<unsigned int>& indices);
+			openCONFIGURATOR::Library::ErrorHandling::Result GetSubIndices(const unsigned int nodeId, const unsigned int index, std::vector<unsigned int>& subIndices);
 		}
 	}
 }
@@ -390,3 +394,8 @@ namespace openCONFIGURATOR
 %pointer_functions(std::string, stringpointer)
 %pointer_functions(bool, boolpointer)
 %pointer_functions(unsigned int, uintpointer)
+
+namespace std
+{
+	%template(UIntVector)    vector<unsigned int>;
+}
