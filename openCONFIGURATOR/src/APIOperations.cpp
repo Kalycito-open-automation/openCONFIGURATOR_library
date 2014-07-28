@@ -4839,7 +4839,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, std::string& Buffe
 
 INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
                  Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
-                 char* moduleName, char* moduleIndexId)
+                 char* moduleName, char* moduleIndexId, const char* moduleSubindexId)
 {
 	ocfmRetCode exceptionObj;
 	if (!cdtObj)
@@ -4879,7 +4879,7 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 			                                    cdtObj->cDtObjPosition);
 			lastVarIndexGlobal = varDeclLC;
 			ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, pdoType,
-			           moduleName, moduleIndexId);
+			           moduleName, moduleIndexId, moduleSubindexId);
 		}
 		if (!cdtCompletedGlobal)
 		{
@@ -4914,6 +4914,10 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 				strcat(piObj.name, moduleName);
 				strcat(piObj.name, ".");
 				strcat(piObj.name, varDeclObj.namIdDtAttr->GetName());
+
+
+				piObj.subindex = new char[strlen(moduleSubindexId) + STR_ALLOC_BUFFER];
+				strcpy(piObj.subindex, moduleSubindexId);
 
 				piObj.moduleName = new char[strlen(moduleName)
 				                            + STR_ALLOC_BUFFER];
@@ -5061,7 +5065,7 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 
 					lastVarIndexGlobal = iLoopCount;
 					ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj,
-					           pdoType, moduleName, moduleIndexId);
+					           pdoType, moduleName, moduleIndexId, moduleSubindexId);
 				}
 			}
 		}
@@ -5195,7 +5199,7 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 						LOG_FATAL() << formatter.str();
 						throw exceptionObj;
 					}
-					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, indexObj.GetPDOType(), (char*)moduleIndexObj->GetName(), (char*) moduleIndexObj->GetIndexValue());
+					totalBytesMapped = ProcessCDT(cdtObj, appProcessObj, nodeObj, parameterObj, indexObj.GetPDOType(), (char*)moduleIndexObj->GetName(), (char*) moduleIndexObj->GetIndexValue(), moduleSidxObj->GetIndexValue());
 					lastVarIndexGlobal = -1;
 					cdtCompletedGlobal = false;
 				}
@@ -5220,6 +5224,8 @@ INT32 DecodeUniqueIDRef(char* uniqueidRefId, Node* nodeObj, Index indexObj, SubI
 						objProcessImage.directionType = OUTPUT;
 					}
 					objProcessImage.nodeId = nodeObj->GetNodeId();
+					objProcessImage.subindex = new char[strlen(moduleSidxObj->GetIndexValue()) + ALLOC_BUFFER];
+					strcpy(objProcessImage.subindex, moduleSidxObj->GetIndexValue());
 
 					objProcessImage.name = new char[strlen(uniqueidRefId) + strlen(moduleIndexObj->GetName()) + 6 + ALLOC_BUFFER];
 					strcpy(objProcessImage.name, GetPIName(nodeObj->GetNodeId()));
@@ -8392,27 +8398,27 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 		nodeObjMN = nodeCollObj->GetNodePtr(MN, MN_NODEID);
 
 		//		INT32* arrangedNodeIDbyStation = NULL;
-		Node nodeObj;
+		Node* nodeObj;
 		//Commented because the below code is not using the arranged node id..
 		//		arrangedNodeIDbyStation = ArrangeNodeIDbyStation();
 		LOG_INFO() << "NodeID arranged by station.";
 		for (INT32 nodeLC = 0; nodeLC < nodeCollObj->GetNumberOfNodes();
 		        nodeLC++)
 		{
-			nodeObj = nodeCollObj->GetNodebyCollectionIndex(nodeLC);
+			nodeObj = nodeCollObj->GetNodebyColIndex(nodeLC);
 
 			StationType currCNStation;
-			if (nodeObj.GetNodeType() == CN)
+			if (nodeObj->GetNodeType() == CN)
 			{
 
 				char* versionNumber = new char[INDEX_LEN];
 				versionNumber[0] = 0;
-				currCNStation = nodeObj.GetStationType();
+				currCNStation = nodeObj->GetStationType();
 
 				nodeObjMN = nodeCollObj->GetNodePtr(MN, MN_NODEID);
 				indexCollObj = nodeObjMN->GetIndexCollection();
 
-				if (nodeObj.MNPDOOUTVarCollection.size() != 0)
+				if (nodeObj->MNPDOOUTVarCollection.size() != 0)
 				{
 					if (CHAINED != currCNStation)
 					{
@@ -8443,7 +8449,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						}
 
 						//to write cn node id in 18XX/01
-						mappNodeID = IntToAscii(nodeObj.GetNodeId(), mappNodeID, 10);
+						mappNodeID = IntToAscii(nodeObj->GetNodeId(), mappNodeID, 10);
 					}
 					else
 					{
@@ -8474,7 +8480,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappNodeID, (char*) "NodeID_U8");
 					delete[] mappNodeID;
 
-					GetSubIndexAttributes(nodeObj.GetNodeId(), CN, (char*) "1400", (char*) "02", ACTUALVALUE, versionNumber);
+					GetSubIndexAttributes(nodeObj->GetNodeId(), CN, (char*) "1400", (char*) "02", ACTUALVALUE, versionNumber);
 					if ((NULL == versionNumber)
 					        || (strcmp(versionNumber, "") == 0))
 					{
@@ -8499,29 +8505,50 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						throw exceptionObj;
 					}
 					UINT32 pdoOutLC = 0;
-					for (pdoOutLC = 0; pdoOutLC < nodeObj.MNPDOOUTVarCollection.size(); pdoOutLC++)
+					UINT32 size = 0;
+					for (pdoOutLC = 0; pdoOutLC < nodeObj->MNPDOOUTVarCollection.size(); pdoOutLC++)
 					{
 						MNPdoVariable mnPDOObj;
-						mnPDOObj = nodeObj.MNPDOOUTVarCollection[pdoOutLC];
+						mnPDOObj = nodeObj->MNPDOOUTVarCollection.at(pdoOutLC);
 						indexObj = indexCollObj->GetIndexbyIndexValue(indexIdMN);
 						if (prevSubIndex >= 252)
 						{
 							boost::format formatter(kMsgChannelObjectLimitExceeded);
 							formatter
-							% nodeObj.GetNodeId()
+							% nodeObj->GetNodeId()
 							% indexObj->GetIndex()
-							% 255;
+							% 252;
 							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_OBJECT_LIMIT_EXCEEDED);
 							exceptionObj.setErrorString(formatter.str());
 							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
+						}
+						size = size + mnPDOObj.dataSize;
+						if (prevSubIndex >= indexObj->GetNumberofSubIndexes() - 1)
+						{
+							//MN Mapping Object does not exist
+							UINT32 processImageSize = 0;
+							std::vector<ProcessImage>::iterator it;
+							for(it = nodeObj->PICollection.begin(); it != nodeObj->PICollection.end(); it++) {
+								processImageSize = processImageSize + it->dataInfo.dataSize;
+								if(size >= processImageSize)
+								{
+									if(it->varDeclName && it->moduleIndex  && it->subindex && it->nodeId && indexObj->GetIndex())
+										cout << "Warning : Generation of MN Mapping failed : " << it->varDeclName << " from domain (0x" << it->moduleIndex << "/0x" << it->subindex << ") on Node: "<< it->nodeId << " cannot be mapped to non-existing MN Object (" << IntToHex(indexObj->GetIndex(), 2, "0x") << "/"<< IntToHex((unsigned int) pdoOutLC + 1, 2, "0x") << ")." << endl;
+									break;
+								}
+							}
+
+							nodeObj->PICollection.erase(it, nodeObj->PICollection.end());
+
+							break;
 						}
 
 						if ((outPrevSize + mnPDOObj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{
 							boost::format formatter(kMsgIsochronousMaxPayloadExceeded);
 							formatter
-							% nodeObj.GetNodeId()
+							% nodeObj->GetNodeId()
 							% "TPDO"
 							% (outPrevSize + mnPDOObj.dataSize);
 							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
@@ -8554,7 +8581,7 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 					}
 				}
 
-				if (nodeObj.MNPDOINVarCollection.size() != 0)
+				if (nodeObj->MNPDOINVarCollection.size() != 0)
 				{
 					/* Create PDO_RxCommParam_XXh_REC 1400 Index*/
 					Index* indexObjTemp;
@@ -8581,12 +8608,12 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 						throw exceptionObj;
 					}
 
-					mappingSidxId = IntToAscii((nodeObj.GetNodeId()), mappingSidxId, 10);
+					mappingSidxId = IntToAscii((nodeObj->GetNodeId()), mappingSidxId, 10);
 					char* tempSidxId = new char[SUBINDEX_LEN];
 					strcpy(tempSidxId, "01");
 					SetBasicSubIndexAttributes(MN_NODEID, MN, indexIdMN, tempSidxId, mappingSidxId, (char*) "NodeID_U8");
 
-					GetSubIndexAttributes(nodeObj.GetNodeId(), CN, (char*) "1800", (char*) "02", ACTUALVALUE, versionNumber);
+					GetSubIndexAttributes(nodeObj->GetNodeId(), CN, (char*) "1800", (char*) "02", ACTUALVALUE, versionNumber);
 					if ((NULL == versionNumber)
 					        || (strcmp(versionNumber, "") == 0))
 					{
@@ -8612,30 +8639,51 @@ ocfmRetCode GenerateMNOBD(bool IsBuild)
 
 					indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
 					UINT32 pdoInLC = 0;
-					for (pdoInLC = 0; pdoInLC < nodeObj.MNPDOINVarCollection.size(); pdoInLC++)
+					UINT32 size = 0;
+					for (pdoInLC = 0; pdoInLC < nodeObj->MNPDOINVarCollection.size(); pdoInLC++)
 					{
 						MNPdoVariable mnPDOobj;
-						mnPDOobj = nodeObj.MNPDOINVarCollection[pdoInLC];
+						mnPDOobj = nodeObj->MNPDOINVarCollection[pdoInLC];
 						indexObjTemp = indexCollObj->GetIndexbyIndexValue(indexIdMN);
 
 						if (inPrevSubIndex >= 254)
 						{
 							boost::format formatter(kMsgChannelObjectLimitExceeded);
 							formatter
-							% nodeObj.GetNodeId()
+							% nodeObj->GetNodeId()
 							% indexObjTemp->GetIndex()
-							% 255;
+							% 254;
 							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_OBJECT_LIMIT_EXCEEDED);
 							exceptionObj.setErrorString(formatter.str());
 							LOG_FATAL() << formatter.str();
 							throw exceptionObj;
 						}
 
+						size = size + mnPDOobj.dataSize;
+						if (inPrevSubIndex >= indexObjTemp->GetNumberofSubIndexes() - 1)
+						{
+							//MN Mapping Object does not exist
+							UINT32 processImageSize = 0;
+							std::vector<ProcessImage>::iterator it;
+							for(it = nodeObj->PICollection.begin(); it != nodeObj->PICollection.end(); it++) {
+								processImageSize = processImageSize + it->dataInfo.dataSize;
+								if(size == processImageSize)
+								{
+									if(it->varDeclName && it->moduleIndex  && it->subindex && it->nodeId && indexObjTemp->GetIndex())
+										cout << "Warning : Generation of MN Mapping failed : " << it->varDeclName << " from domain (0x" << it->moduleIndex << "/0x" << it->subindex << ") on Node: "<< it->nodeId << " cannot be mapped to non-existing MN Object (" << IntToHex(indexObjTemp->GetIndex(), 2, "0x") << "/"<< IntToHex((unsigned int) pdoInLC + 1, 2, "0x") << ")." << endl;
+									break;
+								}
+							}
+							nodeObj->PICollection.erase(it, nodeObj->PICollection.end());
+
+							break;
+						}
+
 						if ((inPrevSize + mnPDOobj.dataSize) > (atoi((const char*) abC_DLL_ISOCHR_MAX_PAYL) * 8))
 						{
 							boost::format formatter(kMsgIsochronousMaxPayloadExceeded);
 							formatter
-							% nodeObj.GetNodeId()
+							% nodeObj->GetNodeId()
 							% "RPDO"
 							% (inPrevSize + mnPDOobj.dataSize);
 							exceptionObj.setErrorCode(OCFM_ERR_CHANNEL_PAYLOAD_LIMIT_EXCEEDED);
