@@ -23,7 +23,7 @@ namespace openCONFIGURATOR
 		namespace API
 		{
 			const string kDefaultMNXDD = "./resources/openPOWERLINK_MN.xdd";
-			const string kDefaultMNName = "openPOWERLINK_MN(240)";
+			const string kDefaultMNName = "openPOWERLINK_MN";
 
 			DLLEXPORT Result NewProject(const string projectName, const string projectPath, const string pathToMNXdd)
 			{
