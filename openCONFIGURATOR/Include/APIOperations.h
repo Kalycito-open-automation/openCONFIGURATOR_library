@@ -109,7 +109,7 @@ void WriteCNsData(char* fileName);
 /*****************************************************************************/
 INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
                  Node* nodeObj, Parameter* parameterObj, PDOType pdoType,
-                 char* moduleName, char* moduleIndexId);
+                 char* moduleName, char* moduleIndexId, const char* moduleSubindexId);
 /*****************************************************************************/
 /**
  \brief		This function shall decode the unique ID reference & generate the relevant MN PDO variable collection
