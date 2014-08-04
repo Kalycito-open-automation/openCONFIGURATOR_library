@@ -228,7 +228,7 @@ namespace openCONFIGURATOR{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeletePath(const std::string id);
 
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result AddViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType viewType, const std::string name, const std::string value);
-				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType viewType, const std::string name, std::string& value);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetViewSetting(openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType viewType, const std::string name, std::string& value);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result DeleteViewSetting(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType viewType, const std::string name);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SetActiveView(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType viewType);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveView(openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType& viewType);
