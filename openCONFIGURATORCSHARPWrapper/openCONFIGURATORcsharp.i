@@ -184,6 +184,7 @@ namespace openCONFIGURATOR{
 		namespace API{
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result NewProject(const std::string projectName, const std::string projectPath, const std::string pathToMNXdd = "");
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject(void);
+				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProjectAs(const std::string projectName, const std::string projectPath);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result CloseProject(void);
 				DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result OpenProject(const std::string projectFile);
 

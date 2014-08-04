@@ -91,6 +91,39 @@ namespace openCONFIGURATOR
 				}
 			}
 
+			DLLEXPORT Result SaveProjectAs(const string projectName , const string projectPath)
+			{
+				try
+				{
+					if (ProjectConfiguration::GetInstance().IsInitialized())
+					{
+						ProjectConfiguration::GetInstance().SetProjectFile(projectName + ".xml");
+						ProjectConfiguration::GetInstance().SetProjectPath(boost::filesystem::path(projectPath));
+						ProjectConfiguration::GetInstance().DeletePath("defaultOutputPath");
+						ProjectConfiguration::GetInstance().SetDefaultOutputPath(boost::filesystem::path(projectPath + PATH_SEPARATOR + "output"));
+						ProjectConfiguration::GetInstance().SetAlreadySaved(false);
+
+						NodeCollection* nodeCollection = NodeCollection::GetNodeColObjectPointer();
+						for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+						{
+							Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+							nodeObj->SetXdcPath(boost::filesystem::path(""));
+
+						}
+						return ProjectConfiguration::GetInstance().SaveProject();
+					}
+					return Result(NO_PROJECT_LOADED, kMsgNoProjectLoaded);
+				}
+				catch (const ocfmRetCode& ex)
+				{
+					return Translate(ex);
+				}
+				catch (const exception& ex)
+				{
+					return Result(UNHANDLED_EXCEPTION, ex.what());
+				}
+			}
+
 			DLLEXPORT Result CloseProject(void)
 			{
 				try

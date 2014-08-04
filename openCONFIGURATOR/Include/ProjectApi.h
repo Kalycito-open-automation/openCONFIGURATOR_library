@@ -41,6 +41,15 @@ namespace openCONFIGURATOR
 			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProject();
 
 			/**
+			\brief	Save %openCONFIGURATOR project in a new folder.
+
+			Updates the project file with the current configuration and persists all imported XDDs as XDCs or alters all existing XDCs with the objects actual values in a new folder.
+
+			\return openCONFIGURATOR::Library::ErrorHandling::Result
+			*/
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result SaveProjectAs(const string projectName, const string projectPath);
+
+			/**
 			\brief	Close project and free allocated resources.
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
