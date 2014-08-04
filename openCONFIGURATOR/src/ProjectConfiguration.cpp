@@ -522,7 +522,7 @@ void ProjectConfiguration::ProcessViewSettings(xmlTextReaderPtr xmlReader)
 	{
 		string settingNameStr = "";
 		string settingValueStr = "";
-		if (xmlStrEqual(node->content, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 1)
+		if (xmlStrEqual(node->name, (xmlChar*) PROJECT_XML_SETTING_ELEMENT.c_str()) == 1)
 		{
 			xmlAttr* attribute = node->properties;
 			while (attribute && attribute->name && attribute->children)
