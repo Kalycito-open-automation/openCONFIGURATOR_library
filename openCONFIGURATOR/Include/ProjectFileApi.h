@@ -68,7 +68,7 @@ namespace openCONFIGURATOR
 
 			\return openCONFIGURATOR::Library::ErrorHandling::Result
 			*/
-			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveView(const openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType& viewType);
+			DLLEXPORT openCONFIGURATOR::Library::ErrorHandling::Result GetActiveView(openCONFIGURATOR::Library::ProjectFile::ViewType::ViewType& viewType);
 			/** @} */
 
 		}

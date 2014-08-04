@@ -668,3 +668,22 @@ const std::string GetCurrentDateTime() {
     strftime(buf, sizeof(buf), "%Y-%m-%dT%X", &tstruct);
     return buf;
 }
+
+string openCONFIGURATOR::Library::Utilities::url_encode(const string &value) {
+    ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        string::value_type c = (*i);
+
+        if (c == ' ') {
+            escaped << '%' << setw(2) << int((unsigned char) c);
+            continue;
+        }
+
+        escaped << c;
+    }
+
+    return escaped.str();
+}

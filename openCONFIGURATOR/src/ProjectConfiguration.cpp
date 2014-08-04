@@ -1557,7 +1557,7 @@ void ProjectConfiguration::WriteProjectFile(void)
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
 
-		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string().c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(ProjectConfiguration::GetInstance().GetDefaultOutputPath().generic_string()).c_str());
 		xmlTextWriterEndElement(writer);
 
 		for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
@@ -1565,7 +1565,7 @@ void ProjectConfiguration::WriteProjectFile(void)
 			xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
 
-			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(it->GetValue()).c_str());
 			xmlTextWriterEndElement(writer);
 
 		}
@@ -1593,7 +1593,7 @@ void ProjectConfiguration::WriteProjectFile(void)
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_MANAGING_NODE_ELEMENT.c_str());
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST "240");
 		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetNodeName());
-		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+		xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(mnXdcPathString).c_str());
 
 		//if (nodeCollection->GetNodeRef(240).IsAsyncOnly())
 		//{
@@ -1654,7 +1654,7 @@ void ProjectConfiguration::WriteProjectFile(void)
 				xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_CONTROLLED_NODE_ELEMENT.c_str());
 				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST  nodeIdStream.str().c_str());
 				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
-				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+				xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
 				if (nodeObj->GetStationType() == CHAINED)
 					xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
 				if (nodeObj->GetStationType() == MULTIPLEXED)
@@ -1975,7 +1975,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 				xmlFree(tempID);
 				if (id.compare("defaultOutputPath") == 0)
 				{
-					xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+					xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(GetDefaultOutputPath().generic_string()).c_str());
 					createPath = false;
 				}
 			}
@@ -1983,7 +1983,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 			{
 				xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
-				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(GetDefaultOutputPath().generic_string()).c_str());
 				xmlAddNextSibling(pPathNode, pNodeNew);
 			}
 
@@ -1999,7 +1999,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 					xmlFree(tempID);
 					if (id.compare(it->GetName()) == 0)
 					{
-						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(it->GetValue()).c_str());
 						createPath = false;
 					}
 
@@ -2008,7 +2008,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 				{
 					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
-					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(it->GetValue()).c_str());
 					xmlAddNextSibling(pPathNode, pNodeNew);
 				}
 			}
@@ -2058,14 +2058,14 @@ void ProjectConfiguration::UpdateProjectFile(void)
 
 				xmlNodePtr pNodeDefaultOutputPath = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 				xmlNewProp(pNodeDefaultOutputPath, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST "defaultOutputPath");
-				xmlNewProp(pNodeDefaultOutputPath, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST GetDefaultOutputPath().generic_string().c_str());
+				xmlNewProp(pNodeDefaultOutputPath, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(GetDefaultOutputPath().generic_string()).c_str());
 				xmlAddChild(pNodePathSettings, pNodeDefaultOutputPath);
 
 				for (std::vector<Path>::iterator it = pathSettings.begin(); it != pathSettings.end(); ++it)
 				{
 					xmlNodePtr pNodeNew = xmlNewNode(0, BAD_CAST PROJECT_XML_PATH_ELEMENT.c_str());
 					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_ID_ATTRIBUTE.c_str(), BAD_CAST it->GetName().c_str());
-					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST it->GetValue().c_str());
+					xmlNewProp(pNodeNew, BAD_CAST PROJECT_XML_PATH_PATH_ATTRIBUTE.c_str(), BAD_CAST url_encode(it->GetValue()).c_str());
 					xmlAddChild(pNodePathSettings, pNodeNew);
 				}
 
@@ -2287,11 +2287,11 @@ void ProjectConfiguration::UpdateProjectFile(void)
 				//Update pathToXDC attribute
 				if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str()))
 				{
-					xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+					xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(mnXdcPathString).c_str());
 				}
 				else
 				{
-					xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST mnXdcPathString.c_str());
+					xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(mnXdcPathString).c_str());
 				}
 
 				/*if (nodeCollection->GetNodeRef(240).IsAsyncOnly())
@@ -2453,11 +2453,11 @@ void ProjectConfiguration::UpdateProjectFile(void)
 							//Update pathToXDC attribute anyway
 							if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str()))
 							{
-								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+								xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
 							}
 							else
 							{
-								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+								xmlNewProp(pCNNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
 							}
 
 							//Update isChained attribute if existing or node is chained
@@ -2533,7 +2533,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 						xmlNodePtr newNode = xmlNewNode(0, BAD_CAST "CN");
 						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST nodeIdStream.str().c_str());
 						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
-						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST cnXdcPathString.c_str());
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
 						if (nodeObj->GetStationType() == CHAINED)
 							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
 						if (nodeObj->GetStationType() == MULTIPLEXED)
