@@ -1106,7 +1106,7 @@
             <SubObject subIndex="ED" name="PResPayloadED" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
             <SubObject subIndex="EE" name="PResPayloadEE" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
             <SubObject subIndex="EF" name="PResPayloadEF" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
-            <SubObject subIndex="F0" name="PResPayloadF0" objectType="7" dataType="0006" accessType="rw" defaultValue="50" />
+            <SubObject subIndex="F0" name="PResPayloadF0" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
             <SubObject subIndex="F1" name="PResPayloadF1" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
             <SubObject subIndex="F2" name="PResPayloadF2" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
             <SubObject subIndex="F3" name="PResPayloadF3" objectType="7" dataType="0006" accessType="rw" defaultValue="0" />
