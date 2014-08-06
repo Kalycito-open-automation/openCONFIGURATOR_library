@@ -431,6 +431,14 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName
 			LOG_FATAL() << formatter.str();
 			throw errCodeObj;
 		}
+
+		errCodeObj = ValidateXDDFile(importXmlFile);
+		if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
+		{
+			LOG_FATAL() << errCodeObj.getErrorString();
+			return errCodeObj;
+		}
+
 		errCodeObj = CreateNode(nodeId, nodeType, nodeName);
 		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
@@ -447,12 +455,7 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName
 			LOG_FATAL() << formatter.str();
 			throw errCodeObj;
 		}
-		errCodeObj = ValidateXDDFile(importXmlFile);
-		if (errCodeObj.getErrorCode() != OCFM_ERR_SUCCESS)
-		{
-			LOG_FATAL() << errCodeObj.getErrorString();
-			throw errCodeObj;
-		}
+
 		errCodeObj = ImportXML(importXmlFile, nodeId, nodeType);
 		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
@@ -4568,7 +4571,7 @@ void FormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
 				                        tempBuffer1, false);
 				Buffer1.append(tempBuffer1);
 			}
-		
+
 		}
 	// write all objects except pdo
 	for (INT32 indexLC = 0; indexLC < noOfIndexes; indexLC++)
@@ -4660,7 +4663,7 @@ void FormatCdc(IndexCollection *objIndexCollection, std::string& Buffer1,
 				                        tempBuffer1, true);
 				Buffer1.append(tempBuffer1);
 			}
-		
+
 		}
 	}
 
@@ -4833,7 +4836,7 @@ void BRSpecificFormatCdc(IndexCollection *objIndexCollection, std::string& Buffe
 					Buffer1.append(tempBuffer1);
 				}
 			}
-		
+
 		}
 	}
 
