@@ -1581,13 +1581,13 @@ void ProjectConfiguration::WriteProjectFile(void)
 
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NETWORK_CONFIGURATION_ELEMENT.c_str());
 		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0))
-			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(1006, 0).get().c_str());
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1006, 0).get());
 		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8))
-			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 8).get());
 		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7))
-			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 7).get());
 		if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9))
-			xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+			xmlTextWriterWriteFormatAttribute(writer, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), "%d", nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 9).get());
 
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_NODE_COLLECTION_ELEMENT.c_str());
 		xmlTextWriterStartElement(writer, BAD_CAST PROJECT_XML_MANAGING_NODE_ELEMENT.c_str());
@@ -1628,10 +1628,10 @@ void ProjectConfiguration::WriteProjectFile(void)
 		//}
 
 		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2))
-		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 2).get().c_str());
 
 		//if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3))
-		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+		//	xmlTextWriterWriteAttribute(writer, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 3).get().c_str());
 
 
 		xmlTextWriterEndElement(writer);
@@ -1779,6 +1779,10 @@ void ProjectConfiguration::WriteProjectFile(void)
 		xmlFreeTextWriter(writer);
 		xmlCleanupParser();
 		xmlMemoryDump();
+	}
+	catch (ocfmRetCode& ex)
+	{
+		throw Translate(ex);
 	}
 	catch (exception& ex)
 	{
@@ -2207,54 +2211,60 @@ void ProjectConfiguration::UpdateProjectFile(void)
 			for (int i = 0; i < pNodeSet->nodeNr; ++i)
 			{
 				xmlNodePtr pPathNode(pNodeSet->nodeTab[i]);
-
-
 				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0))
 				{
 					//Update cycle time attribute
+					std::ostringstream oss;
+					oss << nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1006, 0).get();
 					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0).get().c_str());
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 					else
 					{
-						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1006, 0).get().c_str());
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_CYCLE_TIME_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 				}
 				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8))
 				{
 					//Update async mtu attribute
+					std::ostringstream oss;
+					oss << nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 8).get();
 					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 					else
 					{
-						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 8).get().c_str());
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_ASYNC_MTU_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 				}
 				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7))
 				{
 					//Update multiplexed cycle length attribute
+					std::ostringstream oss;
+					oss << nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 7).get();
 					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 					else
 					{
-						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 7).get().c_str());
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_MULTIPLEXED_CYCLE_LENGTH_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 				}
 				if (nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9))
 				{
 					//Update prescaler attribute
+					std::ostringstream oss;
+					oss << nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F98, 9).get();
 					if (xmlHasProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+						xmlSetProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 					else
 					{
-						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F98, 9).get().c_str());
+						xmlNewProp(pPathNode, BAD_CAST PROJECT_XML_NETWORK_PRESCALER_ATTRIBUTE.c_str(), BAD_CAST oss.str().c_str());
 					}
 				}
 			}
@@ -2365,11 +2375,11 @@ void ProjectConfiguration::UpdateProjectFile(void)
 					//Update asyncSlotTimeout attribute
 					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 2).get());
 					}
 					else
 					{
-						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 2).get().c_str());
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASYNCSLOTTIMEOUT_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 2).get());
 					}
 
 				}
@@ -2378,11 +2388,11 @@ void ProjectConfiguration::UpdateProjectFile(void)
 					//Update asndMaxNumber attribute
 					if (xmlHasProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str()))
 					{
-						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+						xmlSetProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 3).get());
 					}
 					else
 					{
-						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<string>(0x1F8A, 3).get().c_str());
+						xmlNewProp(pMNNode, BAD_CAST PROJECT_XML_NODE_MN_ASNDMAXNUMBER_ATTRIBUTE.c_str(), BAD_CAST nodeCollection->GetNodeRef(240).GetActualValue<UINT32>(0x1F8A, 3).get());
 					}
 				}*/
 			}
@@ -2463,7 +2473,7 @@ void ProjectConfiguration::UpdateProjectFile(void)
 							//Update isChained attribute if existing or node is chained
 							if (nodeObj->GetStationType() == CHAINED)
 							{
-								
+
 								if (xmlHasProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str()))
 								{
 									xmlSetProp(pCNNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST "true");
@@ -2650,6 +2660,50 @@ void ProjectConfiguration::UpdateProjectFile(void)
 					}
 				}
 			}
+		}
+		else
+		{
+			string xpathMn = "//co:MN[@nodeID='240']";
+			xmlXPathObjectPtr mnXpath = GetNodeSet(pDoc, xpathMn.c_str());
+			if (mnXpath)
+			{
+				xmlNodeSetPtr pNodeSet(mnXpath->nodesetval);
+				for (int i = 0; i < nodeCollection->GetNumberOfNodes(); i++)
+				{
+					Node* nodeObj = nodeCollection->GetNodebyColIndex(i);
+					stringstream nodeIdStream;
+					nodeIdStream << nodeObj->GetNodeId();
+
+					if (nodeObj->GetNodeType() == CN)
+					{
+						stringstream nodeIdStream;
+						nodeIdStream << nodeObj->GetNodeId();
+						boost::filesystem::path cnXdcPath = nodeObj->GetXdcPath();
+						string cnXdcPathString = "";
+						if (cnXdcPath.is_relative())
+							cnXdcPathString  = cnXdcPath.generic_string().substr(projectPathStr.size() + 1, cnXdcPath.generic_string().size());
+						else
+							cnXdcPathString  = cnXdcPath.generic_string();
+						bool exists = false;
+
+						xmlNodePtr newNode = xmlNewNode(0, BAD_CAST "CN");
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NODEID_ATTRIBUTE.c_str(), BAD_CAST nodeIdStream.str().c_str());
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_NAME_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetNodeName());
+						xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_PATHTOXDC_ATTRIBUTE.c_str(), BAD_CAST url_encode(cnXdcPathString).c_str());
+						if (nodeObj->GetStationType() == CHAINED)
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISCHAINED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+						if (nodeObj->GetStationType() == MULTIPLEXED)
+						{
+							xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_ISMULTIPLEXED_ATTRIBUTE.c_str(), BAD_CAST PROJECT_XML_VALUE_TRUE.c_str());
+							if (nodeObj->GetForceCycleFlag())
+								xmlNewProp(newNode, BAD_CAST PROJECT_XML_NODE_FORCED_MULTIPLEXED_CYCLE_ATTRIBUTE.c_str(), BAD_CAST nodeObj->GetForcedCycleValue());
+						}
+
+						xmlAddChild(pNodeSet->nodeTab[0]->parent, newNode);
+					}
+				}
+			}
+			xmlXPathFreeObject(mnXpath);
 		}
 		xmlXPathFreeObject(pResultingXPathObject);
 
