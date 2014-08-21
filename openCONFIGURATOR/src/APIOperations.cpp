@@ -5041,6 +5041,10 @@ INT32 ProcessCDT(ComplexDataType* cdtObj, ApplicationProcess* appProcessObj,
 				piObj.byteOffset = offsetVal;
 				isNewBitStr = false;
 			}
+			else
+			{
+				piObj.bitOffset = 0;
+			}
 			nodeObj->AddProcessImage(piObj);
 
 		}
@@ -6610,7 +6614,7 @@ void WriteXAPElements(ProcessImage piCollObj[], xmlTextWriterPtr& xmlWriter,
 				return;
 			}
 
-			if (piObj.bitOffset != -1)
+			if (piObj.bitOffset > 0 || piObj.dataInfo.dataSize == 1)
 			{
 				char* bitOffset = new char[4];
 				bitOffset = IntToAscii(piObj.bitOffset, bitOffset, 16);
