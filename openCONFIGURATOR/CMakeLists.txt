@@ -60,8 +60,8 @@ IF(UNIX)
 	ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
 	IF(${LIBXML2_VERSION_STRING} STRLESS "2.7.2")
 		MESSAGE(FATAL_ERROR "Libxml2 minimum required version '2.7.2' not found on the system.")
-	ENDIF()	
-ELSEIF(WIN32)	
+	ENDIF()
+ELSEIF(WIN32)
 	FIND_LIBRARY(LIBXML2 NAMES libxml2.lib PATHS ${CMAKE_SOURCE_DIR}/libxml2/lib)
 ENDIF(UNIX)
 
@@ -84,11 +84,11 @@ FILE (GLOB_RECURSE LIB_HEADERS "${PROJECT_SOURCE_DIR}/Include/*.h")
 ###############################################################################
 IF(WIN32)
 	INCLUDE_DIRECTORIES(
-		${CMAKE_SOURCE_DIR}/libxml2/include 
+		${CMAKE_SOURCE_DIR}/libxml2/include
 		${CMAKE_SOURCE_DIR}/libxml2/iconv/include
 		${Boost_INCLUDE_DIRS})
 ELSE(WIN32)
-	INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR})	
+	INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR})
 	# This will cause the Boost-Headers to be included via GNU GCC's "-isystem"
 	# option and hence will treat the Boost-Headers as system headers
 	# (and suppress warnings for them).
@@ -118,7 +118,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 ###############################################################################
-# Create openCONF library 
+# Create openCONF library
 ###############################################################################
 ADD_LIBRARY(openCONFIGURATOR ${LIBRARY_TYPE} ${LIB_SOURCES} ${LIB_HEADERS})
 
@@ -130,9 +130,9 @@ IF(UNIX)
 ENDIF()
 
 ###############################################################################
-# Create openCONF library 
+# Create openCONF library
 ###############################################################################
-TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADDITIONAL_DEPENDENCIES})
+TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADDITIONAL_DEPENDENCIES} ${Boost_LIBRARIES})
 
 ###############################################################################
 # Install openCONF library and dependencies to build dir
@@ -140,19 +140,19 @@ TARGET_LINK_LIBRARIES(openCONFIGURATOR ${ADDITIONAL_DEPENDENCIES})
 IF(WIN32)
 	FILE (GLOB_RECURSE LIBS "${CMAKE_SOURCE_DIR}/resources/lib/*.dll")
 	INSTALL(FILES ${LIBS} DESTINATION ${INSTALL_DIR})
-	
+
 	# Install Boost libraries
 	FILE (GLOB BOOST_DEBUG_LIBS "${Boost_LIBRARY_DIRS}/*mt-gd*.dll")
 	FILE (GLOB BOOST_RELEASE_LIBS "${Boost_LIBRARY_DIRS}/*mt-1*.dll")
 	INSTALL(FILES ${BOOST_DEBUG_LIBS} DESTINATION ${INSTALL_DIR} CONFIGURATIONS Debug)
 	INSTALL(FILES ${BOOST_RELEASE_LIBS} DESTINATION ${INSTALL_DIR} CONFIGURATIONS Release)
-	
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc.exe" 
+
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc.exe"
 		DESTINATION
 		${INSTALL_DIR}/resources
 	)
 ELSE()
-	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc" 
+	INSTALL(FILES "${CMAKE_SOURCE_DIR}/resources/txt2cdc"
 		DESTINATION
 		${INSTALL_DIR}/resources
 	)
@@ -181,7 +181,7 @@ INSTALL(
 	FILES "${CMAKE_SOURCE_DIR}/resources/boost_log_settings.ini" DESTINATION ${INSTALL_DIR}/resources/
 )
 INSTALL(
-	TARGETS openCONFIGURATOR 
+	TARGETS openCONFIGURATOR
 	RUNTIME DESTINATION ${INSTALL_DIR}
 	LIBRARY DESTINATION ${INSTALL_DIR}
 )
