@@ -108,7 +108,7 @@ ENDIF()
 # Add a target to always generate the openCONFIGURATOR library
 ###############################################################################
 ADD_SUBDIRECTORY(openCONFIGURATOR)
-
+ADD_SUBDIRECTORY(openCONFIGURATOR_tools)
 ###############################################################################
 # Add a target to generate .NET wrapper
 ###############################################################################
