@@ -68,6 +68,8 @@ ENDIF()
 IF (UNIX)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
 	INCLUDE(FindLibXml2)
+	
+	SET(CMAKE_INSTALL_RPATH ".")
 ENDIF (UNIX)
 
 ###############################################################################
