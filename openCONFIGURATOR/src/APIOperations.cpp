@@ -460,6 +460,7 @@ ocfmRetCode NewProjectNode(INT32 nodeId, NodeType nodeType, const char* nodeName
 		if (OCFM_ERR_SUCCESS != errCodeObj.getErrorCode())
 		{
 			LOG_FATAL() << errCodeObj.getErrorString();
+			DeleteNode(nodeId, nodeType);
 			throw errCodeObj;
 		}
 
@@ -10423,6 +10424,23 @@ void CopyPDODefToAct(INT32 nodeId, NodeType nodeType)
 			        sIdxLC++)
 			{
 				sidxObj = indexObj->GetSubIndexByPosition(sIdxLC);
+				if(sIdxLC == 0)
+				{
+					UINT32 nrOfSubindices = indexObj->GetNumberofSubIndexes() - 1;
+					boost::optional<UINT32> actualNrOfEntries = nodeObj->GetActualValue<UINT32>(indexObj->GetIndex(), sidxObj->GetIndex());
+					if(actualNrOfEntries.is_initialized())
+					{
+						if(actualNrOfEntries.get() > nrOfSubindices)
+						{
+							stringstream errorMessage;
+							errorMessage << "Warning: On Node " << nodeId << ", Index 0x" << indexObj->GetIndexValue() << "/0x0: The actual value (" << actualNrOfEntries.get() << ") does exceed the number of existing subindices (" << nrOfSubindices << ")." << endl;
+							cerr << errorMessage.str();
+							LOG_FATAL() << errorMessage.str();
+							nodeObj->SetActualValue<UINT32>(indexObj->GetIndex(), sidxObj->GetIndex(), nrOfSubindices);
+						}
+					}
+				}
+
 				if (sidxObj->GetActualValue() == NULL)
 				{
 					if (sidxObj->GetDefaultValue() != NULL)
@@ -10430,7 +10448,6 @@ void CopyPDODefToAct(INT32 nodeId, NodeType nodeType)
 						sidxObj->SetActualValue(
 						    (char*) sidxObj->GetDefaultValue());
 					}
-
 				}
 			}
 		}
