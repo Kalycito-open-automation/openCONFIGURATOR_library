@@ -363,6 +363,8 @@ INT32 GetConfigDate(void)
 	}
 	//Calculate the number of days from January 1 of current year
 	daysCount += timeInfo->tm_yday;
+	// Add one because timeInfo starts with zero
+	daysCount++;
 	return daysCount;
 }
 
