@@ -466,16 +466,14 @@ void BaseIndex::SaveChanges(char* idxIdStr, char* nameStr)
 	name = nameStr;
 }
 
-// FIXME:
-// 1. This method will never return false (fix all calls)
-// 2. This method should return ocfmRetCode (or a refactored version)
-// 3. This method should check ranges also for non-hex Index values
 bool BaseIndex::IsIndexValueValid(const char* hexValue)
 {
 	ULONG value;
 	//Determine limits for error message
 	ULONG uhighLimit = 0;
 	ULONG ulowLimit = 0;
+	ocfmRetCode objException;
+
 	if (highLimit != NULL)
 	{
 		if (CheckIfHex(this->highLimit))
@@ -491,103 +489,50 @@ bool BaseIndex::IsIndexValueValid(const char* hexValue)
 			ulowLimit = boost::lexical_cast<ULONG>(string(this->lowLimit));
 	}
 
-	bool retFlag = true;
-	ocfmRetCode objException;
+	if(uhighLimit == 0 && ulowLimit == 0)
+		return true;
 
 	if (0 == strcmp(hexValue, ""))
-	{
 		return true;
-	}
+
 
 	if (CheckIfHex(hexValue))
-	{
-		char* subStr = new char[strlen(hexValue)];
-		SubString(subStr, (const char*) hexValue, 2, (strlen(hexValue) - 2));
-		value = HexToInt(subStr);
-		delete[] subStr;
-	}
+		value = HexToInt<ULONG>(string(hexValue));
 	else
+		value = boost::lexical_cast<ULONG>(string(hexValue));
+
+
+	if (value < ulowLimit)
 	{
-		return true;
+		boost::format formatter(kMsgValueNotWithinRange);
+		formatter
+		% value
+		% this->GetName()
+		% nodeId
+		% ulowLimit
+		% uhighLimit;
+		objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw objException;
 	}
 
-	if (NULL != this->lowLimit)
+	if (value > uhighLimit)
 	{
-		if (0 != strcmp(this->lowLimit, ""))
-		{
-			ULONG lowlimitValue;
-			if (CheckIfHex((char*) this->lowLimit))
-			{
-				char* subStr = new char[strlen(lowLimit)];
-				SubString(subStr, lowLimit, 2, strlen(lowLimit) - 2);
-				lowlimitValue = HexToInt(subStr);
-				delete[] subStr;
-			}
-			else
-			{
-				lowlimitValue = atoi(lowLimit);
-			}
-			if (value >= lowlimitValue)
-			{
-				retFlag = true;
-			}
-			else
-			{
-				boost::format formatter(kMsgValueNotWithinRange);
-				formatter
-				% value
-				% this->GetName()
-				% nodeId
-				% ulowLimit
-				% uhighLimit;
-				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				objException.setErrorString(formatter.str());
-				LOG_FATAL() << formatter.str();
-				throw objException;
-				//bFlag = false;
-				//return bFlag;
-			}
-		}
+		boost::format formatter(kMsgValueNotWithinRange);
+		formatter
+		% value
+		% this->GetName()
+		% nodeId
+		% ulowLimit
+		% uhighLimit;
+		objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
+		objException.setErrorString(formatter.str());
+		LOG_FATAL() << formatter.str();
+		throw objException;
 	}
 
-	if (NULL != this->highLimit)
-	{
-		if (0 != strcmp(this->highLimit, ""))
-		{
-			ULONG ulHighLimit;
-			if (CheckIfHex((char*) this->highLimit))
-			{
-				char* subStr = new char[strlen(highLimit)];
-				SubString(subStr, highLimit, 2, (strlen(highLimit) - 2));
-				ulHighLimit = HexToInt(subStr);
-				delete[] subStr;
-			}
-			else
-			{
-				ulHighLimit = atoi(highLimit);
-			}
-			if (value <= ulHighLimit)
-			{
-				retFlag = true;
-			}
-			else
-			{
-				boost::format formatter(kMsgValueNotWithinRange);
-				formatter
-				% value
-				% this->GetName()
-				% nodeId
-				% ulowLimit
-				% uhighLimit;
-				objException.setErrorCode(OCFM_ERR_VALUE_NOT_WITHIN_RANGE);
-				objException.setErrorString(formatter.str());
-				LOG_FATAL() << formatter.str();
-				throw objException;
-				//bFlag = false;
-			}
-		}
-	}
-	return retFlag;
+	return true;
 }
 
 void BaseIndex::SetForceToCDC(bool force)
