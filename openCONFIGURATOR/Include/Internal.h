@@ -873,7 +873,7 @@ ocfmRetCode AddSubobject(INT32 nodeId, NodeType nodeType, const char* indexId);
  \return	SubIndex* / NULL
  */
 /******************************************************************************************/
-SubIndex* GetMNSubIndexValues(char* indexId, char* subIndexId);
+SubIndex* GetMNSubIndexValues(const char* indexId, const char* subIndexId);
 /*****************************************************************************/
 /**
  \brief		This function shall update the Asynchronous MTU size(0x1F98/0x08) of the CN

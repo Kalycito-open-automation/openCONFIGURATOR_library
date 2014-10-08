@@ -60,8 +60,10 @@
 #include "../Include/Node.h"
 #include "../Include/Internal.h"
 #include "../Include/Logging.h"
+#include "../Include/NodeCollection.h"
 
 using namespace std;
+using namespace openCONFIGURATOR::Library::Utilities;
 
 //==========================================================================//
 // 				F U N C T I O N  D E F I N I T I O N S  					//
@@ -468,41 +470,29 @@ void Node::SetPollResponseTimeout(char* presTimoutVal)
 	{
 		delete[] presTimeOut;
 	}
-	presTimeOut = new char[strlen(presTimoutVal) + STR_ALLOC_BUFFER];
-	strcpy((char*) presTimeOut, presTimoutVal);
 
-	//add or update 1f92 subobjects in MN
-	ocfmRetCode stErrorInfo;
-	INT32 idxPos = 0;
-	INT32 sidxPos = 0;
-	char* sidxId = new char[SUBINDEX_LEN];
-	char indexId[] = MNCN_POLLRESPONSE_TIMEOUT_OBJECT;
+	string nodeIdStr = IntToHex<unsigned int>(nodeId, 2, "", "");
+	Node& mnNode = NodeCollection::GetNodeColObjectPointer()->GetNodeRef(MN_NODEID);
+	boost::optional<std::string> actualValuePollResponse = mnNode.GetActualValue<string>(0x1F92, this->GetNodeId());
 
-	sidxId = IntToAscii(this->GetNodeId(), sidxId, 16);
-	sidxId = PadLeft(sidxId, '0', 2);
-
-	stErrorInfo = IfSubIndexExists(MN_NODEID, MN, indexId, sidxId, &sidxPos,
-	                               &idxPos);
-	if (OCFM_ERR_SUCCESS != stErrorInfo.getErrorCode())
+	//Set PRes Timeout from 1F92/NodeID MN
+	if (actualValuePollResponse.is_initialized()
+		&& IsDefaultActualNotEqual(GetMNSubIndexValues("1f92", nodeIdStr.c_str())))
 	{
+		presTimeOut = new char[actualValuePollResponse.get().size() + STR_ALLOC_BUFFER];
+		strcpy((char*) presTimeOut, actualValuePollResponse.get().c_str());
+		LOG_DEBUG() << "Actual Value for PollResponse-Timeout (0x1F92) for node " << nodeIdStr << " set to: " << actualValuePollResponse.get();
 		return;
 	}
 
-	char* subIndName = new char[50];
-	subIndName[0] = 0;
+	//No ActualValue for CN PResTimeout exists set the calculated value
+	presTimeOut = new char[strlen(presTimoutVal) + STR_ALLOC_BUFFER];
+	strcpy((char*) presTimeOut, presTimoutVal);
+	LOG_DEBUG() << "Actual Value for PollResponse-Timeout (0x1F92) for node " << nodeIdStr << " set to: " << presTimeOut;
 
-	GetSubIndexAttributes(240, MN, indexId, sidxId, NAME, subIndName);
-	SetBasicSubIndexAttributes(MN_NODEID, MN, indexId, sidxId, presTimoutVal,
-	                           subIndName);
+	//update 1f92 subobject in MN
+	mnNode.SetActualValue<std::string>(0x1f92,this->GetNodeId(), string(presTimoutVal));
 
-	Index* idxObj = NULL;
-	idxObj = GetMNIndexValues(indexId);
-	if (NULL != idxObj)
-	{
-		UpdateNumberOfEnteriesSIdx(idxObj);
-	}
-
-	delete[] subIndName;
 }
 
 bool Node::GetForceCycleFlag()
