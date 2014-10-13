@@ -8253,8 +8253,8 @@ void AddForEachSIdx(char* indexId, IndexCollection* indexCollObj, INT32 nodeId,
 	        || (strcmp("1F8B", indexId) == 0) || (strcmp("1F8D", indexId) == 0)
 	        || (strcmp("1F27", indexId) == 0) || (strcmp("1F84", indexId) == 0))
 	{
-		strcpy(sidxId, "00");
-		exceptionObj = DeleteSubIndex(nodeId, MN, indexId, sidxId);
+		//strcpy(sidxId, "00");
+		//exceptionObj = DeleteSubIndex(nodeId, MN, indexId, sidxId);
 	}
 	else
 	{
