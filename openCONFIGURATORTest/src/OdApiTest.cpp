@@ -359,7 +359,7 @@ void OdApiTest::testSetSubIndexAttribute()
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 	CPPUNIT_ASSERT(getSubIndexValue.compare("") == 0);
 
-	this->retCode = GetSubIndexAttribute(1, 8208, 12, FLAGIFINCDC, getSubIndexValue);
+	this->retCode = GetSubIndexAttribute(1, 8208, 12, FORCETOCDC, getSubIndexValue);
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 	CPPUNIT_ASSERT(getSubIndexValue.compare("0") == 0);
 

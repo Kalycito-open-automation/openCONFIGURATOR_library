@@ -35,15 +35,15 @@
 /**
 ********************************************************************************
 
-\file       NodeApitTest.h
+\file       ProjectFileApiTest.h
 
-\brief      Header of the Node API Unit Tests for the openCONFIGURATOR unit tests
+\brief      Header of the Project File API Unit Tests for the openCONFIGURATOR unit tests
 
 \author     Christoph Ruecker
 
-\date       23.08.2013
+\date       03.11.2014
 
-\since      23.08.2013
+\since      03.11.2014
 
 \version    1.0
 
@@ -59,36 +59,30 @@
 using namespace std;
 using namespace openCONFIGURATOR::Library::ErrorHandling;
 
-class NodeApiTest:
+class ProjectFileApiTest:
 	public CppUnit::TestFixture
 {
 
-		CPPUNIT_TEST_SUITE(NodeApiTest);
-		CPPUNIT_TEST(testAddNode);
-		CPPUNIT_TEST(testDeleteNode);
-		CPPUNIT_TEST(testReplaceXdd);
-		CPPUNIT_TEST(testIsExistingNode);
-		CPPUNIT_TEST(testGetNodeCount);
-		CPPUNIT_TEST(testGetNodeParameter);
-		CPPUNIT_TEST(testSetNodeParameter);
-		CPPUNIT_TEST(testGetNodes);
+		CPPUNIT_TEST_SUITE(ProjectFileApiTest);
+		CPPUNIT_TEST(testAddViewSetting);
+		CPPUNIT_TEST(testDeleteViewSetting);
+		CPPUNIT_TEST(testGetActiveView);
+		CPPUNIT_TEST(testGetViewSetting);
+		CPPUNIT_TEST(testSetActiveView);
 		CPPUNIT_TEST_SUITE_END();
 
 	public:
-		NodeApiTest(void);
-		~NodeApiTest(void);
+		ProjectFileApiTest(void);
+		~ProjectFileApiTest(void);
 
 		void setUp();
 		void tearDown();
 
-		void testAddNode();
-		void testDeleteNode();
-		void testReplaceXdd();
-		void testIsExistingNode();
-		void testGetNodeCount();
-		void testGetNodeParameter();
-		void testSetNodeParameter();
-		void testGetNodes();
+		void testAddViewSetting();
+		void testDeleteViewSetting();
+		void testGetActiveView();
+		void testGetViewSetting();
+		void testSetActiveView();
 
 	private:
 		Result retCode;

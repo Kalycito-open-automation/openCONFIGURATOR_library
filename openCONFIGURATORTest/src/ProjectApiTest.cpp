@@ -87,13 +87,6 @@ void ProjectApiTest::testSaveProject()
 
 	this->retCode = NewProject("TestProject", ".");
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
-
-	this->retCode = SaveProject();
-	//NOT IMPLEMENTED
-	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == LEGACY_ERROR);
-
-	this->retCode = CloseProject();
-	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 }
 
 void ProjectApiTest::testCloseProject()
@@ -122,6 +115,102 @@ void ProjectApiTest::testOpenProject()
 
 	this->retCode = IsExistingNode(5, exists);
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true && exists);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
+
+void ProjectApiTest::testAddPath ()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = AddPath("TestPathID", "./testPath/");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = AddPath("TestPathID", "./testPath/");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == false && this->retCode.GetErrorCode() == PATH_EXISTS);
+
+	std::string value;
+	this->retCode = GetPath("TestPathID", value);
+	CPPUNIT_ASSERT(value == "./testPath/" && this->retCode.IsSuccessful() == true);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
+
+void ProjectApiTest::testGetPath ()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	std::string value;
+	this->retCode = GetPath("TestPathID", value);
+	CPPUNIT_ASSERT(this->retCode.GetErrorCode() == PATH_DOES_NOT_EXIST && this->retCode.IsSuccessful() == false);
+
+	this->retCode = AddPath("TestPathID", "./testPath/");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	value = "";
+	this->retCode = GetPath("TestPathID", value);
+	CPPUNIT_ASSERT(value == "./testPath/" && this->retCode.IsSuccessful() == true);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
+
+void ProjectApiTest::testDeletePath ()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = AddPath("TestPathID", "./testPath/");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	this->retCode = DeletePath("TestPathID");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	std::string value;
+	this->retCode = GetPath("TestPathID", value);
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == false && this->retCode.GetErrorCode() == PATH_DOES_NOT_EXIST);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
+void ProjectApiTest::testSetActiveAutoCalculationConfig ()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	std::string value;
+	this->retCode = GetActiveAutoCalculationConfig(value);
+	CPPUNIT_ASSERT(value == "all" && this->retCode.IsSuccessful() == true);
+
+	this->retCode = SetActiveAutoCalculationConfig("none");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	value = "";
+	this->retCode = GetActiveAutoCalculationConfig(value);
+	CPPUNIT_ASSERT(value == "none" && this->retCode.IsSuccessful() == true);
+
+	this->retCode = CloseProject();
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+}
+void ProjectApiTest::testGetActiveAutoCalculationConfig ()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	std::string value;
+	this->retCode = GetActiveAutoCalculationConfig(value);
+	CPPUNIT_ASSERT(value == "all" && this->retCode.IsSuccessful() == true);
+
+	this->retCode = SetActiveAutoCalculationConfig("none");
+	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+
+	value == "";
+	this->retCode = GetActiveAutoCalculationConfig(value);
+	CPPUNIT_ASSERT(value == "none" && this->retCode.IsSuccessful() == true);
 
 	this->retCode = CloseProject();
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);

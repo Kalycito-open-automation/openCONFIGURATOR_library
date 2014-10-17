@@ -72,8 +72,8 @@ void ImportExportApiTest::testGenerateProcessImageDescription()
 	this->retCode = OpenProject(".\\testProject\\testProject.xml");
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
-	this->retCode = GenerateStackConfiguration(".\\testProject\\output", "mnobd");
-	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
+	//this->retCode = GenerateStackConfiguration(".\\testProject\\output", "mnobd");
+	//CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);
 
 	this->retCode = GenerateProcessImageDescription(C, ".\\testProject\\output", "XAP");
 	CPPUNIT_ASSERT(this->retCode.IsSuccessful() == true);

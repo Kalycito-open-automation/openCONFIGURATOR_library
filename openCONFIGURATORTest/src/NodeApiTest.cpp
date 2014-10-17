@@ -52,6 +52,7 @@
 *******************************************************************************/
 #include "..\Include\NodeApiTest.h"
 using namespace openCONFIGURATOR::Library::API;
+using namespace openCONFIGURATOR::Library::NodeParameter;
 
 CPPUNIT_TEST_SUITE_REGISTRATION(NodeApiTest);
 
@@ -80,7 +81,7 @@ void NodeApiTest::testAddNode()
 }
 void NodeApiTest::testDeleteNode()
 {
-	Result retCode = NewProject("TestProject", ".");
+	this->retCode = NewProject("TestProject", ".");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	retCode = AddNode(12, "Node");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
@@ -97,7 +98,7 @@ void NodeApiTest::testReplaceXdd()
 }
 void NodeApiTest::testIsExistingNode()
 {
-	Result retCode = NewProject("TestProject", ".");
+	this->retCode = NewProject("TestProject", ".");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	retCode = AddNode(12, "Node", "./resources/openPOWERLINK_CN.xdd");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
@@ -108,7 +109,7 @@ void NodeApiTest::testIsExistingNode()
 }
 void NodeApiTest::testGetNodeCount()
 {
-	Result retCode = NewProject("TestProject", ".");
+	this->retCode = NewProject("TestProject", ".");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	retCode = AddNode(1, "Node", "./resources/openPOWERLINK_CN.xdd");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
@@ -124,4 +125,53 @@ void NodeApiTest::testGetNodeCount()
 	CPPUNIT_ASSERT(nodeCount == 5);
 	retCode = CloseProject();
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+}
+void NodeApiTest::testGetNodeParameter()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(1, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	std::string value;
+	retCode = GetNodeParameter(1, NODENAME, value);
+	CPPUNIT_ASSERT(value == "Node" && retCode.IsSuccessful() == true);
+	value = "";
+	retCode = GetNodeParameter(1, STATIONTYPE, value);
+	CPPUNIT_ASSERT(value == "0" && retCode.IsSuccessful() == true);
+	retCode = CloseProject();
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+}
+void NodeApiTest::testSetNodeParameter()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(1, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	std::string value;
+	retCode = SetNodeParameter(1, NODENAME, "TestCN");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = GetNodeParameter(1, NODENAME, value);
+	CPPUNIT_ASSERT(value == "TestCN" && retCode.IsSuccessful() == true);
+	retCode = CloseProject();
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+}
+void NodeApiTest::testGetNodes()
+{
+	this->retCode = NewProject("TestProject", ".");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(1, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(2, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(3, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	retCode = AddNode(4, "Node", "./resources/openPOWERLINK_CN.xdd");
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	std::vector<UINT32> nodes;
+	retCode = GetNodes(nodes);
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+	CPPUNIT_ASSERT(nodes.size() == 5);
+	retCode = CloseProject();
+	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
+
 }

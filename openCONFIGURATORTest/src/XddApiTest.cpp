@@ -55,6 +55,7 @@
 
 using namespace openCONFIGURATOR::Library::API;
 using namespace openCONFIGURATOR::Library::ObjectDictionary::PlkDataType;
+using namespace openCONFIGURATOR::Library::ObjectDictionary::PlkFeature;
 
 CPPUNIT_TEST_SUITE_REGISTRATION(XddApiTest);
 
@@ -75,24 +76,19 @@ void XddApiTest::testGetFeatureValue()
 	this-> retCode = NewProject("TestProject", ".", "./resources/openPOWERLINK_MN.xdd");
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 	string featureValue;
-	retCode = GetFeatureValue(240, MN_FEATURES, "DLLMNPResChaining", featureValue);
+	retCode = GetFeatureValue(240, DLLMNPResChaining, featureValue);
 	CPPUNIT_ASSERT(featureValue.compare("true") == 0);
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 
 	featureValue.clear();
-	retCode = GetFeatureValue(240, GENERAL_FEATURES , "NMTBootTimeNotActive", featureValue);
+	retCode = GetFeatureValue(240, NMTBootTimeNotActive, featureValue);
 	CPPUNIT_ASSERT(featureValue.compare("3000000") == 0);
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
 
 	featureValue.clear();
-	retCode = GetFeatureValue(240, CN_FEATURES , "DLLCNFeatureMultiplex", featureValue);
+	retCode = GetFeatureValue(240, DLLCNFeatureMultiplex, featureValue);
 	CPPUNIT_ASSERT(featureValue.compare("true") == 0);
 	CPPUNIT_ASSERT(retCode.IsSuccessful() == true);
-
-	featureValue.clear();
-	retCode = GetFeatureValue(240, CN_FEATURES , "notexisting", featureValue);
-	CPPUNIT_ASSERT(featureValue.compare("") == 0);
-	CPPUNIT_ASSERT(retCode.GetErrorCode() == FEATURE_VALUE_NOT_FOUND);
 }
 void XddApiTest::testGetDataTypeSize()
 {

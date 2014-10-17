@@ -68,6 +68,11 @@ class ProjectApiTest:
 		CPPUNIT_TEST(testSaveProject);
 		CPPUNIT_TEST(testCloseProject);
 		CPPUNIT_TEST(testOpenProject);
+		CPPUNIT_TEST(testAddPath);
+		CPPUNIT_TEST(testGetPath);
+		CPPUNIT_TEST(testDeletePath);
+		CPPUNIT_TEST(testSetActiveAutoCalculationConfig);
+		CPPUNIT_TEST(testGetActiveAutoCalculationConfig);
 		CPPUNIT_TEST_SUITE_END();
 
 	public:
@@ -81,6 +86,12 @@ class ProjectApiTest:
 		void testSaveProject();
 		void testCloseProject();
 		void testOpenProject();
+
+		void testAddPath();
+		void testGetPath();
+		void testDeletePath();
+		void testSetActiveAutoCalculationConfig();
+		void testGetActiveAutoCalculationConfig();
 
 	private:
 		Result retCode;
