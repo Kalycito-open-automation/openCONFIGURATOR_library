@@ -12126,6 +12126,8 @@ bool IsDefaultActualNotEqual(BaseIndex* baseIndexObj)
 	{
 		if (!CheckIfStringDatatypes(dtObj.dataTypeName))
 		{
+			if(strcmp((char*) baseIndexObj->GetActualValue(), "") == 0)
+				return false;
 			INT32 actualValue = 0;
 			INT32 defaultValue = 0;
 			defaultValue = GetDecimalValue(
