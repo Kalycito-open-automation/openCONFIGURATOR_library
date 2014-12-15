@@ -1446,7 +1446,8 @@ void ProjectConfiguration::WriteCNXDCs(void)
 			//Delete no longer needed configuration files
 			for (list<boost::filesystem::path>::iterator it = xddPathVector.begin() ; it != xddPathVector.end(); ++it)
 			{
-				boost::filesystem::remove(*it);
+				LOG_INFO() << "Unused XDD within deviceImport folder: " << it->generic_string();
+				cout << "Unused XDD within deviceImport folder: " << it->generic_string() << endl;
 			}
 			for (list<boost::filesystem::path>::iterator it = xdcPathVector.begin() ; it != xdcPathVector.end(); ++it)
 			{
