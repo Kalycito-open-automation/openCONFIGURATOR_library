@@ -79,6 +79,21 @@ Module includes the openCONFIGURATOR API functions
 	@defgroup apireturn API return value
 	@{
 		\brief Section describes the %openCONFIGURATOR return class and error code enumeration.
-	@} 
+	@}
 @} 
+*/
+
+
+/** @defgroup projectupgradeapi Project Upgrade API Modules
+Module includes the openCONFIGURATOR Project Upgrade API functions
+@{
+	@defgroup projectupgrade Project upgrade module
+	@{
+		\brief Module handles the conversion of pre v1.4.0 '.oct' project file to the new '.xml' project file format and convert all the '.octx' files to the '.xdc' files.
+	@}
+	@defgroup projectupgradeapireturn API return value
+	@{
+		\brief Section describes the openCONFIGURATOR project upgrade return class and error code enumeration.
+	@}
+@}
 */
