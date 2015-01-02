@@ -83,8 +83,11 @@ ADD_DEFINITIONS(/DBOOST_ALL_DYN_LINK)
 FILE ( GLOB_RECURSE LIB_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp" )
 FILE ( GLOB_RECURSE LIB_HEADERS "${PROJECT_SOURCE_DIR}/Include/*.h" )
 FILE ( GLOB_RECURSE OPENCONF_LIB "${CMAKE_SOURCE_DIR}/openCONFIGURATOR/src/*.cpp")
+FILE ( GLOB_RECURSE OPENCONF_PROJECT_UPGRADE_LIB "${CMAKE_SOURCE_DIR}/openCONFIGURATOR_ProjectUpgrade/LibProjectUpgrade/src/*.cpp")
 
 SOURCE_GROUP(openCONFIGURATOR_src FILES ${OPENCONF_LIB})
+SOURCE_GROUP(openCONFIGURATOR_Project_Upgrade_src FILES ${OPENCONF_PROJECT_UPGRADE_LIB})
+
 ###############################################################################
 # Set library include directories
 ###############################################################################
@@ -93,6 +96,7 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_SOURCE_DIR}/libxml2/include 
 	${CMAKE_SOURCE_DIR}/libxml2/iconv/include
 	${CMAKE_SOURCE_DIR}/openCONFIGURATOR/Include
+	${CMAKE_SOURCE_DIR}/openCONFIGURATOR_ProjectUpgrade/LibProjectUpgrade/include
 	${Boost_INCLUDE_DIRS}
 )
 
@@ -108,7 +112,7 @@ ${Boost_LIBRARY_DIRS}
 ###############################################################################
 # Create openCONFIGURATOR test executable 
 ###############################################################################
-ADD_EXECUTABLE(openCONFIGURATORTest ${LIB_SOURCES} ${LIB_HEADERS} ${OPENCONF_LIB})
+ADD_EXECUTABLE(openCONFIGURATORTest ${LIB_SOURCES} ${LIB_HEADERS} ${OPENCONF_LIB} ${OPENCONF_PROJECT_UPGRADE_LIB})
 
 ###############################################################################
 # Link openCONFIGURATOR test executable to libraries 
