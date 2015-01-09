@@ -1,7 +1,7 @@
 /*******************************************************************************
 * \file   Logging.h
 *
-* \brief  Header file that includes MACROS and function headers used for 
+* \brief  Header file that includes MACROS and function headers used for
 *         generation log during project upgrade.
 *
 * \author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
@@ -40,6 +40,7 @@
 #endif
 
 #include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/file.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(pop) // Restore previous warning state
@@ -49,22 +50,49 @@
 #include <string>
 
 #include "Namespace.h"
+#include "Result.h"
 
 PROJECT_UPGRADE_OPEN_NAMESPACE
 
 const std::string kProjectUpgradeLogFile = "upgrade.log";
 
 /**
- * \brief Initializes the 'fileName' of the log file generated during project upgrade.
- *
- * \param[in] fileName The name of the log file.
+ * \brief The Logging class adds the possibility to generate the logs during
+ * the project upgrade process.
  */
-void InitProjectUpgradeLogging(const std::string & fileName);
+class ProjectUpgradeLogging
+{
+	public:
+		static ProjectUpgradeLogging& GetInstance();
 
-/**
- * \brief Disables all the sinks registered for logging.
- */
-void DisableLogging();
+		/**
+		 * \brief Initializes the 'fileName' of the log file generated during project upgrade.
+		 *
+		 * \note This will enable the Boost.Log core state.
+		 * \param[in] fileName The name of the log file.
+		 *
+		 *  \return Result.
+		 */
+		Result InitProjectUpgradeLogging(const std::string & fileName);
+
+		/**
+		 * \brief Disables the sinks registered for logging by this logger and
+		 * restores the Boost.Log state to its state before InitProjectUpgradeLogging.
+		 *
+		 * \return Result.
+		 */
+		Result DisableProjectUpgradeLogging();
+
+	private:
+		static ProjectUpgradeLogging instance;
+		ProjectUpgradeLogging();
+		ProjectUpgradeLogging(const ProjectUpgradeLogging&);
+		void operator=(const ProjectUpgradeLogging&);
+
+		bool oldStateOfBoostLogger; /**< the state of boost.log.core */
+		boost::shared_ptr< boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend > > logFileSink;
+};
+
 
 // Custom macros for severity logging
 #define LOG_TRACE()\

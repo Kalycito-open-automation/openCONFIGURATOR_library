@@ -76,6 +76,10 @@ namespace ErrorCode
 
 		FILE_SYSTEM_ERROR, /**< File system error. */
 
+		/**< Logging errors */
+		INIT_LOGGING_ERROR,
+		DISABLE_LOGGING_ERROR,
+
 		XDD_TAG_DOES_NOT_EXIST, /**< Specified tag does not exist in the XML */
 
 		NODE_ID_DOES_NOT_EXIST /**< Specified node ID does not exist in the project. */

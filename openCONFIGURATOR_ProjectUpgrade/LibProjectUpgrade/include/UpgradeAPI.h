@@ -94,7 +94,7 @@ namespace API
 	PROJECT_UPGRADE_DLLEXPORT Result ImportProjectFile(const std::string & projectFile);
 
 	/**
-	 * \brief   Upgrade the pre v1.4.0 '.oct' project file to the new '.xml' project file 
+	 * \brief   Upgrade the pre v1.4.0 '.oct' project file to the new '.xml' project file
 	 *          format and convert all the '.octx' files to the '.xdc' files.
 	 *
 	 * \param[in] projectPath Path for the new project.
@@ -108,13 +108,13 @@ namespace API
 	 * \return Result.
 	 */
 	PROJECT_UPGRADE_DLLEXPORT Result GetNewProjectFilePath(std::string & newProjectFilePath);
-	
+
 	/**
 	 * \brief   Resets the project upgrade library to its initial state.
 	 * \return Result.
 	 */
 	PROJECT_UPGRADE_DLLEXPORT Result ResetProjectUpgradeLib();
-	
+
 	/**
 	 * \brief   Deletes the new project folder and its contents and restores the
 	 *          old project to its location.

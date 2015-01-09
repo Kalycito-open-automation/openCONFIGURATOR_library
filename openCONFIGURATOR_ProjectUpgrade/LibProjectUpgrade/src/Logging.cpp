@@ -40,7 +40,6 @@
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/utility/setup/file.hpp>
 #include <boost/log/attributes/clock.hpp>
 
 #ifdef _MSC_VER
@@ -52,33 +51,67 @@
 
 PROJECT_UPGRADE_OPEN_NAMESPACE
 
-void InitProjectUpgradeLogging(const std::string & fileName)
+ProjectUpgradeLogging ProjectUpgradeLogging::instance;
+
+ProjectUpgradeLogging::ProjectUpgradeLogging() : oldStateOfBoostLogger(false)
 {
-	boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
-	boost::log::add_file_log(
-				boost::log::keywords::file_name = fileName,
-				boost::log::keywords::format = "[%TimeStamp%] [%Severity%]	%Message%",
-				boost::log::keywords::auto_flush = true,
-				boost::log::keywords::open_mode = std::ios_base::ate | std::ios::out
-			);
-#ifndef DEBUG
-	boost::log::core::get()->set_filter
-			(
-				boost::log::trivial::severity >= boost::log::trivial::info
-				);
-#endif
 
-	// boost::log::add_common_attributes();
-
-	boost::log::core::get()->add_global_attribute(
-				boost::log::aux::default_attribute_names::timestamp(),
-				boost::log::attributes::local_clock());
 }
 
-void DisableLogging()
+ProjectUpgradeLogging& ProjectUpgradeLogging::GetInstance()
 {
-	boost::log::core::get()->flush();
-	boost::log::core::get()->remove_all_sinks();
+	return ProjectUpgradeLogging::instance;
+}
+
+Result ProjectUpgradeLogging::InitProjectUpgradeLogging(const std::string & fileName)
+{
+	try
+	{
+		ProjectUpgradeLogging::GetInstance().oldStateOfBoostLogger = boost::log::core::get()->get_logging_enabled();
+
+		boost::log::core::get()->set_logging_enabled(true);
+
+		boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
+		ProjectUpgradeLogging::GetInstance().logFileSink = boost::log::add_file_log(
+																boost::log::keywords::file_name = fileName,
+																boost::log::keywords::format = "[%TimeStamp%] [%Severity%]	%Message%",
+																boost::log::keywords::auto_flush = true,
+																boost::log::keywords::open_mode = std::ios_base::ate | std::ios::out
+																);
+	#ifndef DEBUG
+		boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+	#endif
+
+		// boost::log::add_common_attributes();
+
+		boost::log::core::get()->add_global_attribute(
+					boost::log::aux::default_attribute_names::timestamp(),
+					boost::log::attributes::local_clock());
+	}
+	catch (const std::exception& ex)
+	{
+		return Result(ErrorCode::INIT_LOGGING_ERROR, ex.what());
+	}
+	return Result(ErrorCode::SUCCESS);
+}
+
+Result ProjectUpgradeLogging::DisableProjectUpgradeLogging()
+{
+	try
+	{
+		boost::log::core::get()->flush();
+
+		// Remove the project upgrade log sink from the Logging core.
+		boost::log::core::get()->remove_sink(ProjectUpgradeLogging::GetInstance().logFileSink);
+
+		// Reset the logger to its original state.
+		boost::log::core::get()->set_logging_enabled(ProjectUpgradeLogging::GetInstance().oldStateOfBoostLogger);
+	}
+	catch (const std::exception& ex)
+	{
+		return Result(ErrorCode::DISABLE_LOGGING_ERROR, ex.what());
+	}
+	return Result(ErrorCode::SUCCESS);
 }
 
 PROJECT_UPGRADE_CLOSE_NAMESPACE

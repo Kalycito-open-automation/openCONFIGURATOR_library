@@ -256,7 +256,12 @@ Result UpgradeProject(const std::string & newProjectPath)
 
 		const std::string logFile = newProjectPath + kPathSeparator + kProjectUpgradeLogFile ;
 
-		InitProjectUpgradeLogging(logFile);
+		retVal = ProjectUpgradeLogging::GetInstance().InitProjectUpgradeLogging(logFile);
+		if (!retVal.IsSuccessful())
+		{
+			LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
+			return retVal;
+		}
 
 		LOG_INFO() << "The old project has been moved to a new location: " << ProjectConfiguration::GetInstance().GetOctProjectPath().generic_string() << std::endl;
 		LOG_INFO() << "Creating new project in the location: " << newProjectPath;
@@ -265,7 +270,7 @@ Result UpgradeProject(const std::string & newProjectPath)
 		if (!retVal.IsSuccessful())
 		{
 			LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
-			DisableLogging();
+			ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 			return retVal;
 		}
 
@@ -273,7 +278,7 @@ Result UpgradeProject(const std::string & newProjectPath)
 		if (!retVal.IsSuccessful())
 		{
 			LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
-			DisableLogging();
+			ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 			return retVal;
 		}
 
@@ -281,7 +286,7 @@ Result UpgradeProject(const std::string & newProjectPath)
 		if (!retVal.IsSuccessful())
 		{
 			LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
-			DisableLogging();
+			ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 			return retVal;
 		}
 
@@ -292,7 +297,7 @@ Result UpgradeProject(const std::string & newProjectPath)
 		if (!retVal.IsSuccessful())
 		{
 			LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
-			DisableLogging();
+			ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 			return retVal;
 		}
 	}
@@ -300,18 +305,18 @@ Result UpgradeProject(const std::string & newProjectPath)
 	{
 		Result retVal = Result(ErrorCode::UNHANDLED_EXCEPTION, ex.what());
 		LOG_FATAL() << "ErrorCode: " << retVal.GetErrorCode() << "	" << retVal.GetErrorString();
-		DisableLogging();
+		ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 		return retVal;
 	}
 	catch (Result & ex)
 	{
 		LOG_FATAL() << "ErrorCode: " << ex.GetErrorCode() << "	" << ex.GetErrorString();
-		DisableLogging();
+		ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 		return ex;
 	}
 
 	LOG_INFO() << "The project " << ProjectConfiguration::GetInstance().GetProjectName() << " has been upgraded successfully.";
-	DisableLogging();
+	ProjectUpgradeLogging::GetInstance().DisableProjectUpgradeLogging();
 	return Result(ErrorCode::SUCCESS);
 }
 

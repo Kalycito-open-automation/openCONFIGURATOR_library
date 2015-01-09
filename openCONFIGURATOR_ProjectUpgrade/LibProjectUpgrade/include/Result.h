@@ -1,12 +1,12 @@
 /*******************************************************************************
 * \file   Result.h
 *
-* \brief  Header file that includes functions to retrieve the result of a 
+* \brief  Header file that includes functions to retrieve the result of a
 *         function execution.
 *
 *    This class is meant to be used as the return type of a function which needs
 *    to return error codes and error context information (like an error message).
-*    Furthermore, this class shall be used as return type for all API functions 
+*    Furthermore, this class shall be used as return type for all API functions
 *    that return error codes.
 *
 * \author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
