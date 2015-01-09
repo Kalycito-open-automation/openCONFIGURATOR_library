@@ -806,6 +806,14 @@ Result ProjectConfiguration::ImportAllXddFiles()
 													 + kPathSeparator
 													 + localPathXddFile.generic_string());
 
+					if (boost::filesystem::exists(xdd_file))
+					{
+						LOG_WARN() << "Node ID:" << nodeObj.GetNodeId()
+								   << ". The node configuration:" << inputXddPath.generic_string()
+								   << " will be overwritten on the already available configuration."
+								   << xdd_file.generic_string();
+					}
+
 					boost::filesystem::copy_file(inputXddPath, xdd_file, boost::filesystem::copy_option::overwrite_if_exists);
 
 					nodeObj.SetXddPath(localPathXddFile);
@@ -884,6 +892,7 @@ Result ProjectConfiguration::ImportAllConfigurationsFromDeviceImportDir()
 				boost::filesystem::path xdcFileLocalPath(kNewProjectDeviceConfigurationDir
 														 + kPathSeparator
 														 + importedXdd.stem().string()
+														 + "_" + boost::lexical_cast<std::string>(nodeId)
 														 + ".xdc");
 				boost::filesystem::path xdc_file(GetNewProjectPath().generic_string()
 												 + kPathSeparator
